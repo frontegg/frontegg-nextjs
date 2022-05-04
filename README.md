@@ -78,7 +78,7 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
     export { FronteggRouter as default, FronteggRouterProps as getServerSideProps } from '@frontegg/nextjs';
    ```
 
-## Get Started
+## Getting Started
 
 ### Create Frontegg worksapce
 
