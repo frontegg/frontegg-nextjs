@@ -1,94 +1,69 @@
 
+![alt text](./logo.png)
 
-# FronteggNextjs
+Frontegg is a web platform where SaaS companies can set up their fully managed, scalable and brand aware - SaaS features
+and integrate them into their SaaS portals in up to 5 lines of code.
 
-This project was generated using [Nx](https://nx.dev).
+## BREAKING CHANGES SINCE VERSION 3.0.0
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+### The new @frontegg/react uses AdminPortal and LoginBox instead of multiple components.
 
-🔎 **Smart, Fast and Extensible Build System**
+## Installation
 
-## Adding capabilities to your workspace
+Use the package manager [npm](https://www.npmjs.com/) to install frontegg React.JS library.
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+```bash
+npm install @frontegg/react
+```
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+## Configuration
 
-Below are our core plugins:
+Wrap your application with `Frontegg Provider`:
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+```js
+import { FronteggProvider } from '@frontegg/react'
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+const contextOptions = {
+  baseUrl: 'https://{HOST}.frontegg.com', // Your backend base URL (frontegg will direct the requests to it)
+}
 
-## Generate an application
+export const App = () => {
+  return <FronteggProvider contextOptions={contextOptions}>
+    {/*...*/}
+  </FronteggProvider>
+}
 
-Run `nx g @nrwl/react:app my-app` to generate an application.
+```
 
-> You can use any of the plugins above to generate applications as well.
+### Usage
 
-When using Nx, you can create multiple applications and libraries in the same workspace.
+You can use React Hooks to access Frontegg store.
 
-## Generate a library
+```js
+import { useAuthUser } from '@frontegg/react'
 
-Run `nx g @nrwl/react:lib my-lib` to generate a library.
+const HomePage = () => {
+  const user = useAuthUser();
 
-> You can also use any of the plugins above to generate libraries as well.
+  return <div>
+    Logged In user: {user.email}
+  </div>
+}
+```
 
-Libraries are shareable across libraries and applications. They can be imported from `@frontegg-nextjs/mylib`.
+Opening the Admin Portal is available via the following code snippet.
 
-## Development server
+```js
+import { AdminPortal } from '@frontegg/react'
 
-Run `nx serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
+const Toolbar = () => {
 
-## Code scaffolding
+  return <nav>
+    {/*... your application tabs ...*/}
 
-Run `nx g @nrwl/react:component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `nx build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `nx test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `nx e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev) to learn more.
-
-
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+    <button onClick={() => AdminPortal.show()}>
+      Open Admin Portal
+    </button>
+  </nav>
+}
+```

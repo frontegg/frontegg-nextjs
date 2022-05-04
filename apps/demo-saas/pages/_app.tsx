@@ -1,18 +1,12 @@
 import { AppProps } from 'next/app';
-import Head from 'next/head';
-import './styles.css';
+import { FronteggProvider, withFronteggApp } from '@frontegg/nextjs';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return (
-    <>
-      <Head>
-        <title>Welcome to demo-saas!</title>
-      </Head>
-      <main className="app">
-        <Component {...pageProps} />
-      </main>
-    </>
+    <FronteggProvider {...pageProps}>
+      <Component {...pageProps} />
+    </FronteggProvider>
   );
 }
 
-export default CustomApp;
+export default withFronteggApp(CustomApp);

@@ -2,6 +2,6 @@
   "version": 2,
   "projects": {
     "demo-saas": "apps/demo-saas",
-    "demo-saas-e2e": "apps/demo-saas-e2e"
+    "nextjs": "libs/nextjs"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "frontegg-nextjs",
+  "name": "frontegg",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -7,6 +7,10 @@
     "build": "nx build",
     "test": "nx test"
   },
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
   "private": true,
   "dependencies": {
     "@nrwl/next": "14.0.5",
@@ -26,6 +30,8 @@
     "@nrwl/react": "14.0.5",
     "@nrwl/web": "14.0.5",
     "@nrwl/workspace": "14.0.5",
+    "@swc/core": "^1.2.177",
+    "@swc/jest": "0.2.20",
     "@testing-library/react": "13.1.1",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.7",
