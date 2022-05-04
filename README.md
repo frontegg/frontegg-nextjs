@@ -13,6 +13,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
     - [Setup environment](#setup-environment)
 - [Documentation](#documentation)
     - [API Reference](#api-reference)
+    - [Frontegg Provider Options](#frontegg-provider-options)
     - [getSession](#getsession)
     - [withSSRSession](#withssrsession)
     - for more [visit](https://docs.frontegg.com/docs/self-service-introduction)
@@ -123,6 +124,27 @@ FRONTEGG_COOKIE_NAME='fe_session'
 ### API Reference
 
 Visit [Frontegg Docs](https://docs.frontegg.com) for the full documentation.
+
+### Frontegg Provider Options
+
+Pass seconds argument to `withFronteggApp` function in `_app.ts` file to customize
+Frontegg library.
+
+```tsx
+    // ./pages/_app.tsx
+   
+    import { withFronteggApp } from '@frontegg/nextjs';
+    
+    function CustomApp({Component, pageProps}: AppProps){
+      return <Component {...pageProps}/>
+    }
+
+    export default withFronteggApp(CustomApp, {
+      /**
+       * Frontegg options for customizations
+       */
+    });
+   ```
 
 ### getSession
 
