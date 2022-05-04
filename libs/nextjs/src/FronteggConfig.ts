@@ -1,4 +1,5 @@
 import { importJWK, KeyLike } from 'jose';
+import { AuthPageRoutes, authInitialState } from '@frontegg/redux-store';
 
 export type PasswordsMap = { [id: string]: string };
 export type Password = string | PasswordsMap;
@@ -13,6 +14,7 @@ class FronteggConfig {
   private _jwtPublicKey: KeyLike | Uint8Array | undefined;
   private readonly _passwordsAsMap: PasswordsMap;
   private readonly _clientId: string;
+  public authRoutes: Partial<AuthPageRoutes> = {};
 
   constructor() {
     this._cookieName = process.env['FRONTEGG_COOKIE_NAME'] ?? 'frontegg-session';

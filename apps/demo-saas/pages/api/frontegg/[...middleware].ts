@@ -1,3 +1,1 @@
-import { fronteggMiddleware } from '@frontegg/nextjs';
-
-export default fronteggMiddleware;
+export { fronteggMiddleware as default } from '@frontegg/nextjs';

@@ -17,6 +17,7 @@
         "external": [
           "@frontegg/admin-portal",
           "@frontegg/react-hooks",
+          "@frontegg/redux-store",
           "@frontegg/rest-api",
           "@frontegg/types",
           "react/jsx-runtime",
