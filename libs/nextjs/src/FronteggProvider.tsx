@@ -1,7 +1,7 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { initialize, AppHolder } from '@frontegg/admin-portal';
 import { FronteggAppOptions } from '@frontegg/types';
-import { FronteggStoreProvider } from '@frontegg/react-hooks';
+import { FronteggStoreProvider, useAuthActions, useAuthUserOrNull } from '@frontegg/react-hooks';
 import { ContextHolder, RedirectOptions, fronteggAuthApiRoutes } from '@frontegg/rest-api';
 import { NextRouter, useRouter } from 'next/router';
 import { FronteggNextJSSession } from './types';
@@ -52,7 +52,7 @@ export const Connector: FC<ConnectorProps> = ({ router, appName, ...props }) => 
       },
       clientId: props.envClientId,
     }),
-    [props.contextOptions]
+    [ props.contextOptions ]
   );
 
   const app = useMemo(() => {
@@ -75,22 +75,36 @@ export const Connector: FC<ConnectorProps> = ({ router, appName, ...props }) => 
       );
     }
     return createdApp;
-  }, [onRedirectTo]);
+  }, [ onRedirectTo ]);
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     app.store.dispatch({ type: 'auth/requestAuthorizeSSR', payload: props.session?.accessToken });
-  }, [app]);
+  }, [ app ]);
   return <FronteggStoreProvider {...({ ...props, app } as any)}>{props.children}</FronteggStoreProvider>;
 };
 
+const ExpireInListener = () => {
+  const user = useAuthUserOrNull()
+  const actions = useAuthActions()
+  useEffect(() => {
+    if (user && user?.expiresIn == null) {
+      actions.setUser({
+        ...user,
+        expiresIn: Math.floor((((user as any)['exp'] * 1000) - Date.now()) / 1000)
+      });
+    }
+  }, [ actions, user ])
+  return <></>
+}
 const FronteggNextJSProvider: FC<FronteggProviderProps> = (props) => {
   const router = useRouter();
 
   return (
     <Connector {...props} router={router}>
+      <ExpireInListener/>
       {props.children}
     </Connector>
   );

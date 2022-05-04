@@ -16,6 +16,7 @@ export async function getSession(req: IncomingMessage): Promise<FronteggNextJSSe
     const jwt: string = await unsealData(sealFromCookies, { password: fronteggConfig.passwordsAsMap });
     const publicKey = await fronteggConfig.getJwtPublicKey();
     const { payload }: any = await jwtVerify(jwt, publicKey);
+
     const session: FronteggNextJSSession = {
       accessToken: jwt,
       user: payload,
@@ -30,11 +31,9 @@ export async function getSession(req: IncomingMessage): Promise<FronteggNextJSSe
   }
 }
 
-export function withSSRSession<
-  P extends { [key: string]: any } = { [key: string]: any },
+export function withSSRSession<P extends { [key: string]: any } = { [key: string]: any },
   Q extends ParsedUrlQuery = ParsedUrlQuery,
-  D extends PreviewData = PreviewData
->(
+  D extends PreviewData = PreviewData>(
   handler: (
     context: GetServerSidePropsContext<Q>,
     session: FronteggNextJSSession

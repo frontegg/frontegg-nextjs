@@ -1,4 +1,3 @@
-
 ![alt text](./logo.png)
 
 Frontegg is a web platform where SaaS companies can set up their fully managed, scalable and brand aware - SaaS features
@@ -10,11 +9,13 @@ and integrate them into their SaaS portals in up to 5 lines of code.
     - [Create new NextJS project](#create-new-nextjs-project)
     - [Add to existing project](#add-to-existing-project)
 - [Getting Started](#getting-started)
-    - [Create Frontegg worksapce](#create-workspace)
+    - [Create Frontegg worksapce](#create-frontegg-worksapce)
     - [Setup environment](#setup-environment)
-    - [Setup environment](#setup-environment)
-      
-
+- [Documentation](#documentation)
+    - [API Reference](#api-reference)
+    - [getSession](#getsession)
+    - [withSSRSession](#withssrsession)
+    - for more [visit](https://docs.frontegg.com/docs/self-service-introduction)
 
 ## Installation
 
@@ -25,7 +26,9 @@ To start a new Create Next App project with TypeScript, you can run:
 ```bash
   npx create-next-app --example https://github.com/frontegg/frontegg-nextjs --example-path apps/example my-nextjs-app-name 
 ```
+
 or
+
 ```bash
   yarn create next-app --example https://github.com/frontegg/frontegg-nextjs --example-path apps/example my-nextjs-app-name
 ```
@@ -33,7 +36,6 @@ or
 > If you've previously installed `create-react-app` globally via `npm install -g create-next-app`, we recommend you uninstall the package using `npm uninstall -g create-next-app` or `yarn global remove create-next-app` to ensure that `npx` always uses the latest version.
 >
 > Global installations of `create-next-app` are no longer supported.
-
 
 ### Add to existing project
 
@@ -43,7 +45,7 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
     ```bash
       npm install --save @frontegg/nextjs 
     ```
-    or
+   or
     ```bash
       yarn add --save @frontegg/nextjs
     ```
@@ -75,3 +77,107 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
     export { FronteggRouter as default, FronteggRouterProps as getServerSideProps } from '@frontegg/nextjs';
    ```
 
+## Get Started
+
+### Create Frontegg worksapce
+
+Navigate to ![Frontegg Portal Settgins](https://portal.frontegg.com/development/settings), If you don't have application
+follow integration steps after signing up.
+
+Next, configure the "Allowed Origins" in your application under "Domain" tab of the "Settings" page :
+
+- http://localhost:3000 // for development environments
+- https://my-company-domain.com // for production environments
+
+Copy ClientID, Frontegg Domain from "Settings" page, You'll need these values in the next step.
+
+### Setup environment
+
+To setup your Next.js application to communicate with Frontegg, you have to create a new file named `.env.local` under
+your root project directory, this file will be used to store environment variables that will be used, configuration
+options:
+
+```dotenv
+# The AppUrl is to tell Frontegg your application hostname
+FRONTEGG_APP_URL='http://localhost:3000'
+
+# The Frontegg domain is your unique URL to connect to the Frontegg gateway
+FRONTEGG_BASE_URL='https://{YOUR_SUB_DOMAIN}.frontegg.com'
+
+# Your Frontegg application's Client ID
+FRONTEGG_CLIENT_ID='{YOUR_APPLICATION_CLIENT_ID}'
+
+# The statless session encruption password, used to encrypt
+# jwt before sending it to the client side.
+# 
+# For quick password generation use the following command:
+#    node -e "console.log(crypto.randomBytes(32).toString('hex'))"
+FRONTEGG_ENCRYPTION_PASSWORD='{YOUR_APPLICATION_CLIENT_ID}'
+
+# The statless session cookie name
+FRONTEGG_COOKIE_NAME='fe_session'
+```
+
+## Documentation
+
+### API Reference
+
+Visit [Frontegg Docs](https://docs.frontegg.com) for the full documentation.
+
+### getSession
+
+For any pages that required AccessToken in Server Side, you can use:
+
+```tsx
+import { GetServerSideProps } from 'next'
+import { getSession } from '@frontegg/nextjs';
+
+export default function MyPage({ products }) {
+  return <div>
+    <h1>My Page</h1>
+    {products}
+  </div>
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context.req);
+  if (session) {
+    const { data } = await fetch('{external}/product', {
+      headers: {
+        Authorization: 'bearer ' + session.accesstoken
+      }
+    })
+    return { props: { products: data } }
+  }
+
+  return { props: { products: [] } }
+}
+```
+
+### withSSRSession
+
+withSSRSession HOC can be used to automatic redirect users to login screen if not logged in:
+
+```tsx
+import { GetServerSideProps } from 'next'
+import { withSSRSession } from '@frontegg/nextjs';
+
+export default function MyPage({ products }) {
+  return <div>
+    <h1>My Page</h1>
+    {products}
+  </div>
+}
+
+export const getServerSideProps: GetServerSideProps = withSSRSession(async (context, session) => {
+  const { data } = await fetch('{external}/product', {
+    headers: {
+      Authorization: 'bearer ' + session.accesstoken
+    }
+  })
+  return { props: { products: data } }
+});
+```
+
+
+ 

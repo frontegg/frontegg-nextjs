@@ -17,10 +17,10 @@ class FronteggConfig {
   public authRoutes: Partial<AuthPageRoutes> = {};
 
   constructor() {
-    this._cookieName = process.env['FRONTEGG_COOKIE_NAME'] ?? 'frontegg-session';
+    this._clientId = process.env['FRONTEGG_CLIENT_ID'] ?? '';
+    this._cookieName = process.env['FRONTEGG_COOKIE_NAME'] ?? `fe_session`;
     this._password = process.env['FRONTEGG_ENCRYPTION_PASSWORD'] ?? '';
     this._passwordsAsMap = normalizeStringPasswordToMap(this._password);
-    this._clientId = process.env['FRONTEGG_CLIENT_ID'] ?? '';
   }
 
   get cookieName(): string {

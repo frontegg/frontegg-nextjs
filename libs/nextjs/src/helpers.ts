@@ -132,6 +132,7 @@ export async function createSessionFromAccessToken(output: string): Promise<[ st
   try {
     const { accessToken } = JSON.parse(output);
     const decodedJwt: any = decodeJwt(accessToken);
+    decodedJwt.expiresIn = Math.floor(((decodedJwt.exp * 1000) - Date.now()) / 1000);
     const session = await sealData(accessToken, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
