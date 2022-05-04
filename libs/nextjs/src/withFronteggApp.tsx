@@ -22,31 +22,26 @@ export const withFronteggApp = (
   ): Promise<AppInitialProps> => {
     const { ctx, Component } = appContext;
 
-    if (!process.env['FRONTEGG_APP_URL']) {
-      throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_APP_URL')
-    }
-    if (!process.env['FRONTEGG_BASE_URL']) {
-      throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_BASE_URL')
-    }
-    if (!process.env['FRONTEGG_CLIENT_ID']) {
-      throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_CLIENT_ID')
-    }
-
-    const envData = {
-      envAppUrl: process.env['FRONTEGG_APP_URL'],
-      envBaseUrl: process.env['FRONTEGG_BASE_URL'],
-      envClientId: process.env['FRONTEGG_CLIENT_ID'],
-    }
-
     if (ctx.req?.url?.indexOf('/_next/data/') === -1) {
       const session = await refreshToken(ctx);
       appContext.session = session;
+      if (!process.env['FRONTEGG_APP_URL']) {
+        throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_APP_URL')
+      }
+      if (!process.env['FRONTEGG_BASE_URL']) {
+        throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_BASE_URL')
+      }
+      if (!process.env['FRONTEGG_CLIENT_ID']) {
+        throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_CLIENT_ID')
+      }
       return {
         pageProps: {
           ...(originalGetInitialProps ? await originalGetInitialProps(appContext) : {}),
           ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
           session,
-          ...envData
+          envAppUrl: process.env['FRONTEGG_APP_URL'],
+          envBaseUrl: process.env['FRONTEGG_BASE_URL'],
+          envClientId: process.env['FRONTEGG_CLIENT_ID'],
         },
       };
     } else {
@@ -55,7 +50,6 @@ export const withFronteggApp = (
         pageProps: {
           ...(originalGetInitialProps ? await originalGetInitialProps(appContext) : {}),
           ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
-          ...envData
         },
       };
     }

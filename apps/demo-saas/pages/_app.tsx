@@ -7,4 +7,10 @@ function CustomApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default withFronteggApp(CustomApp);
+export default withFronteggApp(CustomApp, {
+  authOptions:{
+    routes:{
+      signUpUrl:'/signup'
+    }
+  }
+});

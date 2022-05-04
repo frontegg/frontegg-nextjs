@@ -7,18 +7,18 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 ## Table of Contents
 
 - [Installation](#installation)
-    - [Create new NextJs project](#new-project)
-    - [Add to your existing project](#existing-project)
+    - [Create new NextJS project](#create-new-nextjs-project)
+    - [Add to existing project](#add-to-existing-project)
 - [Getting Started](#getting-started)
     - [Create Frontegg worksapce](#create-workspace)
     - [Setup environment](#setup-environment)
     - [Setup environment](#setup-environment)
-
+      
 
 
 ## Installation
 
-### Create new NextJs project
+### Create new NextJS project
 
 To start a new Create Next App project with TypeScript, you can run:
 
@@ -35,7 +35,7 @@ or
 > Global installations of `create-next-app` are no longer supported.
 
 
-### Add to your existing project
+### Add to existing project
 
 To Add Frontegg to your existing Nextjs project, follow below steps:
 
@@ -61,17 +61,17 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
     export default withFronteggApp(CustomApp);
    ```
 
-3. Create files for frontegg middleware under `./pages/api/frontegg/[...middleware].ts`:
+3. Create files for frontegg middleware under `./pages/api/frontegg/[...frontegg-middleware].ts`:
    ```tsx
-    // ./pages/api/frontegg/[...middleware].ts
+    // ./pages/api/frontegg/[...frontegg-middleware].ts
     
     export { fronteggMiddleware as default } from '@frontegg/nextjs';
    ```
 
-4. Create placeholder pages for frontegg router under `./pages/account/[...frontegg-router].tsx`:
+4. Create placeholder pages for frontegg router under `./pages/[...frontegg-router].tsx`:
    ```tsx
-    // ./pages/account/[...frontegg-router].tsx
+    // ./pages/[...frontegg-router].tsx
     
-    export { fronteggRouter as default } from '@frontegg/nextjs';
+    export { FronteggRouter as default, FronteggRouterProps as getServerSideProps } from '@frontegg/nextjs';
    ```
 
