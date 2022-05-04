@@ -82,7 +82,7 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
 
 ### Create Frontegg worksapce
 
-Navigate to ![Frontegg Portal Settgins](https://portal.frontegg.com/development/settings), If you don't have application
+Navigate to [Frontegg Portal Settgins](https://portal.frontegg.com/development/settings), If you don't have application
 follow integration steps after signing up.
 
 Next, configure the "Allowed Origins" in your application under "Domain" tab of the "Settings" page :
