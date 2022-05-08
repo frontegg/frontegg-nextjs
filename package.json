@@ -5,7 +5,8 @@
   "scripts": {
     "start": "nx serve",
     "build": "nx build nextjs",
-    "test": "nx test"
+    "test": "nx test",
+    "increment-version": "node scripts/increment-version.js"
   },
   "workspaces": [
     "apps/*",
