@@ -18,11 +18,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: '0'
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: 'https://npm.pkg.github.com'
       - name: Git Identity
         run: |
           git config --global user.name 'github-actions[bot]'
@@ -30,82 +25,83 @@ jobs:
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Dependencies
-        run: yarn install
-      - name: Run Components Test
-        run: nx build nextjs
-#      - name: Set Current Version
-#        id: set_current_version
-#        if: startsWith(github.event.pull_request.title, 'v')
-#        shell: bash -ex {0}
-#        run: |
-#          CURRENT_VERSION=$(node -p 'require("./lerna.json").version')
-#          echo "::set-output name=CURRENT_VERSION::${CURRENT_VERSION}"
-#      - name: Tag Check
-#        id: tag_check
-#        shell: bash -ex {0}
-#        run: |
-#          GET_API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/git/ref/tags/v${{ steps.set_current_version.outputs.CURRENT_VERSION }}"
-#          http_status_code=$(curl -LI $GET_API_URL -o /dev/null -w '%{http_code}\n' -s \
-#            -H "Authorization: token ${GITHUB_TOKEN}")
-#          if [ "$http_status_code" -ne "404" ] ; then
-#            echo "::set-output name=exists_tag::true"
-#          else
-#            echo "::set-output name=exists_tag::false"
-#          fi
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      - name: Create Git Tag
-#        if: steps.tag_check.outputs.exists_tag == 'false'
-#        uses: azu/action-package-version-to-git-tag@v1
-#        with:
-#          version: ${{ steps.set_current_version.outputs.CURRENT_VERSION }}
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          github_repo: ${{ github.repository }}
-#          git_commit_sha: ${{ github.sha }}
-#          git_tag_prefix: 'v'
-#      - name: Create Release
-#        id: create_release
-#        if: steps.tag_check.outputs.exists_tag == 'false'
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: v${{ steps.set_current_version.outputs.CURRENT_VERSION }}
-#          release_name: ${{ github.event.pull_request.title }}
-#          body: |
-#            ${{ github.event.pull_request.body }}
-#          draft: false
-#          prerelease: false
-#      - name: Authenticate with Registry
-#        run: |
-#          yarn logout
-#          echo "init-author-name=Frontegg LTD" > .npmrc
-#          echo "init-author-email=hello@frontegg.com" >> .npmrc
-#          echo "init-author-url=https://frontegg.com" >> .npmrc
-#          echo "init-license=MIT" >> .npmrc
-#          echo "always-auth=true" >> .npmrc
-#          echo "registry=https://registry.npmjs.org" >> .npmrc
-#          echo "_authToken=$NPM_TOKEN" >> .npmrc
-#          echo "@frontegg:registry=https://registry.npmjs.org" >> .npmrc
-#          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-#          npm whoami
-#        env:
-#          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-#      - name: Publish
-#        run: |
-#          make move-package-json-to-dist
-#          make publish-packages
-#        env:
-#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-#      - uses: actions/github-script@0.8.0
-#        with:
-#          github-token: ${{secrets.GITHUB_TOKEN}}
-#          script: |
-#            github.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: 'https://github.com/${{ github.repository }}/releases/tag/v${{ steps.set_current_version.outputs.CURRENT_VERSION }} is released 🎉'
-#            })
+      - name: Install Dependencies and Build Packages
+        run: |
+          yarn install
+          yarn build
+      - name: Set Current Version
+        id: set_current_version
+        if: startsWith(github.event.pull_request.title, 'v')
+        shell: bash -ex {0}
+        run: |
+          CURRENT_VERSION=$(node -p 'require("./libs/nextjs/package.json").version')
+          echo "::set-output name=CURRENT_VERSION::${CURRENT_VERSION}"
+      - name: Tag Check
+        id: tag_check
+        shell: bash -ex {0}
+        run: |
+          GET_API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/git/ref/tags/v${{ steps.set_current_version.outputs.CURRENT_VERSION }}"
+          http_status_code=$(curl -LI $GET_API_URL -o /dev/null -w '%{http_code}\n' -s \
+            -H "Authorization: token ${GITHUB_TOKEN}")
+          if [ "$http_status_code" -ne "404" ] ; then
+            echo "::set-output name=exists_tag::true"
+          else
+            echo "::set-output name=exists_tag::false"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Git Tag
+        if: steps.tag_check.outputs.exists_tag == 'false'
+        uses: azu/action-package-version-to-git-tag@v1
+        with:
+          version: ${{ steps.set_current_version.outputs.CURRENT_VERSION }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_repo: ${{ github.repository }}
+          git_commit_sha: ${{ github.sha }}
+          git_tag_prefix: 'v'
+      - name: Create Release
+        id: create_release
+        if: steps.tag_check.outputs.exists_tag == 'false'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.set_current_version.outputs.CURRENT_VERSION }}
+          release_name: ${{ github.event.pull_request.title }}
+          body: |
+            ${{ github.event.pull_request.body }}
+          draft: false
+          prerelease: false
+      - name: Authenticate with Registry
+        run: |
+          yarn logout
+          echo "init-author-name=Frontegg LTD" > .npmrc
+          echo "init-author-email=hello@frontegg.com" >> .npmrc
+          echo "init-author-url=https://frontegg.com" >> .npmrc
+          echo "init-license=MIT" >> .npmrc
+          echo "always-auth=true" >> .npmrc
+          echo "registry=https://registry.npmjs.org" >> .npmrc
+          echo "_authToken=$NPM_TOKEN" >> .npmrc
+          echo "@frontegg:registry=https://registry.npmjs.org" >> .npmrc
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+          npm whoami
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      - name: Publish
+        run: |
+          cp .npmrc ./dist/libs/nextjs/
+          cp .npmignore ./dist/libs/nextjs/
+          cd ./dist/libs/nextjs && npm publish --tag latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+      - uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'https://github.com/${{ github.repository }}/releases/tag/v${{ steps.set_current_version.outputs.CURRENT_VERSION }} is released 🎉'
+            })

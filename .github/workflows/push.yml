@@ -19,6 +19,4 @@ jobs:
       - name: Install Dependencies
         run: yarn install
       - name: Build NextJS Package
-        run: nx build nextjs
-      - name: Build Demo-SaaS for testing
-        run: nx build demo-saas
+        run: yarn build
