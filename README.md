@@ -113,7 +113,7 @@ FRONTEGG_CLIENT_ID='{YOUR_APPLICATION_CLIENT_ID}'
 # 
 # For quick password generation use the following command:
 #    node -e "console.log(crypto.randomBytes(32).toString('hex'))"
-FRONTEGG_ENCRYPTION_PASSWORD='{YOUR_APPLICATION_CLIENT_ID}'
+FRONTEGG_ENCRYPTION_PASSWORD='{SESSION_ENCRYPTION_PASSWORD}'
 
 # The statless session cookie name
 FRONTEGG_COOKIE_NAME='fe_session'
@@ -166,7 +166,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     const { data } = await fetch('{external}/product', {
       headers: {
-        Authorization: 'bearer ' + session.accesstoken
+        Authorization: 'bearer ' + session.accessToken
       }
     })
     return { props: { products: data } }
@@ -194,7 +194,7 @@ export default function MyPage({ products }) {
 export const getServerSideProps: GetServerSideProps = withSSRSession(async (context, session) => {
   const { data } = await fetch('{external}/product', {
     headers: {
-      Authorization: 'bearer ' + session.accesstoken
+      Authorization: 'bearer ' + session.accessToken
     }
   })
   return { props: { products: data } }
