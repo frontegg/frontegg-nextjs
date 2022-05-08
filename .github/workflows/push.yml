@@ -1,0 +1,24 @@
+name: Push Workflow
+on:
+  # When after commit pushed to branches not master nad release/next
+  push:
+    branches-ignore:
+      - 'master'
+      - 'release/next'
+env:
+  CI: true
+jobs:
+  init:
+    name: 'Install, Build and Test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build NextJS Package
+        run: nx build nextjs
+      - name: Build Demo-SaaS for testing
+        run: nx build demo-saas

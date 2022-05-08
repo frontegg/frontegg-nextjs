@@ -1,7 +1,7 @@
 {
   "npmScope": "@frontegg",
   "affected": {
-    "defaultBase": "main"
+    "defaultBase": "master"
   },
   "cli": {
     "defaultCollection": "@nrwl/next"

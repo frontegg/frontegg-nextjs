@@ -1,6 +1,6 @@
 export * from './FronteggProvider';
 export * from './AuthorizedContent';
-export {default as FronteggConfig} from './FronteggConfig';
+export { default as FronteggConfig } from './FronteggConfig';
 export * from './FronteggRouter';
 export * from './withFronteggApp';
 export * from './session';

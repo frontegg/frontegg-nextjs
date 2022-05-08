@@ -3,15 +3,18 @@ import { authInitialState } from '@frontegg/redux-store';
 import { parse } from 'url';
 
 export function FronteggRouter() {
-  return ''
+  return '';
 }
 
 export function FronteggRouterProps(context: any) {
   const routesObj = {
     ...authInitialState.routes,
-    ...FronteggConfig.authRoutes
+    ...FronteggConfig.authRoutes,
   };
-  const routesArr: string[] = Object.keys(routesObj).reduce((p: string[], key: string) => [ ...p, (routesObj as any)[key] ], []);
+  const routesArr: string[] = Object.keys(routesObj).reduce(
+    (p: string[], key: string) => [...p, (routesObj as any)[key]],
+    []
+  );
 
   let { pathname } = parse(context.req.url, true);
   if (!pathname || pathname.startsWith('/_next/data')) {
@@ -21,6 +24,6 @@ export function FronteggRouterProps(context: any) {
   const notFound = routesArr.indexOf(pathname as string) === -1;
   return {
     notFound,
-    props: {}
+    props: {},
   };
 }

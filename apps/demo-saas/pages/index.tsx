@@ -4,11 +4,7 @@ export function Index() {
    *
    * Note: The corresponding styles are in the ./index.css file.
    */
-  return (
-    <div>
-      Next JS application with frontegg
-    </div>
-  );
+  return <div>Next JS application with frontegg</div>;
 }
 
 export default Index;

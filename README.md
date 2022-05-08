@@ -6,17 +6,17 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 ## Table of Contents
 
 - [Installation](#installation)
-    - [Create new NextJS project](#create-new-nextjs-project)
-    - [Add to existing project](#add-to-existing-project)
+  - [Create new NextJS project](#create-new-nextjs-project)
+  - [Add to existing project](#add-to-existing-project)
 - [Getting Started](#getting-started)
-    - [Create Frontegg worksapce](#create-frontegg-worksapce)
-    - [Setup environment](#setup-environment)
+  - [Create Frontegg worksapce](#create-frontegg-worksapce)
+  - [Setup environment](#setup-environment)
 - [Documentation](#documentation)
-    - [API Reference](#api-reference)
-    - [Frontegg Provider Options](#frontegg-provider-options)
-    - [getSession](#getsession)
-    - [withSSRSession](#withssrsession)
-    - for more [visit](https://docs.frontegg.com/docs/self-service-introduction)
+  - [API Reference](#api-reference)
+  - [Frontegg Provider Options](#frontegg-provider-options)
+  - [getSession](#getsession)
+  - [withSSRSession](#withssrsession)
+  - for more [visit](https://docs.frontegg.com/docs/self-service-introduction)
 
 ## Installation
 
@@ -25,7 +25,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 To start a new Create Next App project with TypeScript, you can run:
 
 ```bash
-  npx create-next-app --example https://github.com/frontegg/frontegg-nextjs --example-path apps/example my-nextjs-app-name 
+  npx create-next-app --example https://github.com/frontegg/frontegg-nextjs --example-path apps/example my-nextjs-app-name
 ```
 
 or
@@ -43,39 +43,48 @@ or
 To Add Frontegg to your existing Nextjs project, follow below steps:
 
 1. Use package manager to install Frontegg Next.JS library.
-    ```bash
-      npm install --save @frontegg/nextjs 
-    ```
+
+   ```bash
+     npm install --save @frontegg/nextjs
+   ```
+
    or
-    ```bash
-      yarn add --save @frontegg/nextjs
-    ```
+
+   ```bash
+     yarn add --save @frontegg/nextjs
+   ```
 
 2. Wrap the default export with `withFronteggApp` in `./pages/_app.tsx`:
-   ```tsx
-    // ./pages/_app.tsx
-   
-    import { withFronteggApp } from '@frontegg/nextjs';
-    
-    function CustomApp({Component, pageProps}: AppProps){
-      return <Component {...pageProps}/>
-    }
 
-    export default withFronteggApp(CustomApp);
+   ```tsx
+   // ./pages/_app.tsx
+
+   import { withFronteggApp } from '@frontegg/nextjs';
+
+   function CustomApp({ Component, pageProps }: AppProps) {
+     return <Component {...pageProps} />;
+   }
+
+   export default withFronteggApp(CustomApp);
    ```
 
 3. Create files for frontegg middleware under `./pages/api/frontegg/[...frontegg-middleware].ts`:
+
    ```tsx
-    // ./pages/api/frontegg/[...frontegg-middleware].ts
-    
-    export { fronteggMiddleware as default } from '@frontegg/nextjs';
+   // ./pages/api/frontegg/[...frontegg-middleware].ts
+
+   export { fronteggMiddleware as default } from '@frontegg/nextjs';
    ```
 
 4. Create placeholder pages for frontegg router under `./pages/[...frontegg-router].tsx`:
+
    ```tsx
-    // ./pages/[...frontegg-router].tsx
-    
-    export { FronteggRouter as default, FronteggRouterProps as getServerSideProps } from '@frontegg/nextjs';
+   // ./pages/[...frontegg-router].tsx
+
+   export {
+     FronteggRouter as default,
+     FronteggRouterProps as getServerSideProps,
+   } from '@frontegg/nextjs';
    ```
 
 ## Getting Started
@@ -110,7 +119,7 @@ FRONTEGG_CLIENT_ID='{YOUR_APPLICATION_CLIENT_ID}'
 
 # The statless session encruption password, used to encrypt
 # jwt before sending it to the client side.
-# 
+#
 # For quick password generation use the following command:
 #    node -e "console.log(crypto.randomBytes(32).toString('hex'))"
 FRONTEGG_ENCRYPTION_PASSWORD='{SESSION_ENCRYPTION_PASSWORD}'
@@ -131,34 +140,36 @@ Pass seconds argument to `withFronteggApp` function in `_app.ts` file to customi
 Frontegg library.
 
 ```tsx
-    // ./pages/_app.tsx
-   
-    import { withFronteggApp } from '@frontegg/nextjs';
-    
-    function CustomApp({Component, pageProps}: AppProps){
-      return <Component {...pageProps}/>
-    }
+// ./pages/_app.tsx
 
-    export default withFronteggApp(CustomApp, {
-      /**
-       * Frontegg options for customizations
-       */
-    });
-   ```
+import { withFronteggApp } from '@frontegg/nextjs';
+
+function CustomApp({ Component, pageProps }: AppProps) {
+  return <Component {...pageProps} />;
+}
+
+export default withFronteggApp(CustomApp, {
+  /**
+   * Frontegg options for customizations
+   */
+});
+```
 
 ### getSession
 
 For any pages that required AccessToken in Server Side, you can use:
 
 ```tsx
-import { GetServerSideProps } from 'next'
+import { GetServerSideProps } from 'next';
 import { getSession } from '@frontegg/nextjs';
 
 export default function MyPage({ products }) {
-  return <div>
-    <h1>My Page</h1>
-    {products}
-  </div>
+  return (
+    <div>
+      <h1>My Page</h1>
+      {products}
+    </div>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -166,14 +177,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     const { data } = await fetch('{external}/product', {
       headers: {
-        Authorization: 'bearer ' + session.accessToken
-      }
-    })
-    return { props: { products: data } }
+        Authorization: 'bearer ' + session.accessToken,
+      },
+    });
+    return { props: { products: data } };
   }
 
-  return { props: { products: [] } }
-}
+  return { props: { products: [] } };
+};
 ```
 
 ### withSSRSession
@@ -181,25 +192,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 withSSRSession HOC can be used to automatic redirect users to login screen if not logged in:
 
 ```tsx
-import { GetServerSideProps } from 'next'
+import { GetServerSideProps } from 'next';
 import { withSSRSession } from '@frontegg/nextjs';
 
 export default function MyPage({ products }) {
-  return <div>
-    <h1>My Page</h1>
-    {products}
-  </div>
+  return (
+    <div>
+      <h1>My Page</h1>
+      {products}
+    </div>
+  );
 }
 
-export const getServerSideProps: GetServerSideProps = withSSRSession(async (context, session) => {
-  const { data } = await fetch('{external}/product', {
-    headers: {
-      Authorization: 'bearer ' + session.accessToken
-    }
-  })
-  return { props: { products: data } }
-});
+export const getServerSideProps: GetServerSideProps = withSSRSession(
+  async (context, session) => {
+    const { data } = await fetch('{external}/product', {
+      headers: {
+        Authorization: 'bearer ' + session.accessToken,
+      },
+    });
+    return { props: { products: data } };
+  }
+);
 ```
-
-
- 

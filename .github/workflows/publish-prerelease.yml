@@ -1,0 +1,95 @@
+name: Publish Pre-Release to NPM
+on:
+  # When standard Pull Request is merged
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+jobs:
+  createReleasePullRequest:
+    if: "!contains(join(github.event.pull_request.labels.*.name, ','), 'Release') && github.event.pull_request.merged == true"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+      - name: Install Dependencies
+        run: yarn install
+      - name: Run Components Test
+        run: nx build nextjs
+#      - name: Run Components Test
+#        run: make test-component
+#      - name: Git Identity
+#        run: |
+#          git config --global user.name 'frontegg'
+#          git config --global user.email 'frontegg@users.noreply.github.com'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Authenticate with Registry
+#        run: |
+#          yarn logout
+#          echo "init-author-name=Frontegg LTD" > .npmrc
+#          echo "init-author-email=hello@frontegg.com" >> .npmrc
+#          echo "init-author-url=https://frontegg.com" >> .npmrc
+#          echo "init-license=MIT" >> .npmrc
+#          echo "always-auth=true" >> .npmrc
+#          echo "registry=https://registry.npmjs.org" >> .npmrc
+#          echo "_authToken=$NPM_TOKEN" >> .npmrc
+#          echo "@frontegg:registry=https://registry.npmjs.org" >> .npmrc
+#          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
+#          npm whoami
+#        env:
+#          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+#      - name: Commit Version UP
+#        run: |
+#          yarn lerna version patch --no-git-tag-version --yes --no-push --force-publish
+#          yarn prettier-hook
+#          git add . && git commit -m "chore(release): publish `node -p 'require("./lerna.json").version'`"
+#      - name: Set current CHANGELOG to output
+#        id: changelog
+#        shell: bash -ex {0}
+#        run: |
+#          version=$(node -p 'require("./lerna.json").version')
+#          changelog=$(node -p "(function(){var changelog = require('fs').readFileSync('./CHANGELOG.md', {encoding: 'utf8'}); changelog = changelog.substring(changelog.indexOf('# [')); changelog = changelog.substring(changelog.indexOf('\n')).trim();  return changelog.substring(0, changelog.indexOf('# [') - 2)})()")
+#          changelog="${changelog//'%'/'%25'}"
+#          changelog="${changelog//$'\n'/'%0A'}"
+#          changelog="${changelog//$'\r'/'%0D'}"
+#          echo $changelog
+#          echo "::set-output name=version::${version}"
+#          echo "::set-output name=changelog::${changelog}"
+#      - name: Create Release Pull Request
+#        id: cpr
+#        uses: peter-evans/create-pull-request@v3.5.1
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          path: ${{ secrets.GITHUB_WORKSPACE }}
+#          commit-message: 'Update v${{ steps.changelog.outputs.version }}'
+#          committer: GitHub <noreply@github.com>
+#          author: '${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>'
+#          title: 'v${{ steps.changelog.outputs.version }}'
+#          body: |
+#            # v${{ steps.changelog.outputs.version }}
+#
+#            ${{steps.changelog.outputs.changelog}}
+#
+#          labels: 'Type: Release'
+#          branch: 'release/next'
+#
+#      - name: Publish Pre-Release version to NPM
+#        run: |
+#          version=$(node -p 'require("./lerna.json").version')
+#          echo "Publishing DEV version - v${version}-alpha.${{ github.run_id }}"
+#          make move-package-json-to-dist
+#          make prerelease-version-upgrade-${version}-alpha.${{ github.run_id }}
+#          make pretty
+#          git add .
+#          git commit -m "chore: prelrease version"
+#          make publish-packages-next
+#        env:
+#          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

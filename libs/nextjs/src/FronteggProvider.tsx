@@ -1,12 +1,23 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { initialize, AppHolder } from '@frontegg/admin-portal';
 import { FronteggAppOptions } from '@frontegg/types';
-import { FronteggStoreProvider, useAuthActions, useAuthUserOrNull } from '@frontegg/react-hooks';
-import { ContextHolder, RedirectOptions, fronteggAuthApiRoutes } from '@frontegg/rest-api';
+import {
+  FronteggStoreProvider,
+  useAuthActions,
+  useAuthUserOrNull,
+} from '@frontegg/react-hooks';
+import {
+  ContextHolder,
+  RedirectOptions,
+  fronteggAuthApiRoutes,
+} from '@frontegg/rest-api';
 import { NextRouter, useRouter } from 'next/router';
 import { FronteggNextJSSession } from './types';
 
-export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> & {
+export type FronteggProviderProps = Omit<
+  FronteggAppOptions,
+  'contextOptions'
+> & {
   children?: ReactNode;
   session?: FronteggNextJSSession;
   envAppUrl: string;
@@ -20,7 +31,11 @@ type ConnectorProps = FronteggProviderProps & {
   appName?: string;
 };
 
-export const Connector: FC<ConnectorProps> = ({ router, appName, ...props }) => {
+export const Connector: FC<ConnectorProps> = ({
+  router,
+  appName,
+  ...props
+}) => {
   const isSSR = typeof window === 'undefined';
 
   const baseName = props.basename ?? router.basePath;
@@ -52,7 +67,7 @@ export const Connector: FC<ConnectorProps> = ({ router, appName, ...props }) => 
       },
       clientId: props.envClientId,
     }),
-    [ props.contextOptions ]
+    [props.contextOptions]
   );
 
   const app = useMemo(() => {
@@ -75,36 +90,45 @@ export const Connector: FC<ConnectorProps> = ({ router, appName, ...props }) => 
       );
     }
     return createdApp;
-  }, [ onRedirectTo ]);
+  }, [onRedirectTo]);
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    app.store.dispatch({ type: 'auth/requestAuthorizeSSR', payload: props.session?.accessToken });
-  }, [ app ]);
-  return <FronteggStoreProvider {...({ ...props, app } as any)}>{props.children}</FronteggStoreProvider>;
+    app.store.dispatch({
+      type: 'auth/requestAuthorizeSSR',
+      payload: props.session?.accessToken,
+    });
+  }, [app]);
+  return (
+    <FronteggStoreProvider {...({ ...props, app } as any)}>
+      {props.children}
+    </FronteggStoreProvider>
+  );
 };
 
 const ExpireInListener = () => {
-  const user = useAuthUserOrNull()
-  const actions = useAuthActions()
+  const user = useAuthUserOrNull();
+  const actions = useAuthActions();
   useEffect(() => {
     if (user && user?.expiresIn == null) {
       actions.setUser({
         ...user,
-        expiresIn: Math.floor((((user as any)['exp'] * 1000) - Date.now()) / 1000)
+        expiresIn: Math.floor(
+          ((user as any)['exp'] * 1000 - Date.now()) / 1000
+        ),
       });
     }
-  }, [ actions, user ])
-  return <></>
-}
+  }, [actions, user]);
+  return <></>;
+};
 const FronteggNextJSProvider: FC<FronteggProviderProps> = (props) => {
   const router = useRouter();
 
   return (
     <Connector {...props} router={router}>
-      <ExpireInListener/>
+      <ExpireInListener />
       {props.children}
     </Connector>
   );

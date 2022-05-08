@@ -7,85 +7,110 @@ import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
 import { FronteggNextJSSession } from './types';
 import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 
-function rewriteCookieProperty(header: string | string[], config: any, property: string): string | string[] {
+function rewriteCookieProperty(
+  header: string | string[],
+  config: any,
+  property: string
+): string | string[] {
   if (Array.isArray(header)) {
     return header.map((headerElement) => {
       return rewriteCookieProperty(headerElement, config, property);
     }) as string[];
   }
-  return header.replace(new RegExp('(;\\s*' + property + '=)([^;]+)', 'i'), (match, prefix, previousValue) => {
-    let newValue;
-    if (previousValue in config) {
-      newValue = config[previousValue];
-    } else if ('*' in config) {
-      newValue = config['*'];
-    } else {
-      // no match, return previous value
-      return match;
+  return header.replace(
+    new RegExp('(;\\s*' + property + '=)([^;]+)', 'i'),
+    (match, prefix, previousValue) => {
+      let newValue;
+      if (previousValue in config) {
+        newValue = config[previousValue];
+      } else if ('*' in config) {
+        newValue = config['*'];
+      } else {
+        // no match, return previous value
+        return match;
+      }
+      if (newValue) {
+        // replace value
+        return prefix + newValue;
+      } else {
+        // remove value
+        return '';
+      }
     }
-    if (newValue) {
-      // replace value
-      return prefix + newValue;
-    } else {
-      // remove value
-      return '';
-    }
-  });
+  );
 }
 
-export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
+export async function refreshToken(
+  ctx: NextPageContext
+): Promise<FronteggNextJSSession | null> {
   try {
     const request = ctx.req;
     if (!request) {
-      return null
+      return null;
     }
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
-    const refreshTokenKey = `fe_refresh_${fronteggConfig.clientId}`.replace(/-/g, '');
+    const refreshTokenKey = `fe_refresh_${fronteggConfig.clientId}`.replace(
+      /-/g,
+      ''
+    );
     const cookieKey = Object.keys(cookies).find((cookie) => {
       return cookie.replace(/-/g, '') === refreshTokenKey;
     });
     if (cookieKey) {
-      const response = await fetch(`${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggRefreshTokenUrl}`, {
-        method: 'POST',
-        credentials: 'include',
-        body: '{}',
-        headers: {
-          'accept-encoding': headers['accept-encoding'],
-          'accept-language': headers['accept-language'],
-          cookie: headers['cookie'],
-          accept: headers['accept'],
-          'user-agent': headers['user-agent'],
-          connection: headers['connection'],
-          'cache-control': headers['cache-control'],
-        },
-      });
+      const response = await fetch(
+        `${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggRefreshTokenUrl}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: '{}',
+          headers: {
+            'accept-encoding': headers['accept-encoding'],
+            'accept-language': headers['accept-language'],
+            cookie: headers['cookie'],
+            accept: headers['accept'],
+            'user-agent': headers['user-agent'],
+            connection: headers['connection'],
+            'cache-control': headers['cache-control'],
+          },
+        }
+      );
       if (response.ok) {
         const data = await response.text();
-        const rewriteCookieDomainConfig = { [fronteggConfig.baseUrlHost]: fronteggConfig.cookieDomain };
+        const rewriteCookieDomainConfig = {
+          [fronteggConfig.baseUrlHost]: fronteggConfig.cookieDomain,
+        };
         // @ts-ignore
         const cookieHeader = response.headers.raw()['set-cookie'];
-        let newSetCookie = rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
-        const [ session, decodedJwt ] = await createSessionFromAccessToken(data);
+        let newSetCookie = rewriteCookieProperty(
+          cookieHeader,
+          rewriteCookieDomainConfig,
+          'domain'
+        );
+        const [session, decodedJwt] = await createSessionFromAccessToken(data);
         if (!session) {
           return null;
         }
         const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
-        const cookieValue = cookie.serialize(fronteggConfig.cookieName, session, {
-          expires: new Date(decodedJwt.exp * 1000),
-          httpOnly: true,
-          domain: fronteggConfig.cookieDomain,
-          path: '/',
-          sameSite: isSecured ? 'none' : undefined,
-          secure: isSecured,
-        });
+        const cookieValue = cookie.serialize(
+          fronteggConfig.cookieName,
+          session,
+          {
+            expires: new Date(decodedJwt.exp * 1000),
+            httpOnly: true,
+            domain: fronteggConfig.cookieDomain,
+            path: '/',
+            sameSite: isSecured ? 'none' : undefined,
+            secure: isSecured,
+          }
+        );
         if (cookieValue.length > 4096) {
           console.error(
             `@frontegg/nextjs: Cookie length is too big ${cookieValue.length}, browsers will refuse it. Try to remove some data.`
           );
         }
         if (typeof newSetCookie === 'string') {
-          newSetCookie = [ newSetCookie ];
+          newSetCookie = [newSetCookie];
         }
         newSetCookie.push(cookieValue);
         ctx.res?.setHeader('set-cookie', newSetCookie);
@@ -105,14 +130,20 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
 }
 
 export function addToCookies(cookieValue: string, res: ServerResponse) {
-  let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
+  let existingSetCookie =
+    (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [ existingSetCookie ];
+    existingSetCookie = [existingSetCookie];
   }
-  res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
+  res.setHeader('set-cookie', [...existingSetCookie, cookieValue]);
 }
 
-export function removeCookies(cookieName: string, isSecured: boolean, cookieDomain: string, res: ServerResponse) {
+export function removeCookies(
+  cookieName: string,
+  isSecured: boolean,
+  cookieDomain: string,
+  res: ServerResponse
+) {
   const cookieValue = cookie.serialize(cookieName, '', {
     expires: new Date(),
     httpOnly: true,
@@ -121,23 +152,28 @@ export function removeCookies(cookieName: string, isSecured: boolean, cookieDoma
     sameSite: isSecured ? 'none' : undefined,
     secure: isSecured,
   });
-  let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
+  let existingSetCookie =
+    (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [ existingSetCookie ];
+    existingSetCookie = [existingSetCookie];
   }
-  res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
+  res.setHeader('set-cookie', [...existingSetCookie, cookieValue]);
 }
 
-export async function createSessionFromAccessToken(output: string): Promise<[ string, any ] | []> {
+export async function createSessionFromAccessToken(
+  output: string
+): Promise<[string, any] | []> {
   try {
     const { accessToken } = JSON.parse(output);
     const decodedJwt: any = decodeJwt(accessToken);
-    decodedJwt.expiresIn = Math.floor(((decodedJwt.exp * 1000) - Date.now()) / 1000);
+    decodedJwt.expiresIn = Math.floor(
+      (decodedJwt.exp * 1000 - Date.now()) / 1000
+    );
     const session = await sealData(accessToken, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
-    return [ session, decodedJwt ];
+    return [session, decodedJwt];
   } catch (e) {
     return [];
   }
@@ -156,7 +192,11 @@ export const modifySetCookieIfUnsecure = (
       if (isSecured) {
         return c;
       }
-      return cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None').join('; ');
+      return cookie
+        .filter(
+          (property) => property !== 'Secure' && property !== 'SameSite=None'
+        )
+        .join('; ');
     });
   }
   return setCookieValue;

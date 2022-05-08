@@ -37,7 +37,6 @@ declare module 'iron-session' {
   }
 }
 
-
 declare global {
   interface ProcessEnv {
     FRONTEGG_BASE_URL: string;

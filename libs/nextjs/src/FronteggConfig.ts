@@ -44,12 +44,17 @@ class FronteggConfig {
   }
 
   get cookieDomain(): string {
-    return new URL(process.env['FRONTEGG_APP_URL'] ?? '').hostname.replace(/:(\d)+$/, '');
+    return new URL(process.env['FRONTEGG_APP_URL'] ?? '').hostname.replace(
+      /:(\d)+$/,
+      ''
+    );
   }
 
   async getJwtPublicKey(): Promise<KeyLike | Uint8Array> {
     if (!this._jwtPublicKey) {
-      const response = await fetch(`${process.env['FRONTEGG_BASE_URL']}/.well-known/jwks.json`);
+      const response = await fetch(
+        `${process.env['FRONTEGG_BASE_URL']}/.well-known/jwks.json`
+      );
       const data = await response.json();
       const publicKey = data.keys.find((key: any) => key.kty === 'RSA');
       this._jwtPublicKey = await importJWK(publicKey);
