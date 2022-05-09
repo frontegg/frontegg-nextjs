@@ -1,0 +1,8 @@
+coverage
+src
+.gitignore
+tsconfig.json
+scripts
+Makefile
+.npmrc
+
