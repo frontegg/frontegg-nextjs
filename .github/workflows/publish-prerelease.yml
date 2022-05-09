@@ -77,9 +77,10 @@ jobs:
         run: |
           version=$(node -p 'require("./libs/nextjs/package.json").version')
           echo "Publishing Pre-Release version - v${version}-alpha.${{ github.run_id }}"
-          node -p "(function(){var fs = require('fs'); var pkg = JSON.parse(fs.readFileSync('./dist/@frontegg/angular/package.json', {encoding: 'utf8'})); pkg.version = '${version}-alpha.${{ github.run_id }}'; fs.writeFileSync('./dist/@frontegg/angular/package.json', JSON.stringify(pkg, null, 2),  {encoding: 'utf8'})})()"
-          cp .npmrc ./dist/@frontegg/angular/
-          cp .npmignore ./dist/@frontegg/angular/
-          cd ./dist/@frontegg/angular && npm publish --tag next
+          node -p "(function(){var fs = require('fs'); var pkg = JSON.parse(fs.readFileSync('./dist/libs/nextjs/package.json', {encoding: 'utf8'})); pkg.version = '${version}-alpha.${{ github.run_id }}'; fs.writeFileSync('./dist/libs/nextjs/package.json', JSON.stringify(pkg, null, 2),  {encoding: 'utf8'})})()"
+          cp .npmrc ./dist/libs/nextjs/
+          cp .npmignore ./dist/libs/nextjs/
+          cp REACTME.md ./dist/libs/nextjs/
+          cd ./dist/libs/nextjs && npm publish --tag next
         env:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
