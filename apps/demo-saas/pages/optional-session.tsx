@@ -1,6 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { getSession } from '@frontegg/nextjs';
-import { useAuthUserOrNull } from '@frontegg/react-hooks';
+import { AdminPortal, getSession, useAuthUserOrNull } from '@frontegg/nextjs';
 
 export default function OptionalSession({ ssrSession }) {
   const user = useAuthUserOrNull();
@@ -11,6 +10,16 @@ export default function OptionalSession({ ssrSession }) {
       hook: {user && JSON.stringify(user)}
       <br />
       SSR Session: {ssrSession ? JSON.stringify(ssrSession) : 'No Session'}
+      <br />
+      <br />
+      <br />
+      <button
+        onClick={() => {
+          AdminPortal.show();
+        }}
+      >
+        Open AdminPortal
+      </button>
     </div>
   );
 }

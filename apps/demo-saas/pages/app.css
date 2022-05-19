@@ -1,0 +1,13 @@
+.custom-loader {
+  background: red;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+}
+
+body.frontegg-loading .custom-loader {
+  display: block;
+}

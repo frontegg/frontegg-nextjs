@@ -2,8 +2,8 @@
   "name": "@frontegg/nextjs",
   "version": "5.0.0",
   "dependencies": {
-    "@frontegg/admin-portal": "5.48.0",
-    "@frontegg/react-hooks": "5.48.0",
+    "@frontegg/admin-portal": "5.49.0",
+    "@frontegg/react-hooks": "5.49.0",
     "jose": "^4.8.0",
     "iron-session": "^6.1.2",
     "http-proxy": "^1.18.1",
