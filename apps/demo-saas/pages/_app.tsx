@@ -1,5 +1,6 @@
 import { AppProps } from 'next/app';
 import { withFronteggApp } from '@frontegg/nextjs';
+import './app.css';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
@@ -11,4 +12,5 @@ export default withFronteggApp(CustomApp, {
       signUpUrl: '/signup',
     },
   },
+  customLoader: true,
 });
