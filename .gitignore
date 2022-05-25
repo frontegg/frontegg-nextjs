@@ -37,3 +37,10 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+lerna-changed.json
+.npmrc
+cypress/videos
+.nyc_output
+cypress/screenshots
+.idea
