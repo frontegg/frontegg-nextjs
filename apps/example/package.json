@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@frontegg/nextjs": "^5.1.0"
+  }
+}
