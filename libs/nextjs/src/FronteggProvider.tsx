@@ -59,7 +59,7 @@ export const Connector: FC<ConnectorProps> = ({
   const contextOptions = useMemo(
     () => ({
       baseUrl: (path: string) => {
-        if (fronteggAuthApiRoutes.indexOf(path) !== -1) {
+        if (fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin')) {
           return `${props.envAppUrl}/api`;
         } else {
           return props.envBaseUrl;
