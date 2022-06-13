@@ -2,8 +2,8 @@
   "name": "@frontegg/nextjs",
   "version": "5.3.0",
   "dependencies": {
-    "@frontegg/admin-portal": "5.52.0",
-    "@frontegg/react-hooks": "5.52.0",
+    "@frontegg/admin-portal": "file:///Users/davidfrontegg/git/admin-box/packages/admin-portal/dist/frontegg-admin-portal-5.53.4.tgz",
+    "@frontegg/react-hooks": "file:///Users/davidfrontegg/git/admin-box/packages/react-hooks/dist/frontegg-react-hooks-5.53.4.tgz",
     "jose": "^4.8.0",
     "iron-session": "^6.1.2",
     "http-proxy": "^1.18.1",
