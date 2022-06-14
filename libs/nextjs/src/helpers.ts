@@ -6,6 +6,7 @@ import { decodeJwt } from 'jose';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
 import { FronteggNextJSSession } from './types';
 import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
+import { getSession } from './session';
 
 function rewriteCookieProperty(
   header: string | string[],
@@ -48,6 +49,14 @@ export async function refreshToken(
     if (!request) {
       return null;
     }
+    try {
+      const session = await getSession(ctx.req as any);
+      if (session) {
+        return session;
+      }
+    } catch (e) {
+      // ignore error catch
+    }
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
     const refreshTokenKey = `fe_refresh_${fronteggConfig.clientId}`.replace(
@@ -87,7 +96,7 @@ export async function refreshToken(
           rewriteCookieDomainConfig,
           'domain'
         );
-        const [session, decodedJwt] = await createSessionFromAccessToken(data);
+        const [ session, decodedJwt ] = await createSessionFromAccessToken(data);
         if (!session) {
           return null;
         }
@@ -110,7 +119,7 @@ export async function refreshToken(
           );
         }
         if (typeof newSetCookie === 'string') {
-          newSetCookie = [newSetCookie];
+          newSetCookie = [ newSetCookie ];
         }
         newSetCookie.push(cookieValue);
         ctx.res?.setHeader('set-cookie', newSetCookie);
@@ -133,9 +142,9 @@ export function addToCookies(cookieValue: string, res: ServerResponse) {
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [existingSetCookie];
+    existingSetCookie = [ existingSetCookie ];
   }
-  res.setHeader('set-cookie', [...existingSetCookie, cookieValue]);
+  res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
 }
 
 export function removeCookies(
@@ -155,16 +164,17 @@ export function removeCookies(
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [existingSetCookie];
+    existingSetCookie = [ existingSetCookie ];
   }
-  res.setHeader('set-cookie', [...existingSetCookie, cookieValue]);
+  res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
 }
 
 export async function createSessionFromAccessToken(
   output: string
-): Promise<[string, any] | []> {
+): Promise<[ string, any ] | []> {
   try {
-    const { accessToken } = JSON.parse(output);
+    const data = JSON.parse(output);
+    const accessToken = data?.accessToken ?? data.access_token;
     const decodedJwt: any = decodeJwt(accessToken);
     decodedJwt.expiresIn = Math.floor(
       (decodedJwt.exp * 1000 - Date.now()) / 1000
@@ -173,7 +183,7 @@ export async function createSessionFromAccessToken(
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
-    return [session, decodedJwt];
+    return [ session, decodedJwt ];
   } catch (e) {
     return [];
   }

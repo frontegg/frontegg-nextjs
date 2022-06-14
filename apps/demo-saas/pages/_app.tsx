@@ -10,7 +10,9 @@ export default withFronteggApp(CustomApp, {
   authOptions: {
     routes: {
       signUpUrl: '/signup',
+      loginUrl:'/login'
     },
   },
+  hostedLoginBox: true,
   customLoader: true,
 });
