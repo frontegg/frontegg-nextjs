@@ -1,19 +1,20 @@
 import { GetServerSideProps } from 'next';
-import { AdminPortal, useAuthUser, withSSRSession } from '@frontegg/nextjs';
+import { AdminPortal, useAuthUserOrNull, withSSRSession } from '@frontegg/nextjs';
 
 export default function ForceSession({ ssrSession }) {
-  const user = useAuthUser();
+  const user = useAuthUserOrNull();
+  console.log('user', user);
 
   return (
     <div>
       <h1>Force SSR Session</h1>
-      <br />
+      <br/>
       hooks: {JSON.stringify(user)}
-      <br />
+      <br/>
       SSR Session: {ssrSession ? JSON.stringify(ssrSession) : 'No Session'}
-      <br />
-      <br />
-      <br />
+      <br/>
+      <br/>
+      <br/>
       <button
         onClick={() => {
           AdminPortal.show();

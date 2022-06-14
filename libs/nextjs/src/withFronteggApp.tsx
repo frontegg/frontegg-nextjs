@@ -16,16 +16,12 @@ export const withFronteggApp = (
   options?: Omit<FronteggAppOptions, 'contextOptions'> & {
     contextOptions?: FronteggAppOptions['contextOptions'];
   }
-): NextComponentType<
-  AppContextType & { session: FronteggNextJSSession | null },
+): NextComponentType<AppContextType & { session: FronteggNextJSSession | null },
   AppInitialProps,
-  AppPropsType
-> => {
-  type GetInitialProps = NextComponentType<
-    AppContextType & { session: FronteggNextJSSession | null },
+  AppPropsType> => {
+  type GetInitialProps = NextComponentType<AppContextType & { session: FronteggNextJSSession | null },
     AppInitialProps,
-    AppPropsType
-  >['getInitialProps'];
+    AppPropsType>['getInitialProps'];
   const originalGetInitialProps: GetInitialProps | undefined =
     app.getInitialProps;
 
@@ -82,6 +78,7 @@ export const withFronteggApp = (
   };
 
   fronteggConfig.authRoutes = options?.authOptions?.routes ?? {};
+  fronteggConfig.fronteggAppOptions = options ?? {};
 
   function CustomFronteggApp(appProps: AppProps) {
     return (

@@ -10,6 +10,8 @@ import {
   GetServerSidePropsResult,
   PreviewData,
 } from 'next';
+import FronteggConfig from './FronteggConfig';
+import { authInitialState } from '@frontegg/redux-store';
 
 export async function getSession(
   req: IncomingMessage
@@ -61,7 +63,7 @@ export function withSSRSession<
       return {
         redirect: {
           permanent: false,
-          destination: `/account/login?redirectUrl=${encodeURIComponent(
+          destination: `/${FronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl}?redirectUrl=${encodeURIComponent(
             context.req.url!
           )}`,
         },

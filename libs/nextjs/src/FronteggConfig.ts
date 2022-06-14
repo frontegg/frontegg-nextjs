@@ -1,5 +1,6 @@
 import { importJWK, KeyLike } from 'jose';
-import { AuthPageRoutes, authInitialState } from '@frontegg/redux-store';
+import { AuthPageRoutes } from '@frontegg/redux-store';
+import { FronteggAppOptions } from '@frontegg/types';
 
 export type PasswordsMap = { [id: string]: string };
 export type Password = string | PasswordsMap;
@@ -15,6 +16,7 @@ class FronteggConfig {
   private readonly _passwordsAsMap: PasswordsMap;
   private readonly _clientId: string;
   public authRoutes: Partial<AuthPageRoutes> = {};
+  public fronteggAppOptions: Partial<FronteggAppOptions> = {};
 
   constructor() {
     this._clientId = process.env['FRONTEGG_CLIENT_ID'] ?? '';
