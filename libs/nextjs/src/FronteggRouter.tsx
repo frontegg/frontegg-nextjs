@@ -26,7 +26,7 @@ export function FronteggRouter() {
       const pathname = `/${pathArr.join('/')}`;
       if (pathname === routesObj.loginUrl) {
         if(queryParams.redirectUrl){
-          localStorage.setItem('_REDIRECT_AFTER_LOGIN_', `${window.location.origin}/${queryParams.redirectUrl}`);
+          localStorage.setItem('FRONTEGG_AFTER_AUTH_REDIRECT_URL', `${window.location.origin}/${queryParams.redirectUrl}`);
         }
         loginWithRedirect()
       } else if (pathname === routesObj.logoutUrl) {
@@ -35,8 +35,6 @@ export function FronteggRouter() {
         logout(()=>{
           window.location.href = `${baseUrl}/oauth/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`
         })
-      } else {
-        console.log('NO', pathname, queryParams)
       }
     }
   }, [app, query, loginWithRedirect, logout, replace])

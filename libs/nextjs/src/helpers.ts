@@ -212,7 +212,6 @@ export async function createSessionFromAccessToken(
     });
     return [ session, decodedJwt ];
   } catch (e) {
-    console.error(e)
     return [];
   }
 }
