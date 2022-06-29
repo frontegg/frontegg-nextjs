@@ -4,12 +4,14 @@ import { parse } from 'url';
 import { useContext, useEffect } from 'react';
 import AppContext from './AppContext';
 import { useRouter } from 'next/router';
-import { useLoginWithRedirect } from '@frontegg/react-hooks';
+import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 
 export function FronteggRouter() {
   const app = useContext(AppContext);
-  const { query } = useRouter();
+  const { query, replace } = useRouter();
   const loginWithRedirect = useLoginWithRedirect()
+  const {logout} = useLoginActions()
+
   useEffect(() => {
     if (!app) {
       return;
@@ -23,12 +25,19 @@ export function FronteggRouter() {
       const { 'frontegg-router': pathArr, ...queryParams } = query as any;
       const pathname = `/${pathArr.join('/')}`;
       if (pathname === routesObj.loginUrl) {
+        if(queryParams.redirectUrl){
+          localStorage.setItem('FRONTEGG_AFTER_AUTH_REDIRECT_URL', `${window.location.origin}/${queryParams.redirectUrl}`);
+        }
         loginWithRedirect()
-      } else {
-        console.log('NO', pathname, queryParams)
+      } else if (pathname === routesObj.logoutUrl) {
+        const _baseUrl = app.options.contextOptions.baseUrl;
+        const baseUrl = typeof _baseUrl === 'string' ? _baseUrl : _baseUrl('')
+        logout(()=>{
+          window.location.href = `${baseUrl}/oauth/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`
+        })
       }
     }
-  }, [ app, query, loginWithRedirect ])
+  }, [app, query, loginWithRedirect, logout, replace])
   return '';
 }
 
@@ -50,7 +59,7 @@ export function FronteggRouterProps(context: any) {
   const notFound = routesArr.indexOf(pathname as string) === -1;
 
   if (FronteggConfig.fronteggAppOptions.hostedLoginBox) {
-    const notFound = !(routesObj.loginUrl === pathname || routesObj.hostedLoginRedirectUrl === pathname);
+    const notFound = !(routesObj.loginUrl === pathname || routesObj.logoutUrl === pathname || routesObj.hostedLoginRedirectUrl === pathname);
     return { notFound, props: {} }
   }
   return {

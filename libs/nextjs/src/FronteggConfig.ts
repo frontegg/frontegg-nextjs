@@ -20,13 +20,13 @@ class FronteggConfig {
 
   constructor() {
     this._clientId = process.env['FRONTEGG_CLIENT_ID'] ?? '';
-    this._cookieName = process.env['FRONTEGG_COOKIE_NAME'] ?? `fe_session`;
+    this._cookieName = process.env['FRONTEGG_COOKIE_NAME'] ?? `fe_next_session`;
     this._password = process.env['FRONTEGG_ENCRYPTION_PASSWORD'] ?? '';
     this._passwordsAsMap = normalizeStringPasswordToMap(this._password);
   }
 
   get cookieName(): string {
-    return this._cookieName;
+    return `${this._cookieName}-${this._clientId.replace(/-/g, '')}`;
   }
 
   get password(): string {
