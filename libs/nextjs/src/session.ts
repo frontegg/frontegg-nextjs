@@ -12,6 +12,7 @@ import {
 } from 'next';
 import FronteggConfig from './FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
+import { uncompress } from './helpers';
 
 export async function getSession(
   req: IncomingMessage
@@ -23,9 +24,11 @@ export async function getSession(
     if (!sealFromCookies) {
       return undefined;
     }
-    const jwt: string = await unsealData(sealFromCookies, {
+    const compressedJwt: string = await unsealData(sealFromCookies, {
       password: fronteggConfig.passwordsAsMap,
     });
+    const jwt = await uncompress(compressedJwt);
+
     const publicKey = await fronteggConfig.getJwtPublicKey();
     const { payload }: any = await jwtVerify(jwt, publicKey);
 

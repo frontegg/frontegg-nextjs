@@ -7,6 +7,7 @@ import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
 import { FronteggNextJSSession } from './types';
 import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import { getSession } from './session';
+import * as zlib from 'zlib';
 
 function rewriteCookieProperty(
   header: string | string[],
@@ -169,6 +170,30 @@ export function removeCookies(
   res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
 }
 
+export function compress(input: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    zlib.brotliCompress(input, (error: Error | null, result: Buffer) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result.toString('base64'))
+      }
+    })
+  })
+}
+
+export function uncompress(input: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    zlib.brotliDecompress(Buffer.from(input, 'base64'), (error: Error | null, result: Buffer) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(result.toString('utf-8'))
+      }
+    })
+  })
+}
+
 export async function createSessionFromAccessToken(
   output: string
 ): Promise<[ string, any ] | []> {
@@ -179,12 +204,15 @@ export async function createSessionFromAccessToken(
     decodedJwt.expiresIn = Math.floor(
       (decodedJwt.exp * 1000 - Date.now()) / 1000
     );
-    const session = await sealData(accessToken, {
+
+    const compressedAccessToken = await compress(accessToken);
+    const session = await sealData(compressedAccessToken, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
     return [ session, decodedJwt ];
   } catch (e) {
+    console.error(e)
     return [];
   }
 }
