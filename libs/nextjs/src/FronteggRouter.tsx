@@ -51,7 +51,7 @@ export function FronteggRouterProps(context: any) {
     []
   );
 
-  let { pathname } = parse(context.req.url, true);
+  let { pathname } = parse(context.resolvedUrl ?? context.req.url, true);
   if (!pathname || pathname.startsWith('/_next/data')) {
     const query = context.req.query[Object.keys(context.req.query)[0]];
     pathname = `/${Array.isArray(query) ? query.join('/') : query}`;

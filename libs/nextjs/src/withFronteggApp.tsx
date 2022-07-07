@@ -30,6 +30,7 @@ export const withFronteggApp = (
   ): Promise<AppInitialProps> => {
     const { ctx, Component } = appContext;
 
+
     if (ctx.req?.url?.indexOf('/_next/data/') === -1) {
       const session = await refreshToken(ctx);
       appContext.session = session;

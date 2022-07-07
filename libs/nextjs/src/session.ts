@@ -20,7 +20,7 @@ export async function getSession(
   try {
     const sealFromCookies = cookie.parse(req.headers.cookie || '')[
       fronteggConfig.cookieName
-    ];
+      ];
     if (!sealFromCookies) {
       return undefined;
     }
@@ -46,11 +46,9 @@ export async function getSession(
   }
 }
 
-export function withSSRSession<
-  P extends { [key: string]: any } = { [key: string]: any },
+export function withSSRSession<P extends { [key: string]: any } = { [key: string]: any },
   Q extends ParsedUrlQuery = ParsedUrlQuery,
-  D extends PreviewData = PreviewData
->(
+  D extends PreviewData = PreviewData>(
   handler: (
     context: GetServerSidePropsContext<Q>,
     session: FronteggNextJSSession
@@ -63,12 +61,14 @@ export function withSSRSession<
     if (session) {
       return handler(context, session);
     } else {
+      let loginUrl = FronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
+      if (!loginUrl.startsWith('/')) {
+        loginUrl = `/${loginUrl}`
+      }
       return {
         redirect: {
           permanent: false,
-          destination: `/${FronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl}?redirectUrl=${encodeURIComponent(
-            context.req.url!
-          )}`,
+          destination: `${loginUrl}?redirectUrl=${encodeURIComponent(context.resolvedUrl ?? context.req.url!)}`,
         },
         props: {},
       } as GetServerSidePropsResult<P>;
