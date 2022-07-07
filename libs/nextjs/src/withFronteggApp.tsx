@@ -1,6 +1,6 @@
-import type { AppInitialProps, AppType } from 'next/dist/shared/lib/utils';
-import { AppContext, AppProps } from 'next/app';
-import {
+import type { AppContext, AppProps, AppInitialProps } from 'next/app';
+import type {
+  AppType,
   AppContextType,
   AppPropsType,
   NextComponentType,
@@ -12,18 +12,17 @@ import { FronteggAppOptions } from '@frontegg/types';
 import fronteggConfig from './FronteggConfig';
 
 export const withFronteggApp = (
-  app: AppType,
+  app: ((props: AppProps) => JSX.Element) & {
+    getInitialProps?: AppType['getInitialProps']
+  },
   options?: Omit<FronteggAppOptions, 'contextOptions'> & {
     contextOptions?: FronteggAppOptions['contextOptions'];
   }
-): NextComponentType<AppContextType & { session: FronteggNextJSSession | null },
-  AppInitialProps,
-  AppPropsType> => {
+): NextComponentType<AppContextType & { session: FronteggNextJSSession | null }, AppInitialProps, AppPropsType> => {
   type GetInitialProps = NextComponentType<AppContextType & { session: FronteggNextJSSession | null },
     AppInitialProps,
     AppPropsType>['getInitialProps'];
-  const originalGetInitialProps: GetInitialProps | undefined =
-    app.getInitialProps;
+  const originalGetInitialProps: GetInitialProps | undefined = app.getInitialProps;
 
   app.getInitialProps = async (
     appContext: AppContext & { session: FronteggNextJSSession | null }
@@ -90,7 +89,7 @@ export const withFronteggApp = (
         envBaseUrl={appProps.pageProps.envBaseUrl}
         envClientId={appProps.pageProps.envClientId}
       >
-        {(app as any)(appProps)}
+        {app(appProps) as any}
       </FronteggProvider>
     );
   }
