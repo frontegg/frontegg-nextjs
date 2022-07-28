@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/nextjs",
-  "version": "5.8.0",
+  "version": "5.9.0",
   "dependencies": {
     "@frontegg/admin-portal": "5.72.2",
     "@frontegg/react-hooks": "5.72.2",
