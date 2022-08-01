@@ -25,13 +25,13 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 To start a new Create Next App project with TypeScript, you can run:
 
 ```bash
-  npx create-next-app --example "https://github.com/frontegg/frontegg-nextjs/tree/main" --example-path "apps/example" my-nextjs-app-name
+  npx create-next-app --example "https://github.com/frontegg/frontegg-nextjs" --example-path "apps/example" my-nextjs-app-name
 ```
 
 or
 
 ```bash
-  yarn create next-app --example "https://github.com/frontegg/frontegg-nextjs/tree/main" --example-path "apps/example" my-nextjs-app-name
+  yarn create next-app --example "https://github.com/frontegg/frontegg-nextjs" --example-path "apps/example" my-nextjs-app-name
 ```
 
 > If you've previously installed `create-react-app` globally via `npm install -g create-next-app`, we recommend you uninstall the package using `npm uninstall -g create-next-app` or `yarn global remove create-next-app` to ensure that `npx` always uses the latest version.
