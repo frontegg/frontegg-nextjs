@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { AdminPortal, getSession } from '@frontegg/nextjs';
+import { AdminPortal } from '@frontegg/nextjs';
 
 export default function MyPage() {
   return (
@@ -10,15 +10,6 @@ export default function MyPage() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context.req);
-  if (session) {
-    const { data } = await fetch('{external}/product', {
-      headers: {
-        Authorization: 'bearer ' + session.accessToken,
-      },
-    });
-    return { props: { products: data } };
-  }
+export const getServerSideProps: GetServerSideProps = () => {
   return { props: { products: [] } };
 };
