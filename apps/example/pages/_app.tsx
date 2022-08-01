@@ -5,4 +5,4 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
 }
 
-export default withFronteggApp(CustomApp, global.CYPRESS_CONFIG);
+export default withFronteggApp(CustomApp, global?.CYPRESS_CONFIG);
