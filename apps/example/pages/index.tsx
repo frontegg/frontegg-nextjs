@@ -10,6 +10,6 @@ export default function MyPage() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return { props: { products: [] } };
 };
