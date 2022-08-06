@@ -94,6 +94,6 @@ jobs:
           SLACK_COLOR : ${{ job.status }}
           SLACK_ICON : https://avatars.githubusercontent.com/u/67857107?s=40&v=4
           SLACK_MESSAGE : '${{ steps.publish_pre_release_version.outputs.LIB_VERSION }}-alpha.${{ github.run_id }} has been released :rocket:'
-          SLACK_TITLE : 'A new @frontegg/angular alpha version!'
+          SLACK_TITLE : 'A new @frontegg/nextjs alpha version!'
           SLACK_USERNAME : ${{ github.actor }}
           SLACK_WEBHOOK : ${{ secrets.ROTEM_SLACK_WEBHOOK }}
