@@ -97,3 +97,4 @@ jobs:
           SLACK_TITLE : 'A new @frontegg/nextjs alpha version!'
           SLACK_USERNAME : ${{ github.actor }}
           SLACK_WEBHOOK : ${{ secrets.ROTEM_SLACK_WEBHOOK }}
+          MSG_MINIMAL: true
