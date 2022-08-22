@@ -44,3 +44,4 @@ cypress/videos
 .nyc_output
 cypress/screenshots
 .idea
+.env
