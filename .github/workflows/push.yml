@@ -12,53 +12,11 @@ jobs:
     name: 'Install, Build and Test'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
         with:
-          fetch-depth: '0'
-      - name: Git Identity
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Dependencies and Build Packages
-        run: |
-          yarn install
-          yarn build
-      - name: Git Identity
-        run: |
-          git config --global user.name 'frontegg'
-          git config --global user.email 'frontegg@users.noreply.github.com'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Authenticate with Registry
-        run: |
-          yarn logout
-          echo "init-author-name=Frontegg LTD" > .npmrc
-          echo "init-author-email=hello@frontegg.com" >> .npmrc
-          echo "init-author-url=https://frontegg.com" >> .npmrc
-          echo "init-license=MIT" >> .npmrc
-          echo "always-auth=true" >> .npmrc
-          echo "registry=https://registry.npmjs.org" >> .npmrc
-          echo "_authToken=$NPM_TOKEN" >> .npmrc
-          echo "@frontegg:registry=https://registry.npmjs.org" >> .npmrc
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
-          npm whoami
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
-      - name: Publish Pre-Release version to NPM
-        id: publish_pre_release_version
-        run: |
-          yarn increment-version
-          version=$(node -p 'require("./libs/nextjs/package.json").version')
-          echo "::set-output name=LIB_VERSION::${version}"
-          echo "Publishing Pre-Release version - v${version}-alpha.${{ github.run_id }}"
-          node -p "(function(){var fs = require('fs'); var pkg = JSON.parse(fs.readFileSync('./dist/libs/nextjs/package.json', {encoding: 'utf8'})); pkg.version = '${version}-alpha.${{ github.run_id }}'; fs.writeFileSync('./dist/libs/nextjs/package.json', JSON.stringify(pkg, null, 2),  {encoding: 'utf8'})})()"
-          cp .npmrc ./dist/libs/nextjs/
-          cp .npmignore ./dist/libs/nextjs/
-          cp README.md ./dist/libs/nextjs/
-          cd ./dist/libs/nextjs && npm publish --tag alpha
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build NextJS Package
+        run: yarn build
