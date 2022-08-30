@@ -42,14 +42,18 @@ class FronteggConfig {
   }
 
   getEnvAppUrl(): string | undefined {
-    if(process.env['VERCEL_URL']){
-      return process.env['VERCEL_URL'];
+    let url: string | undefined = undefined
+    if (process.env['VERCEL_URL']) {
+      url = process.env['VERCEL_URL'];
+    } else if (process.env['FRONTEGG_APP_URL']) {
+      url = process.env['FRONTEGG_APP_URL'];
     }
-    if(process.env['FRONTEGG_APP_URL']){
-      return process.env['FRONTEGG_APP_URL'];
+    if (url && !url.startsWith('http')) {
+      url = `https://${url}`;
     }
-    return undefined;
+    return url;
   }
+
   get appUrl(): string {
     return this.getEnvAppUrl() ?? 'http://localhost:3000';
   }
