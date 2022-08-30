@@ -42,11 +42,11 @@ class FronteggConfig {
   }
 
   get appUrl(): string {
-    return process.env['FRONTEGG_APP_URL'] ?? 'http://localhost:3000';
+    return process.env['VERCEL_URL'] ?? process.env['FRONTEGG_APP_URL'] ?? 'http://localhost:3000';
   }
 
   get cookieDomain(): string {
-    return new URL(process.env['FRONTEGG_APP_URL'] ?? '').hostname.replace(
+    return new URL(process.env['VERCEL_URL'] ?? process.env['FRONTEGG_APP_URL'] ?? '').hostname.replace(
       /:(\d)+$/,
       ''
     );
