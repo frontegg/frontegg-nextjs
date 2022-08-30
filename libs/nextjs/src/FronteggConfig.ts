@@ -49,7 +49,8 @@ class FronteggConfig {
       url = process.env['FRONTEGG_APP_URL'];
     }
     if (url && !url.startsWith('http')) {
-      url = `https://${url}`;
+      const protocol = url.startsWith('localhost') ? 'http://' : 'https://'
+      url = `${protocol}${url}`;
     }
     return url;
   }
