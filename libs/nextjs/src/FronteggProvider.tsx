@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
-import { initialize, AppHolder } from '@frontegg/admin-portal';
+import { initialize, AppHolder } from '@frontegg/js';
 import { FronteggAppOptions } from '@frontegg/types';
 import {
   FronteggStoreProvider,

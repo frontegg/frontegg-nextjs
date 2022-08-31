@@ -5,8 +5,4 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
 }
 
-export default withFronteggApp(CustomApp, {
-  /**
-   * Optional frontegg options
-   */
-});
+export default withFronteggApp(CustomApp, {});

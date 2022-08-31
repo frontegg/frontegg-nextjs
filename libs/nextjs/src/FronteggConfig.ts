@@ -41,12 +41,26 @@ class FronteggConfig {
     return new URL(process.env['FRONTEGG_BASE_URL'] ?? '').hostname;
   }
 
+  getEnvAppUrl(): string | undefined {
+    let url: string | undefined = undefined
+    if (process.env['VERCEL_URL']) {
+      url = process.env['VERCEL_URL'];
+    } else if (process.env['FRONTEGG_APP_URL']) {
+      url = process.env['FRONTEGG_APP_URL'];
+    }
+    if (url && !url.startsWith('http')) {
+      const protocol = url.startsWith('localhost') ? 'http://' : 'https://'
+      url = `${protocol}${url}`;
+    }
+    return url;
+  }
+
   get appUrl(): string {
-    return process.env['FRONTEGG_APP_URL'] ?? 'http://localhost:3000';
+    return this.getEnvAppUrl() ?? 'http://localhost:3000';
   }
 
   get cookieDomain(): string {
-    return new URL(process.env['FRONTEGG_APP_URL'] ?? '').hostname.replace(
+    return new URL(this.getEnvAppUrl() ?? '').hostname.replace(
       /:(\d)+$/,
       ''
     );

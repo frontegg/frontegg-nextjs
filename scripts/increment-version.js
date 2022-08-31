@@ -15,7 +15,7 @@ function isAdminPortalPackageUpdated() {
   return (
     yarnLockChanges.toString().indexOf('@frontegg/rest-api@') !== -1 ||
     yarnLockChanges.toString().indexOf('@frontegg/redux-store@') !== -1 ||
-    yarnLockChanges.toString().indexOf('@frontegg/admin-portal@') !== -1
+    yarnLockChanges.toString().indexOf('@frontegg/js@') !== -1
   );
 }
 

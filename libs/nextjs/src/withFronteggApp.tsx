@@ -33,7 +33,8 @@ export const withFronteggApp = (
     if (ctx.req?.url?.indexOf('/_next/data/') === -1) {
       const session = await refreshToken(ctx);
       appContext.session = session;
-      if (!process.env['FRONTEGG_APP_URL']) {
+      const envAppUrl = fronteggConfig.getEnvAppUrl();
+      if (!envAppUrl) {
         throw Error(
           '@frontegg/nextjs: .env.local must contain FRONTEGG_APP_URL'
         );
@@ -57,7 +58,7 @@ export const withFronteggApp = (
             ? await Component.getInitialProps(ctx)
             : {}),
           session,
-          envAppUrl: process.env['FRONTEGG_APP_URL'],
+          envAppUrl,
           envBaseUrl: process.env['FRONTEGG_BASE_URL'],
           envClientId: process.env['FRONTEGG_CLIENT_ID'],
         },
