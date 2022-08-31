@@ -13,7 +13,7 @@
         "project": "libs/nextjs/package.json",
         "entryFile": "libs/nextjs/src/index.ts",
         "external": [
-          "@frontegg/admin-portal",
+          "@frontegg/js",
           "@frontegg/react-hooks",
           "@frontegg/redux-store",
           "@frontegg/rest-api",
