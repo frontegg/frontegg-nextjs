@@ -14,13 +14,15 @@ import FronteggConfig from './FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
 import { uncompress } from './helpers';
 
+type RequestType = IncomingMessage | Request;
+
 export async function getSession(
-  req: IncomingMessage
+  req: RequestType
 ): Promise<FronteggNextJSSession | undefined> {
   try {
-    const sealFromCookies = cookie.parse(req.headers.cookie || '')[
-      fronteggConfig.cookieName
-      ];
+    const cookieStr = "credentials" in req ? req.headers.get("cookie") || "" : req.headers.cookie || "";
+
+    const sealFromCookies = cookie.parse(cookieStr)[fronteggConfig.cookieName];
     if (!sealFromCookies) {
       return undefined;
     }
@@ -68,7 +70,7 @@ export function withSSRSession<P extends { [key: string]: any } = { [key: string
       return {
         redirect: {
           permanent: false,
-          destination: `${loginUrl}?redirectUrl=${encodeURIComponent(context.resolvedUrl ?? context.req.url!)}`,
+          destination: `${loginUrl}?redirectUrl=${encodeURIComponent(context.resolvedUrl ?? context.req.url)}`,
         },
         props: {},
       } as GetServerSidePropsResult<P>;
