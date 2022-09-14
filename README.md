@@ -16,6 +16,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
   - [Frontegg Provider Options](#frontegg-provider-options)
   - [getSession](#getsession)
   - [withSSRSession](#withssrsession)
+  - [Next.js middlewares usage](#nextjs-middlewares-usage)
   - for more [visit](https://docs.frontegg.com/docs/self-service-introduction)
 
 ## Installation
@@ -214,4 +215,34 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
     return { props: { products: data } };
   }
 );
+```
+
+## Next.js middlewares usage
+
+To prevent access unauthenticated user to all routes, use [Next.js middlewares](https://nextjs.org/docs/advanced-features/middleware).
+
+**Note: If you were using Middleware prior to 12.2, please see the [upgrade guide](https://nextjs.org/docs/messages/middleware-upgrade-guide).**
+
+```ts
+// /middleware.ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getSession } from '@frontegg/nextjs';
+
+export const middleware = async (request: NextRequest) => {
+  const session = await getSession(request);
+
+  console.log("middleware session", session);
+  
+  if(!session){
+    // redirect unauthenticated user to /account/login page
+    return NextResponse.redirect(new URL('/account/login', req.url))
+  }
+  
+  return NextResponse.next();
+};
+
+export const config = {
+  matcher: "/(.*)",
+};
 ```
