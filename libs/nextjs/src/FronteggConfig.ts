@@ -43,11 +43,12 @@ class FronteggConfig {
 
   getEnvAppUrl(): string | undefined {
     let url: string | undefined = undefined
-    if (process.env['VERCEL_URL']) {
-      url = process.env['VERCEL_URL'];
-    } else if (process.env['FRONTEGG_APP_URL']) {
+    if (process.env['FRONTEGG_APP_URL']) {
       url = process.env['FRONTEGG_APP_URL'];
+    } else if (process.env['VERCEL'] && process.env['VERCEL_URL']) {
+      url = process.env['VERCEL_URL'];
     }
+
     if (url && !url.startsWith('http')) {
       const protocol = url.startsWith('localhost') ? 'http://' : 'https://'
       url = `${protocol}${url}`;
