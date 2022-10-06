@@ -8,6 +8,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 - [Installation](#installation)
   - [Create new NextJS project](#create-new-nextjs-project)
   - [Add to existing project](#add-to-existing-project)
+  - [Using Vercel platform with custom domain](#using-vercel-platform-with-custom-domain)
 - [Getting Started](#getting-started)
   - [Create Frontegg worksapce](#create-frontegg-worksapce)
   - [Setup environment](#setup-environment)
@@ -87,6 +88,13 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
      FronteggRouterProps as getServerSideProps,
    } from '@frontegg/nextjs';
    ```
+
+### Using Vercel platform with custom domain
+
+  1. Visit `https://vercel.com/[ACCOUNT_ID]/[PROJECT_ID]/settings/environment-variables`
+  2. Add `FRONTEGG_APP_URL` environment variable for each Vercel Environment
+  ![vercel-settings-pages](https://github.com/frontegg/frontegg-nextjs/blob/master/vercel-environment.png)
+ 
 
 ## Getting Started
 
