@@ -91,6 +91,7 @@ jobs:
         run: |
           cp .npmrc ./dist/libs/nextjs/
           cp .npmignore ./dist/libs/nextjs/
+          cp README.md ./dist/libs/nextjs/
           cd ./dist/libs/nextjs && npm publish --tag latest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
