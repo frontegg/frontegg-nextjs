@@ -56,6 +56,8 @@ jobs:
         with:
           result-encoding: string
           script: |
+            const fs = await import('fs')
+            console.log(fs.readdirSync(`${{ github.workspace }}/.github/scripts`));
             const { generateChangeLog } = await import(`${{ github.workspace }}/.github/scripts/index.js`);
             return generateChangeLog({context, github, core})
       - name: "Set incremented version"
