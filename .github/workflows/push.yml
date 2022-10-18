@@ -20,11 +20,3 @@ jobs:
         run: yarn install
       - name: Build NextJS Package
         run: yarn build
-      - name: "Set Generated changelog"
-        uses: actions/github-script@v6
-        id: 'generated-changelog'
-        with:
-          result-encoding: string
-          script: |
-            const { generateChangeLog } = await import(`${{ github.workspace }}/.github/scripts/index.js`);
-            return generateChangeLog({context, github, core})
