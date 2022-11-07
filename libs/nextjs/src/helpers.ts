@@ -1,5 +1,5 @@
 import { ServerResponse } from 'http';
-import cookie from 'cookie';
+import cookie, { CookieSerializeOptions } from 'cookie';
 import { sealData } from 'iron-session';
 import fronteggConfig from './FronteggConfig';
 import { decodeJwt } from 'jose';
@@ -102,27 +102,11 @@ export async function refreshToken(
           return null;
         }
         const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
-        const cookieValue = cookie.serialize(
-          fronteggConfig.cookieName,
-          session,
-          {
-            expires: new Date(decodedJwt.exp * 1000),
-            httpOnly: true,
-            domain: fronteggConfig.cookieDomain,
-            path: '/',
-            sameSite: isSecured ? 'none' : undefined,
-            secure: isSecured,
-          }
-        );
-        if (cookieValue.length > 4096) {
-          console.error(
-            `@frontegg/nextjs: Cookie length is too big ${cookieValue.length}, browsers will refuse it. Try to remove some data.`
-          );
-        }
+        const cookieValue = createCookie({ session, expires: new Date(decodedJwt.exp * 1000), isSecured })
         if (typeof newSetCookie === 'string') {
-          newSetCookie = [ newSetCookie ];
+          newSetCookie = [newSetCookie];
         }
-        newSetCookie.push(cookieValue);
+        newSetCookie.push(...cookieValue);
         ctx.res?.setHeader('set-cookie', newSetCookie);
         return {
           accessToken: JSON.parse(data).accessToken,
@@ -139,13 +123,82 @@ export async function refreshToken(
   }
 }
 
-export function addToCookies(cookieValue: string, res: ServerResponse) {
+type CreateCookieArguments = {
+  cookieName?: string,
+  session: string,
+  expires: CookieSerializeOptions['expires'],
+  isSecured: CookieSerializeOptions['secure'],
+  cookieDomain?: CookieSerializeOptions['domain'],
+  httpOnly?: CookieSerializeOptions['httpOnly'],
+  path?: CookieSerializeOptions['path']
+}
+const COOKIE_MAX_LENGTH = 4096
+export function createCookie(
+  {
+    cookieName = fronteggConfig.cookieName,
+    session,
+    expires,
+    isSecured,
+    cookieDomain = fronteggConfig.cookieDomain,
+    httpOnly = true,
+    path = '/'
+  }: CreateCookieArguments) {
+  const options = {
+    expires,
+    httpOnly,
+    domain: cookieDomain,
+    path,
+    sameSite: isSecured ? 'none' as const : undefined,
+    secure: isSecured,
+  }
+  const cookieValue = cookie.serialize(cookieName, session, options);
+  if (cookieValue.length < COOKIE_MAX_LENGTH) {
+    return [cookieValue]
+  }
+  return createSplitCookie(cookieName, session, options, cookieValue.length)
+}
+
+function createSplitCookie(cookieName: string, session: string, options: CookieSerializeOptions, cookieLength: number) {
+  const numberOfCookies = Math.ceil(cookieLength / COOKIE_MAX_LENGTH)
+  const splitSession = chunkString(session, numberOfCookies)
+  const allCookies = []
+  for (let i = 1; i <= numberOfCookies; i++) {
+    allCookies.push(cookie.serialize(`${cookieName}-${i}`, splitSession[i - 1], options))
+  }
+  return allCookies
+}
+
+function chunkString(str: string, numChunks: number) {
+  const chunkSize = Math.ceil(str.length / numChunks)
+  const chunks = []
+  for (let i = 0; i < numChunks; i + chunkSize) {
+    const limit = i + chunkSize
+    chunks.push(str.substring(i, limit < str.length ? limit : str.length))
+  }
+  return chunks
+}
+
+export function parseCookie(cookieStr: string) {
+  let sealFromCookies = '';
+  if (cookie.parse(cookieStr)[fronteggConfig.cookieName]) {
+    sealFromCookies = cookie.parse(cookieStr)[fronteggConfig.cookieName]
+  } else {
+    let i = 1;
+    while (cookie.parse(cookieStr)[`${fronteggConfig.cookieName}-${i}`]) {
+      sealFromCookies += cookie.parse(cookieStr)[`${fronteggConfig.cookieName}-${i}`]
+      i++;
+    }
+  }
+  return sealFromCookies !== '' ? sealFromCookies : undefined
+}
+
+export function addToCookies(newCookies: string[], res: ServerResponse) {
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [ existingSetCookie ];
+    existingSetCookie = [existingSetCookie];
   }
-  res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
+  res.setHeader('set-cookie', [...existingSetCookie, ...newCookies]);
 }
 
 export function removeCookies(
@@ -154,20 +207,13 @@ export function removeCookies(
   cookieDomain: string,
   res: ServerResponse
 ) {
-  const cookieValue = cookie.serialize(cookieName, '', {
-    expires: new Date(),
-    httpOnly: true,
-    domain: cookieDomain,
-    path: '/',
-    sameSite: isSecured ? 'none' : undefined,
-    secure: isSecured,
-  });
+  const cookieValue = createCookie({ cookieName, session: '', expires: new Date(), isSecured, cookieDomain, })
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [ existingSetCookie ];
+    existingSetCookie = [existingSetCookie];
   }
-  res.setHeader('set-cookie', [ ...existingSetCookie, cookieValue ]);
+  res.setHeader('set-cookie', [...existingSetCookie, ...cookieValue]);
 }
 
 export function compress(input: string): Promise<string> {

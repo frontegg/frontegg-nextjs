@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import httpProxy from 'http-proxy';
-import cookie from 'cookie';
 import fronteggConfig from './FronteggConfig';
 import {
   addToCookies,
+  createCookie,
   createSessionFromAccessToken,
   modifySetCookieIfUnsecure,
   removeCookies,
@@ -133,23 +133,11 @@ export function fronteggMiddleware(
                 output
               );
               if (session) {
-                const cookieValue = cookie.serialize(
-                  fronteggConfig.cookieName,
+                const cookieValue = createCookie({
                   session,
-                  {
-                    expires: new Date(decodedJwt.exp * 1000),
-                    httpOnly: true,
-                    domain: fronteggConfig.cookieDomain,
-                    path: '/',
-                    sameSite: isSecured ? 'none' : undefined,
-                    secure: isSecured,
-                  }
-                );
-                if (cookieValue.length > 4096) {
-                  console.error(
-                    `@frontegg/nextjs: Cookie length is too big ${cookieValue.length}, browsers will refuse it. Try to remove some data.`
-                  );
-                }
+                  expires: new Date(decodedJwt.exp * 1000),
+                  isSecured
+                })
                 addToCookies(cookieValue, serverResponse);
               }
             }

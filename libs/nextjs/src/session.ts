@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http';
 import { FronteggNextJSSession } from './types';
-import cookie from 'cookie';
 import fronteggConfig from './FronteggConfig';
 import { unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
@@ -12,7 +11,7 @@ import {
 } from 'next';
 import FronteggConfig from './FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
-import { uncompress } from './helpers';
+import { parseCookie, uncompress } from './helpers';
 
 type RequestType = IncomingMessage | Request;
 
@@ -22,7 +21,7 @@ export async function getSession(
   try {
     const cookieStr = "credentials" in req ? req.headers.get("cookie") || "" : req.headers.cookie || "";
 
-    const sealFromCookies = cookie.parse(cookieStr)[fronteggConfig.cookieName];
+    const sealFromCookies = parseCookie(cookieStr)
     if (!sealFromCookies) {
       return undefined;
     }
