@@ -1,4 +1,4 @@
-import FronteggConfig from './FronteggConfig';
+import fronteggConfig from './FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
 import { parse } from 'url';
 import { useContext, useEffect } from 'react';
@@ -19,7 +19,7 @@ export function FronteggRouter() {
     if (app.options.hostedLoginBox) {
       const routesObj = {
         ...authInitialState.routes,
-        ...FronteggConfig.authRoutes,
+        ...fronteggConfig.authRoutes,
       };
 
       const { 'frontegg-router': pathArr, ...queryParams } = query as any;
@@ -44,7 +44,7 @@ export function FronteggRouter() {
 export function FronteggRouterProps(context: any) {
   const routesObj = {
     ...authInitialState.routes,
-    ...FronteggConfig.authRoutes,
+    ...fronteggConfig.authRoutes,
   };
   const routesArr: string[] = Object.keys(routesObj).reduce(
     (p: string[], key: string) => [ ...p, (routesObj as any)[key] ],
@@ -58,7 +58,7 @@ export function FronteggRouterProps(context: any) {
   }
   const notFound = routesArr.indexOf(pathname as string) === -1;
 
-  if (FronteggConfig.fronteggAppOptions.hostedLoginBox) {
+  if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
     const notFound = !(routesObj.loginUrl === pathname || routesObj.logoutUrl === pathname || routesObj.hostedLoginRedirectUrl === pathname);
     return { notFound, props: {} }
   }

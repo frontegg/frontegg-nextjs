@@ -129,7 +129,7 @@ export function fronteggMiddleware(
                 serverResponse
               );
             } else {
-              const [session, decodedJwt] = await createSessionFromAccessToken(
+              const [session, _, decodedJwt] = await createSessionFromAccessToken(
                 output
               );
               if (session) {

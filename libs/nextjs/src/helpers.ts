@@ -67,7 +67,32 @@ export async function refreshToken(
     const cookieKey = Object.keys(cookies).find((cookie) => {
       return cookie.replace(/-/g, '') === refreshTokenKey;
     });
-    if (cookieKey) {
+
+    if (!cookieKey) {
+      // ctx.res?.setHeader('set-cookie', removedCookies);
+      // remove all fe_nextjs-session cookies
+      return null;
+    }
+
+    if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
+      const response = await fetch(
+        `${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggRefreshTokenUrl}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          body: '{}',
+          headers: {
+            'accept-encoding': headers['accept-encoding'],
+            'accept-language': headers['accept-language'],
+            cookie: headers['cookie'],
+            accept: headers['accept'],
+            'user-agent': headers['user-agent'],
+            connection: headers['connection'],
+            'cache-control': headers['cache-control'],
+          },
+        }
+      );
+    } else {
       const response = await fetch(
         `${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggRefreshTokenUrl}`,
         {
@@ -97,26 +122,29 @@ export async function refreshToken(
           rewriteCookieDomainConfig,
           'domain'
         );
-        const [ session, decodedJwt ] = await createSessionFromAccessToken(data);
+        const [ session, refreshToken, decodedJwt ] = await createSessionFromAccessToken(data);
         if (!session) {
           return null;
         }
         const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
         const cookieValue = createCookie({ session, expires: new Date(decodedJwt.exp * 1000), isSecured })
         if (typeof newSetCookie === 'string') {
-          newSetCookie = [newSetCookie];
+          newSetCookie = [ newSetCookie ];
         }
         newSetCookie.push(...cookieValue);
         ctx.res?.setHeader('set-cookie', newSetCookie);
         return {
           accessToken: JSON.parse(data).accessToken,
           user: decodedJwt,
+          refreshToken
         };
-      } else {
-        // refresh token failed
+      }
+      else {
+        // remove all fe_nextjs-session cookies
+        // ctx.res?.setHeader('set-cookie', removedCookies);
+        return null;
       }
     }
-    return null;
   } catch (e) {
     console.log(e);
     return null;
@@ -133,6 +161,7 @@ type CreateCookieArguments = {
   path?: CookieSerializeOptions['path']
 }
 const COOKIE_MAX_LENGTH = 4096
+
 export function createCookie(
   {
     cookieName = fronteggConfig.cookieName,
@@ -153,7 +182,7 @@ export function createCookie(
   }
   const cookieValue = cookie.serialize(cookieName, session, options);
   if (cookieValue.length < COOKIE_MAX_LENGTH) {
-    return [cookieValue]
+    return [ cookieValue ]
   }
   return createSplitCookie(cookieName, session, options, cookieValue.length)
 }
@@ -196,9 +225,9 @@ export function addToCookies(newCookies: string[], res: ServerResponse) {
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [existingSetCookie];
+    existingSetCookie = [ existingSetCookie ];
   }
-  res.setHeader('set-cookie', [...existingSetCookie, ...newCookies]);
+  res.setHeader('set-cookie', [ ...existingSetCookie, ...newCookies ]);
 }
 
 export function removeCookies(
@@ -211,9 +240,9 @@ export function removeCookies(
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [existingSetCookie];
+    existingSetCookie = [ existingSetCookie ];
   }
-  res.setHeader('set-cookie', [...existingSetCookie, ...cookieValue]);
+  res.setHeader('set-cookie', [ ...existingSetCookie, ...cookieValue ]);
 }
 
 export function compress(input: string): Promise<string> {
@@ -242,21 +271,22 @@ export function uncompress(input: string): Promise<string> {
 
 export async function createSessionFromAccessToken(
   output: string
-): Promise<[ string, any ] | []> {
+): Promise<[ string, string, any ] | []> {
   try {
     const data = JSON.parse(output);
     const accessToken = data?.accessToken ?? data.access_token;
+    const refreshToken = data?.refreshToken ?? data.refresh_token;
     const decodedJwt: any = decodeJwt(accessToken);
     decodedJwt.expiresIn = Math.floor(
       (decodedJwt.exp * 1000 - Date.now()) / 1000
     );
 
-    const compressedAccessToken = await compress(accessToken);
+    const compressedAccessToken = await compress(JSON.stringify(accessToken, refreshToken));
     const session = await sealData(compressedAccessToken, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
-    return [ session, decodedJwt ];
+    return [ session, refreshToken, decodedJwt ];
   } catch (e) {
     return [];
   }

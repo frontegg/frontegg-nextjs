@@ -9,7 +9,7 @@ import {
   GetServerSidePropsResult,
   PreviewData,
 } from 'next';
-import FronteggConfig from './FronteggConfig';
+import fronteggConfig from './FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
 import { parseCookie, uncompress } from './helpers';
 
@@ -19,7 +19,7 @@ export async function getSession(
   req: RequestType
 ): Promise<FronteggNextJSSession | undefined> {
   try {
-    const cookieStr = "credentials" in req ? req.headers.get("cookie") || "" : req.headers.cookie || "";
+    const cookieStr = 'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
 
     const sealFromCookies = parseCookie(cookieStr)
     if (!sealFromCookies) {
@@ -28,14 +28,18 @@ export async function getSession(
     const compressedJwt: string = await unsealData(sealFromCookies, {
       password: fronteggConfig.passwordsAsMap,
     });
-    const jwt = await uncompress(compressedJwt);
+    const { jwt, refreshToken } = JSON.parse(await uncompress(compressedJwt));
 
+    if (!jwt) {
+      return undefined;
+    }
     const publicKey = await fronteggConfig.getJwtPublicKey();
     const { payload }: any = await jwtVerify(jwt, publicKey);
 
     const session: FronteggNextJSSession = {
       accessToken: jwt,
       user: payload,
+      refreshToken,
     };
     if (session.user.exp * 1000 < Date.now()) {
       return undefined;
@@ -62,7 +66,7 @@ export function withSSRSession<P extends { [key: string]: any } = { [key: string
     if (session) {
       return handler(context, session);
     } else {
-      let loginUrl = FronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
+      let loginUrl = fronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`
       }
