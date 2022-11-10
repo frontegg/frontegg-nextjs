@@ -26,7 +26,7 @@ export function FronteggRouter() {
       const pathname = `/${pathArr.join('/')}`;
       if (pathname === routesObj.loginUrl) {
         if(queryParams.redirectUrl){
-          localStorage.setItem('FRONTEGG_AFTER_AUTH_REDIRECT_URL', `${window.location.origin}/${queryParams.redirectUrl}`);
+          localStorage.setItem('FRONTEGG_AFTER_AUTH_REDIRECT_URL', `${window.location.origin}${queryParams.redirectUrl}`);
         }
         loginWithRedirect()
       } else if (pathname === routesObj.logoutUrl) {
@@ -60,6 +60,7 @@ export function FronteggRouterProps(context: any) {
 
   if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
     const notFound = !(routesObj.loginUrl === pathname || routesObj.logoutUrl === pathname || routesObj.hostedLoginRedirectUrl === pathname);
+    console.log("Page not found? :" , notFound, pathname)
     return { notFound, props: {} }
   }
   return {
