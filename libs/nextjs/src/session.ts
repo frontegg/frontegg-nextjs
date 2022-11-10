@@ -65,6 +65,7 @@ export async function getSession(
     }
     return session;
   } catch (e) {
+    console.error(e);
     return undefined;
   }
 }

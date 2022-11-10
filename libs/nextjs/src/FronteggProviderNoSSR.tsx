@@ -15,16 +15,11 @@ import { NextRouter, useRouter } from 'next/router';
 import { FronteggNextJSSession } from './types';
 import AppContext from './AppContext';
 
-export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> & {
+export type FronteggProviderNoSSRProps = FronteggAppOptions & {
   children?: ReactNode;
-  session?: FronteggNextJSSession;
-  envAppUrl: string;
-  envBaseUrl: string;
-  envClientId: string;
-  contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
 };
 
-type ConnectorProps = FronteggProviderProps & {
+type ConnectorProps = FronteggProviderNoSSRProps & {
   router: NextRouter;
   appName?: string;
 };
@@ -51,25 +46,6 @@ const Connector: FC<ConnectorProps> = (_props) => {
     }
   }, []);
 
-  const contextOptions = useMemo(
-    () => ({
-      baseUrl: (path: string) => {
-        if (fronteggAuthApiRoutes.indexOf(path) !== -1 ||
-          path.endsWith('/postlogin') ||
-          path.endsWith('/prelogin') ||
-          path === '/oauth/token'
-        ) {
-          return `${props.envAppUrl}/api`;
-        } else {
-          return props.envBaseUrl;
-        }
-      },
-      clientId: props.envClientId,
-    }),
-    [ props.envAppUrl, props.envBaseUrl, props.envClientId ]
-  );
-
-
   const app = useMemo(() => {
     let createdApp;
     try {
@@ -87,7 +63,6 @@ const Connector: FC<ConnectorProps> = (_props) => {
           contextOptions: {
             requestCredentials: 'include',
             ...props.contextOptions,
-            ...contextOptions,
           },
           onRedirectTo,
         },
@@ -95,16 +70,11 @@ const Connector: FC<ConnectorProps> = (_props) => {
       );
     }
     return createdApp;
-  }, [ appName, props, hostedLoginBox, baseName, onRedirectTo, contextOptions ]);
+  }, [ appName, props, hostedLoginBox, baseName, onRedirectTo ]);
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    app.store.dispatch({
-      type: 'auth/requestAuthorizeSSR',
-      payload: props.session?.accessToken,
-    });
+    app.store.dispatch({ type: 'auth/requestAuthorize', payload: true, });
   }, [ app ]);
 
   return (
@@ -132,7 +102,7 @@ const ExpireInListener = () => {
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 };
-const FronteggNextJSProvider: FC<FronteggProviderProps> = (props) => {
+const FronteggNextJSProvider: FC<FronteggProviderNoSSRProps> = (props) => {
   const router = useRouter();
 
   return (
@@ -143,7 +113,7 @@ const FronteggNextJSProvider: FC<FronteggProviderProps> = (props) => {
   );
 };
 
-export const FronteggProvider: FC<FronteggProviderProps> = (props) => {
+export const FronteggProviderNoSSR: FC<FronteggProviderNoSSRProps> = (props) => {
   return (
     <FronteggNextJSProvider {...props} framework={'nextjs'}>
       {props.children}
