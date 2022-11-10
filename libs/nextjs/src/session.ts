@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http';
 import { FronteggNextJSSession } from './types';
-import fronteggConfig from './FronteggConfig';
 import { unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { ParsedUrlQuery } from 'querystring';
@@ -9,17 +8,17 @@ import {
   GetServerSidePropsResult,
   PreviewData,
 } from 'next';
-import FronteggConfig from './FronteggConfig';
+import fronteggConfig from './FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
 import { parseCookie, uncompress } from './helpers';
 
 type RequestType = IncomingMessage | Request;
 
-export async function getSession(
+export async function getHostedLoginRefreshToken(
   req: RequestType
-): Promise<FronteggNextJSSession | undefined> {
+): Promise<string | undefined> {
   try {
-    const cookieStr = "credentials" in req ? req.headers.get("cookie") || "" : req.headers.cookie || "";
+    const cookieStr = 'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
 
     const sealFromCookies = parseCookie(cookieStr)
     if (!sealFromCookies) {
@@ -28,14 +27,39 @@ export async function getSession(
     const compressedJwt: string = await unsealData(sealFromCookies, {
       password: fronteggConfig.passwordsAsMap,
     });
-    const jwt = await uncompress(compressedJwt);
+    const { refreshToken } = JSON.parse(await uncompress(compressedJwt));
 
+    return refreshToken;
+  }catch (e){
+    return undefined;
+  }
+}
+export async function getSession(
+  req: RequestType
+): Promise<FronteggNextJSSession | undefined> {
+  try {
+    const cookieStr = 'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
+
+    const sealFromCookies = parseCookie(cookieStr)
+    if (!sealFromCookies) {
+      return undefined;
+    }
+    const compressedJwt: string = await unsealData(sealFromCookies, {
+      password: fronteggConfig.passwordsAsMap,
+    });
+    const uncompressedJwt = await uncompress(compressedJwt);
+    const { accessToken, refreshToken } = JSON.parse(uncompressedJwt);
+
+    if (!accessToken) {
+      return undefined;
+    }
     const publicKey = await fronteggConfig.getJwtPublicKey();
-    const { payload }: any = await jwtVerify(jwt, publicKey);
+    const { payload }: any = await jwtVerify(accessToken, publicKey);
 
     const session: FronteggNextJSSession = {
-      accessToken: jwt,
+      accessToken,
       user: payload,
+      refreshToken,
     };
     if (session.user.exp * 1000 < Date.now()) {
       return undefined;
@@ -62,10 +86,11 @@ export function withSSRSession<P extends { [key: string]: any } = { [key: string
     if (session) {
       return handler(context, session);
     } else {
-      let loginUrl = FronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
+      let loginUrl = fronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`
       }
+      console.log("redriecting to login")
       return {
         redirect: {
           permanent: false,

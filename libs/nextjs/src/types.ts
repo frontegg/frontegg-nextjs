@@ -10,6 +10,7 @@ export interface CustomClaims {
 
 export interface FronteggNextJSSession {
   accessToken: string;
+  refreshToken?: string;
   user: {
     sub: string;
     name: string;

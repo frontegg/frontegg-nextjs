@@ -113,13 +113,13 @@ export function fronteggMiddleware(
         let buffer = new Buffer('');
         proxyRes
           .on('data', (chunk) => {
-            buffer = Buffer.concat([buffer, chunk]);
+            buffer = Buffer.concat([ buffer, chunk ]);
           })
           .on('end', async () => {
             const output = buffer.toString('utf-8');
             const isLogout = req?.url?.endsWith(
               fronteggAuthApiRoutes.find((path) => path.endsWith('/logout')) ??
-                '/logout'
+              '/logout'
             );
             if (isLogout) {
               removeCookies(
@@ -129,22 +129,22 @@ export function fronteggMiddleware(
                 serverResponse
               );
             } else {
-              const [session, decodedJwt] = await createSessionFromAccessToken(
+              const [ session, decodedJwt ] = await createSessionFromAccessToken(
                 output
               );
               if (session) {
-                const cookieValue = createCookie({
+                const sessionCookie = createCookie({
                   session,
                   expires: new Date(decodedJwt.exp * 1000),
                   isSecured
                 })
-                addToCookies(cookieValue, serverResponse);
+                addToCookies(sessionCookie, serverResponse);
               }
             }
             res.setHeader('content-length', output.length);
             res.setHeader('content-encoding', '');
             // @ts-ignore
-            _end.apply(res, [output]);
+            _end.apply(res, [ output ]);
           });
 
         // disable default behavior to read jwt
