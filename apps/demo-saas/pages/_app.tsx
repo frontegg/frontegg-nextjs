@@ -8,8 +8,5 @@ function CustomApp({ Component, pageProps }: AppProps) {
 
 export default withFronteggApp(CustomApp, {
   hostedLoginBox: true,
-  customLoader: true,
-  authOptions:{
-    disableSilentRefresh:true
-  }
+  customLoader: true
 });

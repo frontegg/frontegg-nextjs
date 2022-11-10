@@ -1,8 +1,8 @@
 import { GetServerSideProps } from 'next';
-import { AdminPortal, useAuthUserOrNull, withSSRSession } from '@frontegg/nextjs';
+import { AdminPortal, useAuthUser, withSSRSession } from '@frontegg/nextjs';
 
 export default function ForceSession({ ssrSession }) {
-  const user = useAuthUserOrNull();
+  const user = useAuthUser();
   console.log('user', user);
 
   return (

@@ -103,7 +103,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
     // @ts-ignore
     app.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
-      payload: props.session,
+      payload: props.session ?? {refreshToken:null, accessToken:null},
     });
   }, [ app ]);
 
