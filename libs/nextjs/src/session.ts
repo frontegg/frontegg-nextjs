@@ -47,16 +47,17 @@ export async function getSession(
     const compressedJwt: string = await unsealData(sealFromCookies, {
       password: fronteggConfig.passwordsAsMap,
     });
-    const { jwt, refreshToken } = JSON.parse(await uncompress(compressedJwt));
+    const uncompressedJwt = await uncompress(compressedJwt);
+    const { accessToken, refreshToken } = JSON.parse(uncompressedJwt);
 
-    if (!jwt) {
+    if (!accessToken) {
       return undefined;
     }
     const publicKey = await fronteggConfig.getJwtPublicKey();
-    const { payload }: any = await jwtVerify(jwt, publicKey);
+    const { payload }: any = await jwtVerify(accessToken, publicKey);
 
     const session: FronteggNextJSSession = {
-      accessToken: jwt,
+      accessToken,
       user: payload,
       refreshToken,
     };

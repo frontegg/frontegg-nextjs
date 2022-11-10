@@ -322,7 +322,8 @@ export async function createSessionFromAccessToken(
       (decodedJwt.exp * 1000 - Date.now()) / 1000
     );
 
-    const compressedAccessToken = await compress(JSON.stringify(accessToken, refreshToken));
+    const uncompressedSession = JSON.stringify({accessToken, refreshToken})
+    const compressedAccessToken = await compress(uncompressedSession);
     const session = await sealData(compressedAccessToken, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,

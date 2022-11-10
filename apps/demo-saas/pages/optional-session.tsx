@@ -1,8 +1,9 @@
 import { GetServerSideProps } from 'next';
-import { AdminPortal, getSession, useAuthUserOrNull } from '@frontegg/nextjs';
+import { AdminPortal, getSession, useAuthUserOrNull, useLoginWithRedirect } from '@frontegg/nextjs';
 
 export default function OptionalSession({ ssrSession }) {
   const user = useAuthUserOrNull();
+  const loginWithRedirect = useLoginWithRedirect()
   return (
     <div>
       <h1>Optional Server-Side session</h1>
@@ -20,6 +21,16 @@ export default function OptionalSession({ ssrSession }) {
       >
         Open AdminPortal
       </button>
+      <br/>
+      <br/>
+      <br/>
+      <button
+        onClick={() => {
+          loginWithRedirect()
+        }}
+      >
+        Hosted login
+      </button>
     </div>
   );
 }
@@ -34,3 +45,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {},
   };
 };
+
