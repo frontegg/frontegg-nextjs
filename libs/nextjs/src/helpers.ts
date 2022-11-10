@@ -135,7 +135,7 @@ export async function refreshToken(
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
 
-    if(ctx.req!.url!.startsWith('/oauth/callback')){
+    if (ctx.req!.url!.startsWith('/oauth/callback')) {
       return null;
     }
     let response: Response | null;
@@ -166,7 +166,7 @@ export async function refreshToken(
         rewriteCookieDomainConfig,
         'domain'
       );
-      const [ session, refreshToken, decodedJwt ] = await createSessionFromAccessToken(data);
+      const [ session, decodedJwt, refreshToken ] = await createSessionFromAccessToken(data);
       if (!session) {
         return null;
       }
@@ -312,7 +312,7 @@ export function uncompress(input: string): Promise<string> {
 
 export async function createSessionFromAccessToken(
   output: string
-): Promise<[ string, string, any ] | []> {
+): Promise<[ string, any, string ] | []> {
   try {
     const data = JSON.parse(output);
     const accessToken = data?.accessToken ?? data.access_token;
@@ -322,13 +322,13 @@ export async function createSessionFromAccessToken(
       (decodedJwt.exp * 1000 - Date.now()) / 1000
     );
 
-    const uncompressedSession = JSON.stringify({accessToken, refreshToken})
+    const uncompressedSession = JSON.stringify({ accessToken, refreshToken })
     const compressedAccessToken = await compress(uncompressedSession);
     const session = await sealData(compressedAccessToken, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
-    return [ session, refreshToken, decodedJwt ];
+    return [ session, decodedJwt, refreshToken ];
   } catch (e) {
     return [];
   }
