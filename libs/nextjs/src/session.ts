@@ -90,7 +90,6 @@ export function withSSRSession<P extends { [key: string]: any } = { [key: string
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`
       }
-      console.log("redriecting to login")
       return {
         redirect: {
           permanent: false,
