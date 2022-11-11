@@ -60,7 +60,6 @@ export function FronteggRouterProps(context: any) {
 
   if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
     const notFound = !(routesObj.loginUrl === pathname || routesObj.logoutUrl === pathname || routesObj.hostedLoginRedirectUrl === pathname);
-    console.log("Page not found? :" , notFound, pathname)
     return { notFound, props: {} }
   }
   return {
