@@ -12,7 +12,7 @@ import {
   fronteggAuthApiRoutes,
 } from '@frontegg/rest-api';
 import { NextRouter, useRouter } from 'next/router';
-import { FronteggNextJSSession } from './types';
+import { FronteggNextJSSession } from '../common/types';
 import AppContext from './AppContext';
 
 export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> & {

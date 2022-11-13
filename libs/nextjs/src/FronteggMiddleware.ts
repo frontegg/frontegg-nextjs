@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import httpProxy from 'http-proxy';
-import fronteggConfig from './FronteggConfig';
+import fronteggConfig from '../common/FronteggConfig';
 import {
   addToCookies,
   createCookie,
   createSessionFromAccessToken,
   modifySetCookieIfUnsecure,
   removeCookies,
-} from './helpers';
+} from '../common/helpers';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 
 /**

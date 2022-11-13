@@ -28,6 +28,11 @@ export function Index() {
     <Link href="/force-session">
       check force session
     </Link>
+    <br/>
+    <br/>
+    <Link href="/new">
+      check app directory
+    </Link>
   </div>
     ;
 }

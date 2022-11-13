@@ -1,4 +1,4 @@
-import fronteggConfig from './FronteggConfig';
+import fronteggConfig from '../common/FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
 import { parse } from 'url';
 import { useContext, useEffect } from 'react';

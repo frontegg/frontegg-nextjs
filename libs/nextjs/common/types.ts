@@ -1,3 +1,5 @@
+import { CookieSerializeOptions } from "cookie";
+
 export interface AccountEnvironment {
   id: string;
   createdAt: string;
@@ -29,6 +31,16 @@ export interface FronteggNextJSSession {
     aud: string;
     iss: string;
   };
+}
+
+export interface CreateCookieArguments {
+  cookieName?: string,
+  session: string,
+  expires: CookieSerializeOptions['expires'],
+  isSecured: CookieSerializeOptions['secure'],
+  cookieDomain?: CookieSerializeOptions['domain'],
+  httpOnly?: CookieSerializeOptions['httpOnly'],
+  path?: CookieSerializeOptions['path']
 }
 
 declare module 'iron-session' {

@@ -1,34 +1,41 @@
 import type { AppContext, AppProps, AppInitialProps } from 'next/app';
 import type {
-  AppType,
   AppContextType,
   AppPropsType,
   NextComponentType,
 } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession } from './types';
-import { refreshToken } from './helpers';
+import { FronteggNextJSSession } from '../common/types';
+import { refreshToken } from './refreshToken';
 import { FronteggProvider } from './FronteggProvider';
 import { FronteggAppOptions } from '@frontegg/types';
-import fronteggConfig from './FronteggConfig';
+import fronteggConfig from '../common/FronteggConfig';
+
+type EnhancedAppContextType = AppContextType & {
+  session: FronteggNextJSSession | null;
+};
+
+type CustomFronteggAppType = NextComponentType<
+  EnhancedAppContextType,
+  AppInitialProps,
+  AppPropsType
+>;
+
+type CustomAppType = ((props: AppProps) => JSX.Element) & {
+  getInitialProps?: CustomFronteggAppType['getInitialProps'];
+};
+
+type GetInitialProps = CustomFronteggAppType['getInitialProps'] | undefined;
 
 export const withFronteggApp = (
-  app: ((props: AppProps) => JSX.Element) & {
-    getInitialProps?: AppType['getInitialProps']
-  },
-  options?: Omit<FronteggAppOptions, 'contextOptions'> & {
-    contextOptions?: FronteggAppOptions['contextOptions'];
-  }
-): NextComponentType<AppContextType & { session: FronteggNextJSSession | null }, AppInitialProps, AppPropsType> => {
-  type GetInitialProps = NextComponentType<AppContextType & { session: FronteggNextJSSession | null },
-    AppInitialProps,
-    AppPropsType>['getInitialProps'];
-  const originalGetInitialProps: GetInitialProps | undefined = app.getInitialProps;
+  app: CustomAppType,
+  options?: Partial<FronteggAppOptions>
+): CustomFronteggAppType => {
+  const originalGetInitialProps: GetInitialProps = app.getInitialProps;
 
   app.getInitialProps = async (
     appContext: AppContext & { session: FronteggNextJSSession | null }
   ): Promise<AppInitialProps> => {
     const { ctx, Component } = appContext;
-
 
     if (ctx.req?.url?.indexOf('/_next/data/') === -1) {
       const session = await refreshToken(ctx);
@@ -90,12 +97,12 @@ export const withFronteggApp = (
         envBaseUrl={appProps.pageProps.envBaseUrl}
         envClientId={appProps.pageProps.envClientId}
       >
-        {app(appProps) as any}
+        {app(appProps)}
       </FronteggProvider>
     );
   }
 
   CustomFronteggApp.getInitialProps = app.getInitialProps;
 
-  return CustomFronteggApp as AppType;
+  return CustomFronteggApp as CustomFronteggAppType;
 };

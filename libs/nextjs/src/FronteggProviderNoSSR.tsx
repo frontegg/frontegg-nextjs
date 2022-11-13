@@ -9,10 +9,8 @@ import {
 import {
   ContextHolder,
   RedirectOptions,
-  fronteggAuthApiRoutes,
 } from '@frontegg/rest-api';
 import { NextRouter, useRouter } from 'next/router';
-import { FronteggNextJSSession } from './types';
 import AppContext from './AppContext';
 
 export type FronteggProviderNoSSRProps = FronteggAppOptions & {

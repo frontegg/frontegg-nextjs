@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http';
-import { FronteggNextJSSession } from './types';
+import { FronteggNextJSSession } from '../common/types';
 import { unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { ParsedUrlQuery } from 'querystring';
@@ -8,9 +8,9 @@ import {
   GetServerSidePropsResult,
   PreviewData,
 } from 'next';
-import fronteggConfig from './FronteggConfig';
+import fronteggConfig from '../common/FronteggConfig';
 import { authInitialState } from '@frontegg/redux-store';
-import { parseCookie, uncompress } from './helpers';
+import { parseCookie, uncompress } from '../common/helpers';
 
 type RequestType = IncomingMessage | Request;
 
