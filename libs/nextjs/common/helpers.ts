@@ -2,6 +2,7 @@ import cookie, { CookieSerializeOptions } from 'cookie';
 import { ServerResponse } from 'http';
 import { sealData } from 'iron-session';
 import { decodeJwt } from 'jose';
+import { ReadonlyRequestCookies } from 'next/dist/server/app-render';
 import * as zlib from 'zlib';
 import fronteggConfig from '../common/FronteggConfig';
 import { CreateCookieArguments } from '../common/types';
@@ -193,3 +194,18 @@ export const modifySetCookieIfUnsecure = (
   }
   return setCookieValue;
 };
+
+export function getCookieFromArray(cookies: () => ReadonlyRequestCookies) {
+  let cookie = cookies().get(fronteggConfig.cookieName)?.value ?? '';
+  if (cookie) {
+    return cookie
+  }
+  const allCookies = cookies().getAll();
+  const cookieNameSet = new Set(allCookies.map(c => c.name))
+  let i = 1;
+  while (cookieNameSet.has(`${fronteggConfig.cookieName}-${i}`)) {
+    cookie += allCookies[i].value
+    i++;
+  }
+  return cookie
+}

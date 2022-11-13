@@ -2,19 +2,18 @@ import { unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { ReadonlyRequestCookies } from 'next/dist/server/app-render';
 import fronteggConfig from '../common/FronteggConfig';
-import { uncompress } from '../common/helpers';
+import { getCookieFromArray, uncompress } from '../common/helpers';
 import { FronteggNextJSSession } from '../common/types';
 
 export async function getSessionFromCookies(
     cookies: () => ReadonlyRequestCookies
 ): Promise<FronteggNextJSSession | undefined> {
     try {
-        const cookie = cookies().get(fronteggConfig.cookieName);
+        const cookie = getCookieFromArray(cookies);
         if (!cookie) {
             return undefined;
         }
-        const { value: cookieValue } = cookie
-        const compressedJwt: string = await unsealData(cookieValue, {
+        const compressedJwt: string = await unsealData(cookie, {
             password: fronteggConfig.passwordsAsMap,
         });
         const uncompressedJwt = await uncompress(compressedJwt);
