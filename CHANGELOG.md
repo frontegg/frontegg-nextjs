@@ -2,26 +2,12 @@
 
 ## [6.7.4](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.3...v6.7.4) (2022-11-15)
 
-- FR-9664 - update @frontegg/rest-api
-- FR-9661 - fix chips in dark them
-- FR-9653 - fix hide fields session management
-- FR-9659 - inherit button dark them
-- FR-9655 - fix dialog and select dark them
-- FR-8948 - Fix - clean error message from sign up page when visiting it again
-- FR-9624 - typo + snyk git ignore
-- FR-9629 - typography should be white in dark theme
-- FR-9625 - empty table in dark theme
-- FR-9631 - resize the login box when logo is null
-- FR-9176 - hide fields security and account details pages
-- FR-8714 - Fix ReCaptcha timeout
-- FR-9186 - support ssr with session and refresh token
-- FR-9614 - Add support for innerThemeProvider for admin portal pages and tabs
-
-- FR-9186 - fix pipeline
-
-### NextJS Wrapper 6.7.4:
-- FR-9544 - remove console logs
-- FR-9544 - Add support for keep session a live
+- Fixed redirect to the app after signing up without forced email verification
+- Fixed admin portal dark theme
+- Added the ability to customize fields and tabs in the admin portal
+- Fixed cleaning up error messages on sign up page when re-visiting the page
+- Fixed resizing the login box when the logo is null
+- Fix the ReCaptcha timeout issue
 
 ## [6.7.3](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.2...v6.7.3) (2022-11-11)
 
