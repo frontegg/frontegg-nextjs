@@ -1,5 +1,14 @@
 # Change Log
 
+## [6.7.4](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.3...v6.7.4) (2022-11-15)
+
+- Fixed redirect to the app after signing up without forced email verification
+- Fixed admin portal dark theme
+- Added the ability to customize fields and tabs in the admin portal
+- Fixed cleaning up error messages on sign up page when re-visiting the page
+- Fixed resizing the login box when the logo is null
+- Fix the ReCaptcha timeout issue
+
 ## [6.7.3](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.2...v6.7.3) (2022-11-11)
 
 - FR-9186 - support ssr with session and refresh token
