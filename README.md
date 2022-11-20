@@ -67,7 +67,9 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
      return <Component {...pageProps} />;
    }
 
-   export default withFronteggApp(CustomApp);
+  export default withFronteggApp(CustomApp, {
+    hostedLoginBox: true
+  });
    ```
 
 3. Create files for frontegg middleware under `./pages/api/frontegg/[...frontegg-middleware].ts`:
@@ -158,6 +160,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
 }
 
 export default withFronteggApp(CustomApp, {
+  hostedLoginBox: true,
   /**
    * Frontegg options for customizations
    */
