@@ -1,5 +1,24 @@
 # Change Log
 
+## [6.7.5](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.4...v6.7.5) (2022-11-28)
+
+# v6.7.5
+- Update hide fields API according to new security tabs naming
+- Changed max length for secret fields to 100 characters
+- Added support for customizing invite user dialog fields
+- Added support for admin portal pre-defined theme options (dark, vivid, modern, and classic themes)
+- Added support for customizing admin portal navigation hover color
+- Fixed typo of Andorra country in countries dropdown
+- Fixed select popup alignment issue
+- Changed no local authentication feature to also hide the sign-up form when there is no local authentication option (use only social logins and SSO for signing up)
+- Added mock for feature flags API for admin portal preview mode
+- Fixed resend invitation and activate your account API calls
+- Fixed creating custom webhook on the Admin Portal is sent with the event ID and not with the event Key
+- Added support for customizing fields and tabs in the admin portal
+
+### NextJS Wrapper 6.7.5:
+- Updated next readme to include hosted login box integration
+
 ## [6.7.4](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.3...v6.7.4) (2022-11-15)
 
 - Fixed redirect to the app after signing up without forced email verification
