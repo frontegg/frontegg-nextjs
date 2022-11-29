@@ -10,3 +10,4 @@ export * from './FronteggMiddleware';
 export { AdminPortal } from '@frontegg/js';
 export * from '@frontegg/react-hooks';
 export * from '@frontegg/types';
+export { ContextHolder } from '@frontegg/rest-api';
