@@ -30,7 +30,7 @@ type ConnectorProps = FronteggProviderProps & {
 };
 
 const Connector: FC<ConnectorProps> = (_props) => {
-  const { router, appName, hostedLoginBox, customLoginBox, ...props } = _props;
+  const { router, appName, hostedLoginBox, ...props } = _props;
   const isSSR = typeof window === 'undefined';
 
   const baseName = props.basename ?? router.basePath;
@@ -79,7 +79,6 @@ const Connector: FC<ConnectorProps> = (_props) => {
         {
           ...props,
           hostedLoginBox: hostedLoginBox ?? false,
-          customLoginBox: customLoginBox ?? false,
           basename: props.basename ?? baseName,
           authOptions: {
             ...props.authOptions,
