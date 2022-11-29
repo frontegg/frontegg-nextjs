@@ -79,6 +79,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
         {
           ...props,
           hostedLoginBox: hostedLoginBox ?? false,
+          customLoginBox: customLoginBox ?? false,
           basename: props.basename ?? baseName,
           authOptions: {
             ...props.authOptions,
