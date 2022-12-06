@@ -12,25 +12,34 @@ import {
   fronteggAuthApiRoutes,
 } from '@frontegg/rest-api';
 import { NextRouter, useRouter } from 'next/router';
-import { FronteggNextJSSession } from './types';
+import { MeAndTenants, FronteggNextJSSession } from './types';
 import AppContext from './AppContext';
 
-export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> & {
-  children?: ReactNode;
-  session?: FronteggNextJSSession;
-  envAppUrl: string;
-  envBaseUrl: string;
-  envClientId: string;
-  contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
-};
+export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> &
+  MeAndTenants & {
+    children?: ReactNode;
+    session?: FronteggNextJSSession;
+    envAppUrl: string;
+    envBaseUrl: string;
+    envClientId: string;
+    contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
+  };
 
 type ConnectorProps = FronteggProviderProps & {
   router: NextRouter;
   appName?: string;
 };
 
-const Connector: FC<ConnectorProps> = (_props) => {
-  const { router, appName, hostedLoginBox, customLoginBox, ...props } = _props;
+const Connector: FC<ConnectorProps> = ({
+  router,
+  appName,
+  hostedLoginBox,
+  customLoginBox,
+  user = null,
+  tenants = null,
+  ...props
+}) => {
+  const { accessToken = null, refreshToken = null } = props.session ?? {};
   const isSSR = typeof window === 'undefined';
 
   const baseName = props.basename ?? router.basePath;
@@ -54,7 +63,8 @@ const Connector: FC<ConnectorProps> = (_props) => {
   const contextOptions = useMemo(
     () => ({
       baseUrl: (path: string) => {
-        if (fronteggAuthApiRoutes.indexOf(path) !== -1 ||
+        if (
+          fronteggAuthApiRoutes.indexOf(path) !== -1 ||
           path.endsWith('/postlogin') ||
           path.endsWith('/prelogin') ||
           path === '/oauth/token'
@@ -66,24 +76,32 @@ const Connector: FC<ConnectorProps> = (_props) => {
       },
       clientId: props.envClientId,
     }),
-    [ props.envAppUrl, props.envBaseUrl, props.envClientId ]
+    [props.envAppUrl, props.envBaseUrl, props.envClientId]
   );
-
 
   const app = useMemo(() => {
     let createdApp;
     try {
       createdApp = AppHolder.getInstance(appName ?? 'default');
     } catch (e) {
+      ContextHolder.setAccessToken(accessToken);
       createdApp = initialize(
         {
           ...props,
+          accessToken,
           hostedLoginBox: hostedLoginBox ?? false,
           customLoginBox: customLoginBox ?? false,
           basename: props.basename ?? baseName,
           authOptions: {
             ...props.authOptions,
             onRedirectTo,
+            isLoading: false,
+            isAuthenticated: !!props.session,
+            user: user
+              ? { ...user, refreshToken: refreshToken ?? undefined }
+              : null,
+            //@ts-ignore
+            tenantsState: tenants ? { tenants, loading: false } : undefined,
           },
           contextOptions: {
             requestCredentials: 'include',
@@ -96,7 +114,17 @@ const Connector: FC<ConnectorProps> = (_props) => {
       );
     }
     return createdApp;
-  }, [ appName, props, hostedLoginBox, baseName, onRedirectTo, contextOptions ]);
+  }, [
+    appName,
+    props,
+    hostedLoginBox,
+    baseName,
+    onRedirectTo,
+    contextOptions,
+    user,
+    tenants,
+  ]);
+
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
   useEffect(() => {
@@ -104,9 +132,9 @@ const Connector: FC<ConnectorProps> = (_props) => {
     // @ts-ignore
     app.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
-      payload: props.session ?? {refreshToken:null, accessToken:null},
+      payload: { accessToken, refreshToken, user, tenants },
     });
-  }, [ app ]);
+  }, [app]);
 
   return (
     <AppContext.Provider value={app}>
@@ -129,7 +157,7 @@ const ExpireInListener = () => {
         ),
       });
     }
-  }, [ actions, user ]);
+  }, [actions, user]);
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 };
@@ -138,7 +166,7 @@ const FronteggNextJSProvider: FC<FronteggProviderProps> = (props) => {
 
   return (
     <Connector {...props} router={router}>
-      <ExpireInListener/>
+      <ExpireInListener />
       {props.children}
     </Connector>
   );

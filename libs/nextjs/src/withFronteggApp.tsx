@@ -5,34 +5,45 @@ import type {
   AppPropsType,
   NextComponentType,
 } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession } from './types';
-import { refreshToken } from './helpers';
+import { FronteggNextJSSession, MeAndTenants } from './types';
+import { refreshToken, meAndTenants } from './helpers';
 import { FronteggProvider } from './FronteggProvider';
 import { FronteggAppOptions } from '@frontegg/types';
 import fronteggConfig from './FronteggConfig';
 
 export const withFronteggApp = (
   app: ((props: AppProps) => JSX.Element) & {
-    getInitialProps?: AppType['getInitialProps']
+    getInitialProps?: AppType['getInitialProps'];
   },
   options?: Omit<FronteggAppOptions, 'contextOptions'> & {
     contextOptions?: FronteggAppOptions['contextOptions'];
   }
-): NextComponentType<AppContextType & { session: FronteggNextJSSession | null }, AppInitialProps, AppPropsType> => {
-  type GetInitialProps = NextComponentType<AppContextType & { session: FronteggNextJSSession | null },
+): NextComponentType<
+  AppContextType & { session: FronteggNextJSSession | null },
+  AppInitialProps,
+  AppPropsType
+> => {
+  type GetInitialProps = NextComponentType<
+    AppContextType & { session: FronteggNextJSSession | null },
     AppInitialProps,
-    AppPropsType>['getInitialProps'];
-  const originalGetInitialProps: GetInitialProps | undefined = app.getInitialProps;
+    AppPropsType
+  >['getInitialProps'];
+  const originalGetInitialProps: GetInitialProps | undefined =
+    app.getInitialProps;
 
   app.getInitialProps = async (
-    appContext: AppContext & { session: FronteggNextJSSession | null }
+    appContext: AppContext & {
+      session: FronteggNextJSSession | null;
+    } & MeAndTenants
   ): Promise<AppInitialProps> => {
     const { ctx, Component } = appContext;
 
-
     if (ctx.req?.url?.indexOf('/_next/data/') === -1) {
       const session = await refreshToken(ctx);
+      const { user, tenants } = await meAndTenants(ctx, session?.accessToken);
       appContext.session = session;
+      appContext.user = user;
+      appContext.tenants = tenants;
       const envAppUrl = fronteggConfig.getEnvAppUrl();
       if (!envAppUrl) {
         throw Error(
@@ -58,6 +69,8 @@ export const withFronteggApp = (
             ? await Component.getInitialProps(ctx)
             : {}),
           session,
+          user,
+          tenants,
           envAppUrl,
           envBaseUrl: process.env['FRONTEGG_BASE_URL'],
           envClientId: process.env['FRONTEGG_CLIENT_ID'],
@@ -82,13 +95,12 @@ export const withFronteggApp = (
   fronteggConfig.fronteggAppOptions = options ?? {};
 
   function CustomFronteggApp(appProps: AppProps) {
+    const { user, tenants, session, envAppUrl, envBaseUrl, envClientId } =
+      appProps.pageProps;
     return (
       <FronteggProvider
         {...options}
-        session={appProps.pageProps.session}
-        envAppUrl={appProps.pageProps.envAppUrl}
-        envBaseUrl={appProps.pageProps.envBaseUrl}
-        envClientId={appProps.pageProps.envClientId}
+        {...{ user, tenants, session, envAppUrl, envBaseUrl, envClientId }}
       >
         {app(appProps) as any}
       </FronteggProvider>

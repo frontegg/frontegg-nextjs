@@ -1,3 +1,5 @@
+import { ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
+
 export interface AccountEnvironment {
   id: string;
   createdAt: string;
@@ -29,6 +31,11 @@ export interface FronteggNextJSSession {
     aud: string;
     iss: string;
   };
+}
+
+export interface MeAndTenants {
+  user?: ILoginResponse;
+  tenants?: ITenantsResponse[];
 }
 
 declare module 'iron-session' {
