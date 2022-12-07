@@ -1,5 +1,5 @@
 import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
-import { initialize, AppHolder } from '@frontegg/js';
+import { initialize, AppHolder, FronteggApp } from '@frontegg/js';
 import { FronteggAppOptions } from '@frontegg/types';
 import {
   FronteggStoreProvider,
@@ -30,16 +30,37 @@ type ConnectorProps = FronteggProviderProps & {
   appName?: string;
 };
 
+const requestAuthorizeSSR = ({
+  app,
+  accessToken,
+  user,
+  tenants,
+  refreshToken,
+}: {
+  app: FronteggApp | null;
+} & Partial<Pick<FronteggNextJSSession, 'accessToken' | 'refreshToken'>> &
+  MeAndTenants) => {
+  app?.store.dispatch({
+    type: 'auth/requestAuthorizeSSR',
+    payload: {
+      accessToken,
+      user: user ? { ...user, refreshToken } : null,
+      tenants,
+    },
+  });
+};
+
 const Connector: FC<ConnectorProps> = ({
   router,
   appName,
   hostedLoginBox,
   customLoginBox,
-  user = null,
-  tenants = null,
+  user,
+  tenants,
+  session,
   ...props
 }) => {
-  const { accessToken = null, refreshToken = null } = props.session ?? {};
+  const { accessToken, refreshToken } = session ?? {};
   const isSSR = typeof window === 'undefined';
 
   const baseName = props.basename ?? router.basePath;
@@ -84,11 +105,11 @@ const Connector: FC<ConnectorProps> = ({
     try {
       createdApp = AppHolder.getInstance(appName ?? 'default');
     } catch (e) {
-      ContextHolder.setAccessToken(accessToken);
+      ContextHolder.setAccessToken(accessToken ?? null);
+      ContextHolder.setUser(user ?? null);
       createdApp = initialize(
         {
           ...props,
-          accessToken,
           hostedLoginBox: hostedLoginBox ?? false,
           customLoginBox: customLoginBox ?? false,
           basename: props.basename ?? baseName,
@@ -96,9 +117,13 @@ const Connector: FC<ConnectorProps> = ({
             ...props.authOptions,
             onRedirectTo,
             isLoading: false,
-            isAuthenticated: !!props.session,
+            isAuthenticated: !!session,
             user: user
-              ? { ...user, refreshToken: refreshToken ?? undefined }
+              ? {
+                  ...user,
+                  accessToken: accessToken ?? '',
+                  refreshToken: refreshToken ?? undefined,
+                }
               : null,
             //@ts-ignore
             tenantsState: tenants ? { tenants, loading: false } : undefined,
@@ -121,19 +146,22 @@ const Connector: FC<ConnectorProps> = ({
     baseName,
     onRedirectTo,
     contextOptions,
+    customLoginBox,
     user,
     tenants,
+    session,
+    accessToken,
+    refreshToken,
   ]);
 
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
+  if (isSSR) {
+    requestAuthorizeSSR({ app, user, tenants, refreshToken, accessToken });
+  }
+
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    app.store.dispatch({
-      type: 'auth/requestAuthorizeSSR',
-      payload: { accessToken, refreshToken, user, tenants },
-    });
+    requestAuthorizeSSR({ app, user, tenants, refreshToken, accessToken });
   }, [app]);
 
   return (

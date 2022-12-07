@@ -33,6 +33,12 @@ export interface FronteggNextJSSession {
   };
 }
 
+export interface AppEnvConfig {
+  envAppUrl?: string,
+  envBaseUrl?: string,
+  envClientId?: string
+}
+
 export interface MeAndTenants {
   user?: ILoginResponse;
   tenants?: ITenantsResponse[];

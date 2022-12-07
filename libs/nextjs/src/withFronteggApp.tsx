@@ -10,6 +10,7 @@ import { refreshToken, meAndTenants } from './helpers';
 import { FronteggProvider } from './FronteggProvider';
 import { FronteggAppOptions } from '@frontegg/types';
 import fronteggConfig from './FronteggConfig';
+import { fronteggErrors } from './consts';
 
 export const withFronteggApp = (
   app: ((props: AppProps) => JSX.Element) & {
@@ -37,28 +38,22 @@ export const withFronteggApp = (
     } & MeAndTenants
   ): Promise<AppInitialProps> => {
     const { ctx, Component } = appContext;
-
-    if (ctx.req?.url?.indexOf('/_next/data/') === -1) {
+    if (ctx.req) {
       const session = await refreshToken(ctx);
       const { user, tenants } = await meAndTenants(ctx, session?.accessToken);
       appContext.session = session;
       appContext.user = user;
       appContext.tenants = tenants;
-      const envAppUrl = fronteggConfig.getEnvAppUrl();
+      const { envAppUrl, envBaseUrl, envClientId } =
+        fronteggConfig.appEnvConfig;
       if (!envAppUrl) {
-        throw Error(
-          '@frontegg/nextjs: .env.local must contain FRONTEGG_APP_URL'
-        );
+        throw Error(fronteggErrors.envAppUrl);
       }
-      if (!process.env['FRONTEGG_BASE_URL']) {
-        throw Error(
-          '@frontegg/nextjs: .env.local must contain FRONTEGG_BASE_URL'
-        );
+      if (!envBaseUrl) {
+        throw Error(fronteggErrors.envBaseUrl);
       }
-      if (!process.env['FRONTEGG_CLIENT_ID']) {
-        throw Error(
-          '@frontegg/nextjs: .env.local must contain FRONTEGG_CLIENT_ID'
-        );
+      if (!envClientId) {
+        throw Error(fronteggErrors.envClientId);
       }
       return {
         pageProps: {
