@@ -1,9 +1,13 @@
 import { GetServerSideProps } from 'next';
 import { AdminPortal, useAuthUserOrNull, withSSRSession } from '@frontegg/nextjs';
+import { useContext } from 'react';
+import {FronteggStoreContext} from '@frontegg/react-hooks'
 
 export default function ForceSession({ ssrSession }) {
   const user = useAuthUserOrNull();
-  console.log('user', user);
+  const { store, storeState } = useContext(FronteggStoreContext);
+  const isSSR = typeof window === 'undefined'
+  // console.log('user', user, isSSR);
 
   return (
     <div>
