@@ -38,26 +38,6 @@ type ConnectorProps = FronteggProviderProps & {
   appName?: string;
 };
 
-const requestAuthorizeSSR = ({
-  app,
-  accessToken,
-  user,
-  tenants,
-  refreshToken,
-}: {
-  app: FronteggApp | null;
-} & Partial<Pick<FronteggNextJSSession, 'accessToken' | 'refreshToken'>> &
-  MeAndTenants) => {
-  app?.store.dispatch({
-    type: 'auth/requestAuthorizeSSR',
-    payload: {
-      accessToken,
-      user: user ? { ...user, refreshToken } : null,
-      tenants,
-    },
-  });
-};
-
 const Connector: FC<ConnectorProps> = ({
   router,
   appName,
@@ -211,12 +191,15 @@ const Connector: FC<ConnectorProps> = ({
 
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
-  if (isSSR) {
-    requestAuthorizeSSR({ app, user, tenants, refreshToken, accessToken });
-  }
-
   useEffect(() => {
-    requestAuthorizeSSR({ app, user, tenants, refreshToken, accessToken });
+    app?.store.dispatch({
+      type: 'auth/requestAuthorizeSSR',
+      payload: {
+        accessToken,
+        user: user ? { ...user, refreshToken } : null,
+        tenants,
+      },
+    });
   }, [app]);
 
   return (
