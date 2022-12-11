@@ -4,10 +4,11 @@ import { sealData } from 'iron-session';
 import fronteggConfig from './FronteggConfig';
 import { decodeJwt } from 'jose';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession } from './types';
+import { FronteggNextJSSession, MeAndTenants } from './types';
 import { fronteggRefreshTokenUrl, fronteggSilentRefreshTokenUrl } from '@frontegg/rest-api';
 import { getHostedLoginRefreshToken, getSession } from './session';
 import * as zlib from 'zlib';
+import { getTenants, getUsers } from './api';
 
 function rewriteCookieProperty(
   header: string | string[],
@@ -166,13 +167,13 @@ export async function refreshToken(
         rewriteCookieDomainConfig,
         'domain'
       );
-      const [ session, decodedJwt, refreshToken ] = await createSessionFromAccessToken(data);
+      const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
       if (!session) {
         return null;
       }
       const cookieValue = createCookie({ session, expires: new Date(decodedJwt.exp * 1000), isSecured })
       if (typeof newSetCookie === 'string') {
-        newSetCookie = [ newSetCookie ];
+        newSetCookie = [newSetCookie];
       }
       newSetCookie.push(...cookieValue);
       ctx.res?.setHeader('set-cookie', newSetCookie);
@@ -222,7 +223,7 @@ export function createCookie(
   }
   const cookieValue = cookie.serialize(cookieName, session, options);
   if (cookieValue.length < COOKIE_MAX_LENGTH) {
-    return [ cookieValue ]
+    return [cookieValue]
   }
   return createSplitCookie(cookieName, session, options, cookieValue.length)
 }
@@ -265,9 +266,9 @@ export function addToCookies(newCookies: string[], res: ServerResponse) {
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [ existingSetCookie ];
+    existingSetCookie = [existingSetCookie];
   }
-  res.setHeader('set-cookie', [ ...existingSetCookie, ...newCookies ]);
+  res.setHeader('set-cookie', [...existingSetCookie, ...newCookies]);
 }
 
 export function removeCookies(
@@ -280,9 +281,9 @@ export function removeCookies(
   let existingSetCookie =
     (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
-    existingSetCookie = [ existingSetCookie ];
+    existingSetCookie = [existingSetCookie];
   }
-  res.setHeader('set-cookie', [ ...existingSetCookie, ...cookieValue ]);
+  res.setHeader('set-cookie', [...existingSetCookie, ...cookieValue]);
 }
 
 export function compress(input: string): Promise<string> {
@@ -311,7 +312,7 @@ export function uncompress(input: string): Promise<string> {
 
 export async function createSessionFromAccessToken(
   output: string
-): Promise<[ string, any, string ] | []> {
+): Promise<[string, any, string] | []> {
   try {
     const data = JSON.parse(output);
     const accessToken = data?.accessToken ?? data.access_token;
@@ -327,7 +328,7 @@ export async function createSessionFromAccessToken(
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
-    return [ session, decodedJwt, refreshToken ];
+    return [session, decodedJwt, refreshToken];
   } catch (e) {
     return [];
   }
@@ -355,3 +356,15 @@ export const modifySetCookieIfUnsecure = (
   }
   return setCookieValue;
 };
+
+export async function meAndTenants(ctx: NextPageContext, accessToken?: string
+): Promise<MeAndTenants> {
+  const request = ctx.req;
+  if (!request || !accessToken) {
+    return {};
+  }
+  const headers = { ...request.headers, Authorization: `Bearer ${accessToken}` } as unknown as Record<string, string>;
+  const [user, tenants] = await Promise.all([getUsers(headers), getTenants(headers)]);
+
+  return { user, tenants }
+}

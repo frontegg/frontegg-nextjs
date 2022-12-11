@@ -1,6 +1,7 @@
 import { importJWK, KeyLike } from 'jose';
 import { AuthPageRoutes } from '@frontegg/redux-store';
 import { FronteggAppOptions } from '@frontegg/types';
+import { AppEnvConfig } from './types';
 
 export type PasswordsMap = { [id: string]: string };
 export type Password = string | PasswordsMap;
@@ -58,6 +59,14 @@ class FronteggConfig {
 
   get appUrl(): string {
     return this.getEnvAppUrl() ?? 'http://localhost:3000';
+  }
+
+  get appEnvConfig(): AppEnvConfig {
+    return {
+      envAppUrl: this.getEnvAppUrl(),
+      envBaseUrl: process.env['FRONTEGG_BASE_URL'],
+      envClientId: process.env['FRONTEGG_CLIENT_ID']
+    };
   }
 
   get cookieDomain(): string {

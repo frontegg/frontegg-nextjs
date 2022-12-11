@@ -1,6 +1,14 @@
-import React, { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
-import { initialize, AppHolder } from '@frontegg/js';
+import React, {
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
+import { initialize, AppHolder, FronteggApp } from '@frontegg/js';
 import { FronteggAppOptions } from '@frontegg/types';
+import { createFronteggStore, AuthState } from '@frontegg/redux-store';
 import {
   FronteggStoreProvider,
   useAuthActions,
@@ -12,49 +20,66 @@ import {
   fronteggAuthApiRoutes,
 } from '@frontegg/rest-api';
 import { NextRouter, useRouter } from 'next/router';
-import { FronteggNextJSSession } from './types';
+import { MeAndTenants, FronteggNextJSSession } from './types';
 import AppContext from './AppContext';
 
-export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> & {
-  children?: ReactNode;
-  session?: FronteggNextJSSession;
-  envAppUrl: string;
-  envBaseUrl: string;
-  envClientId: string;
-  contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
-};
+export type FronteggProviderProps = Omit<FronteggAppOptions, 'contextOptions'> &
+  MeAndTenants & {
+    children?: ReactNode;
+    session?: FronteggNextJSSession;
+    envAppUrl: string;
+    envBaseUrl: string;
+    envClientId: string;
+    contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
+  };
 
 type ConnectorProps = FronteggProviderProps & {
   router: NextRouter;
   appName?: string;
 };
 
-const Connector: FC<ConnectorProps> = (_props) => {
-  const { router, appName, hostedLoginBox, customLoginBox, ...props } = _props;
+const Connector: FC<ConnectorProps> = ({
+  router,
+  appName,
+  hostedLoginBox,
+  customLoginBox,
+  user,
+  tenants,
+  session,
+  ...props
+}) => {
+  const { accessToken, refreshToken } = session ?? {};
   const isSSR = typeof window === 'undefined';
+  const storeHolder = useRef({});
 
   const baseName = props.basename ?? router.basePath;
 
-  const onRedirectTo = useCallback((_path: string, opts?: RedirectOptions) => {
-    let path = _path;
-    if (path.startsWith(baseName)) {
-      path = path.substring(baseName.length);
-    }
-    if (opts?.preserveQueryParams) {
-      path = `${path}${window.location.search}`;
-    }
-    if (opts?.refresh && !isSSR) {
-      // @ts-ignore
-      window.Cypress ? router.push(path) : (window.location.href = path);
-    } else {
-      opts?.replace ? router.replace(path) : router.push(path);
-    }
-  }, []);
+  const onRedirectTo: AuthState['onRedirectTo'] = useCallback(
+    (_path: string, opts?: RedirectOptions) => {
+      let path = _path;
+      if (path.startsWith(baseName)) {
+        path = path.substring(baseName.length);
+      }
+      if (opts?.preserveQueryParams) {
+        path = `${path}${window.location.search}`;
+      }
+      if (opts?.refresh && !isSSR) {
+        // @ts-ignore
+        window.Cypress ? router.push(path) : (window.location.href = path);
+      } else {
+        opts?.replace ? router.replace(path) : router.push(path);
+      }
+    },
+    []
+  );
 
-  const contextOptions = useMemo(
+  const contextOptions: FronteggAppOptions['contextOptions'] = useMemo(
     () => ({
+      requestCredentials: 'include' as RequestCredentials,
+      ...props.contextOptions,
       baseUrl: (path: string) => {
-        if (fronteggAuthApiRoutes.indexOf(path) !== -1 ||
+        if (
+          fronteggAuthApiRoutes.indexOf(path) !== -1 ||
           path.endsWith('/postlogin') ||
           path.endsWith('/prelogin') ||
           path === '/oauth/token'
@@ -66,47 +91,116 @@ const Connector: FC<ConnectorProps> = (_props) => {
       },
       clientId: props.envClientId,
     }),
-    [ props.envAppUrl, props.envBaseUrl, props.envClientId ]
+    [props.envAppUrl, props.envBaseUrl, props.envClientId, props.contextOptions]
   );
 
+  const authOptions: FronteggAppOptions['authOptions'] = useMemo(() => {
+    const tenantsState = tenants
+      ? {
+          tenantTree: null,
+          subTenants: [],
+          tenants,
+          loading: false,
+          ...props.authOptions?.tenantsState,
+        }
+      : undefined;
+    const userData = user
+      ? {
+          ...user,
+          accessToken: accessToken ?? '',
+          refreshToken: refreshToken ?? undefined,
+          ...props.authOptions?.user,
+        }
+      : null;
+    return {
+      ...props.authOptions,
+      onRedirectTo,
+      isLoading: false,
+      isAuthenticated: !!session,
+      hostedLoginBox: hostedLoginBox ?? false,
+      disableSilentRefresh: props.authOptions?.disableSilentRefresh ?? false,
+      user: userData,
+      tenantsState,
+    };
+  }, [
+    accessToken,
+    hostedLoginBox,
+    onRedirectTo,
+    props.authOptions,
+    refreshToken,
+    session,
+    tenants,
+    user,
+  ]);
+
+  const sharedStore = useMemo(
+    () =>
+      createFronteggStore(
+        { context: contextOptions },
+        storeHolder.current,
+        props.previewMode,
+        authOptions,
+        {
+          auth: authOptions ?? {},
+          audits: props.auditsOptions ?? {},
+        },
+        false,
+        props.urlStrategy
+      ),
+    [
+      authOptions,
+      contextOptions,
+      props.auditsOptions,
+      props.previewMode,
+      props.urlStrategy,
+    ]
+  );
 
   const app = useMemo(() => {
     let createdApp;
     try {
       createdApp = AppHolder.getInstance(appName ?? 'default');
+      createdApp.store = sharedStore;
     } catch (e) {
       createdApp = initialize(
         {
           ...props,
+          store: sharedStore,
           hostedLoginBox: hostedLoginBox ?? false,
           customLoginBox: customLoginBox ?? false,
           basename: props.basename ?? baseName,
-          authOptions: {
-            ...props.authOptions,
-            onRedirectTo,
-          },
-          contextOptions: {
-            requestCredentials: 'include',
-            ...props.contextOptions,
-            ...contextOptions,
-          },
+          authOptions,
+          contextOptions,
           onRedirectTo,
         },
         appName ?? 'default'
       );
     }
     return createdApp;
-  }, [ appName, props, hostedLoginBox, baseName, onRedirectTo, contextOptions ]);
+  }, [
+    appName,
+    props,
+    hostedLoginBox,
+    baseName,
+    onRedirectTo,
+    contextOptions,
+    customLoginBox,
+    authOptions,
+    sharedStore,
+  ]);
+
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    app.store.dispatch({
+    app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
-      payload: props.session ?? {refreshToken:null, accessToken:null},
+      payload: {
+        accessToken,
+        user: user ? { ...user, refreshToken } : null,
+        tenants,
+      },
     });
-  }, [ app ]);
+  }, [app]);
 
   return (
     <AppContext.Provider value={app}>
@@ -129,7 +223,7 @@ const ExpireInListener = () => {
         ),
       });
     }
-  }, [ actions, user ]);
+  }, [actions, user]);
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
 };
@@ -138,7 +232,7 @@ const FronteggNextJSProvider: FC<FronteggProviderProps> = (props) => {
 
   return (
     <Connector {...props} router={router}>
-      <ExpireInListener/>
+      <ExpireInListener />
       {props.children}
     </Connector>
   );
