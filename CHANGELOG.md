@@ -1,5 +1,31 @@
 # Change Log
 
+## [6.7.6](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.5...v6.7.6) (2022-12-12)
+
+- FR-9969 - fix getBaseUrl never returns context prefix
+- FR-9927 - fix validation invite with bulk
+- FR-9914 - Move initial api calls to NextJS server-side before the first render
+- FR-9887 - OTC digits are not visible on mobile devices
+- FR-9860 - mfa devices management
+- FR-9418 - invite email bulk
+- FR-9852 - copy invite link fix
+- FR-9858 - fix - appearance and settings should be optional for invite user customization
+- FR-9852 - Support copy invite link for dynamic base URL as well (mainly for Next.js)
+- FR-9742 - login with mfa
+- FR-9520 - FR-9504 - fonts improvements
+- FR-9750 - change api according to the new names security tabs
+- FR-9717 - update rest api to have optional name in add user payload - and make sure to not send name if not exist
+- FR-9826 - fix table header in dark theme
+- FR-9237 - Max length for secret fields increased to 100 
+- FR-9742 - enroll mfa list
+- FR-9772 - Send NULL on profilePictureUrl rather than null
+- FR-9717 - Invite user customize form API
+- FR-9597 - Webhooks - missing validation error on UI when added not allowed URL
+
+### NextJS Wrapper 6.7.6:
+- FR-9891 - better support for SSR in withFrontegg
+- FR-9844 - propagate customLoginBox param to admin box
+
 ## [6.7.5](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.4...v6.7.5) (2022-11-28)
 
 # v6.7.5
