@@ -1,5 +1,22 @@
 # Change Log
 
+## [6.7.6](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.5...v6.7.6) (2022-12-12)
+# v6.7.6
+• Fixed ignoring urlPrefix issue
+• Added the ability to Invite a user by bulk API in the admin portal
+• Fixed OTC digits are not visible on mobile devices
+• Added MFA devices management section in the admin portal under FF
+• Fixed the ability to copy invite link for dynamic base URL as well
+• Added new abilities to MFA flows under FF
+• Added support for providing an external CDN to load fonts in Frontegg components
+• Update hide fields API according to new security tabs naming
+• Changed max length for secret fields to 100 characters
+• Added support for customizing invite user dialog fields
+• Fixed creating custom webhook on the Admin Portal is sent with the event ID and not with the event Key
+
+### NextJS Wrapper 6.7.6:
+- Improved SSR support for `withFronteggApp` function
+
 ## [6.7.5](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.4...v6.7.5) (2022-11-28)
 
 # v6.7.5
