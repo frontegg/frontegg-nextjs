@@ -1,5 +1,25 @@
 # Change Log
 
+## [6.7.7](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.6...v6.7.7) (2022-12-13)
+
+- FR-10010 - mfa fixes
+- FR-9932 - Subscriptions billing collection
+- FR-9526 - remove adding class to body when frontegg loading on nextjs
+- FR-9977 - change validations + color in autofill mode
+- FR-9971 - otc mobile fix
+- FR-9821 - SCIM
+- FR-9969 - fix getBaseUrl never returns context prefix
+- FR-9927 - fix validation invite with bulk
+- FR-9914 - Move initial api calls to NextJS server-side before the first render
+- FR-9887 - OTC digits are not visible on mobile devices
+- FR-9860 - mfa devices management
+- FR-9418 - invite email bulk
+- FR-9852 - copy invite link fix
+- FR-9858 - fix - appearance and settings should be optional for invite user customization
+
+### NextJS Wrapper 6.7.7:
+- FR-9891 - better support for SSR in withFrontegg
+
 ## [6.7.6](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.5...v6.7.6) (2022-12-12)
 # v6.7.6
 • Fixed ignoring urlPrefix issue
