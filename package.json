@@ -9,7 +9,7 @@
     "start": "cd packages/demo-saas && yarn dev",
     "build-demo-saas": "cd packages/demo-saas && yarn build",
     "prettier-hook": "prettier --config ./.prettierrc --write .",
-    "prettier-check-hook": "prettier --config ./.prettierrc.json --check .",
+    "prettier-check-hook": "prettier --config ./.prettierrc --check .",
     "prepublishOnly": "make move-package-json-to-dist"
   },
   "devDependencies": {
