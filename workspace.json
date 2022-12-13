@@ -1,7 +1,0 @@
-{
-  "version": 2,
-  "projects": {
-    "demo-saas": "apps/demo-saas",
-    "nextjs": "libs/nextjs"
-  }
-}

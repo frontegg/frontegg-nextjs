@@ -228,6 +228,50 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 );
 ```
 
+## Next.js 13
+wrap your application with frontegg-
+```ts
+// app/layout.tsx
+import { FronteggAppProvider } from '@frontegg/nextjs/server';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <FronteggAppProvider hostedLoginBox authOptions={{ keepSessionAlive: true }}>
+      <html>
+        <head></head>
+        <body>{children}</body>
+      </html>
+    </FronteggAppProvider>
+  );
+}
+```
+get session on server component
+```ts
+// app/ServerComponent.tsx
+import { getUserSession } from '@frontegg/nextjs/server';
+
+export const ServerComponent = async () => {
+  const userSession = await getUserSession();
+  return (
+    <div>
+      user session server side: {JSON.stringify(userSession)}
+    </div>
+  );
+};
+```
+
+get session on client component
+```ts
+// app/ClientComponent.tsx
+'use client';
+import { useAuthUserOrNull } from '@frontegg/nextjs';
+
+export const ClientComponent = () => {
+  const user = useAuthUserOrNull();
+  return <div>user session client side: {JSON.stringify(user)}</div>;
+};
+```
+
 ## Next.js middlewares usage
 
 To prevent access unauthenticated user to all routes, use [Next.js middlewares](https://nextjs.org/docs/advanced-features/middleware).

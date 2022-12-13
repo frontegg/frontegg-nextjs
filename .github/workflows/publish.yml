@@ -17,7 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: '0'
+          fetch-depth: "0"
+      - name: Read .nvmrc
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+        id: nvm
+      - name: Use Node.js (.nvmrc)
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - name: Git Identity
         run: |
           git config --global user.name 'github-actions[bot]'
@@ -34,7 +41,7 @@ jobs:
         if: startsWith(github.event.pull_request.title, 'v')
         shell: bash -ex {0}
         run: |
-          CURRENT_VERSION=$(node -p 'require("./libs/nextjs/package.json").version')
+          CURRENT_VERSION=$(node -p 'require("./lerna.json").version')
           echo "::set-output name=CURRENT_VERSION::${CURRENT_VERSION}"
       - name: Tag Check
         id: tag_check
@@ -89,11 +96,8 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Publish
         run: |
-          cp .npmrc ./dist/libs/nextjs/
-          cp .npmignore ./dist/libs/nextjs/
-          cp README.md ./dist/libs/nextjs/
-          cp CHANGELOG.md ./dist/libs/nextjs/
-          cd ./dist/libs/nextjs && npm publish --tag latest
+          make move-package-json-to-dist
+          make publish-packages-latest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
