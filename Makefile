@@ -78,7 +78,7 @@ add-dist-folders-%:
 ########################################################################################################################
 
 build: ##@4 Build build all packages
-	${MAKE} build-react
+	${MAKE} build-nextjs
 
 build-%: ##@4 Build build a specific package
 	@echo "${YELLOW}Building package ${WHITE}${*}${RESET}"
@@ -120,16 +120,16 @@ demo:
 	@cd ./packages/demo-saas && yarn start
 
 publish-packages-next:
-	@cp ./.npmrc "./packages/react/dist/.npmrc"
-	@cp ./.npmignore "./packages/react/dist/.npmignore"
-	@cd "./packages/react/dist" && npm publish --tag next
+	@cp ./.npmrc "./packages/nextjs/dist/.npmrc"
+	@cp ./.npmignore "./packages/nextjs/dist/.npmignore"
+	@cd "./packages/nextjs/dist" && npm publish --tag next
 
 publish-packages-alpha:
-	@cp ./.npmrc "./packages/react/dist/.npmrc"
-	@cp ./.npmignore "./packages/react/dist/.npmignore"
-	@cd "./packages/react/dist" && npm publish --tag alpha
+	@cp ./.npmrc "./packages/nextjs/dist/.npmrc"
+	@cp ./.npmignore "./packages/nextjs/dist/.npmignore"
+	@cd "./packages/nextjs/dist" && npm publish --tag alpha
 
 publish-packages-latest:
-	@cp ./.npmrc "./packages/react/dist/.npmrc"
-	@cp ./.npmignore "./packages/react/dist/.npmignore"
-	@cd "./packages/react/dist" && npm publish --tag latest
+	@cp ./.npmrc "./packages/nextjs/dist/.npmrc"
+	@cp ./.npmignore "./packages/nextjs/dist/.npmignore"
+	@cd "./packages/nextjs/dist" && npm publish --tag latest
