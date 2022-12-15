@@ -5,8 +5,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "cd packages/nextjs && yarn build:watch",
     "start": "cd packages/demo-saas && yarn dev",
+    "clean": "rm -rf ./node_modules",
+    "build": "cd packages/nextjs && yarn build:watch",
     "build-demo-saas": "cd packages/demo-saas && yarn build",
     "prettier-hook": "prettier --config ./.prettierrc --write .",
     "prettier-check-hook": "prettier --config ./.prettierrc --check .",

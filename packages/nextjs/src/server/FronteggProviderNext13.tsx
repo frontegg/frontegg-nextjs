@@ -9,12 +9,6 @@ export const FronteggAppProvider = async ({
   children,
   ...options
 }: PropsWithChildren<Omit<FronteggAppOptions, 'contextOptions'>>) => {
-  const session = await getSession();
-  const allHeaders = {} as any;
-  headers().forEach((value, key) => (allHeaders[key] = value));
-
-  const { user, tenants } = await getMeAndTenants(allHeaders, session?.accessToken);
-
   const envAppUrl = process.env['FRONTEGG_APP_URL'];
   const envBaseUrl = process.env['FRONTEGG_BASE_URL'];
   const envClientId = process.env['FRONTEGG_CLIENT_ID'];
@@ -28,6 +22,12 @@ export const FronteggAppProvider = async ({
   if (!envClientId) {
     throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_CLIENT_ID');
   }
+
+  const session = await getSession();
+  const allHeaders = {} as any;
+  headers().forEach((value: string, key: string) => (allHeaders[key] = value));
+
+  const { user, tenants } = await getMeAndTenants(allHeaders, session?.accessToken);
 
   return (
     <FronteggClientProviderNext13 {...{ session, envAppUrl, envBaseUrl, envClientId, user, tenants }} {...options}>
