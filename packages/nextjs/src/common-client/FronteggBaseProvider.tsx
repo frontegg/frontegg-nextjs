@@ -2,7 +2,7 @@ import { FronteggStoreProvider } from '@frontegg/react-hooks';
 import { AuthState } from '@frontegg/redux-store';
 import { ContextHolder, RedirectOptions } from '@frontegg/rest-api';
 import React, { FC, useCallback, useMemo, useRef } from 'react';
-import { FronteggProviderProps } from '../common';
+import { FronteggProviderProps } from '../common/types';
 import AppContext from './AppContext';
 import { createOrGetFronteggApp } from './createOrGetFronteggApp';
 import { ExpireInListener } from './ExpireInListener';

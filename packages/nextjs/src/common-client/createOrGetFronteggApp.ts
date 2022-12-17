@@ -2,7 +2,7 @@ import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
 import { createFronteggStore, AuthState } from '@frontegg/redux-store';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
-import { FronteggProviderOptions, MeAndTenantsResponse } from '../common/types';
+import { FronteggProviderOptions, MeAndTenantsResponse } from '../common';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;

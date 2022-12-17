@@ -1,7 +1,7 @@
-import { FronteggConfig as fronteggConfig } from '../common';
+import { FronteggConfig } from '../common';
+import AppContext from '../common-client/AppContext';
 import { authInitialState } from '@frontegg/redux-store';
 import { useContext, useEffect } from 'react';
-import AppContext from './AppContext';
 import { useRouter, notFound } from 'next/navigation';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { ParsedUrlQuery } from 'querystring';
@@ -14,7 +14,7 @@ type FronteggRouterProps = {
 export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] }, searchParams }: FronteggRouterProps) {
   const routesObj = {
     ...authInitialState.routes,
-    ...fronteggConfig.authRoutes,
+    ...FronteggConfig.authRoutes,
   };
   const routesArr: string[] = Object.keys(routesObj).reduce(
     (p: string[], key: string) => [...p, (routesObj as any)[key]],
@@ -35,7 +35,7 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
   }
 
   if (
-    fronteggConfig.fronteggAppOptions.hostedLoginBox &&
+    FronteggConfig.fronteggAppOptions.hostedLoginBox &&
     routesObj.loginUrl !== pathname &&
     routesObj.logoutUrl !== pathname &&
     routesObj.hostedLoginRedirectUrl !== pathname

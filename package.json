@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "start": "cd packages/demo-saas && yarn dev",
+    "start-next12": "cd packages/demo-saas-next12 && yarn dev",
     "clean": "rm -rf ./node_modules",
     "build": "cd packages/nextjs && yarn build:watch",
     "build-demo-saas": "cd packages/demo-saas && yarn build",

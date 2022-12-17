@@ -11,7 +11,7 @@ export function Index() {
    */
   return (
     <div>
-      Next JS application with frontegg
+      Next JS V12 application with frontegg
       <br />
       <br />
       <div>{user?.email ?? 'not logged in'}</div>

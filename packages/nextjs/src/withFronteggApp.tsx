@@ -29,7 +29,6 @@ export const withFronteggApp = (
     const { ctx, Component } = appContext;
     if (ctx.req) {
       const session = await refreshToken(ctx);
-      console.log({ session });
       const { user, tenants } = await getMeAndTenants(ctx.req?.headers, session?.accessToken);
       appContext.session = session;
       appContext.user = user;

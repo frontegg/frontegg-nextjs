@@ -1,5 +1,5 @@
-import { FronteggBaseProvider } from './FronteggBaseProvider';
 import { FronteggProviderProps } from '../common';
+import { FronteggBaseProvider } from '../common-client';
 import { useRouter } from 'next/navigation';
 import React, { FC } from 'react';
 

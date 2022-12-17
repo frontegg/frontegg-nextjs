@@ -35,6 +35,7 @@ export default [
       'server/index': './src/server/index.ts',
       'client/index': './src/client/index.ts',
       'common/index': './src/common/index.ts',
+      'common-client/index': './src/common-client/index.ts',
     },
     plugins,
     external: (id) => !(path.isAbsolute(id) || id.startsWith('.')),

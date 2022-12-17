@@ -229,7 +229,7 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 ```
 
 ## Next.js 13
-wrap your application with frontegg-
+### wrapping your application
 ```ts
 // app/layout.tsx
 import { FronteggAppProvider } from '@frontegg/nextjs/server';
@@ -245,7 +245,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
-get session on server component
+
+### routing
+```ts
+// app/[...frontegg-router]/page.tsx
+export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
+```
+
+### server component
 ```ts
 // app/ServerComponent.tsx
 import { getUserSession } from '@frontegg/nextjs/server';
@@ -260,7 +267,7 @@ export const ServerComponent = async () => {
 };
 ```
 
-get session on client component
+### client component
 ```ts
 // app/ClientComponent.tsx
 'use client';
