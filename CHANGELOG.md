@@ -1,5 +1,12 @@
 # Change Log
 
+## [6.7.7](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.6...v6.7.7) (2022-12-13)
+
+- Fixed MFA flow issues
+- Added support for subscriptions billing collection
+- Fixed the issue of the OTC screen submit button is disabled on mobile devices
+- Added SCIM section in admin portal under FF
+
 ## [6.7.6](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.5...v6.7.6) (2022-12-12)
 # v6.7.6
 • Fixed ignoring urlPrefix issue
