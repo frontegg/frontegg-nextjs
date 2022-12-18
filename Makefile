@@ -55,6 +55,7 @@ clean: ##@1 Global uninstall node modules, remove transpiled code & lock files
 
 clean-%:
 	@rm -rf ./packages/${*}/dist
+	@rm -rf ./packages/${*}/.next
 	@rm -rf ./packages/${*}/node_modules
 	@rm -rf ./packages/${*}/package-lock.json
 	@rm -rf ./packages/${*}/yarn.lock
@@ -117,7 +118,7 @@ pretty:
 	@yarn prettier-hook
 
 demo:
-	@cd ./packages/demo-saas && yarn start
+	@cd ./packages/demo-saas && yarn dev
 
 publish-packages-next:
 	@cp ./.npmrc "./packages/nextjs/dist/.npmrc"

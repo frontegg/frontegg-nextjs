@@ -1,11 +1,12 @@
 {
-  "name": "@frontegg/demo-saas-next-12",
+  "name": "@frontegg/demo-saas-next12",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "clean": "rm -rf ./node_modules && rm -rf ./.next",
     "lint": "next lint"
   },
   "dependencies": {

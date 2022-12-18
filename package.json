@@ -5,14 +5,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "cd packages/demo-saas && yarn dev",
-    "start-next12": "cd packages/demo-saas-next12 && yarn dev",
-    "clean": "rm -rf ./node_modules",
-    "build": "cd packages/nextjs && yarn build:watch",
-    "build-demo-saas": "cd packages/demo-saas && yarn build",
+    "clean": "lerna run clean && rm -rf ./node_modules",
+    "dev": "lerna run build:watch --stream --scope '@frontegg/nextjs'",
+    "demo": "lerna run dev --stream --scope '@frontegg/demo-saas'",
+    "demo12": "lerna run dev --stream --scope '@frontegg/demo-saas-next12'",
+    "build": "lerna run build --stream --scope '@frontegg/nextjs'",
     "prettier-hook": "prettier --config ./.prettierrc --write .",
-    "prettier-check-hook": "prettier --config ./.prettierrc --check .",
-    "prepublishOnly": "make move-package-json-to-dist"
+    "prettier-check-hook": "prettier --config ./.prettierrc --check ."
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^8.0.1",
