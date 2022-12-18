@@ -17,7 +17,7 @@ const getCookie = () => {
 export async function getSession(): Promise<FronteggNextJSSession | undefined> {
   try {
     const cookie = getCookie();
-    return getSessionFromCookie(cookie);
+    return getSessionFromCookie(cookie, getTokensFromCookie);
   } catch (e) {
     console.error(e);
     return undefined;

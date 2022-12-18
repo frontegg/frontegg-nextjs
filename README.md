@@ -289,7 +289,7 @@ To prevent access unauthenticated user to all routes, use [Next.js middlewares](
 // /middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSession } from '@frontegg/nextjs';
+import { getSession } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
   const session = await getSession(request);
@@ -298,7 +298,7 @@ export const middleware = async (request: NextRequest) => {
   
   if(!session){
     // redirect unauthenticated user to /account/login page
-    return NextResponse.redirect(new URL('/account/login', req.url))
+    return NextResponse.redirect(new URL('/account/login', request))
   }
   
   return NextResponse.next();

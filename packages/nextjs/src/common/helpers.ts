@@ -1,13 +1,10 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { ServerResponse } from 'http';
-import { sealData } from 'iron-session';
+import { sealData, unsealData } from 'iron-session';
 import { decodeJwt } from 'jose';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import * as zlib from 'zlib';
 import fronteggConfig from './FronteggConfig';
-import { unsealData } from 'iron-session';
-import { jwtVerify } from 'jose';
-import { FronteggNextJSSession, FronteggUserTokens, RequestType } from './types';
+import { FronteggUserTokens } from './types';
 
 export function rewriteCookieProperty(header: string | string[], config: any, property: string): string | string[] {
   if (Array.isArray(header)) {
@@ -90,20 +87,6 @@ function chunkString(str: string, numChunks: number) {
   return chunks;
 }
 
-export function parseCookie(cookieStr: string) {
-  let sealFromCookies = '';
-  if (cookie.parse(cookieStr)[fronteggConfig.cookieName]) {
-    sealFromCookies = cookie.parse(cookieStr)[fronteggConfig.cookieName];
-  } else {
-    let i = 1;
-    while (cookie.parse(cookieStr)[`${fronteggConfig.cookieName}-${i}`]) {
-      sealFromCookies += cookie.parse(cookieStr)[`${fronteggConfig.cookieName}-${i}`];
-      i++;
-    }
-  }
-  return sealFromCookies !== '' ? sealFromCookies : undefined;
-}
-
 export function parseCookieFromArray(cookies: RequestCookie[]): string | undefined {
   const userCookie = cookies.find((c) => c.name === fronteggConfig.cookieName);
   if (userCookie) {
@@ -134,30 +117,6 @@ export function removeCookies(cookieName: string, isSecured: boolean, cookieDoma
   res.setHeader('set-cookie', [...existingSetCookie, ...cookieValue]);
 }
 
-export function compress(input: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    zlib.brotliCompress(input, (error: Error | null, result: Buffer) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result.toString('base64'));
-      }
-    });
-  });
-}
-
-export function uncompress(input: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    zlib.brotliDecompress(Buffer.from(input, 'base64'), (error: Error | null, result: Buffer) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result.toString('utf-8'));
-      }
-    });
-  });
-}
-
 export async function createSessionFromAccessToken(output: string): Promise<[string, any, string] | []> {
   try {
     const data = JSON.parse(output);
@@ -166,9 +125,8 @@ export async function createSessionFromAccessToken(output: string): Promise<[str
     const decodedJwt: any = decodeJwt(accessToken);
     decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
-    const uncompressedSession = JSON.stringify({ accessToken, refreshToken });
-    const compressedAccessToken = await compress(uncompressedSession);
-    const session = await sealData(compressedAccessToken, {
+    const stringifySession = JSON.stringify({ accessToken, refreshToken });
+    const session = await sealData(stringifySession, {
       password: fronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
@@ -197,42 +155,12 @@ export const modifySetCookieIfUnsecure = (
   return setCookieValue;
 };
 
-export function getCookieFromRequest(req?: RequestType): string | undefined {
-  if (!req) {
-    return undefined;
-  }
-  const cookieStr = 'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
-  return parseCookie(cookieStr);
-}
-
 export async function getTokensFromCookie(cookie?: string): Promise<FronteggUserTokens | undefined> {
   if (!cookie) {
     return undefined;
   }
-  const compressedJwt: string = await unsealData(cookie, {
+  const stringifyJwt: string = await unsealData(cookie, {
     password: fronteggConfig.passwordsAsMap,
   });
-  const uncompressedJwt = await uncompress(compressedJwt);
-  return JSON.parse(uncompressedJwt);
-}
-
-export async function getSessionFromCookie(cookie?: string): Promise<FronteggNextJSSession | undefined> {
-  const tokens = await getTokensFromCookie(cookie);
-
-  if (!tokens?.accessToken) {
-    return undefined;
-  }
-  const { accessToken, refreshToken } = tokens;
-  const publicKey = await fronteggConfig.getJwtPublicKey();
-  const { payload }: any = await jwtVerify(accessToken, publicKey);
-
-  const session: FronteggNextJSSession = {
-    accessToken,
-    user: payload,
-    refreshToken,
-  };
-  if (session.user.exp * 1000 < Date.now()) {
-    return undefined;
-  }
-  return session;
+  return JSON.parse(stringifyJwt);
 }
