@@ -236,7 +236,7 @@ import { FronteggAppProvider } from '@frontegg/nextjs/server';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <FronteggAppProvider hostedLoginBox authOptions={{ keepSessionAlive: true }}>
+    <FronteggAppProvider hostedLoginBox>
       <html>
         <head></head>
         <body>{children}</body>
