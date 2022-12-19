@@ -4,7 +4,7 @@ import { getSession } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
   const session = await getSession(request);
-  const isAuthRoute = request.url.endsWith('/') || request.url.endsWith('/session');
+  const isAuthRoute = request.url.endsWith('/') || request.url.endsWith('/force-session');
 
   if (!session && isAuthRoute) {
     // redirect unauthenticated user to /account/login page

@@ -1,7 +1,7 @@
 import cookie from 'cookie';
 import fronteggConfig from '../FronteggConfig';
 
-export default function parseCookie(cookieStr: string) {
+export function parseCookie(cookieStr: string) {
   let sealFromCookies = '';
   if (cookie.parse(cookieStr)[fronteggConfig.cookieName]) {
     sealFromCookies = cookie.parse(cookieStr)[fronteggConfig.cookieName];

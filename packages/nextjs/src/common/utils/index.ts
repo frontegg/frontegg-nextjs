@@ -1,3 +1,3 @@
-export { default as parseCookie } from './parseCookie';
-export { default as getSessionFromCookie } from './getSessionFromCookie';
-export { default as getCookieFromRequest } from './getCookieFromRequest';
+export * from './parseCookie';
+export * from './createGetSession';
+export * from './getCookieFromRequest';

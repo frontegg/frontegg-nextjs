@@ -1,12 +1,6 @@
-import {
-  FronteggNextJSSession,
-  FronteggUserSession,
-  FronteggUserTokens,
-  parseCookieFromArray,
-  getSessionFromCookie,
-  getTokensFromCookie,
-} from '../common';
 import { cookies } from 'next/headers';
+import { FronteggUserSession, FronteggUserTokens, getTokensFromCookie, parseCookieFromArray } from '../common';
+import { createGetSession } from '../common/utils/createGetSession';
 
 const getCookie = () => {
   const allCookies = cookies().getAll();
@@ -14,15 +8,7 @@ const getCookie = () => {
   return cookie;
 };
 
-export async function getSession(): Promise<FronteggNextJSSession | undefined> {
-  try {
-    const cookie = getCookie();
-    return getSessionFromCookie(cookie, getTokensFromCookie);
-  } catch (e) {
-    console.error(e);
-    return undefined;
-  }
-}
+export const getSession = () => createGetSession({ getCookie, cookieResolver: getTokensFromCookie });
 
 export async function getUserSession(): Promise<FronteggUserSession | undefined> {
   const session = await getSession();

@@ -4976,7 +4976,7 @@ ip@^1.1.5:
   resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
   integrity sha1-vd7XARQpCCjAoDnnLvJfWq7ENUo=
 
-iron-session@^6.2.1:
+iron-session@^6.3.1:
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/iron-session/-/iron-session-6.3.1.tgz#9c8b331acc0f9561dd0f942b089e8197576a03de"
   integrity sha512-3UJ7y2vk/WomAtEySmPgM6qtYF1cZ3tXuWX5GsVX4PJXAcs5y/sV9HuSfpjKS6HkTL/OhZcTDWJNLZ7w+Erx3A==

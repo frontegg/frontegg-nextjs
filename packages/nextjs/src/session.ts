@@ -1,24 +1,12 @@
 import { authInitialState } from '@frontegg/redux-store';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import {
-  FronteggNextJSSession,
-  getCookieFromRequest,
-  getSessionFromCookie,
-  RequestType,
-  getTokensFromCookie,
-} from './common';
+import { FronteggNextJSSession, getCookieFromRequest, RequestType, getTokensFromCookie } from './common';
 import fronteggConfig from './common/FronteggConfig';
+import { createGetSession } from './common/utils/createGetSession';
 
-export async function getSession(req: RequestType): Promise<FronteggNextJSSession | undefined> {
-  try {
-    const sealFromCookies = getCookieFromRequest(req);
-    return getSessionFromCookie(sealFromCookies, getTokensFromCookie);
-  } catch (e) {
-    console.error(e);
-    return undefined;
-  }
-}
+export const getSession = (req: RequestType) =>
+  createGetSession({ getCookie: () => getCookieFromRequest(req), cookieResolver: getTokensFromCookie });
 
 export function withSSRSession<
   P extends { [key: string]: any } = { [key: string]: any },

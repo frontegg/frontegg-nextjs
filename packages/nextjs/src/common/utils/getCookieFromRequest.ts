@@ -1,7 +1,7 @@
 import { RequestType } from '../types';
-import parseCookie from './parseCookie';
+import { parseCookie } from './parseCookie';
 
-export default function getCookieFromRequest(req?: RequestType): string | undefined {
+export function getCookieFromRequest(req?: RequestType): string | undefined {
   if (!req) {
     return undefined;
   }
