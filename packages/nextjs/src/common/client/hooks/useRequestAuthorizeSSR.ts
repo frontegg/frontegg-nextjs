@@ -1,6 +1,6 @@
 import { FronteggApp } from '@frontegg/js';
 import { useEffect } from 'react';
-import { MeAndTenantsResponse } from '../../common/types';
+import { MeAndTenantsResponse } from '../../types';
 
 type useRequestAuthorizeSSR = {
   app: FronteggApp;

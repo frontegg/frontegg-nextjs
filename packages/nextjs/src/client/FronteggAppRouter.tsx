@@ -1,5 +1,5 @@
 import { FronteggConfig } from '../common';
-import AppContext from '../common-client/AppContext';
+import { AppContext } from '../common/client';
 import { authInitialState } from '@frontegg/redux-store';
 import { useContext, useEffect } from 'react';
 import { useRouter, notFound } from 'next/navigation';

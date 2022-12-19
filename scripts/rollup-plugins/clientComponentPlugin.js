@@ -8,7 +8,7 @@ export default function clientComponentPlugin(options= {}) {
     name: 'client component',
     transform(code, map) {
       if (!filter(map)) return;
-      if(map.includes('src/client') || map.includes('src/common-client')) {
+      if(map.includes('src/client') || map.includes('src/common/client')) {
         const relativeFilePath = map.split('src').pop().split('.')[0]
         const finalPath = relativeFilePath.includes('index') ? relativeFilePath : relativeFilePath.split('/').pop()
         clientFiles.push(finalPath);
