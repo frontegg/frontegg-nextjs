@@ -1,7 +1,7 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { ServerResponse } from 'http';
 import { sealData, unsealData } from 'iron-session';
-import { decodeJwt } from 'jose';
+import { jwtVerify } from 'jose';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import fronteggConfig from './FronteggConfig';
 import { FronteggUserTokens } from './types';
@@ -122,7 +122,8 @@ export async function createSessionFromAccessToken(output: string): Promise<[str
     const data = JSON.parse(output);
     const accessToken = data?.accessToken ?? data.access_token;
     const refreshToken = data?.refreshToken ?? data.refresh_token;
-    const decodedJwt: any = decodeJwt(accessToken);
+    const publicKey = await fronteggConfig.getJwtPublicKey();
+    const { payload: decodedJwt }: any = await jwtVerify(accessToken, publicKey);
     decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
     const stringifySession = JSON.stringify({ accessToken, refreshToken });
