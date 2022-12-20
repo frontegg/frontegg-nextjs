@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.7.9](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.8...v6.7.9) (2022-12-20)
+
+
+
 ## [6.7.8](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.7...v6.7.8) (2022-12-20)
 
 - Fixed mfa input on mobile 
