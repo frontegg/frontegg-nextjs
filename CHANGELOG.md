@@ -1,5 +1,16 @@
 # Change Log
 
+## [6.7.8](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.7...v6.7.8) (2022-12-20)
+
+- Fixed mfa input on mobile 
+- Enabled scim without roles
+- Fixed menu component for dark theme
+- Added api navigation icon
+- Added tests for mfa
+- Added apple social login types
+- Added support for Hiding Invoices
+
+
 ## [6.7.7](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.6...v6.7.7) (2022-12-13)
 
 - Fixed MFA flow issues
