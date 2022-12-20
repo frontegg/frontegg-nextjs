@@ -9,17 +9,18 @@ jobs:
   createReleasePullRequest:
     if: "!contains(join(github.event.pull_request.labels.*.name, ','), 'Release') && github.event.pull_request.merged == true"
     runs-on: ubuntu-latest
-    container: cypress/browsers:node14.17.0-chrome88-ff89
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Git Identity
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          fetch-depth: "0"
+      - name: Read .nvmrc
+        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+        id: nvm
+      - name: Use Node.js (.nvmrc)
+        uses: actions/setup-node@v1
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - name: Install Dependencies and Build Packages
         run: |
           yarn install
@@ -47,7 +48,8 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Commit Version UP
         run: |
-          yarn increment-version
+          yarn lerna version patch --no-git-tag-version --yes --no-push --force-publish
+          yarn prettier-hook
       - name: "Set Generated changelog"
         uses: actions/github-script@v6
         id: 'generated-changelog'
@@ -63,7 +65,7 @@ jobs:
           result-encoding: string
           script: |
             const {default: fs} = await import('fs');
-            const {version} = JSON.parse(fs.readFileSync('./libs/nextjs/package.json', {encoding: "utf-8"}));
+            const {version} = JSON.parse(fs.readFileSync('./lerna.json', {encoding: "utf-8"}));
             return version;
       - name: Commit changes
         shell: bash -ex {0}
@@ -90,14 +92,15 @@ jobs:
       - name: Publish Pre-Release version to NPM
         id: publish_pre_release_version
         run: |
-          version=$(node -p 'require("./libs/nextjs/package.json").version')
+          version=$(node -p 'require("./lerna.json").version')
           echo "::set-output name=LIB_VERSION::${version}"
-          echo "Publishing Pre-Release version - v${version}-alpha.${{ github.run_id }}"
-          node -p "(function(){var fs = require('fs'); var pkg = JSON.parse(fs.readFileSync('./dist/libs/nextjs/package.json', {encoding: 'utf8'})); pkg.version = '${version}-alpha.${{ github.run_id }}'; fs.writeFileSync('./dist/libs/nextjs/package.json', JSON.stringify(pkg, null, 2),  {encoding: 'utf8'})})()"
-          cp .npmrc ./dist/libs/nextjs/
-          cp .npmignore ./dist/libs/nextjs/
-          cp README.md ./dist/libs/nextjs/
-          cd ./dist/libs/nextjs && npm publish --tag next
+          echo "Publishing DEV version - v${version}-alpha.${{ github.run_id }}"
+          make move-package-json-to-dist
+          make prerelease-version-upgrade-${version}-alpha.${{ github.run_id }}
+          make pretty
+          git add .
+          git commit -m "chore: prelrease version"
+          make publish-packages-next
         env:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 

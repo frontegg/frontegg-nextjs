@@ -1,66 +1,50 @@
 {
-  "name": "frontegg",
-  "version": "0.0.0",
+  "name": "@frontegg/nextjs",
+  "version": "1.0.0",
+  "author": "Frontegg LTD",
   "license": "MIT",
-  "scripts": {
-    "start": "nx serve",
-    "build": "nx build nextjs",
-    "test": "nx test",
-    "prettier": "nx format:write",
-    "increment-version": "node scripts/increment-version.js"
-  },
-  "workspaces": [
-    "apps/*",
-    "libs/*"
-  ],
   "private": true,
-  "dependencies": {
-    "@nrwl/next": "14.0.5",
-    "core-js": "^3.6.5",
-    "next": "^12.2.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "regenerator-runtime": "0.13.7",
-    "tslib": "^2.3.0"
+  "scripts": {
+    "clean": "lerna run clean && rm -rf ./node_modules",
+    "dev": "lerna run build:watch --stream --scope '@frontegg/nextjs'",
+    "demo": "lerna run dev --stream --scope '@frontegg/demo-saas'",
+    "demo12": "lerna run dev --stream --scope '@frontegg/demo-saas-next12'",
+    "build": "lerna run build --stream --scope '@frontegg/nextjs'",
+    "prettier-hook": "prettier --config ./.prettierrc --write .",
+    "prettier-check-hook": "prettier --config ./.prettierrc --check ."
   },
   "devDependencies": {
-    "@nrwl/cli": "14.0.5",
-    "@nrwl/cypress": "14.0.5",
-    "@nrwl/eslint-plugin-nx": "14.0.5",
-    "@nrwl/jest": "14.0.5",
-    "@nrwl/linter": "14.0.5",
-    "@nrwl/react": "14.0.5",
-    "@nrwl/web": "14.0.5",
-    "@nrwl/workspace": "14.0.5",
-    "@swc/core": "^1.2.177",
-    "@swc/jest": "0.2.20",
-    "@testing-library/react": "13.1.1",
-    "@types/jest": "27.4.1",
-    "@types/node": "16.11.7",
-    "@types/react": "18.0.1",
-    "@types/react-dom": "18.0.0",
-    "@typescript-eslint/eslint-plugin": "~5.18.0",
-    "@typescript-eslint/parser": "~5.18.0",
-    "babel-jest": "27.5.1",
-    "cypress": "^9.1.0",
-    "eslint": "~8.12.0",
-    "eslint-config-next": "12.1.5",
-    "eslint-config-prettier": "8.1.0",
-    "eslint-plugin-cypress": "^2.10.3",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-jsx-a11y": "6.5.1",
-    "eslint-plugin-react": "7.29.4",
-    "eslint-plugin-react-hooks": "4.4.0",
-    "jest": "27.5.1",
-    "nx": "14.0.5",
-    "prettier": "^2.5.1",
-    "react-test-renderer": "18.0.0",
-    "ts-jest": "27.1.4",
-    "ts-node": "9.1.1",
-    "typescript": "~4.6.2"
+    "@rollup/plugin-node-resolve": "^8.0.1",
+    "@types/history": "^4.7.7",
+    "@types/node": "^13.9.1",
+    "@types/react": "^18.0.26",
+    "@types/react-dom": "^18.0.9",
+    "eslint": "^8.30.0",
+    "eslint-plugin-react": "^7.17.0",
+    "history": "^4.9.0",
+    "lerna": "6.2.0",
+    "path": "^0.12.7",
+    "pre-commit": "^1.2.2",
+    "prettier": "2.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rollup": "^2.15.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript2": "^0.27.2",
+    "tslib": "^2.3.0",
+    "tslint": "^6.1.0",
+    "typescript": "^3.9.7",
+    "webpack": "^5.75.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/frontegg/frontegg-nextjs.git"
-  }
+  "nyc": {
+    "reporter": [
+      "html"
+    ]
+  },
+  "pre-commit": {
+    "run": "prettier-check-hook"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

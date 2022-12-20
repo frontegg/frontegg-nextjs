@@ -228,6 +228,57 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 );
 ```
 
+## Next.js 13
+### wrapping your application
+```ts
+// app/layout.tsx
+import { FronteggAppProvider } from '@frontegg/nextjs/server';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <FronteggAppProvider hostedLoginBox>
+      <html>
+        <head></head>
+        <body>{children}</body>
+      </html>
+    </FronteggAppProvider>
+  );
+}
+```
+
+### routing
+```ts
+// app/[...frontegg-router]/page.tsx
+export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
+```
+
+### server component
+```ts
+// app/ServerComponent.tsx
+import { getUserSession } from '@frontegg/nextjs/server';
+
+export const ServerComponent = async () => {
+  const userSession = await getUserSession();
+  return (
+    <div>
+      user session server side: {JSON.stringify(userSession)}
+    </div>
+  );
+};
+```
+
+### client component
+```ts
+// app/ClientComponent.tsx
+'use client';
+import { useAuthUserOrNull } from '@frontegg/nextjs';
+
+export const ClientComponent = () => {
+  const user = useAuthUserOrNull();
+  return <div>user session client side: {JSON.stringify(user)}</div>;
+};
+```
+
 ## Next.js middlewares usage
 
 To prevent access unauthenticated user to all routes, use [Next.js middlewares](https://nextjs.org/docs/advanced-features/middleware).
@@ -238,16 +289,17 @@ To prevent access unauthenticated user to all routes, use [Next.js middlewares](
 // /middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getSession } from '@frontegg/nextjs';
+import { getSession } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
   const session = await getSession(request);
+  const isAuthRoute = [...your auth routes]
 
   console.log("middleware session", session);
-  
-  if(!session){
+
+  if(!session && isAuthRoute){
     // redirect unauthenticated user to /account/login page
-    return NextResponse.redirect(new URL('/account/login', req.url))
+    return NextResponse.redirect(new URL('/account/login', request))
   }
   
   return NextResponse.next();

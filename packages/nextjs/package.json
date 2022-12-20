@@ -1,0 +1,32 @@
+{
+  "name": "@frontegg/nextjs",
+  "libName": "FronteggNextJs",
+  "version": "6.7.8",
+  "author": "Frontegg LTD",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && mkdir dist && rollup -c ./rollup.config.js",
+    "build:watch": "rm -rf dist && mkdir dist && rollup -w -c ./rollup.config.js",
+    "clean": "rm -rf ./node_modules && rm -rf ./dist",
+    "test": "jest --runInBand --passWithNoTests -c ../../scripts/jest.config.json --rootDir ."
+  },
+  "dependencies": {
+    "@frontegg/js": "6.52.0",
+    "@frontegg/react-hooks": "6.52.0",
+    "@types/http-proxy": "^1.17.9",
+    "cookie": "^0.5.0",
+    "http-proxy": "^1.18.1",
+    "iron-session": "^6.3.1",
+    "jose": "^4.9.2"
+  },
+  "devDependencies": {
+    "next": ">10.0.0"
+  },
+  "peerDependencies": {
+    "next": ">10.0.0",
+    "react": ">16.9.0",
+    "react-dom": ">16.9.0"
+  }
+}
