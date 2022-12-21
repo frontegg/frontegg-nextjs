@@ -3,7 +3,7 @@ import { AppContext } from './common/client';
 import { authInitialState } from '@frontegg/redux-store';
 import { parse } from 'url';
 import { useContext, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router.js';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 
 export function FronteggRouter() {

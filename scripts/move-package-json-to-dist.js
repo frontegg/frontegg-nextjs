@@ -14,8 +14,7 @@ function movePackageJson(packagePath) {
 
     const {scripts, main, typings, devDependencies, jest, prettier, standard, ...newPkg} = pkg;
     newPkg.main = 'index.js';
-    newPkg.module = 'index.esm.js';
-    newPkg.es2015 = 'index.es.js';
+    newPkg.type = 'module';
     newPkg.types = 'index.d.ts';
     if (newPkg.bin) {
       for (const k in newPkg.bin) {
