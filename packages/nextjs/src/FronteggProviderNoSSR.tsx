@@ -2,7 +2,7 @@ import { AppHolder, initialize } from '@frontegg/js';
 import { FronteggStoreProvider } from '@frontegg/react-hooks';
 import { ContextHolder, RedirectOptions } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
-import { NextRouter, useRouter } from 'next/router.js';
+import { NextRouter, useRouter } from 'next/router';
 import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { AppContext, ExpireInListener } from './common/client';
 

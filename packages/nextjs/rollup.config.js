@@ -6,43 +6,48 @@ import movePackageJsonPlugin from '../../scripts/rollup-plugins/movePackageJsonP
 
 const distFolder = path.join(__dirname, './dist/');
 
-const plugins = [
-  resolve({
-    browser: false,
-    preferBuiltins: false,
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-  }),
-  movePackageJsonPlugin(distFolder),
-  ts({
-    tsconfig: `${__dirname}/tsconfig.json`,
-    useTsconfigDeclarationDir: true,
-    tsconfigOverride: {
-      compilerOptions: {
-        declaration: true,
-        declarationDir: distFolder,
-        target: 'ES5',
-        module: 'ES6',
+const createCommonConfiguration = (outputFormat) => ({
+  external: (id) => !(path.isAbsolute(id) || id.startsWith('.')),
+  plugins: [
+    resolve({
+      browser: false,
+      preferBuiltins: false,
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    }),
+    movePackageJsonPlugin(distFolder),
+    ts({
+      tsconfig: `${__dirname}/tsconfig.json`,
+      useTsconfigDeclarationDir: true,
+      tsconfigOverride: {
+        compilerOptions: {
+          declaration: true,
+          declarationDir: distFolder,
+          target: 'ES5',
+          module: 'ES6',
+        },
       },
-    },
-  }),
-  clientComponentPlugin(),
-];
+    }),
+    clientComponentPlugin(),
+  ],
+  output: {
+    dir: distFolder,
+    sourcemap: true,
+    format: outputFormat,
+  },
+});
 
 export default [
   {
+    input: './src/index.ts',
+    ...createCommonConfiguration('cjs'),
+  },
+  {
     input: {
-      index: './src/index.ts',
       'server/index': './src/server/index.ts',
       'client/index': './src/client/index.ts',
       'common/index': './src/common/index.ts',
       'edge/index': './src/edge/index.ts',
     },
-    plugins,
-    external: (id) => !(path.isAbsolute(id) || id.startsWith('.')),
-    output: {
-      dir: distFolder,
-      sourcemap: true,
-      format: 'esm',
-    },
+    ...createCommonConfiguration('esm'),
   },
 ];

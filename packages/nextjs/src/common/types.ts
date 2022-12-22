@@ -3,7 +3,7 @@ import { ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
 import { IncomingMessage } from 'http';
 import { ReactNode } from 'react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
-import { NextRouter } from 'next/router.js';
+import { NextRouter } from 'next/router';
 
 export type RequestType = IncomingMessage | Request;
 

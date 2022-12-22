@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router.js';
+import { useRouter } from 'next/router';
 import React, { FC } from 'react';
 import { FronteggBaseProvider } from './common/client';
 import { FronteggProviderProps } from './common';
