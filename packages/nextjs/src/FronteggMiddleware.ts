@@ -99,7 +99,7 @@ export function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse): P
               fronteggAuthApiRoutes.find((path) => path.endsWith('/logout')) ?? '/logout'
             );
             if (isLogout) {
-              removeCookies(fronteggConfig.cookieName, isSecured, fronteggConfig.cookieDomain, serverResponse);
+              removeCookies(fronteggConfig.cookieName, isSecured, fronteggConfig.cookieDomain, serverResponse, req);
             } else {
               const [session, decodedJwt] = await createSessionFromAccessToken(output);
               if (session) {

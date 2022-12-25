@@ -104,7 +104,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       response = await refreshTokenEmbedded(ctx, headers, cookies);
     }
     if (!response) {
-      removeCookies(fronteggConfig.cookieName, isSecured, fronteggConfig.cookieDomain, ctx.res!);
+      removeCookies(fronteggConfig.cookieName, isSecured, fronteggConfig.cookieDomain, ctx.res!, ctx.req);
       return null;
     }
 

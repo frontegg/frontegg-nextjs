@@ -4,7 +4,7 @@ import { sealData, unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import FronteggConfig from './FronteggConfig';
-import { FronteggUserTokens } from './types';
+import { FronteggUserTokens, RequestType } from './types';
 
 export function rewriteCookieProperty(header: string | string[], config: any, property: string): string | string[] {
   if (Array.isArray(header)) {
@@ -74,7 +74,6 @@ function createSplitCookie(cookieName: string, session: string, options: CookieS
   for (let i = 1; i <= numberOfCookies; i++) {
     allCookies.push(cookie.serialize(`${cookieName}-${i}`, splitSession[i - 1], options));
   }
-  FronteggConfig.setNumberOfCookies(numberOfCookies);
   return allCookies;
 }
 
@@ -116,8 +115,7 @@ export function addToCookies(newCookies: string[], res: ServerResponse) {
 const createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) =>
   createCookie({ cookieName, session: '', expires: new Date(), isSecured, cookieDomain });
 
-const createEmptyCookies = (cookieName: string, isSecured: boolean, cookieDomain: string) => {
-  const numberOfCookies = FronteggConfig.getNumberOfCookies;
+const createEmptyCookies = (cookieName: string, isSecured: boolean, cookieDomain: string, numberOfCookies: number) => {
   if (!numberOfCookies || numberOfCookies === 1) {
     return createEmptySingleCookie(cookieName, isSecured, cookieDomain);
   }
@@ -128,8 +126,31 @@ const createEmptyCookies = (cookieName: string, isSecured: boolean, cookieDomain
   return allEmptyCookies;
 };
 
-export function removeCookies(cookieName: string, isSecured: boolean, cookieDomain: string, res: ServerResponse) {
-  const cookieValue = createEmptyCookies(cookieName, isSecured, cookieDomain);
+export const getNumberOfCookiesFromRequest = (req?: RequestType): number => {
+  let numberOfCookies = 1;
+  if (!req) {
+    return numberOfCookies;
+  }
+  const cookieStr = 'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
+  const allCookies = cookieStr && cookie.parse(cookieStr);
+  if (!allCookies || allCookies[FronteggConfig.cookieName]) {
+    return numberOfCookies;
+  }
+  while (allCookies[`${FronteggConfig.cookieName}-${numberOfCookies}`]) {
+    numberOfCookies++;
+  }
+  return numberOfCookies - 1;
+};
+
+export function removeCookies(
+  cookieName: string,
+  isSecured: boolean,
+  cookieDomain: string,
+  res: ServerResponse,
+  req?: RequestType
+) {
+  const numberOfCookies = getNumberOfCookiesFromRequest(req);
+  const cookieValue = createEmptyCookies(cookieName, isSecured, cookieDomain, numberOfCookies);
   let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
     existingSetCookie = [existingSetCookie];
