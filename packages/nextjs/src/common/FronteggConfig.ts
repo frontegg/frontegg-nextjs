@@ -14,6 +14,7 @@ class FronteggConfig {
   private readonly _cookieName: string;
   private readonly _password: string;
   private _jwtPublicKey: KeyLike | Uint8Array | undefined;
+  private numberOfCookies: number | undefined;
   private readonly _passwordsAsMap: PasswordsMap;
   private readonly _clientId: string;
   public authRoutes: Partial<AuthPageRoutes> = {};
@@ -70,6 +71,14 @@ class FronteggConfig {
 
   get cookieDomain(): string {
     return new URL(this.getEnvAppUrl() ?? '').hostname.replace(/:(\d)+$/, '');
+  }
+
+  get getNumberOfCookies(): number | undefined {
+    return this.numberOfCookies;
+  }
+
+  setNumberOfCookies(numberOfCookies: number) {
+    this.numberOfCookies = numberOfCookies;
   }
 
   async getJwtPublicKey(): Promise<KeyLike | Uint8Array> {

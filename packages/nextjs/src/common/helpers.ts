@@ -3,7 +3,7 @@ import { ServerResponse } from 'http';
 import { sealData, unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import fronteggConfig from './FronteggConfig';
+import FronteggConfig from './FronteggConfig';
 import { FronteggUserTokens } from './types';
 
 export function rewriteCookieProperty(header: string | string[], config: any, property: string): string | string[] {
@@ -44,11 +44,11 @@ type CreateCookieArguments = {
 const COOKIE_MAX_LENGTH = 4096;
 
 export function createCookie({
-  cookieName = fronteggConfig.cookieName,
+  cookieName = FronteggConfig.cookieName,
   session,
   expires,
   isSecured,
-  cookieDomain = fronteggConfig.cookieDomain,
+  cookieDomain = FronteggConfig.cookieDomain,
   httpOnly = true,
   path = '/',
 }: CreateCookieArguments) {
@@ -74,25 +74,27 @@ function createSplitCookie(cookieName: string, session: string, options: CookieS
   for (let i = 1; i <= numberOfCookies; i++) {
     allCookies.push(cookie.serialize(`${cookieName}-${i}`, splitSession[i - 1], options));
   }
+  FronteggConfig.setNumberOfCookies(numberOfCookies);
   return allCookies;
 }
 
 function chunkString(str: string, numChunks: number) {
   const chunkSize = Math.ceil(str.length / numChunks);
   const chunks: string[] = [];
-  for (let i = 0; i < numChunks; i + chunkSize) {
-    const limit = i + chunkSize;
-    chunks.push(str.substring(i, limit < str.length ? limit : str.length));
+  for (let i = 0; i < numChunks; i++) {
+    const start = i * chunkSize;
+    const end = (i + 1) * chunkSize;
+    chunks.push(str.substring(start, end < str.length ? end : str.length));
   }
   return chunks;
 }
 
 export function parseCookieFromArray(cookies: RequestCookie[]): string | undefined {
-  const userCookie = cookies.find((c) => c.name === fronteggConfig.cookieName);
+  const userCookie = cookies.find((c) => c.name === FronteggConfig.cookieName);
   if (userCookie) {
     return userCookie.value;
   }
-  const cookieChunks = cookies.filter((c) => c.name.includes(fronteggConfig.cookieName));
+  const cookieChunks = cookies.filter((c) => c.name.includes(FronteggConfig.cookieName));
   if (!cookieChunks) {
     return undefined;
   }
@@ -107,9 +109,23 @@ export function addToCookies(newCookies: string[], res: ServerResponse) {
   }
   res.setHeader('set-cookie', [...existingSetCookie, ...newCookies]);
 }
+const createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) =>
+  createCookie({ cookieName, session: '', expires: new Date(), isSecured, cookieDomain });
+
+const createEmptyCookies = (cookieName: string, isSecured: boolean, cookieDomain: string) => {
+  const numberOfCookies = FronteggConfig.getNumberOfCookies;
+  if (!numberOfCookies || numberOfCookies === 1) {
+    return createEmptySingleCookie(cookieName, isSecured, cookieDomain);
+  }
+  const allEmptyCookies = [];
+  for (let i = 0; i < numberOfCookies; i++) {
+    allEmptyCookies.push(...createEmptySingleCookie(`${cookieName}-${i}`, isSecured, cookieDomain));
+  }
+  return allEmptyCookies;
+};
 
 export function removeCookies(cookieName: string, isSecured: boolean, cookieDomain: string, res: ServerResponse) {
-  const cookieValue = createCookie({ cookieName, session: '', expires: new Date(), isSecured, cookieDomain });
+  const cookieValue = createEmptyCookies(cookieName, isSecured, cookieDomain);
   let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
   if (typeof existingSetCookie === 'string') {
     existingSetCookie = [existingSetCookie];
@@ -122,13 +138,13 @@ export async function createSessionFromAccessToken(output: string): Promise<[str
     const data = JSON.parse(output);
     const accessToken = data?.accessToken ?? data.access_token;
     const refreshToken = data?.refreshToken ?? data.refresh_token;
-    const publicKey = await fronteggConfig.getJwtPublicKey();
+    const publicKey = await FronteggConfig.getJwtPublicKey();
     const { payload: decodedJwt }: any = await jwtVerify(accessToken, publicKey);
     decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
     const stringifySession = JSON.stringify({ accessToken, refreshToken });
     const session = await sealData(stringifySession, {
-      password: fronteggConfig.passwordsAsMap,
+      password: FronteggConfig.passwordsAsMap,
       ttl: decodedJwt.exp,
     });
     return [session, decodedJwt, refreshToken];
@@ -161,7 +177,7 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
     return undefined;
   }
   const stringifyJwt: string = await unsealData(cookie, {
-    password: fronteggConfig.passwordsAsMap,
+    password: FronteggConfig.passwordsAsMap,
   });
   return JSON.parse(stringifyJwt);
 }
