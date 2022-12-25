@@ -103,7 +103,7 @@ export function parseCookieFromArray(cookies: RequestCookie[]): string | undefin
     const secondCookieNumber = parseInt(b.name.slice(-1));
     return firstCookieNumber > secondCookieNumber ? 1 : -1;
   });
-  return cookieChunks.map((c) => c.value).join();
+  return cookieChunks.map((c) => c.value).join('');
 }
 
 export function addToCookies(newCookies: string[], res: ServerResponse) {
