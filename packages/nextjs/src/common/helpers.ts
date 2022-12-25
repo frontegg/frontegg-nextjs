@@ -98,7 +98,11 @@ export function parseCookieFromArray(cookies: RequestCookie[]): string | undefin
   if (!cookieChunks) {
     return undefined;
   }
-  cookieChunks.sort((a, b) => (parseInt(a.name) > parseInt(b.name) ? 1 : -1));
+  cookieChunks.sort((a, b) => {
+    const firstCookieNumber = parseInt(a.name.slice(-1));
+    const secondCookieNumber = parseInt(b.name.slice(-1));
+    return firstCookieNumber > secondCookieNumber ? 1 : -1;
+  });
   return cookieChunks.map((c) => c.value).join();
 }
 
