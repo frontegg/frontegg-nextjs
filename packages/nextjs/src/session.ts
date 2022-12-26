@@ -1,12 +1,14 @@
 import { authInitialState } from '@frontegg/redux-store';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import { FronteggNextJSSession, getCookieFromRequest, RequestType, getTokensFromCookie } from './common';
-import fronteggConfig from './common/FronteggConfig';
-import { createGetSession } from './common/utils/createGetSession';
+import type { FronteggNextJSSession, RequestType } from './common';
+import { CookieManager, getTokensFromCookie, createGetSession, FronteggConfig } from './common';
 
 export const getSession = (req: RequestType) =>
-  createGetSession({ getCookie: () => getCookieFromRequest(req), cookieResolver: getTokensFromCookie });
+  createGetSession({
+    getCookie: () => CookieManager.getParsedCookieFromRequest(req),
+    cookieResolver: getTokensFromCookie,
+  });
 
 export function withSSRSession<
   P extends { [key: string]: any } = { [key: string]: any },
@@ -22,7 +24,7 @@ export function withSSRSession<
     if (session) {
       return handler(context, session);
     } else {
-      let loginUrl = fronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
+      let loginUrl = FronteggConfig.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
 
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`;

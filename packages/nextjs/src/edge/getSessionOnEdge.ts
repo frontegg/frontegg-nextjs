@@ -1,8 +1,8 @@
 import { unsealData } from 'iron-session/edge';
 import FronteggConfig from '../common/FronteggConfig';
 import { FronteggUserTokens, RequestType } from '../common/types';
-import { getCookieFromRequest } from '../common/utils';
-import { createGetSession } from '../common/utils/createGetSession';
+import CookieManager from '../common/CookieManager';
+import { createGetSession } from '../common/createGetSession';
 
 async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
   const jwt: string = await unsealData(cookie, {
@@ -12,4 +12,7 @@ async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTo
 }
 
 export const getSession = (req: RequestType) =>
-  createGetSession({ getCookie: () => getCookieFromRequest(req), cookieResolver: getTokensFromCookieOnEdge });
+  createGetSession({
+    getCookie: () => CookieManager.getParsedCookieFromRequest(req),
+    cookieResolver: getTokensFromCookieOnEdge,
+  });

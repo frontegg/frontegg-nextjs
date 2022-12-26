@@ -1,13 +1,6 @@
 import { fronteggRefreshTokenUrl, fronteggSilentRefreshTokenUrl } from '@frontegg/rest-api';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import {
-  createCookie,
-  createSessionFromAccessToken,
-  getCookieFromRequest,
-  getTokensFromCookie,
-  removeCookies,
-  rewriteCookieProperty,
-} from './common';
+import { createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
 import fronteggConfig from './common/FronteggConfig';
 import { FronteggNextJSSession } from './common/types';
 import { getSession } from './session';
@@ -17,7 +10,7 @@ async function refreshTokenHostedLogin(
   headers: Record<string, string>
 ): Promise<Response | null> {
   try {
-    const sealFromCookies = getCookieFromRequest(ctx?.req);
+    const sealFromCookies = CookieManager.getParsedCookieFromRequest(ctx?.req);
     const tokens = await getTokensFromCookie(sealFromCookies);
     if (!tokens?.refreshToken) {
       return null;
@@ -104,7 +97,12 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       response = await refreshTokenEmbedded(ctx, headers, cookies);
     }
     if (!response) {
-      removeCookies(fronteggConfig.cookieName, isSecured, fronteggConfig.cookieDomain, ctx.res!, ctx.req);
+      CookieManager.removeCookies({
+        isSecured,
+        cookieDomain: fronteggConfig.cookieDomain,
+        res: ctx.res!,
+        req: ctx.req,
+      });
       return null;
     }
 
@@ -115,12 +113,12 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       };
       // @ts-ignore
       const cookieHeader = response.headers.raw()['set-cookie'];
-      let newSetCookie = rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
+      let newSetCookie = CookieManager.rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
       const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
       if (!session) {
         return null;
       }
-      const cookieValue = createCookie({ session, expires: new Date(decodedJwt.exp * 1000), isSecured });
+      const cookieValue = CookieManager.createCookie({ session, expires: new Date(decodedJwt.exp * 1000), isSecured });
       if (typeof newSetCookie === 'string') {
         newSetCookie = [newSetCookie];
       }
