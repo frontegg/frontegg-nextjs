@@ -1,10 +1,10 @@
 import { cookies } from 'next/headers';
-import { FronteggUserSession, FronteggUserTokens, getTokensFromCookie, parseCookieFromArray } from '../common';
-import { createGetSession } from '../common/utils/createGetSession';
+import type { FronteggUserSession, FronteggUserTokens } from '../common';
+import { getTokensFromCookie, CookieManager, createGetSession } from '../common';
 
 const getCookie = () => {
   const allCookies = cookies().getAll();
-  const cookie = parseCookieFromArray(allCookies);
+  const cookie = CookieManager.parseCookieFromArray(allCookies);
   return cookie;
 };
 

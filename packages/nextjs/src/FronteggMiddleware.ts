@@ -1,13 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import httpProxy from 'http-proxy';
 import fronteggConfig from './common/FronteggConfig';
-import {
-  addToCookies,
-  createCookie,
-  createSessionFromAccessToken,
-  modifySetCookieIfUnsecure,
-  removeCookies,
-} from './common';
+import { createSessionFromAccessToken, CookieManager } from './common';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 
 /**
@@ -86,7 +80,10 @@ export function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse): P
         }
       })
       .once('proxyRes', (proxyRes, req, serverResponse) => {
-        proxyRes.headers['set-cookie'] = modifySetCookieIfUnsecure(proxyRes.headers['set-cookie'], isSecured);
+        proxyRes.headers['set-cookie'] = CookieManager.modifySetCookieIfUnsecure(
+          proxyRes.headers['set-cookie'],
+          isSecured
+        );
         const _end = res.end;
         let buffer = new Buffer('');
         proxyRes
@@ -99,16 +96,21 @@ export function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse): P
               fronteggAuthApiRoutes.find((path) => path.endsWith('/logout')) ?? '/logout'
             );
             if (isLogout) {
-              removeCookies(fronteggConfig.cookieName, isSecured, fronteggConfig.cookieDomain, serverResponse);
+              CookieManager.removeCookies({
+                isSecured,
+                cookieDomain: fronteggConfig.cookieDomain,
+                res: serverResponse,
+                req,
+              });
             } else {
               const [session, decodedJwt] = await createSessionFromAccessToken(output);
               if (session) {
-                const sessionCookie = createCookie({
-                  session,
+                const sessionCookie = CookieManager.createCookie({
+                  value: session,
                   expires: new Date(decodedJwt.exp * 1000),
                   isSecured,
                 });
-                addToCookies(sessionCookie, serverResponse);
+                CookieManager.addToCookies(sessionCookie, serverResponse);
               }
             }
             res.setHeader('content-length', output.length);

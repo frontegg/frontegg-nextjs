@@ -1,6 +1,6 @@
 import { jwtVerify } from 'jose';
-import fronteggConfig from '../FronteggConfig';
-import { FronteggNextJSSession, FronteggUserTokens } from '../types';
+import fronteggConfig from './FronteggConfig';
+import { FronteggNextJSSession, FronteggUserTokens } from './types';
 
 type CreateGetSessionParams = {
   getCookie: () => string | undefined;

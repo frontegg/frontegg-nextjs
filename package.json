@@ -10,18 +10,21 @@
     "demo": "lerna run dev --stream --scope '@frontegg/demo-saas'",
     "demo12": "lerna run dev --stream --scope '@frontegg/demo-saas-next12'",
     "build": "lerna run build --stream --scope '@frontegg/nextjs'",
+    "test": "jest",
     "prettier-hook": "prettier --config ./.prettierrc --write .",
     "prettier-check-hook": "prettier --config ./.prettierrc --check ."
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^8.0.1",
     "@types/history": "^4.7.7",
+    "@types/jest": "^29.2.4",
     "@types/node": "^13.9.1",
     "@types/react": "^18.0.26",
     "@types/react-dom": "^18.0.9",
     "eslint": "^8.30.0",
     "eslint-plugin-react": "^7.17.0",
     "history": "^4.9.0",
+    "jest": "^29.3.1",
     "lerna": "6.2.0",
     "path": "^0.12.7",
     "pre-commit": "^1.2.2",
@@ -31,9 +34,10 @@
     "rollup": "^2.15.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript2": "^0.27.2",
+    "ts-jest": "^29.0.3",
     "tslib": "^2.3.0",
     "tslint": "^6.1.0",
-    "typescript": "^3.9.7",
+    "typescript": "^4.9.4",
     "webpack": "^5.75.0"
   },
   "nyc": {
@@ -41,9 +45,10 @@
       "html"
     ]
   },
-  "pre-commit": {
-    "run": "prettier-check-hook"
-  },
+  "pre-commit": [
+    "test",
+    "prettier-check-hook"
+  ],
   "workspaces": [
     "packages/*"
   ]
