@@ -24,12 +24,12 @@ type RemoveCookiesArguments = {
 
 const COOKIE_MAX_LENGTH = 4096;
 
-function chunkString(str: string, numChunks: number) {
-  const chunkSize = Math.ceil(str.length / numChunks);
+function chunkString(str: string, chunkSize: number) {
+  const numChunks = Math.ceil(str.length / chunkSize);
   const chunks: string[] = [];
   for (let i = 0; i < numChunks; i++) {
     const start = i * chunkSize;
-    const end = (i + 1) * chunkSize;
+    const end = start + chunkSize;
     chunks.push(str.substring(start, end < str.length ? end : str.length));
   }
   return chunks;
@@ -37,6 +37,9 @@ function chunkString(str: string, numChunks: number) {
 
 class CookieManager {
   constructor() {}
+
+  getCookieName = (cookieNumber: number, cookieName?: string) =>
+    `${cookieName ?? FronteggConfig.cookieName}-${cookieNumber}`;
 
   rewriteCookieProperty(header: string | string[], config: any, property: string): string | string[] {
     if (Array.isArray(header)) {
@@ -81,30 +84,28 @@ class CookieManager {
       sameSite: isSecured ? ('none' as const) : undefined,
       secure: isSecured,
     };
-    const firstCookieName = cookieName ?? `${FronteggConfig.cookieName}-1`;
-    const cookieValue = cookie.serialize(firstCookieName, session, options);
+    const cookieValue = cookie.serialize(cookieName ?? this.getCookieName(1), session, options);
     if (cookieValue.length < COOKIE_MAX_LENGTH) {
       return [cookieValue];
     }
-    const cookieOptionLength = cookie.serialize(firstCookieName, '', options).length;
-    const maxSessionLength = COOKIE_MAX_LENGTH - cookieOptionLength;
-    return this.createSplitCookie(cookieName ?? FronteggConfig.cookieName, session, options, maxSessionLength);
+    const sessionChunks = this.splitSessionToChunks(cookieName, session, options);
+    return this.mapSessionChunksToCookies(cookieName, sessionChunks, options);
   }
 
-  createSplitCookie(
-    cookieName: string,
-    session: string,
-    options: CookieSerializeOptions,
-    maxSessionLength: number
-  ): string[] {
-    const numberOfCookies = Math.ceil(session.length / maxSessionLength);
-    const splitSession = chunkString(session, numberOfCookies);
-    const allCookies: string[] = [];
-    for (let i = 1; i <= numberOfCookies; i++) {
-      allCookies.push(cookie.serialize(`${cookieName}-${i}`, splitSession[i - 1], options));
-    }
-    return allCookies;
+  splitSessionToChunks(cookieName: string | undefined, session: string, options: CookieSerializeOptions): string[] {
+    const cookieOptionLength = cookie.serialize(this.getCookieName(1, cookieName), '', options).length;
+    const maxSessionLength = COOKIE_MAX_LENGTH - cookieOptionLength;
+    return chunkString(session, maxSessionLength);
   }
+
+  mapSessionChunksToCookies = (
+    cookieName: string | undefined,
+    sessionChunks: string[],
+    options: CookieSerializeOptions
+  ): string[] =>
+    sessionChunks.map((sessionChunk, index) =>
+      cookie.serialize(this.getCookieName(index + 1, cookieName), sessionChunk, options)
+    );
 
   getCookieStringFromRequest = (req: RequestType) =>
     'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
@@ -120,8 +121,8 @@ class CookieManager {
   parseCookie(cookieStr: string) {
     let sealFromCookies = '';
     let i = 1;
-    while (cookie.parse(cookieStr)[`${FronteggConfig.cookieName}-${i}`]) {
-      sealFromCookies += cookie.parse(cookieStr)[`${FronteggConfig.cookieName}-${i}`];
+    while (cookie.parse(cookieStr)[this.getCookieName(i)]) {
+      sealFromCookies += cookie.parse(cookieStr)[this.getCookieName(i)];
       i++;
     }
     return sealFromCookies !== '' ? sealFromCookies : undefined;
@@ -174,8 +175,8 @@ class CookieManager {
       }
       let cookieNumber = 1;
       const cookieToRemove = [];
-      while (allCookies[`${FronteggConfig.cookieName}-${cookieNumber}`]) {
-        cookieToRemove.push(`${FronteggConfig.cookieName}-${cookieNumber}`);
+      while (allCookies[this.getCookieName(cookieNumber)]) {
+        cookieToRemove.push(this.getCookieName(cookieNumber));
         cookieNumber++;
       }
       return cookieToRemove;
