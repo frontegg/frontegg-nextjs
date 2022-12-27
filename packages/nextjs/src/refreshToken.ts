@@ -118,7 +118,11 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       if (!session) {
         return null;
       }
-      const cookieValue = CookieManager.createCookie({ session, expires: new Date(decodedJwt.exp * 1000), isSecured });
+      const cookieValue = CookieManager.createCookie({
+        value: session,
+        expires: new Date(decodedJwt.exp * 1000),
+        isSecured,
+      });
       if (typeof newSetCookie === 'string') {
         newSetCookie = [newSetCookie];
       }

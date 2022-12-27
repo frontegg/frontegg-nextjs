@@ -3,10 +3,11 @@ import { ServerResponse } from 'http';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import FronteggConfig from './FronteggConfig';
 import { RequestType } from './types';
+import { chunkString } from './utils';
 
 type CreateCookieArguments = {
   cookieName?: string;
-  session: string;
+  value: string;
   expires: CookieSerializeOptions['expires'];
   isSecured: CookieSerializeOptions['secure'];
   cookieDomain?: CookieSerializeOptions['domain'];
@@ -23,17 +24,6 @@ type RemoveCookiesArguments = {
 };
 
 const COOKIE_MAX_LENGTH = 4096;
-
-function chunkString(str: string, chunkSize: number) {
-  const numChunks = Math.ceil(str.length / chunkSize);
-  const chunks: string[] = [];
-  for (let i = 0; i < numChunks; i++) {
-    const start = i * chunkSize;
-    const end = start + chunkSize;
-    chunks.push(str.substring(start, end < str.length ? end : str.length));
-  }
-  return chunks;
-}
 
 class CookieManager {
   constructor() {}
@@ -69,7 +59,7 @@ class CookieManager {
 
   createCookie({
     cookieName,
-    session,
+    value,
     expires,
     isSecured,
     cookieDomain = FronteggConfig.cookieDomain,
@@ -84,28 +74,26 @@ class CookieManager {
       sameSite: isSecured ? ('none' as const) : undefined,
       secure: isSecured,
     };
-    const cookieValue = cookie.serialize(cookieName ?? this.getCookieName(1), session, options);
+    const cookieValue = cookie.serialize(cookieName ?? this.getCookieName(1), value, options);
     if (cookieValue.length < COOKIE_MAX_LENGTH) {
       return [cookieValue];
     }
-    const sessionChunks = this.splitSessionToChunks(cookieName, session, options);
-    return this.mapSessionChunksToCookies(cookieName, sessionChunks, options);
+    const valueChunks = this.splitValueToChunks(cookieName, value, options);
+    return this.mapValueChunksToCookies(cookieName, valueChunks, options);
   }
 
-  splitSessionToChunks(cookieName: string | undefined, session: string, options: CookieSerializeOptions): string[] {
+  splitValueToChunks(cookieName: string | undefined, value: string, options: CookieSerializeOptions): string[] {
     const cookieOptionLength = cookie.serialize(this.getCookieName(1, cookieName), '', options).length;
-    const maxSessionLength = COOKIE_MAX_LENGTH - cookieOptionLength;
-    return chunkString(session, maxSessionLength);
+    const maxValueLength = COOKIE_MAX_LENGTH - cookieOptionLength;
+    return chunkString(value, maxValueLength);
   }
 
-  mapSessionChunksToCookies = (
+  mapValueChunksToCookies = (
     cookieName: string | undefined,
-    sessionChunks: string[],
+    valueChunks: string[],
     options: CookieSerializeOptions
   ): string[] =>
-    sessionChunks.map((sessionChunk, index) =>
-      cookie.serialize(this.getCookieName(index + 1, cookieName), sessionChunk, options)
-    );
+    valueChunks.map((chunk, index) => cookie.serialize(this.getCookieName(index + 1, cookieName), chunk, options));
 
   getCookieStringFromRequest = (req: RequestType) =>
     'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
@@ -153,7 +141,7 @@ class CookieManager {
     res.setHeader('set-cookie', [...existingSetCookie, ...newCookies]);
   }
   createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) =>
-    this.createCookie({ cookieName, session: '', expires: new Date(), isSecured, cookieDomain });
+    this.createCookie({ cookieName, value: '', expires: new Date(), isSecured, cookieDomain });
 
   createEmptyCookies = (isSecured: boolean, cookieDomain: string, cookiesToRemove: string[]): string[] => {
     const allEmptyCookies: string[] = [];

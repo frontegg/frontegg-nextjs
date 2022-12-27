@@ -106,7 +106,7 @@ export function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse): P
               const [session, decodedJwt] = await createSessionFromAccessToken(output);
               if (session) {
                 const sessionCookie = CookieManager.createCookie({
-                  session,
+                  value: session,
                   expires: new Date(decodedJwt.exp * 1000),
                   isSecured,
                 });
