@@ -62,41 +62,21 @@ describe('Cookie Manager', () => {
     expect(firstCookieValue + secondCookieValue).toEqual(bigCookieValue);
   });
 
-  it('createCookie with big value should create split cookie properly', () => {
-    const cookieValue = CookieManager.createCookie({
-      cookieName,
-      value: bigCookieValue,
-      expires: new Date(),
-      isSecured: true,
-      cookieDomain,
-    });
+  it('createEmptyCookies should accepts cookie names and create cookies with empty value and expiration date equals to now', () => {
     const firstCookieName = CookieManager.getCookieName(1, cookieName);
     const secondCookieName = CookieManager.getCookieName(2, cookieName);
+    const cookiesToRemove = [cookieName, firstCookieName, secondCookieName];
+    const isSecured = true;
+    const emptyCookies = CookieManager.createEmptyCookies(isSecured, cookieDomain, cookiesToRemove);
 
-    expect(cookieValue.length).toEqual(2);
-
-    expect(cookieValue[0]).toContain(firstCookieName);
-    expect(cookieValue[0]).toContain('HttpOnly');
-    expect(cookieValue[0]).toContain('Secure');
-    expect(cookieValue[0]).toContain('SameSite=None');
-    expect(cookieValue[0]).toContain(`Domain=${cookieDomain}`);
-
-    expect(cookieValue[1]).toContain(secondCookieName);
-    expect(cookieValue[1]).toContain('HttpOnly');
-    expect(cookieValue[1]).toContain('Secure');
-    expect(cookieValue[1]).toContain('SameSite=None');
-    expect(cookieValue[1]).toContain(`Domain=${cookieDomain}`);
-  });
-
-  it('createEmptyCookies should accepts cookie names and create same cookies with empty value and expiration date equals to now', () => {
-    const emptyCookies = CookieManager.createEmptyCookies(true, cookieDomain, [cookieName]);
-
-    expect(emptyCookies.length).toEqual(1);
-    expect(emptyCookies[0]).toContain(`${cookieName}=;`);
-    expect(emptyCookies[0]).toContain('HttpOnly');
-    expect(emptyCookies[0]).toContain('Secure');
-    expect(emptyCookies[0]).toContain('SameSite=None');
-    expect(emptyCookies[0]).toContain(`Domain=${cookieDomain}`);
-    expect(emptyCookies[0]).toContain(`Expires=${new Date().toUTCString()}`);
+    expect(emptyCookies.length).toEqual(cookiesToRemove.length);
+    cookiesToRemove.forEach((name, index) => {
+      expect(emptyCookies[index]).toContain(`${name}=;`);
+      expect(emptyCookies[index]).toContain('HttpOnly');
+      expect(emptyCookies[index]).toContain('Secure');
+      expect(emptyCookies[index]).toContain('SameSite=None');
+      expect(emptyCookies[index]).toContain(`Domain=${cookieDomain}`);
+      expect(emptyCookies[index]).toContain(`Expires=${new Date().toUTCString()}`);
+    });
   });
 });

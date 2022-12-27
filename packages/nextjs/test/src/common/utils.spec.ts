@@ -17,7 +17,7 @@ describe('utils', () => {
     expect(chunks[0].length).toEqual(string.length);
   });
 
-  it('chunkString should return array of strings with the right chunk size and also last item if his size is not equal chunk size', () => {
+  it('chunkString should return array of strings with the right chunk size and also last item if his size is not equal to chunk size', () => {
     const chunkSize = 3;
     const string = '12345678';
     const chunks = chunkString(string, chunkSize);
