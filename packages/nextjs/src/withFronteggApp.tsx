@@ -12,7 +12,7 @@ type FronteggCustomApp = NextComponentType<
   AppPropsType
 >;
 export const withFronteggApp = (
-  app: ((props: unknown) => JSX.Element) & {
+  app: ((props: AppProps | unknown) => JSX.Element) & {
     getInitialProps?: FronteggCustomApp['getInitialProps'];
   },
   options?: Omit<FronteggAppOptions, 'contextOptions'> & {
