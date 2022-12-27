@@ -1,5 +1,15 @@
 # Change Log
 
+## [6.7.9](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.8...v6.7.9) (2022-12-27)
+
+
+### NextJS Wrapper 6.7.9:
+- FR-10132 - update withFronteggApp type
+- FR-10132 - update withFronteggApp type
+- FR-10166 - update code owners
+- FR-10132 - split cookie and type fixes
+- FR-10106-FR-10103- Make package output both cjs and esm and support useAuthUser for SSR
+
 ## [6.7.8](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.7...v6.7.8) (2022-12-20)
 
 - Fixed mfa input on mobile 
