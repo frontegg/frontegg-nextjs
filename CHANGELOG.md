@@ -1,5 +1,13 @@
 # Change Log
 
+## [6.7.9](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.8...v6.7.9) (2022-12-20)
+
+- Added support for next 13 - app directory and server components
+- Added support for tree shaking
+- Added support for getSession on edge run time
+- Update iron-session to decrease bundle size 
+
+
 ## [6.7.8](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.7...v6.7.8) (2022-12-20)
 
 - Fixed mfa input on mobile 
