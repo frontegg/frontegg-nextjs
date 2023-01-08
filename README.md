@@ -231,7 +231,7 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 ## Next.js 13
 ### wrapping your application
 ```ts
-// app/layout.tsx
+// ./app/layout.tsx
 import { FronteggAppProvider } from '@frontegg/nextjs/server';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -248,36 +248,70 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ### routing
 ```ts
-// app/[...frontegg-router]/page.tsx
+// ./app/[...frontegg-router]/page.tsx
 export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
 ```
 
 ### server component
 ```ts
-// app/ServerComponent.tsx
-import { getUserSession } from '@frontegg/nextjs/server';
+// ./app/ServerComponent.tsx
+import { getUserSession } from "@frontegg/nextjs/server";
 
 export const ServerComponent = async () => {
-  const userSession = await getUserSession();
-  return (
+  const user = await getUserSession();
+
+  return user ? (
     <div>
-      user session server side: {JSON.stringify(userSession)}
+      {user.profilePictureUrl && <img src={user.profilePictureUrl} />}
+      <span>Logged in as: {user?.name}</span>
     </div>
-  );
+  ) : null;
 };
+
 ```
 
 ### client component
 ```ts
-// app/ClientComponent.tsx
-'use client';
-import { useAuthUserOrNull } from '@frontegg/nextjs';
+// ./app/ClientComponent.tsx
+"use client";
+import { useAuth, useLoginWithRedirect } from "@frontegg/nextjs";
 
-export const ClientComponent = () => {
-  const user = useAuthUserOrNull();
-  return <div>user session client side: {JSON.stringify(user)}</div>;
+export const ClientComponent = ({ baseUrl }: { baseUrl: string }) => {
+  const { isAuthenticated } = useAuth();
+  const loginWithRedirect = useLoginWithRedirect();
+
+  const logout = () => {
+    window.location.href = `${baseUrl}/account/logout`;
+  };
+
+  return (
+    <button onClick={isAuthenticated ? logout : () => loginWithRedirect()}>
+      {isAuthenticated ? "Log out" : "Click me to login"}
+    </button>
+  );
 };
 ```
+
+### Page
+```ts
+// ./app/page.tsx
+import { ClientComponent } from "./client";
+import { ServerComponent } from "./server";
+
+export default function MainPage() {
+  const baseUrl = process.env["FRONTEGG_APP_URL"];
+  return (
+    <div>
+      <h3>Next JS application with frontegg</h3>
+      {/* @ts-ignore ignore server components error with typescript*/}
+      <ServerComponent />
+      <ClientComponent baseUrl={baseUrl} />
+    </div>
+  );
+}
+```
+
+also keep fronteggMiddleware inside ./pages/api/frontegg/[...frontegg-middleware].ts as shown before
 
 ## Next.js middlewares usage
 
@@ -293,9 +327,7 @@ import { getSession } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
   const session = await getSession(request);
-  const isAuthRoute = [...your auth routes]
-
-  console.log("middleware session", session);
+  const isAuthRoute = request.url.endsWith(YOUR_AUTH_ROUTES)
 
   if(!session && isAuthRoute){
     // redirect unauthenticated user to /account/login page
