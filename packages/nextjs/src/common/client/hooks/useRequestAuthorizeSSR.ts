@@ -1,20 +1,14 @@
 import { FronteggApp } from '@frontegg/js';
 import { useEffect } from 'react';
-import { MeAndTenantsResponse } from '../../types';
+import { AllUserData } from '../../types';
 
-type useRequestAuthorizeSSR = {
-  app: FronteggApp;
-  accessToken?: string;
-  refreshToken?: string;
-} & MeAndTenantsResponse;
-
-export const useRequestAuthorizeSSR = ({ app, accessToken, user, tenants, refreshToken }: useRequestAuthorizeSSR) => {
+export const useRequestAuthorizeSSR = ({ app, user, tenants, session }: { app: FronteggApp } & AllUserData) => {
   useEffect(() => {
     app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
       payload: {
-        accessToken,
-        user: user ? { ...user, refreshToken } : null,
+        accessToken: session?.accessToken,
+        user: user ? { ...user, refreshToken: session?.refreshToken } : null,
         tenants,
       },
     });

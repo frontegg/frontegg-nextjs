@@ -2,15 +2,11 @@ import { FronteggAppOptions } from '@frontegg/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import type { AppContextType, AppPropsType, NextComponentType } from 'next/dist/shared/lib/utils';
 import React from 'react';
-import { FronteggConfig, fronteggErrors, FronteggNextJSSession, getMeAndTenants, MeAndTenantsResponse } from './common';
+import { FronteggConfig, fronteggErrors, getAllUserData, AllUserData } from './common';
 import { FronteggProvider } from './FronteggProvider';
 import { refreshToken } from './refreshToken';
 
-type FronteggCustomApp = NextComponentType<
-  AppContextType & { session: FronteggNextJSSession | null },
-  AppInitialProps,
-  AppPropsType
->;
+type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
 export const withFronteggApp = (
   app: ((props: AppPropsType<any>) => JSX.Element) & {
     getInitialProps?: FronteggCustomApp['getInitialProps'];
@@ -21,15 +17,13 @@ export const withFronteggApp = (
 ): FronteggCustomApp => {
   const originalGetInitialProps: FronteggCustomApp['getInitialProps'] | undefined = app.getInitialProps;
 
-  app.getInitialProps = async (
-    appContext: AppContext & {
-      session: FronteggNextJSSession | null;
-    } & MeAndTenantsResponse
-  ): Promise<AppInitialProps> => {
+  app.getInitialProps = async (appContext: AppContext & AllUserData): Promise<AppInitialProps> => {
     const { ctx, Component } = appContext;
     if (ctx.req) {
-      const session = await refreshToken(ctx);
-      const { user, tenants } = await getMeAndTenants(ctx.req?.headers, session?.accessToken);
+      const { user, tenants, session } = await getAllUserData({
+        getSession: async () => await refreshToken(ctx),
+        reqHeaders: ctx.req?.headers,
+      });
       appContext.session = session;
       appContext.user = user;
       appContext.tenants = tenants;
@@ -56,7 +50,7 @@ export const withFronteggApp = (
         },
       };
     } else {
-      appContext.session = null;
+      appContext.session = undefined;
       return {
         pageProps: {
           ...(originalGetInitialProps ? await originalGetInitialProps(appContext) : {}),

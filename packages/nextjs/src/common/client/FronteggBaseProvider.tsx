@@ -5,12 +5,11 @@ import React, { FC, useCallback, useMemo, useRef } from 'react';
 import { FronteggProviderProps } from '../types';
 import AppContext from './AppContext';
 import { createOrGetFronteggApp } from './createOrGetFronteggApp';
-import { ExpireInListener } from './ExpireInListener';
 import { useRequestAuthorizeSSR } from './hooks';
 
-const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', user, tenants, ...props }) => {
+const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...props }) => {
   const isSSR = typeof window === 'undefined';
-  const { accessToken, refreshToken } = props.session ?? {};
+  const { user, session, tenants } = props;
   const baseName = props.basename ?? '';
   const storeHolder = useRef({});
 
@@ -34,8 +33,6 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', use
     () =>
       createOrGetFronteggApp({
         options: { ...props, basename: baseName },
-        user,
-        tenants,
         onRedirectTo,
         appName,
         storeHolder,
@@ -44,7 +41,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', use
   );
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
-  useRequestAuthorizeSSR({ app, accessToken, user, tenants, refreshToken });
+  useRequestAuthorizeSSR({ app, user, tenants, session });
   return (
     <AppContext.Provider value={app}>
       <FronteggStoreProvider {...({ ...props, app } as any)}>{props.children}</FronteggStoreProvider>
@@ -55,7 +52,6 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', use
 export const FronteggBaseProvider: FC<FronteggProviderProps> = (props) => {
   return (
     <Connector {...props} framework={'nextjs'}>
-      <ExpireInListener />
       {props.children}
     </Connector>
   );
