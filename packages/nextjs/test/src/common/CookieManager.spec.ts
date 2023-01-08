@@ -1,10 +1,30 @@
 import { CookieManager, FronteggConfig } from '../../../src';
-import { smallCookieValue, bigCookieValue, cookieDomain, cookieName } from './const';
+import { COOKIE_MAX_LENGTH } from '../../../src/common/consts';
+import { SMALL_COOKIE_VALUE, LARGE_COOKIE_VALUE, COOKIE_DOMAIN, COOKIE_NAME } from './const';
+
+const commonTestsForCookie = ({
+  cookie,
+  cookieName,
+  cookieValue,
+  expires,
+}: {
+  cookie: string;
+  cookieName: string;
+  cookieValue: string;
+  expires: Date;
+}) => {
+  expect(cookie).toContain(`${cookieName}=${cookieValue};`);
+  expect(cookie).toContain('HttpOnly');
+  expect(cookie).toContain('Secure');
+  expect(cookie).toContain('SameSite=None');
+  expect(cookie).toContain(`Domain=${COOKIE_DOMAIN}`);
+  expect(cookie).toContain(`Expires=${expires.toUTCString()}`);
+};
 
 const extractValueOutOfCookie = (cookie: string) =>
   cookie
     .split('; ')
-    ?.find((c) => c.includes(cookieName))
+    ?.find((c) => c.includes(COOKIE_NAME))
     ?.split('=')[1] ?? '';
 
 describe('Cookie Manager', () => {
@@ -15,68 +35,52 @@ describe('Cookie Manager', () => {
   });
 
   it('createCookie should create cookie properly', () => {
-    const cookieValue = CookieManager.createCookie({
-      cookieName,
-      value: smallCookieValue,
-      expires: new Date(),
+    const expires = new Date(2023, 1, 9);
+    const cookies = CookieManager.createCookie({
+      cookieName: COOKIE_NAME,
+      value: SMALL_COOKIE_VALUE,
+      expires,
       isSecured: true,
-      cookieDomain,
+      cookieDomain: COOKIE_DOMAIN,
     });
 
-    expect(cookieValue.length).toEqual(1);
-    expect(cookieValue[0]).toContain(`${cookieName}=${smallCookieValue}`);
-    expect(cookieValue[0]).toContain('HttpOnly');
-    expect(cookieValue[0]).toContain('Secure');
-    expect(cookieValue[0]).toContain('SameSite=None');
-    expect(cookieValue[0]).toContain(`Domain=${cookieDomain}`);
+    expect(cookies.length).toEqual(1);
+    commonTestsForCookie({ cookie: cookies[0], cookieName: COOKIE_NAME, cookieValue: SMALL_COOKIE_VALUE, expires });
   });
 
   it('createCookie with big value should create split cookie properly', () => {
-    const cookieValue = CookieManager.createCookie({
-      cookieName,
-      value: bigCookieValue,
-      expires: new Date(),
+    const expires = new Date(2023, 1, 9);
+    const cookies = CookieManager.createCookie({
+      cookieName: COOKIE_NAME,
+      value: LARGE_COOKIE_VALUE,
+      expires,
       isSecured: true,
-      cookieDomain,
+      cookieDomain: COOKIE_DOMAIN,
     });
-    const firstCookieName = CookieManager.getCookieName(1, cookieName);
-    const secondCookieName = CookieManager.getCookieName(2, cookieName);
 
-    const firstCookieValue = extractValueOutOfCookie(cookieValue[0]);
-    const secondCookieValue = extractValueOutOfCookie(cookieValue[1]);
+    let calculatedValue = '';
 
-    expect(cookieValue.length).toEqual(2);
-
-    expect(cookieValue[0]).toContain(`${firstCookieName}=${firstCookieValue}`);
-    expect(cookieValue[0]).toContain('HttpOnly');
-    expect(cookieValue[0]).toContain('Secure');
-    expect(cookieValue[0]).toContain('SameSite=None');
-    expect(cookieValue[0]).toContain(`Domain=${cookieDomain}`);
-
-    expect(cookieValue[1]).toContain(`${secondCookieName}=${secondCookieValue}`);
-    expect(cookieValue[1]).toContain('HttpOnly');
-    expect(cookieValue[1]).toContain('Secure');
-    expect(cookieValue[1]).toContain('SameSite=None');
-    expect(cookieValue[1]).toContain(`Domain=${cookieDomain}`);
-
-    expect(firstCookieValue + secondCookieValue).toEqual(bigCookieValue);
+    expect(cookies.length).toBeGreaterThan(1);
+    cookies.forEach((cookie, index) => {
+      const cookieName = CookieManager.getCookieName(index + 1, COOKIE_NAME);
+      const cookieValue = extractValueOutOfCookie(cookie);
+      commonTestsForCookie({ cookie, cookieName, cookieValue, expires });
+      expect(cookies[0].length).toBeLessThan(COOKIE_MAX_LENGTH + 1);
+      calculatedValue += cookieValue;
+    });
+    expect(calculatedValue).toEqual(LARGE_COOKIE_VALUE);
   });
 
   it('createEmptyCookies should accepts cookie names and create cookies with empty value and expiration date equals to now', () => {
-    const firstCookieName = CookieManager.getCookieName(1, cookieName);
-    const secondCookieName = CookieManager.getCookieName(2, cookieName);
-    const cookiesToRemove = [cookieName, firstCookieName, secondCookieName];
+    const firstCookieName = CookieManager.getCookieName(1, COOKIE_NAME);
+    const secondCookieName = CookieManager.getCookieName(2, COOKIE_NAME);
+    const cookiesToRemove = [COOKIE_NAME, firstCookieName, secondCookieName];
     const isSecured = true;
-    const emptyCookies = CookieManager.createEmptyCookies(isSecured, cookieDomain, cookiesToRemove);
+    const emptyCookies = CookieManager.createEmptyCookies(isSecured, COOKIE_DOMAIN, cookiesToRemove);
 
     expect(emptyCookies.length).toEqual(cookiesToRemove.length);
-    cookiesToRemove.forEach((name, index) => {
-      expect(emptyCookies[index]).toContain(`${name}=;`);
-      expect(emptyCookies[index]).toContain('HttpOnly');
-      expect(emptyCookies[index]).toContain('Secure');
-      expect(emptyCookies[index]).toContain('SameSite=None');
-      expect(emptyCookies[index]).toContain(`Domain=${cookieDomain}`);
-      expect(emptyCookies[index]).toContain(`Expires=${new Date().toUTCString()}`);
+    cookiesToRemove.forEach((cookieName, index) => {
+      commonTestsForCookie({ cookie: emptyCookies[index], cookieName, cookieValue: '', expires: new Date() });
     });
   });
 });

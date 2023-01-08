@@ -5,3 +5,5 @@ export const fronteggErrors = {
   envBaseUrl: envError('FRONTEGG_BASE_URL'),
   envClientId: envError('FRONTEGG_CLIENT_ID'),
 };
+
+export const COOKIE_MAX_LENGTH = 4092;
