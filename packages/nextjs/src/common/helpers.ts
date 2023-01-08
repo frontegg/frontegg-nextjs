@@ -1,7 +1,9 @@
 import { sealData, unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
+import { getTenants, getUsers } from './api';
+import { calculateExpiresInFromExp } from './client/ExpireInListener';
 import FronteggConfig from './FronteggConfig';
-import { FronteggUserTokens } from './types';
+import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
 
 export async function createSessionFromAccessToken(output: string): Promise<[string, any, string] | []> {
   try {
@@ -32,3 +34,29 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
   });
   return JSON.parse(stringifyJwt);
 }
+
+type UserDataArguments = {
+  getSession: () => Promise<FronteggNextJSSession | undefined | null>;
+  reqHeaders: Record<string, string | string[] | undefined>;
+};
+
+export const getAllUserData = async ({ getSession, reqHeaders }: UserDataArguments): Promise<Partial<AllUserData>> => {
+  try {
+    const session = await getSession();
+    if (!session) return {};
+    const headers = { ...reqHeaders, Authorization: `Bearer ${session.accessToken}` };
+    const [baseUser, tenants] = await Promise.all([getUsers(headers), getTenants(headers)]);
+    if (!baseUser || !tenants) return {};
+    const user =
+      baseUser && session
+        ? {
+            ...session.user,
+            ...baseUser,
+            expiresIn: calculateExpiresInFromExp(session.user.exp),
+          }
+        : undefined;
+    return { user, session, tenants };
+  } catch {
+    return {};
+  }
+};

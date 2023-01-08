@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from 'react';
 import { getSession } from './getSessionNext13';
 import { FronteggClientProviderNext13 } from '../client';
 import { FronteggAppOptions } from '@frontegg/types';
-import { getMeAndTenants } from '../common';
+import { getAllUserData } from '../common';
 import { headers } from 'next/headers';
 
 export const FronteggAppProvider = async ({
@@ -23,11 +23,10 @@ export const FronteggAppProvider = async ({
     throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_CLIENT_ID');
   }
 
-  const session = await getSession();
-  const allHeaders = {} as any;
-  headers().forEach((value: string, key: string) => (allHeaders[key] = value));
+  const reqHeaders = {} as any;
+  headers().forEach((value: string, key: string) => (reqHeaders[key] = value));
 
-  const { user, tenants } = await getMeAndTenants(allHeaders, session?.accessToken);
+  const { user, tenants, session } = await getAllUserData({ getSession, reqHeaders });
 
   return (
     <FronteggClientProviderNext13 {...{ session, envAppUrl, envBaseUrl, envClientId, user, tenants }} {...options}>

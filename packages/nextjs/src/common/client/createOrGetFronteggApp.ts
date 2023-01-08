@@ -2,24 +2,23 @@ import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
 import { createFronteggStore, AuthState } from '@frontegg/redux-store';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
-import { FronteggProviderOptions, MeAndTenantsResponse } from '../types';
+import { FronteggProviderOptions } from '../types';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
   onRedirectTo: AuthState['onRedirectTo'];
   appName?: string;
   storeHolder: any;
-} & MeAndTenantsResponse;
+};
 
 export const createOrGetFronteggApp = ({
   options,
   onRedirectTo,
   appName,
-  user,
-  tenants,
   storeHolder,
 }: CreateOrGetFronteggAppParams): FronteggApp => {
-  const { accessToken, refreshToken } = options.session ?? {};
+  const { session, user, tenants } = options;
+  const { accessToken, refreshToken } = session ?? {};
 
   const contextOptions: FronteggAppOptions['contextOptions'] = {
     requestCredentials: 'include' as RequestCredentials,

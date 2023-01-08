@@ -22,9 +22,10 @@ export interface FronteggUserTokens {
   refreshToken?: string;
 }
 
-export interface MeAndTenantsResponse {
-  user?: ILoginResponse;
-  tenants?: ITenantsResponse[];
+export interface AllUserData {
+  user?: ILoginResponse | null;
+  tenants?: ITenantsResponse[] | null;
+  session?: FronteggNextJSSession | null;
 }
 export interface FronteggUserSession {
   sub: string;
@@ -55,15 +56,14 @@ export interface AppEnvConfig {
   envClientId?: string;
 }
 
-export interface FronteggProviderOptions extends Omit<FronteggAppOptions, 'contextOptions'> {
-  session?: FronteggNextJSSession;
+export interface FronteggProviderOptions extends Omit<FronteggAppOptions, 'contextOptions'>, AllUserData {
   envAppUrl: string;
   envBaseUrl: string;
   envClientId: string;
   contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
 }
 
-export interface FronteggProviderProps extends FronteggProviderOptions, MeAndTenantsResponse {
+export interface FronteggProviderProps extends FronteggProviderOptions {
   children?: ReactNode;
   router: AppRouterInstance | NextRouter;
   appName?: string;
