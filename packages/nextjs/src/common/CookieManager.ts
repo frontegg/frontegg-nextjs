@@ -4,6 +4,7 @@ import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import FronteggConfig from './FronteggConfig';
 import { RequestType } from './types';
 import { chunkString } from './utils';
+import { COOKIE_MAX_LENGTH } from './consts';
 
 type CreateCookieArguments = {
   cookieName?: string;
@@ -23,13 +24,11 @@ type RemoveCookiesArguments = {
   req?: RequestType;
 };
 
-const COOKIE_MAX_LENGTH = 4096;
-
 class CookieManager {
   constructor() {}
 
-  getCookieName = (cookieNumber: number, cookieName?: string) =>
-    `${cookieName ?? FronteggConfig.cookieName}-${cookieNumber}`;
+  getCookieName = (cookieNumber?: number, cookieName = FronteggConfig.cookieName) =>
+    cookieNumber ? `${cookieName}-${cookieNumber}` : cookieName;
 
   rewriteCookieProperty(header: string | string[], config: any, property: string): string | string[] {
     if (Array.isArray(header)) {
@@ -75,7 +74,7 @@ class CookieManager {
       secure: isSecured,
     };
     const cookieValue = cookie.serialize(cookieName ?? this.getCookieName(1), value, options);
-    if (cookieValue.length < COOKIE_MAX_LENGTH) {
+    if (cookieValue.length <= COOKIE_MAX_LENGTH) {
       return [cookieValue];
     }
     const valueChunks = this.splitValueToChunks(cookieName, value, options);
@@ -107,21 +106,18 @@ class CookieManager {
   }
 
   parseCookie(cookieStr: string) {
+    const cookies = cookie.parse(cookieStr);
     let sealFromCookies = '';
     let i = 1;
-    while (cookie.parse(cookieStr)[this.getCookieName(i)]) {
-      sealFromCookies += cookie.parse(cookieStr)[this.getCookieName(i)];
+    while (cookies[this.getCookieName(i)]) {
+      sealFromCookies += cookies[this.getCookieName(i)];
       i++;
     }
     return sealFromCookies !== '' ? sealFromCookies : undefined;
   }
 
   parseCookieFromArray(cookies: RequestCookie[]): string | undefined {
-    const userCookie = cookies.find((c) => c.name === FronteggConfig.cookieName);
-    if (userCookie) {
-      return userCookie.value;
-    }
-    const cookieChunks = cookies.filter((c) => c.name.includes(FronteggConfig.cookieName));
+    const cookieChunks = cookies.filter((c) => c.name.includes(this.getCookieName()));
     if (!cookieChunks) {
       return undefined;
     }
@@ -157,13 +153,13 @@ class CookieManager {
     }
     try {
       const cookieStr = this.getCookieStringFromRequest(req);
-      const allCookies = cookieStr && cookie.parse(cookieStr);
-      if (!allCookies) {
+      const cookies = cookieStr && cookie.parse(cookieStr);
+      if (!cookies) {
         return [];
       }
       let cookieNumber = 1;
       const cookieToRemove = [];
-      while (allCookies[this.getCookieName(cookieNumber)]) {
+      while (cookies[this.getCookieName(cookieNumber)]) {
         cookieToRemove.push(this.getCookieName(cookieNumber));
         cookieNumber++;
       }
