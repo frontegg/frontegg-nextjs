@@ -69,11 +69,11 @@ async function refreshTokenEmbedded(
   });
 }
 
-export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJSSession | undefined> {
+export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
   try {
     const request = ctx.req;
     if (!request) {
-      return undefined;
+      return null;
     }
     try {
       const session = await getSession(ctx.req as any);
@@ -88,7 +88,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     const cookies = (request as NextApiRequest).cookies;
 
     if (ctx.req!.url!.startsWith('/oauth/callback')) {
-      return undefined;
+      return null;
     }
     let response: Response | null;
     if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
@@ -103,7 +103,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
         res: ctx.res!,
         req: ctx.req,
       });
-      return undefined;
+      return null;
     }
 
     if (response.ok) {
@@ -116,7 +116,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       let newSetCookie = CookieManager.rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
       const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
       if (!session) {
-        return undefined;
+        return null;
       }
       const cookieValue = CookieManager.createCookie({
         value: session,
@@ -136,9 +136,9 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     } else {
       // remove all fe_nextjs-session cookies
       // ctx.res?.setHeader('set-cookie', removedCookies);
-      return undefined;
+      return null;
     }
   } catch (e) {
-    return undefined;
+    return null;
   }
 }

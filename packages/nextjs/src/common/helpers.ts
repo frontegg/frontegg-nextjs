@@ -36,7 +36,7 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
 }
 
 type UserDataArguments = {
-  getSession: () => Promise<FronteggNextJSSession | undefined>;
+  getSession: () => Promise<FronteggNextJSSession | undefined | null>;
   reqHeaders: Record<string, string | string[] | undefined>;
 };
 

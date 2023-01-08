@@ -50,7 +50,7 @@ export const withFronteggApp = (
         },
       };
     } else {
-      appContext.session = undefined;
+      appContext.session = null;
       return {
         pageProps: {
           ...(originalGetInitialProps ? await originalGetInitialProps(appContext) : {}),

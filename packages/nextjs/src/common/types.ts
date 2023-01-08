@@ -23,9 +23,9 @@ export interface FronteggUserTokens {
 }
 
 export interface AllUserData {
-  user?: ILoginResponse;
-  tenants?: ITenantsResponse[];
-  session?: FronteggNextJSSession;
+  user?: ILoginResponse | null;
+  tenants?: ITenantsResponse[] | null;
+  session?: FronteggNextJSSession | null;
 }
 export interface FronteggUserSession {
   sub: string;
