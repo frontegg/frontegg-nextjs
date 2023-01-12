@@ -260,12 +260,8 @@ import { getUserSession } from "@frontegg/nextjs/server";
 export const ServerComponent = async () => {
   const user = await getUserSession();
 
-  return user ? (
-    <div>
-      {user.profilePictureUrl && <img src={user.profilePictureUrl} />}
-      <span>Logged in as: {user?.name}</span>
-    </div>
-  ) : null;
+  console.log(user);
+  return null;
 };
 
 ```
@@ -276,8 +272,9 @@ export const ServerComponent = async () => {
 "use client";
 import { useAuth, useLoginWithRedirect } from "@frontegg/nextjs";
 
-export const ClientComponent = ({ baseUrl }: { baseUrl: string }) => {
-  const { isAuthenticated } = useAuth();
+export const ClientComponent = ({ baseUrl }: { baseUrl?: string }) => {
+  const { user, isAuthenticated } = useAuth();
+
   const loginWithRedirect = useLoginWithRedirect();
 
   const logout = () => {
@@ -285,9 +282,30 @@ export const ClientComponent = ({ baseUrl }: { baseUrl: string }) => {
   };
 
   return (
-    <button onClick={isAuthenticated ? logout : () => loginWithRedirect()}>
-      {isAuthenticated ? "Log out" : "Click me to login"}
-    </button>
+    <div className="App">
+      {isAuthenticated ? (
+        <div>
+          <div>
+            <img src={user?.profilePictureUrl} alt={user?.name} />
+          </div>
+          <div>
+            <span>Logged in as: {user?.name}</span>
+          </div>
+          <div>
+            <button onClick={() => alert(user?.accessToken)}>
+              What is my access token?
+            </button>
+          </div>
+          <div>
+            <button onClick={() => logout()}>Click to logout</button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <button onClick={() => loginWithRedirect()}>Click me to login</button>
+        </div>
+      )}
+    </div>
   );
 };
 ```
