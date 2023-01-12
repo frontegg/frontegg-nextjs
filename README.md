@@ -255,12 +255,12 @@ export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
 ### server component
 ```ts
 // ./app/ServerComponent.tsx
-import { getUserSession } from "@frontegg/nextjs/server";
+import { getSession } from "@frontegg/nextjs/server";
 
 export const ServerComponent = async () => {
-  const user = await getUserSession();
+  const session = await getSession();
 
-  console.log(user);
+  console.log(session);
   return null;
 };
 
