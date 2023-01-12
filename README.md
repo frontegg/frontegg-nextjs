@@ -253,6 +253,7 @@ export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
 ```
 
 ### server component
+notice that this session is not part of the state and therefore wont trigger ui changes when it changes
 ```ts
 // ./app/ServerComponent.tsx
 import { getSession } from "@frontegg/nextjs/server";
@@ -260,8 +261,7 @@ import { getSession } from "@frontegg/nextjs/server";
 export const ServerComponent = async () => {
   const session = await getSession();
 
-  console.log(session);
-  return null;
+  return <pre>{JSON.stringify(session, null, 2)}</pre>;
 };
 
 ```
