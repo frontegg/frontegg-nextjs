@@ -92,9 +92,14 @@ export function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse): P
           })
           .on('end', async () => {
             const output = buffer.toString('utf-8');
-            const isLogout = req?.url?.endsWith(
-              fronteggAuthApiRoutes.find((path) => path.endsWith('/logout')) ?? '/logout'
-            );
+            const logoutRoutes = fronteggAuthApiRoutes.filter((path) => path.endsWith('/logout'));
+            let isLogout = false;
+            logoutRoutes.forEach((route) => {
+              if (req?.url?.endsWith(route)) {
+                isLogout = true;
+              }
+            });
+
             if (isLogout) {
               CookieManager.removeCookies({
                 isSecured,
