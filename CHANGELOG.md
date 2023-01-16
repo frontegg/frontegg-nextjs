@@ -2,25 +2,12 @@
 
 ## [6.7.10](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.9...v6.7.10) (2023-1-16)
 
-- FR-10261 - fix sign up position in dark theme
-- FR-10369 - change mfa ff name
-- FR-10330 - fixes for bulk
-- FR-9816 - Fix branch selection
-- 
+- Fixed sign up position in dark theme
+- Added margin to login error
+- Disabled silent refresh token for SSR
+- Added support for logout on hosted login
+- Fixed session without keepSessionAlive
 
-- FR-10112 - update admin box pipeline angular
-- FR-10141 - update rest-api
-
-- FR-9816 - fix version
-
-### NextJS Wrapper 6.7.10:
-- FR-10379 - disable refresh token by default for ssr
-- FR-10141 - Added support for logout on hosted login
-- FR-10342 - update readme for app directory
-- Bump json5 from 1.0.1 to 1.0.2
-- Update Frontegg AdminPortal to 6.58.0
-- FR-10153 - Fix app session bug without keepSessionAlive
-- Bump minimatch from 3.0.4 to 3.0.5
 
 ## [6.7.9](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.8...v6.7.9) (2022-12-20)
 
