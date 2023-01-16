@@ -2,6 +2,7 @@
 
 ## [6.7.10](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.9...v6.7.10) (2023-1-16)
 
+- Added support for built-in authenticators, security keys, and SMS as MFA methods
 - Fixed sign up position in dark theme
 - Added margin to login error
 - Disabled silent refresh token for SSR
