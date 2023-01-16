@@ -24,12 +24,7 @@ export const createOrGetFronteggApp = ({
     requestCredentials: 'include' as RequestCredentials,
     ...options.contextOptions,
     baseUrl: (path: string) => {
-      if (
-        fronteggAuthApiRoutes.indexOf(path) !== -1 ||
-        path.endsWith('/postlogin') ||
-        path.endsWith('/prelogin') ||
-        path === '/oauth/token'
-      ) {
+      if (fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin')) {
         return `${options.envAppUrl}/api`;
       } else {
         return options.envBaseUrl;
@@ -62,7 +57,7 @@ export const createOrGetFronteggApp = ({
     isLoading: false,
     isAuthenticated: !!options.session,
     hostedLoginBox: options.hostedLoginBox ?? false,
-    disableSilentRefresh: options.authOptions?.disableSilentRefresh ?? false,
+    disableSilentRefresh: options.authOptions?.disableSilentRefresh ?? true,
     user: userData,
     tenantsState,
   };
