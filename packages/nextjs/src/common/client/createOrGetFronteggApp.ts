@@ -57,7 +57,7 @@ export const createOrGetFronteggApp = ({
     isLoading: false,
     isAuthenticated: !!options.session,
     hostedLoginBox: options.hostedLoginBox ?? false,
-    disableSilentRefresh: options.authOptions?.disableSilentRefresh ?? false,
+    disableSilentRefresh: options.authOptions?.disableSilentRefresh ?? true,
     user: userData,
     tenantsState,
   };
