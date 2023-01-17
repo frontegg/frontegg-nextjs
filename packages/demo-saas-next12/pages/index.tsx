@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useAuthUserOrNull, useLoginWithRedirect } from '@frontegg/nextjs';
+import { useAuthUserOrNull, useLoginWithRedirect, withFronteggPage } from '@frontegg/nextjs';
 
 export function Index() {
   const user = useAuthUserOrNull();
@@ -30,4 +30,4 @@ export function Index() {
   );
 }
 
-export default Index;
+export default withFronteggPage(Index);

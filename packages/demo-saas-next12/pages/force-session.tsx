@@ -1,7 +1,6 @@
-import { GetServerSideProps } from 'next';
-import { AdminPortal, useAuthUserOrNull, withSSRSession } from '@frontegg/nextjs';
+import { AdminPortal, useAuthUserOrNull, withFronteggPage } from '@frontegg/nextjs';
 
-export default function ForceSession({ ssrSession }) {
+export default withFronteggPage(function ForceSession({ pageProps: { session } }) {
   const user = useAuthUserOrNull();
 
   return (
@@ -10,7 +9,7 @@ export default function ForceSession({ ssrSession }) {
       <br />
       hooks: {JSON.stringify(user)}
       <br />
-      SSR Session: {ssrSession ? JSON.stringify(ssrSession) : 'No Session'}
+      SSR Session: {session ? JSON.stringify(session) : 'No Session'}
       <br />
       <br />
       <br />
@@ -23,8 +22,4 @@ export default function ForceSession({ ssrSession }) {
       </button>
     </div>
   );
-}
-
-export const getServerSideProps: GetServerSideProps = withSSRSession((context, session) => {
-  return { props: { ssrSession: session } };
 });

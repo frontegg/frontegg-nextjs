@@ -6,6 +6,8 @@ export * from './withFronteggApp';
 export * from './session';
 export * from './FronteggMiddleware';
 export * from './common';
+export * from './FronteggProviderSSG';
+export * from './withFronteggPage';
 
 export { AdminPortal } from '@frontegg/js';
 export * from '@frontegg/react-hooks';
