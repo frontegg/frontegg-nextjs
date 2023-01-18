@@ -17,6 +17,7 @@
     "@frontegg/react-hooks": "6.65.0",
     "@types/http-proxy": "^1.17.9",
     "cookie": "^0.5.0",
+    "deepmerge": "^4.2.2",
     "http-proxy": "^1.18.1",
     "iron-session": "^6.3.1",
     "jose": "^4.9.2"

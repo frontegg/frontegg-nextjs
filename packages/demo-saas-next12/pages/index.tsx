@@ -29,5 +29,8 @@ export function Index() {
     </div>
   );
 }
+Index.getInitialProps = async () => {
+  return {};
+};
 
 export default withFronteggPage(Index);

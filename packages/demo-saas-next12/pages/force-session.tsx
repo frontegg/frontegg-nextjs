@@ -1,7 +1,9 @@
-import { AdminPortal, useAuthUserOrNull, withFronteggPage } from '@frontegg/nextjs';
+import { GetServerSideProps } from 'next';
+import { AdminPortal, useAuthUserOrNull, getServerSidePropsWithFrontegg, withFronteggPage } from '@frontegg/nextjs';
 
-export default withFronteggPage(function ForceSession({ pageProps: { session } }) {
+export default withFronteggPage(function ForceSession({ session, hello }: any) {
   const user = useAuthUserOrNull();
+  console.log(hello);
 
   return (
     <div>
@@ -23,3 +25,10 @@ export default withFronteggPage(function ForceSession({ pageProps: { session } }
     </div>
   );
 });
+
+export const getServerSideProps: GetServerSideProps = getServerSidePropsWithFrontegg(
+  (context) => {
+    return { props: { hello: 'yes' } };
+  },
+  { isProtectedRoute: false }
+);
