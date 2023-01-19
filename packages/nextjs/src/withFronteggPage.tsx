@@ -73,6 +73,7 @@ export const withFronteggPage = <T extends { usedSSR: boolean; user: ILoginRespo
           user,
         })
       );
+      store.dispatch(authActions.loadTenants());
     }
     return (page as FunctionComponent<T>)(props);
   };
@@ -140,11 +141,11 @@ export function getServerSidePropsWithFrontegg<
   Q extends ParsedUrlQuery = ParsedUrlQuery
 >(
   handler: (context: GetServerSidePropsContext<Q>) => Promise<GetServerSidePropsResult<P>>,
-  options: { isProtectedRoute?: boolean }
+  { isProtectedRoute = true }
 ) {
   return async (context: GetServerSidePropsContext<Q>): Promise<GetServerSidePropsResult<P>> => {
     let fronteggServerSideProps: GetServerSidePropsResult<P>;
-    if (options.isProtectedRoute) {
+    if (isProtectedRoute) {
       fronteggServerSideProps = await getFronteggProtectedServerSideProps(context);
     } else {
       fronteggServerSideProps = await getFronteggServerSideProps(context);

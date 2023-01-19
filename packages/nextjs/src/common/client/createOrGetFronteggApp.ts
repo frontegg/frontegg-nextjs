@@ -1,5 +1,5 @@
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
-import { createFronteggStore, AuthState } from '@frontegg/redux-store';
+import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import { FronteggProviderOptions } from '../types';
@@ -41,7 +41,7 @@ export const createOrGetFronteggApp = ({
         loading: false,
         ...options.authOptions?.tenantsState,
       }
-    : undefined;
+    : defaultTenantsState;
   const userData = user
     ? {
         ...user,
@@ -79,6 +79,7 @@ export const createOrGetFronteggApp = ({
   try {
     createdApp = AppHolder.getInstance(appName ?? 'default');
     createdApp.store = sharedStore;
+    createdApp.options.store = sharedStore;
   } catch (e) {
     createdApp = initialize(
       {
