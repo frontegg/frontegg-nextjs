@@ -64,7 +64,7 @@ export const createOrGetFronteggApp = ({
 
   const sharedStore = createFronteggStore(
     { context: contextOptions },
-    storeHolder.current,
+    storeHolder,
     options.previewMode,
     authOptions,
     {
