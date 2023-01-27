@@ -84,7 +84,7 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
             resolve();
           } catch (e: any) {
             console.error('[ERROR] FronteggMiddleware', 'proxy failed to send request', e);
-            res.status(500).end(JSON.stringify({ message: e.message }));
+            res.status(500).end('Internal Server Error');
             resolve();
           }
         });
