@@ -5,6 +5,7 @@ import FronteggConfig from './FronteggConfig';
 import { RequestType } from './types';
 import { chunkString } from './utils';
 import { COOKIE_MAX_LENGTH } from './consts';
+import fronteggConfig from './FronteggConfig';
 
 type CreateCookieArguments = {
   cookieName?: string;
@@ -136,6 +137,7 @@ class CookieManager {
     }
     res.setHeader('set-cookie', [...existingSetCookie, ...newCookies]);
   }
+
   createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) =>
     this.createCookie({ cookieName, value: '', expires: new Date(), isSecured, cookieDomain });
 
@@ -144,6 +146,24 @@ class CookieManager {
     cookiesToRemove.forEach((name) => {
       allEmptyCookies.push(...this.createEmptySingleCookie(name, isSecured, cookieDomain));
     });
+    // TODO: remove replace in the next major v7
+    const fixedRefreshToken = this.createEmptySingleCookie(
+      `fe_refresh_${fronteggConfig.clientId}`,
+      isSecured,
+      cookieDomain
+    );
+    const refreshTokenCookie = this.createEmptySingleCookie(
+      `fe_refresh_${fronteggConfig.clientId.replace('-', '')}`,
+      isSecured,
+      cookieDomain
+    );
+    const solidRefreshTokenCookie = this.createEmptySingleCookie(
+      `fe_refresh_${fronteggConfig.clientId.replace(/-/g, '')}`,
+      isSecured,
+      cookieDomain
+    );
+    const refreshTokenCookies: string[] = [...fixedRefreshToken, ...refreshTokenCookie, ...solidRefreshTokenCookie];
+    allEmptyCookies.push(...refreshTokenCookies);
     return allEmptyCookies;
   };
 
@@ -180,17 +200,26 @@ class CookieManager {
     res.setHeader('set-cookie', [...existingSetCookie, ...cookieValue]);
   }
 
-  modifySetCookieIfUnsecure = (setCookieValue: string[] | undefined, isSecured: boolean): string[] | undefined => {
+  modifySetCookie = (setCookieValue: string[] | undefined, isSecured: boolean): string[] | undefined => {
     if (!setCookieValue) {
       return setCookieValue;
     }
     if (setCookieValue.length > 0) {
       return setCookieValue.map((c) => {
-        const cookie = c.split('; ');
-        if (isSecured) {
-          return c;
+        let cookie = c.split('; ');
+
+        if (!isSecured) {
+          cookie = cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None');
         }
-        return cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None').join('; ');
+
+        return cookie
+          .map((property) => {
+            if (property.toLowerCase() === `domain=${fronteggConfig.baseUrlHost}`) {
+              return `Domain=${fronteggConfig.cookieDomain}`;
+            }
+            return property;
+          })
+          .join(';');
       });
     }
     return setCookieValue;

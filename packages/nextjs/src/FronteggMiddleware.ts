@@ -1,53 +1,99 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import httpProxy from 'http-proxy';
 import fronteggConfig from './common/FronteggConfig';
 import { createSessionFromAccessToken, CookieManager } from './common';
-import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
+import { fronteggPathRewrite, FronteggProxy, isFronteggLogoutUrl, rewritePath } from './common/FronteggProxy';
 
-/**
- * @see https://www.npmjs.com/package/http-proxy
- */
-const proxy = httpProxy.createProxyServer({
-  target: process.env['FRONTEGG_BASE_URL'],
-});
-
-/**
- * Please refer to the following links for the specification document for HTTP.
- * @see https://tools.ietf.org/html/rfc7231
- * @see https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol
- */
-const hasRequestBodyMethods: string[] = ['HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH'];
-
-/**
- * If pattern information matching the input url information is found in the `pathRewrite` array,
- * the url value is partially replaced with the `pathRewrite.replaceStr` value.
- * @param url
- * @param pathRewrite
- */
-export const rewritePath = (
-  url: string,
-  pathRewrite: { [key: string]: string } | { patternStr: string; replaceStr: string }[]
-) => {
-  if (Array.isArray(pathRewrite)) {
-    for (const item of pathRewrite) {
-      const { patternStr, replaceStr } = item;
-      const pattern = RegExp(patternStr);
-      if (pattern.test(url as string)) {
-        return url.replace(pattern, replaceStr);
-      }
-    }
-  } else {
-    // tslint:disable-next-line:forin
-    for (const patternStr in pathRewrite) {
-      const pattern = RegExp(patternStr);
-      const path = pathRewrite[patternStr];
-      if (pattern.test(url as string)) {
-        return url.replace(pattern, path);
-      }
-    }
-  }
-  return url;
+export const config = {
+  api: {
+    externalResolver: true,
+    bodyParser: false,
+    responseLimit: false,
+  },
 };
+
+const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
+  new Promise<void>((resolve) => {
+    req.url = rewritePath(req.url ?? '/', fronteggPathRewrite);
+    // console.log('FronteggMiddleware.start', { url: req.url });
+
+    const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
+
+    FronteggProxy.once('proxyReq', (proxyReq: any, req: any) => {
+      try {
+        if (req.body) {
+          const bodyData = JSON.stringify(req.body);
+          // in case if content-type is application/x-www-form-urlencoded -> we need to change to application/json
+          proxyReq.setHeader('Content-Type', 'application/json');
+          proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+          // stream the content
+          proxyReq.write(bodyData);
+        }
+      } catch (e) {
+        console.error("once('proxyReq'), ERROR", e);
+      }
+    })
+      .once('proxyRes', (proxyRes, req) => {
+        let buffer = new Buffer('');
+        let totalLength: number = 0;
+        proxyRes.on('data', (chunk: Buffer) => {
+          totalLength += chunk.length;
+          buffer = Buffer.concat([buffer, chunk], totalLength);
+        });
+        proxyRes.on('end', async () => {
+          try {
+            const url = req.url!;
+            const statusCode = proxyRes.statusCode ?? 500;
+            const isSuccess = statusCode >= 200 && statusCode < 300;
+            const bodyStr = buffer.toString('utf-8');
+            const isLogout = isFronteggLogoutUrl(url);
+
+            if (isLogout) {
+              CookieManager.removeCookies({
+                isSecured,
+                cookieDomain: fronteggConfig.cookieDomain,
+                res,
+                req,
+              });
+              res.status(statusCode).end(bodyStr);
+              resolve();
+              return;
+            }
+
+            if (isSuccess) {
+              const body = JSON.parse(bodyStr);
+
+              // console.log("FronteggMiddleware.proxyRes", "creating session from access Token")
+              const [session, decodedJwt] = await createSessionFromAccessToken(body);
+
+              const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
+
+              if (session) {
+                const sessionCookie = CookieManager.createCookie({
+                  value: session,
+                  expires: new Date(decodedJwt.exp * 1000),
+                  isSecured,
+                });
+                cookies.push(...sessionCookie);
+              }
+              res.setHeader('set-cookie', cookies);
+              res.status(statusCode).end(bodyStr);
+            } else {
+              console.error('[ERROR] FronteggMiddleware', { url, statusCode, bodyStr });
+              res.status(statusCode).send(bodyStr);
+            }
+            resolve();
+          } catch (e: any) {
+            console.error('[ERROR] FronteggMiddleware', 'proxy failed to send request', e);
+            res.status(500).end(JSON.stringify({ message: e.message }));
+            resolve();
+          }
+        });
+      })
+      .web(req, res, {
+        changeOrigin: true,
+        selfHandleResponse: true,
+      });
+  });
 
 /**
  * Next.js HTTP Proxy Middleware
@@ -55,88 +101,6 @@ export const rewritePath = (
  * @param {NextApiRequest} req
  * @param {NextApiResponse} res
  */
-export function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse): Promise<any> {
-  return new Promise((resolve, reject) => {
-    const pathRewrite = [
-      {
-        patternStr: '^/api/',
-        replaceStr: '/',
-      },
-    ];
-    if (pathRewrite) {
-      req.url = rewritePath(req.url as string, pathRewrite);
-    }
-
-    if (hasRequestBodyMethods.indexOf(req.method as string) >= 0 && typeof req.body === 'object') {
-      req.body = JSON.stringify(req.body);
-    }
-    const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
-
-    proxy
-      .once('proxyReq', (proxyReq: any, req: any): void => {
-        if (hasRequestBodyMethods.indexOf(req.method as string) >= 0 && typeof req.body === 'string') {
-          proxyReq.write(req.body);
-          proxyReq.end();
-        }
-      })
-      .once('proxyRes', (proxyRes, req, serverResponse) => {
-        proxyRes.headers['set-cookie'] = CookieManager.modifySetCookieIfUnsecure(
-          proxyRes.headers['set-cookie'],
-          isSecured
-        );
-        const _end = res.end;
-        let buffer = new Buffer('');
-        proxyRes
-          .on('data', (chunk) => {
-            buffer = Buffer.concat([buffer, chunk]);
-          })
-          .on('end', async () => {
-            const output = buffer.toString('utf-8');
-            const logoutRoutes = fronteggAuthApiRoutes.filter((path) => path.endsWith('/logout'));
-            let isLogout = false;
-            logoutRoutes.forEach((route) => {
-              if (req?.url?.endsWith(route)) {
-                isLogout = true;
-              }
-            });
-
-            if (isLogout) {
-              CookieManager.removeCookies({
-                isSecured,
-                cookieDomain: fronteggConfig.cookieDomain,
-                res: serverResponse,
-                req,
-              });
-            } else {
-              const [session, decodedJwt] = await createSessionFromAccessToken(output);
-              if (session) {
-                const sessionCookie = CookieManager.createCookie({
-                  value: session,
-                  expires: new Date(decodedJwt.exp * 1000),
-                  isSecured,
-                });
-                CookieManager.addToCookies(sessionCookie, serverResponse);
-              }
-            }
-            res.setHeader('content-length', output.length);
-            res.setHeader('content-encoding', '');
-            // @ts-ignore
-            _end.apply(res, [output]);
-          });
-
-        // disable default behavior to read jwt
-        // @ts-ignore
-        serverResponse.write = () => undefined;
-        // @ts-ignore
-        serverResponse.end = () => undefined;
-      })
-      .once('error', reject)
-      .web(req, res, {
-        changeOrigin: true,
-        cookieDomainRewrite: {
-          [fronteggConfig.baseUrlHost]: fronteggConfig.cookieDomain,
-        },
-        // ...serverOptions
-      });
-  });
+export async function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse) {
+  return await middlewarePromise(req, res);
 }
