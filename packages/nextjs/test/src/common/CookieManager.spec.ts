@@ -78,7 +78,8 @@ describe('Cookie Manager', () => {
     const isSecured = true;
     const emptyCookies = CookieManager.createEmptyCookies(isSecured, COOKIE_DOMAIN, cookiesToRemove);
 
-    expect(emptyCookies.length).toEqual(cookiesToRemove.length);
+    const refreshTokenCookieNamesLength = 3;
+    expect(emptyCookies.length).toEqual(cookiesToRemove.length + refreshTokenCookieNamesLength);
     cookiesToRemove.forEach((cookieName, index) => {
       commonTestsForCookie({ cookie: emptyCookies[index], cookieName, cookieValue: '', expires: new Date() });
     });
