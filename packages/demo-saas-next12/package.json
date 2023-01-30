@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/demo-saas-next12",
-  "version": "6.7.10",
+  "version": "6.7.11",
   "private": true,
   "scripts": {
     "dev": "next dev",

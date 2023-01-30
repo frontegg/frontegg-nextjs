@@ -1,5 +1,42 @@
 # Change Log
 
+## [6.7.11](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.10...v6.7.11) (2023-1-30)
+
+- FR-10549 - fix error login with sms
+- FR-10437 - select color
+- FR-10518 - fix client id not show in model
+- 
+
+- FR-10485 - Update restapi version
+- FR-10017 - add email type to all email inputs
+- FR-10501 - Fix mobile width of login box
+- FR-10196 - Fix scroll in privacy page
+- FR-10489 - update scim ui
+- FR-10483 - Added the option to customize forget password button
+- FR-10374 - improve values ui in split mode
+- FR-10184 - add access tokens
+- FR-9995 - Accept Invitation text and icon change
+- FR-10261 - fix sign up position in dark theme
+- FR-10369 - change mfa ff name
+- FR-10330 - fixes for bulk
+- FR-9816 - Fix branch selection
+- 
+
+- FR-10112 - update admin box pipeline angular
+- FR-10141 - update rest-api
+
+- FR-9816 - fix version
+
+### NextJS Wrapper 6.7.11:
+- FR-10584 - Set searchParam as optional in FronteggAppRouter
+- FR-10557 - Improve FronteggMiddleware request handler
+- update frontegg manually
+- FR-10379 - disable refresh token by default for ssr
+- FR-10141 - Added support for logout on hosted login
+- FR-10342 - update readme for app directory
+- Bump json5 from 1.0.1 to 1.0.2
+- Update Frontegg AdminPortal to 6.58.0
+
 ## [6.7.10](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.9...v6.7.10) (2023-1-16)
 
 - Added support for built-in authenticators, security keys, and SMS as MFA methods
