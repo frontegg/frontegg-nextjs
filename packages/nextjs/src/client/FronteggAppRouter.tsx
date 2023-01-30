@@ -6,10 +6,10 @@ import { useRouter, notFound } from 'next/navigation';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { ParsedUrlQuery } from 'querystring';
 
-type FronteggRouterProps = {
+interface FronteggRouterProps {
   params: ParsedUrlQuery & { 'frontegg-router'?: string[] };
-  searchParams: ParsedUrlQuery;
-};
+  searchParams?: ParsedUrlQuery;
+}
 
 export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] }, searchParams }: FronteggRouterProps) {
   const routesObj = {
@@ -26,7 +26,7 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
   const { logout } = useLoginActions();
   let pathname = `/${pathArr.join('/')}`;
 
-  if (!pathname || pathname.startsWith('/_next/data')) {
+  if (searchParams && (!pathname || pathname.startsWith('/_next/data'))) {
     const query = searchParams[Object.keys(searchParams)[0]];
     pathname = `/${Array.isArray(query) ? query.join('/') : query}`;
   }
@@ -49,10 +49,10 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
     }
     if (app.options.hostedLoginBox) {
       if (pathname === routesObj.loginUrl) {
-        if (searchParams.redirectUrl) {
+        if (searchParams?.redirectUrl) {
           localStorage.setItem(
             'FRONTEGG_AFTER_AUTH_REDIRECT_URL',
-            `${window.location.origin}${searchParams.redirectUrl}`
+            `${window.location.origin}${searchParams?.redirectUrl}`
           );
         }
         loginWithRedirect();
