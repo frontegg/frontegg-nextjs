@@ -60,20 +60,24 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
             }
 
             if (isSuccess) {
-              const body = JSON.parse(bodyStr);
-
-              // console.log("FronteggMiddleware.proxyRes", "creating session from access Token")
-              const [session, decodedJwt] = await createSessionFromAccessToken(body);
-
               const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
 
-              if (session) {
-                const sessionCookie = CookieManager.createCookie({
-                  value: session,
-                  expires: new Date(decodedJwt.exp * 1000),
-                  isSecured,
-                });
-                cookies.push(...sessionCookie);
+              try {
+                const body = JSON.parse(bodyStr);
+                const [session, decodedJwt] = await createSessionFromAccessToken(body);
+
+                if (session) {
+                  const sessionCookie = CookieManager.createCookie({
+                    value: session,
+                    expires: new Date(decodedJwt.exp * 1000),
+                    isSecured,
+                  });
+                  cookies.push(...sessionCookie);
+                }
+              } catch (e) {
+                if (bodyStr !== '') {
+                  console.error('[ERROR] FronteggMiddleware', 'proxy failed to parse response body', bodyStr, e);
+                }
               }
               res.setHeader('set-cookie', cookies);
               res.status(statusCode).end(bodyStr);
