@@ -1,5 +1,5 @@
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
-import { createFronteggStore, AuthState } from '@frontegg/redux-store';
+import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import { FronteggProviderOptions } from '../types';
@@ -33,15 +33,11 @@ export const createOrGetFronteggApp = ({
     clientId: options.envClientId,
   };
 
-  const tenantsState = tenants
-    ? {
-        tenantTree: null,
-        subTenants: [],
-        tenants,
-        loading: false,
-        ...options.authOptions?.tenantsState,
-      }
-    : undefined;
+  const tenantsState = {
+    ...defaultTenantsState,
+    tenants: tenants || [],
+    ...options.authOptions?.tenantsState,
+  };
   const userData = user
     ? {
         ...user,
