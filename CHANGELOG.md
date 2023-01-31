@@ -1,5 +1,11 @@
 # Change Log
 
+## [6.7.13](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.12...v6.7.13) (2023-1-31)
+
+
+### NextJS Wrapper 6.7.13:
+- FR-10557 - Bypass session creation if bodyStr is empty
+
 ## [6.7.12](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.11...v6.7.12) (2023-1-31)
 
 - FR-10549 - fix error login with sms
