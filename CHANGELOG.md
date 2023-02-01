@@ -1,5 +1,11 @@
 # Change Log
 
+## [6.7.14](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.13...v6.7.14) (2023-2-1)
+
+
+### NextJS Wrapper 6.7.14:
+- FR-10557 - Create proxy single request handler instead of handler per request
+
 ## [6.7.13](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.12...v6.7.13) (2023-1-31)
 
 
