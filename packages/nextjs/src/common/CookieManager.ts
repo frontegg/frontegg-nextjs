@@ -212,14 +212,16 @@ class CookieManager {
           cookie = cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None');
         }
 
-        return cookie
-          .map((property) => {
-            if (property.toLowerCase() === `domain=${fronteggConfig.baseUrlHost}`) {
-              return `Domain=${fronteggConfig.cookieDomain}`;
-            }
-            return property;
-          })
-          .join(';');
+        return (
+          cookie
+            .map((property) => {
+              if (property.toLowerCase() === `domain=${fronteggConfig.baseUrlHost}`) {
+                return `Domain=${fronteggConfig.cookieDomain}`;
+              }
+              return property;
+            })
+            .join(';') + ';'
+        );
       });
     }
     return setCookieValue;
