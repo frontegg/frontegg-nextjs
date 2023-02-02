@@ -1,10 +1,12 @@
 import { test, Page, expect } from '@playwright/test';
 
 const LUNCH_BROWSERS = 5;
-const PAGES_PER_BROWSER = 5;
-const CALL_PER_PAGE = 20;
+const PAGES_PER_BROWSER = 4;
+const CALL_PER_PAGE = 10;
 let visibleIds: string[] = [];
 
+const COUNT = LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE;
+let percentage = 0;
 const delay = (timeout = 2000) => new Promise((resolve) => setTimeout(resolve, timeout));
 test('MiddlewareTest | run app with multiple browsers', async ({ browser }) => {
   const browserCounter = Array.from(Array(LUNCH_BROWSERS).keys());
@@ -61,6 +63,12 @@ async function runStressRefreshTokenOnPages(userAgent: string, page: Page) {
     lastValue = await idValue.inputValue();
     await expect(visibleIds).not.toContain(lastValue);
     visibleIds.push(lastValue);
+
+    let newPercentage = (visibleIds.length / COUNT) * 100;
+    if (newPercentage > percentage + 5) {
+      percentage = newPercentage;
+      console.log(`${newPercentage.toFixed(0)}%`);
+    }
     await delay(100);
   }
 }

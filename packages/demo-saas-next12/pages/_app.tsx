@@ -7,9 +7,9 @@ function CustomApp({ Component, pageProps }: AppProps) {
 }
 
 export default withFronteggApp(CustomApp, {
-  hostedLoginBox: false,
+  hostedLoginBox: true,
   customLoader: true,
   authOptions: {
-    keepSessionAlive: true,
+    // keepSessionAlive: true,
   },
 });
