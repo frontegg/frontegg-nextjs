@@ -18,6 +18,7 @@
     "prettier-check-hook": "prettier --config ./.prettierrc --check ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.30.0",
     "concurrently": "^7.6.0",
     "@rollup/plugin-node-resolve": "^8.0.1",
     "@types/history": "^4.7.7",
