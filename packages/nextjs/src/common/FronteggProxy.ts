@@ -12,7 +12,6 @@ import cookie from 'cookie';
  */
 export const FronteggProxy = httpProxy.createProxyServer({
   target: process.env['FRONTEGG_BASE_URL'],
-  followRedirects: true,
   changeOrigin: true,
   selfHandleResponse: true,
 });
@@ -57,7 +56,7 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
     try {
       const url = req.url!;
       const statusCode = proxyRes.statusCode ?? 500;
-      const isSuccess = statusCode >= 200 && statusCode < 300;
+      const isSuccess = statusCode >= 200 && statusCode < 400;
       const bodyStr = buffer.toString('utf-8');
       const isLogout = isFronteggLogoutUrl(url);
 
@@ -77,20 +76,23 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
 
         try {
           const body = JSON.parse(bodyStr);
-          const [session, decodedJwt] = await createSessionFromAccessToken(body);
+          if (body.accessToken && body.access_token) {
+            const [session, decodedJwt] = await createSessionFromAccessToken(body);
 
-          if (session) {
-            const sessionCookie = CookieManager.createCookie({
-              value: session,
-              expires: new Date(decodedJwt.exp * 1000),
-              isSecured,
-            });
-            cookies.push(...sessionCookie);
+            if (session) {
+              const sessionCookie = CookieManager.createCookie({
+                value: session,
+                expires: new Date(decodedJwt.exp * 1000),
+                isSecured,
+              });
+              cookies.push(...sessionCookie);
+            }
           }
         } catch (e) {
-          if (bodyStr !== '' && !process.env['FRONTEGG_TEST_URL']) {
-            console.error('[ERROR] FronteggMiddleware', 'proxy failed to parse response body', bodyStr, e);
-          }
+          /** ignore api call if:
+           * - Does not have accessToken / access_token
+           * - Not json response
+           */
         }
         Object.keys(proxyRes.headers)
           .filter((header) => header !== 'cookie')
@@ -100,7 +102,14 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
         res.setHeader('set-cookie', cookies);
         res.status(statusCode).end(bodyStr);
       } else {
-        console.error('[ERROR] FronteggMiddleware', { url, statusCode, bodyStr });
+        if (statusCode >= 400) {
+          console.error('[ERROR] FronteggMiddleware', { url, statusCode });
+        }
+        Object.keys(proxyRes.headers)
+          .filter((header) => header !== 'cookie')
+          .forEach((header) => {
+            res.setHeader(header, `${proxyRes.headers[header]}`);
+          });
         res.status(statusCode).end(bodyStr);
       }
     } catch (e: any) {
