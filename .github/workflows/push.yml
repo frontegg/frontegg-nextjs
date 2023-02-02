@@ -23,5 +23,13 @@ jobs:
       - run: make clean
       - run: make install
       - run: make build
-#      - run: yarn add -WD playwright
-#      - run: yarn test-middleware
+      - run: npm playwright install
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: yarn test-middleware
+        env:
+          FRONTEGG_APP_URL: "http://localhost:3000"
+          FRONTEGG_BASE_URL: "https://demo.frontegg.com"
+          FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
+          FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
