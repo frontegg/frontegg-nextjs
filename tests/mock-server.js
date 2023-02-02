@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const delay = (timeout = 300) => new Promise((resolve) => setTimeout(resolve, timeout));
+const delay = (timeout = 200) => new Promise((resolve) => setTimeout(resolve, timeout));
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
   res.setHeader('Access-Control-Allow-Origin', `http://localhost:3000`);

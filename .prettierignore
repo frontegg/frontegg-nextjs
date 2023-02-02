@@ -12,3 +12,4 @@ lerna.json
 lerna-debug.log
 yarn.lock
 node_modules
+playwright-report

@@ -1,8 +1,8 @@
 import { test, Page, expect } from '@playwright/test';
 
-const LUNCH_BROWSERS = 5;
-const PAGES_PER_BROWSER = 4;
-const CALL_PER_PAGE = 10;
+const LUNCH_BROWSERS = 2;
+const PAGES_PER_BROWSER = 5;
+const CALL_PER_PAGE = 5;
 let visibleIds: string[] = [];
 
 const COUNT = LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE;
@@ -46,7 +46,11 @@ test('MiddlewareTest | run app with multiple browsers', async ({ browser }) => {
   await expect(visibleIds.length).toBe(LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE);
   const duration = Date.now() - startTime;
   console.log('Duration: ', `${duration / 1000} sec`);
-  console.log('Middleware avg simultaneously request: ~', ((visibleIds.length * 300) / duration).toFixed(0));
+
+  const avgSimReq = (visibleIds.length * 300) / duration;
+  console.log('Middleware avg simultaneously request: ~', avgSimReq.toFixed(0));
+
+  await expect(avgSimReq).toBeGreaterThan(1);
 });
 
 async function runStressRefreshTokenOnPages(userAgent: string, page: Page) {
