@@ -26,7 +26,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
-        run: yarn test-middleware
+        run: npx playwright test
         env:
           FRONTEGG_TEST_URL: "http://localhost:3001"
           FRONTEGG_APP_URL: "http://localhost:3000"
