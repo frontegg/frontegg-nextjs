@@ -7,11 +7,9 @@ function CustomApp({ Component, pageProps }: AppProps) {
 }
 
 export default withFronteggApp(CustomApp, {
-  hostedLoginBox: !!process.env['FRONTEGG_TEST_URL'],
+  hostedLoginBox: false,
   customLoader: true,
-  authOptions: process.env['FRONTEGG_TEST_URL']
-    ? {
-        keepSessionAlive: true,
-      }
-    : {},
+  authOptions: {
+    keepSessionAlive: true,
+  },
 });
