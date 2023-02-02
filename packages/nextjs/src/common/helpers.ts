@@ -51,8 +51,8 @@ export const getAllUserData = async ({ getSession, reqHeaders }: UserDataArgumen
           }
         : undefined;
     return { user, session, tenants };
-  } catch (e){
-    console.error(e)
+  } catch (e) {
+    console.error(e);
     return {};
   }
 };

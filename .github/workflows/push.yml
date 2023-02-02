@@ -17,9 +17,11 @@ jobs:
         run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
         id: nvm
       - name: Use Node.js (.nvmrc)
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - run: make clean
       - run: make install
       - run: make build
+#      - run: yarn add -WD playwright
+#      - run: yarn test-middleware
