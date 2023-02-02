@@ -4,7 +4,11 @@ on:
   push:
     branches-ignore:
       - 'master'
-      - 'release/next'
+
+concurrency:
+  group: ci-push-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   CI: true
 jobs:
