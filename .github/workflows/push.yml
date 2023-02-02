@@ -23,12 +23,19 @@ jobs:
       - run: make clean
       - run: make install
       - run: make build
-      - name: Install Playwright
+      - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: yarn test-middleware
         env:
+          FRONTEGG_TEST_URL: "http://localhost:3001"
           FRONTEGG_APP_URL: "http://localhost:3000"
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
           FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
           FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

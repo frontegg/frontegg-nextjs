@@ -12,8 +12,7 @@
     "build": "lerna run build --stream --scope '@frontegg/nextjs'",
     "test": "jest ./packages/nextjs/test/**",
     "start:mock-server": "node tests/mock-server.js",
-    "start:playwrite-test": "npx playwright test ./tests/middleware-test.spec.ts",
-    "test-middleware": "export FRONTEGG_TEST_URL='http://localhost:3001' && yarn build && concurrently -k -s last \"yarn start:mock-server\" \"yarn start:playwrite-test\"",
+    "start:test-demo12": "concurrently \"yarn start:mock-server\" \"yarn demo12\"",
     "prettier-hook": "prettier --config ./.prettierrc --write .",
     "prettier-check-hook": "prettier --config ./.prettierrc --check ."
   },
