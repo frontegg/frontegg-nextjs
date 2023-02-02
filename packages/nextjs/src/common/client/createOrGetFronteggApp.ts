@@ -1,5 +1,10 @@
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
-import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
+import {
+  createFronteggStore,
+  AuthState,
+  tenantsState as defaultTenantsState,
+  authInitialState,
+} from '@frontegg/redux-store';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import { FronteggProviderOptions } from '../types';
@@ -24,12 +29,16 @@ export const createOrGetFronteggApp = ({
     requestCredentials: 'include' as RequestCredentials,
     ...options.contextOptions,
     baseUrl: (path: string) => {
-      if (
-        fronteggAuthApiRoutes.indexOf(path) !== -1 ||
-        path.endsWith('/postlogin') ||
-        path.endsWith('/prelogin') ||
-        path.endsWith('/oauth/logout')
-      ) {
+      if (path.endsWith('/oauth/logout') && typeof window !== 'undefined') {
+        const logoutPath = options.authOptions?.routes?.logoutUrl || authInitialState.routes.logoutUrl;
+        if (window.location.pathname != logoutPath) {
+          // clear fe_nextjs session before logout from hosted login
+          // @ts-ignore
+          window.location.href = logoutPath;
+        }
+        return options.envBaseUrl;
+      }
+      if (fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin')) {
         /**
          * Exclude social login redirects from nextjs middleware
          */
