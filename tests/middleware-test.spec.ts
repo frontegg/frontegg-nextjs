@@ -5,6 +5,7 @@ const PAGES_PER_BROWSER = 5;
 const CALL_PER_PAGE = 20;
 let visibleIds: string[] = [];
 
+const COUNT = LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE
 const delay = (timeout = 2000) => new Promise((resolve) => setTimeout(resolve, timeout));
 test('MiddlewareTest | run app with multiple browsers', async ({ browser }) => {
   const browserCounter = Array.from(Array(LUNCH_BROWSERS).keys());
@@ -61,6 +62,7 @@ async function runStressRefreshTokenOnPages(userAgent: string, page: Page) {
     lastValue = await idValue.inputValue();
     await expect(visibleIds).not.toContain(lastValue);
     visibleIds.push(lastValue);
+    console.log(`${((visibleIds.length/COUNT)*100).toFixed(0)}%`)
     await delay(100);
   }
 }
