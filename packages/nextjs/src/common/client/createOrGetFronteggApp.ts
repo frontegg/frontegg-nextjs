@@ -30,6 +30,9 @@ export const createOrGetFronteggApp = ({
         path.endsWith('/prelogin') ||
         path.endsWith('/oauth/logout')
       ) {
+        /**
+         * Exclude social login redirects from nextjs middleware
+         */
         if (RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path)) {
           return options.envBaseUrl;
         }
