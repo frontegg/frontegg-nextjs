@@ -1,7 +1,7 @@
 import { test, Page, expect } from '@playwright/test';
 
-const LUNCH_BROWSERS = 4;
-const PAGES_PER_BROWSER = 3;
+const LUNCH_BROWSERS = 2;
+const PAGES_PER_BROWSER = 5;
 const CALL_PER_PAGE = 10;
 let visibleIds: string[] = [];
 

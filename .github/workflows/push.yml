@@ -12,7 +12,7 @@ jobs:
     name: 'Install, Build and Test'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Read .nvmrc
         run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
         id: nvm
@@ -33,9 +33,9 @@ jobs:
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
           FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
           FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
+          retention-days: 14
