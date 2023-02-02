@@ -93,7 +93,7 @@ class CookieManager {
     valueChunks: string[],
     options: CookieSerializeOptions
   ): string[] =>
-    valueChunks.map((chunk, index) => cookie.serialize(this.getCookieName(index + 1, cookieName), chunk, options));
+    valueChunks.map((chunk, index) => cookie.serialize(this.getCookieName(index + 1, cookieName), chunk, options) + ';');
 
   getCookieStringFromRequest = (req: RequestType) =>
     'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';

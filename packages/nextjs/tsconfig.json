@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "isolatedModules": false,
+    "sourceMap": true,
     "outDir": "./dist"
   },
   "include": [
