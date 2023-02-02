@@ -5,18 +5,26 @@ import Server from 'http-proxy';
 import type { ClientRequest, IncomingMessage } from 'http';
 import { CookieManager, createSessionFromAccessToken } from './index';
 import fronteggConfig from './FronteggConfig';
+import cookie from 'cookie';
 
 /**
  * @see https://www.npmjs.com/package/http-proxy
  */
 export const FronteggProxy = httpProxy.createProxyServer({
   target: process.env['FRONTEGG_BASE_URL'],
-  autoRewrite: false,
   followRedirects: true,
 });
 
 const proxyReqCallback: Server.ProxyReqCallback<ClientRequest, NextApiRequest, NextApiResponse> = (proxyReq, req) => {
   try {
+
+    const cookies = cookie.parse(req.headers['cookie'] ?? '')
+    Object.keys(cookies)
+      .filter(cookieName => cookieName.startsWith('fe_') && !cookieName.startsWith(fronteggConfig.cookieName))
+      .forEach(cookieName => {
+        proxyReq.setHeader(cookieName, cookies[cookieName])
+      })
+
     if (req.body) {
       const bodyData = JSON.stringify(req.body);
       // in case if content-type is application/x-www-form-urlencoded -> we need to change to application/json
@@ -26,7 +34,7 @@ const proxyReqCallback: Server.ProxyReqCallback<ClientRequest, NextApiRequest, N
       proxyReq.write(bodyData);
     }
   } catch (e) {
-    console.error("once('proxyReq'), ERROR", e);
+    console.error('once(\'proxyReq\'), ERROR', e);
   }
 };
 /**
@@ -68,7 +76,7 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
 
         try {
           const body = JSON.parse(bodyStr);
-          const [session, decodedJwt] = await createSessionFromAccessToken(body);
+          const [ session, decodedJwt ] = await createSessionFromAccessToken(body);
 
           if (session) {
             const sessionCookie = CookieManager.createCookie({
@@ -83,6 +91,9 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
             console.error('[ERROR] FronteggMiddleware', 'proxy failed to parse response body', bodyStr, e);
           }
         }
+        Object.keys(proxyRes.headers).filter(header => header !== 'cookie').forEach(header => {
+          res.setHeader(header, `${proxyRes.headers[header]}`)
+        });
         res.setHeader('set-cookie', cookies);
         res.status(statusCode).end(bodyStr);
       } else {

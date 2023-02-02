@@ -98,39 +98,40 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       return null;
     }
 
-    if (response.ok) {
-      const data = await response.text();
-      const rewriteCookieDomainConfig = {
-        [fronteggConfig.baseUrlHost]: fronteggConfig.cookieDomain,
-      };
-      // @ts-ignore
-      const cookieHeader = response.headers.raw()['set-cookie'];
-      let newSetCookie = CookieManager.rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
-      const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
-      if (!session) {
-        return null;
-      }
-      const cookieValue = CookieManager.createCookie({
-        value: session,
-        expires: new Date(decodedJwt.exp * 1000),
-        isSecured,
-      });
-      if (typeof newSetCookie === 'string') {
-        newSetCookie = [newSetCookie];
-      }
-      newSetCookie.push(...cookieValue);
-      ctx.res?.setHeader('set-cookie', newSetCookie);
-      return {
-        accessToken: JSON.parse(data).accessToken,
-        user: decodedJwt,
-        refreshToken,
-      };
-    } else {
-      // remove all fe_nextjs-session cookies
-      // ctx.res?.setHeader('set-cookie', removedCookies);
+
+    const data = await response.json();
+
+    const rewriteCookieDomainConfig = {
+      [fronteggConfig.baseUrlHost]: fronteggConfig.cookieDomain,
+    };
+    // @ts-ignore
+    const cookieHeader = response.headers.raw()['set-cookie'];
+    // let newSetCookie = CookieManager.rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
+    const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
+    const [ session, decodedJwt, refreshToken ] = await createSessionFromAccessToken(data);
+
+    if (!session) {
       return null;
     }
+    const cookieValue = CookieManager.createCookie({
+      value: session,
+      expires: new Date(decodedJwt.exp * 1000),
+      isSecured,
+    });
+    // if (typeof newSetCookie === 'string') {
+    //   newSetCookie = [ newSetCookie ];
+    // }
+    newSetCookie.push(...cookieValue);
+    ctx.res?.setHeader('set-cookie', newSetCookie);
+
+    return {
+      accessToken: data.accessToken,
+      user: decodedJwt,
+      refreshToken,
+    };
+
   } catch (e) {
+    console.error('Failed to create session e', e)
     return null;
   }
 }
