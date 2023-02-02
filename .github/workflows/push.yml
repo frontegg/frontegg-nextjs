@@ -23,4 +23,5 @@ jobs:
       - run: make clean
       - run: make install
       - run: make build
+      - run: yarn add -WD playwright
       - run: yarn test-middleware
