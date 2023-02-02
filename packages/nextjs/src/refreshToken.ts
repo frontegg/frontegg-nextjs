@@ -3,7 +3,6 @@ import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
 import { createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
 import fronteggConfig from './common/FronteggConfig';
 import { FronteggNextJSSession } from './common/types';
-import { getSession } from './session';
 
 async function refreshTokenHostedLogin(
   ctx: NextPageContext,
@@ -48,10 +47,9 @@ async function refreshTokenEmbedded(
   });
 
   if (!cookieKey) {
-    // ctx.res?.setHeader('set-cookie', removedCookies);
-    // remove all fe_nextjs-session cookies
     return null;
   }
+
 
   return await fetch(`${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggRefreshTokenUrl}`, {
     method: 'POST',
@@ -75,14 +73,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     if (!request) {
       return null;
     }
-    try {
-      const session = await getSession(ctx.req as any);
-      if (session) {
-        return session;
-      }
-    } catch (e) {
-      // ignore error catch
-    }
+
     const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
@@ -96,7 +87,8 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     } else {
       response = await refreshTokenEmbedded(ctx, headers, cookies);
     }
-    if (!response) {
+
+    if (response === null || !response.ok) {
       CookieManager.removeCookies({
         isSecured,
         cookieDomain: fronteggConfig.cookieDomain,
