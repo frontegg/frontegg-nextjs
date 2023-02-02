@@ -24,7 +24,15 @@ export const createOrGetFronteggApp = ({
     requestCredentials: 'include' as RequestCredentials,
     ...options.contextOptions,
     baseUrl: (path: string) => {
-      if (fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin')) {
+      if (
+        fronteggAuthApiRoutes.indexOf(path) !== -1 ||
+        path.endsWith('/postlogin') ||
+        path.endsWith('/prelogin') ||
+        path.endsWith('/oauth/logout')
+      ) {
+        if (RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path)) {
+          return options.envBaseUrl;
+        }
         return `${options.envAppUrl}/api`;
       } else {
         return options.envBaseUrl;
@@ -60,7 +68,7 @@ export const createOrGetFronteggApp = ({
 
   const sharedStore = createFronteggStore(
     { context: contextOptions },
-    storeHolder.current,
+    storeHolder,
     options.previewMode,
     authOptions,
     {
