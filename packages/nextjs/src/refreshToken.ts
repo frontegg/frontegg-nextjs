@@ -50,7 +50,6 @@ async function refreshTokenEmbedded(
     return null;
   }
 
-
   return await fetch(`${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggRefreshTokenUrl}`, {
     method: 'POST',
     credentials: 'include',
@@ -98,7 +97,6 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       return null;
     }
 
-
     const data = await response.json();
 
     const rewriteCookieDomainConfig = {
@@ -108,7 +106,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     const cookieHeader = response.headers.raw()['set-cookie'];
     // let newSetCookie = CookieManager.rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
     const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
-    const [ session, decodedJwt, refreshToken ] = await createSessionFromAccessToken(data);
+    const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
 
     if (!session) {
       return null;
@@ -129,9 +127,8 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       user: decodedJwt,
       refreshToken,
     };
-
   } catch (e) {
-    console.error('Failed to create session e', e)
+    console.error('Failed to create session e', e);
     return null;
   }
 }

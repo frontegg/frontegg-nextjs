@@ -13,10 +13,13 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
   new Promise<void>((resolve) => {
     req.url = rewritePath(req.url ?? '/', fronteggPathRewrite);
     res.on('close', () => resolve());
-    FronteggProxy.web(req, res, {
-      changeOrigin: true,
-      selfHandleResponse: true,
-    });
+    const options = {
+      target: process.env['FRONTEGG_BASE_URL'],
+    };
+    if (process.env['FRONTEGG_TEST_URL'] && req.url == '/frontegg/middleware-test') {
+      options.target = process.env['FRONTEGG_TEST_URL'];
+    }
+    FronteggProxy.web(req, res, options);
   });
 
 /**
