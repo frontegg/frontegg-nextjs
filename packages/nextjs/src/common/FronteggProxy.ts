@@ -162,6 +162,12 @@ export const fronteggPathRewrite = [
     replaceStr: '/',
   },
 ];
+export const fronteggSSOPathRewrite = [
+  {
+    patternStr: '/frontegg/saml/callback$',
+    replaceStr: '/auth/saml/callback',
+  },
+];
 
 export const isFronteggLogoutUrl = (url: string) => {
   return (
