@@ -33,6 +33,7 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
         env:
+          DEBUG: "pw:webserver"
           FRONTEGG_TEST_URL: "http://localhost:3001"
           FRONTEGG_APP_URL: "http://localhost:3000"
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"

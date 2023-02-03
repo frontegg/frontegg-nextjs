@@ -27,6 +27,7 @@ app.use(function (req, res, next) {
 let idCounter = 0;
 app.post('/frontegg/middleware-test', async (req, res, next) => {
   const userAgent = req.headers['user-agent'];
+  console.log('got request from: ', userAgent);
   await delay();
   res.json({
     userAgent,
