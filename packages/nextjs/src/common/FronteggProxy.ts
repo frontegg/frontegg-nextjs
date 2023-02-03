@@ -6,6 +6,8 @@ import type { ClientRequest, IncomingMessage } from 'http';
 import { CookieManager, createSessionFromAccessToken } from './index';
 import fronteggConfig from './FronteggConfig';
 import cookie from 'cookie';
+import nextjsPkg from 'next/package.json';
+import sdkVersion from '../sdkVersion';
 
 /**
  * @see https://www.npmjs.com/package/http-proxy
@@ -24,6 +26,10 @@ const proxyReqCallback: Server.ProxyReqCallback<ClientRequest, NextApiRequest, N
       .forEach((cookieName) => {
         proxyReq.setHeader(cookieName, cookies[cookieName]);
       });
+
+    proxyReq.setHeader('x-frontegg-middleware', 'true');
+    proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${nextjsPkg.version}`);
+    proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
 
     if (req.body) {
       const bodyData = JSON.stringify(req.body);

@@ -5,9 +5,11 @@ import {
   tenantsState as defaultTenantsState,
   authInitialState,
 } from '@frontegg/redux-store';
-import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
+import { fronteggAuthApiRoutes, KeyValuePair } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
+import sdkVersion from '../../sdkVersion';
 import { FronteggProviderOptions } from '../types';
+import nextjsPkg from 'next/package.json';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -28,6 +30,28 @@ export const createOrGetFronteggApp = ({
   const contextOptions: FronteggAppOptions['contextOptions'] = {
     requestCredentials: 'include' as RequestCredentials,
     ...options.contextOptions,
+    additionalHeadersResolver: async () => {
+      const additionalHeaders: KeyValuePair[] = [];
+      const originalAdditionalHeadersResolver = options.contextOptions?.additionalHeadersResolver;
+      if (typeof originalAdditionalHeadersResolver === 'function') {
+        try {
+          additionalHeaders.push(...(await originalAdditionalHeadersResolver()));
+        } catch (e) {
+          /** ignore failed additionalHeadersResolver */
+        }
+      } else if (Array.isArray(originalAdditionalHeadersResolver)) {
+        additionalHeaders.push(...(originalAdditionalHeadersResolver as KeyValuePair[]));
+      }
+      additionalHeaders.push({
+        key: 'x-frontegg-framework',
+        value: `next@${nextjsPkg.version}`,
+      });
+      additionalHeaders.push({
+        key: 'x-frontegg-sdk',
+        value: `@frontegg/nextjs@${sdkVersion.version}`,
+      });
+      return additionalHeaders;
+    },
     baseUrl: (path: string) => {
       if (path.endsWith('/oauth/logout') && typeof window !== 'undefined') {
         const logoutPath = options.authOptions?.routes?.logoutUrl || authInitialState.routes.logoutUrl;

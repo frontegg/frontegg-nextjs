@@ -3,6 +3,8 @@ import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
 import { createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
 import fronteggConfig from './common/FronteggConfig';
 import { FronteggNextJSSession } from './common/types';
+import nextjsPkg from 'next/package.json';
+import sdkVersion from './sdkVersion';
 
 async function refreshTokenHostedLogin(
   ctx: NextPageContext,
@@ -29,6 +31,8 @@ async function refreshTokenHostedLogin(
         'user-agent': headers['user-agent'],
         connection: headers['connection'],
         'cache-control': headers['cache-control'],
+        'x-frontegg-framework': `next@${nextjsPkg.version}`,
+        'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
       },
     });
   } catch (e) {
@@ -62,6 +66,8 @@ async function refreshTokenEmbedded(
       'user-agent': headers['user-agent'],
       connection: headers['connection'],
       'cache-control': headers['cache-control'],
+      'x-frontegg-framework': `next@${nextjsPkg.version}`,
+      'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
     },
   });
 }
