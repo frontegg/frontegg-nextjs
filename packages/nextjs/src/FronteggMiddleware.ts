@@ -1,17 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fronteggPathRewrite, FronteggProxy, rewritePath } from './common/FronteggProxy';
+import { fronteggPathRewrite, FronteggProxy, fronteggSSOPathRewrite, rewritePath } from './common/FronteggProxy';
 
 export const config = {
   api: {
     externalResolver: true,
-    bodyParser: false,
+    bodyParser: true,
     responseLimit: false,
   },
 };
 
 const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
   new Promise<void>((resolve) => {
-    req.url = rewritePath(req.url ?? '/', fronteggPathRewrite);
+    const fronteggUrlPath = rewritePath(req.url ?? '/', fronteggPathRewrite);
+    const rewriteUrl = rewritePath(fronteggUrlPath ?? '/', fronteggSSOPathRewrite);
+    req.url = rewriteUrl;
+
     res.on('close', () => resolve());
     const options = {
       target: process.env['FRONTEGG_BASE_URL'],

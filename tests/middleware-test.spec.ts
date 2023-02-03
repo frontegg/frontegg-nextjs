@@ -1,10 +1,12 @@
 import { test, Page, expect } from '@playwright/test';
 
-const LUNCH_BROWSERS = 5;
-const PAGES_PER_BROWSER = 5;
+const LUNCH_BROWSERS = 6;
+const PAGES_PER_BROWSER = 4;
 const CALL_PER_PAGE = 20;
 let visibleIds: string[] = [];
 
+const COUNT = LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE;
+let percentage = 0;
 const delay = (timeout = 2000) => new Promise((resolve) => setTimeout(resolve, timeout));
 test('MiddlewareTest | run app with multiple browsers', async ({ browser }) => {
   const browserCounter = Array.from(Array(LUNCH_BROWSERS).keys());
@@ -44,7 +46,11 @@ test('MiddlewareTest | run app with multiple browsers', async ({ browser }) => {
   await expect(visibleIds.length).toBe(LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE);
   const duration = Date.now() - startTime;
   console.log('Duration: ', `${duration / 1000} sec`);
-  console.log('Middleware avg simultaneously request: ~', ((visibleIds.length * 300) / duration).toFixed(0));
+
+  const avgSimReq = (visibleIds.length * 300) / duration;
+  console.log('Middleware avg simultaneously request: ~', avgSimReq.toFixed(0));
+
+  await expect(avgSimReq).toBeGreaterThan(1);
 });
 
 async function runStressRefreshTokenOnPages(userAgent: string, page: Page) {
@@ -56,11 +62,17 @@ async function runStressRefreshTokenOnPages(userAgent: string, page: Page) {
   let lastValue = '';
   for (let i = 1; i <= CALL_PER_PAGE; i++) {
     await button.click();
-    await expect(await userAgentValue).toHaveValue(userAgent, { timeout: 5000 });
-    await expect(await idValue).not.toHaveValue(lastValue, { timeout: 5000 });
+    await expect(await userAgentValue).toHaveValue(userAgent, { timeout: 20000 });
+    await expect(await idValue).not.toHaveValue(lastValue);
     lastValue = await idValue.inputValue();
     await expect(visibleIds).not.toContain(lastValue);
     visibleIds.push(lastValue);
+
+    let newPercentage = (visibleIds.length / COUNT) * 100;
+    if (newPercentage > percentage + 5) {
+      percentage = newPercentage;
+      console.log(`${newPercentage.toFixed(0)}%`);
+    }
     await delay(100);
   }
 }

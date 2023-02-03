@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { useAuthUserOrNull, useLoginWithRedirect, useLoginActions } from '@frontegg/nextjs';
+import { useAuth, useLoginWithRedirect } from '@frontegg/nextjs';
 import { useState } from 'react';
 
 export function Index() {
-  const user = useAuthUserOrNull();
+  const { user, isAuthenticated } = useAuth();
   const loginWithRedirect = useLoginWithRedirect();
   const [state, setState] = useState({ userAgent: '', id: -1 });
   /*
@@ -16,7 +16,7 @@ export function Index() {
       Next JS V12 application with frontegg
       <br />
       <br />
-      <div>{user?.email ?? 'not logged in'}</div>
+      <div>{isAuthenticated ? user?.email : 'not logged in'}</div>
       <br />
       <button
         onClick={() => {
