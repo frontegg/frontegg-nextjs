@@ -1,8 +1,8 @@
 import { test, Page, expect } from '@playwright/test';
 
 const LUNCH_BROWSERS = 6;
-const PAGES_PER_BROWSER = 3;
-const CALL_PER_PAGE = 10;
+const PAGES_PER_BROWSER = 4;
+const CALL_PER_PAGE = 20;
 let visibleIds: string[] = [];
 
 const COUNT = LUNCH_BROWSERS * PAGES_PER_BROWSER * CALL_PER_PAGE;
