@@ -33,6 +33,7 @@ app.post('/frontegg/middleware-test', async (req, res, next) => {
     userAgent,
     id: idCounter++,
   });
+  console.log('sent response to: ', userAgent);
 });
 
 app.listen(3001, () => {
