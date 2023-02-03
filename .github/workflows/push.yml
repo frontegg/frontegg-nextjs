@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - run: make clean
+      - run: make install
       - name: Get installed Playwright version
         id: playwright-version
         run: echo "::set-output name=version::$(yarn why --json @playwright/test | grep -h 'workspace:.' | jq --raw-output '.children[].locator' | sed -e 's/@playwright\/test@.*://')"
@@ -36,7 +37,6 @@ jobs:
           key: '${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}'
           restore-keys: |
             ${{ runner.os }}-playwright-
-      - run: make install
       - run: make build
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
