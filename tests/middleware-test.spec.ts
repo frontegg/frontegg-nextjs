@@ -63,7 +63,7 @@ async function runStressRefreshTokenOnPages(userAgent: string, page: Page) {
   for (let i = 1; i <= CALL_PER_PAGE; i++) {
     await button.click();
     await expect(await userAgentValue).toHaveValue(userAgent, { timeout: 20000 });
-    await expect(await idValue).not.toHaveValue(lastValue);
+    await expect(await idValue).not.toHaveValue(lastValue, { timeout: 20000 });
     lastValue = await idValue.inputValue();
     await expect(visibleIds).not.toContain(lastValue);
     visibleIds.push(lastValue);
