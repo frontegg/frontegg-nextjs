@@ -31,10 +31,12 @@ let idCounter = 0;
 app.post('/frontegg/middleware-test', async (req, res, next) => {
   const userAgent = req.headers['user-agent'];
   await delay();
-  res.json({
+  const data = {
     userAgent,
     id: idCounter++,
-  });
+  };
+  console.log(JSON.stringify(data));
+  res.json(data);
 });
 
 app.listen(3001, () => {
