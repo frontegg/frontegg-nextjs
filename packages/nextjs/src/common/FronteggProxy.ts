@@ -82,9 +82,8 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
 
         try {
           const body = JSON.parse(bodyStr);
-          if (body.accessToken && body.access_token) {
+          if (body.accessToken || body.access_token) {
             const [session, decodedJwt] = await createSessionFromAccessToken(body);
-
             if (session) {
               const sessionCookie = CookieManager.createCookie({
                 value: session,
@@ -99,6 +98,7 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
            * - Does not have accessToken / access_token
            * - Not json response
            */
+          console.log('failed to create session', e);
         }
         Object.keys(proxyRes.headers)
           .filter((header) => header !== 'cookie')
