@@ -3,6 +3,11 @@ import type { NextRequest } from 'next/server';
 import { getSession, shouldByPassMiddleware } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
+  // this if for frontegg middleware tests
+  if (process.env['FRONTEGG_TEST_URL']) {
+    return NextResponse.next();
+  }
+
   const pathname = request.nextUrl.pathname;
 
   if (
