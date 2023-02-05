@@ -10,6 +10,6 @@ export default withFronteggApp(CustomApp, {
   hostedLoginBox: true,
   customLoader: true,
   authOptions: {
-    // keepSessionAlive: true,
+    keepSessionAlive: true,
   },
 });
