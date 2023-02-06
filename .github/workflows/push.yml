@@ -31,7 +31,7 @@ jobs:
       - run: sudo sed -i 's/azure\.//' /etc/apt/sources.list
       - run: sudo apt-get update
       - name: Install Playwright Browsers
-        run: npx playwright install-deps chromium
+        run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
         run: npx playwright test
         env:
