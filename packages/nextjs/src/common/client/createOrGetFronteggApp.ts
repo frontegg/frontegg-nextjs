@@ -55,14 +55,8 @@ export const createOrGetFronteggApp = ({
       return additionalHeaders;
     },
     baseUrl: (path: string) => {
-      if (path.endsWith('/oauth/logout') && typeof window !== 'undefined') {
-        const logoutPath = options.authOptions?.routes?.logoutUrl || authInitialState.routes.logoutUrl;
-        if (window.location.pathname != logoutPath) {
-          // clear fe_nextjs session before logout from hosted login
-          // @ts-ignore
-          window.location.href = logoutPath;
-        }
-        return options.envBaseUrl;
+      if (path.endsWith('/oauth/logout')) {
+        return `${options.envAppUrl}/api`;
       }
       if (fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin')) {
         /**
