@@ -73,7 +73,15 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
           res,
           req,
         });
-        res.status(statusCode).end(bodyStr);
+        if (isSuccess) {
+          res.redirect(
+            `${process.env['FRONTEGG_BASE_URL']}/oauth/logout?post_logout_redirect_uri=${encodeURIComponent(
+              process.env['FRONTEGG_APP_URL'] ?? ''
+            )}`
+          );
+        } else {
+          res.status(statusCode).end(bodyStr);
+        }
         return;
       }
 
@@ -81,16 +89,18 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
         const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
 
         try {
-          const body = JSON.parse(bodyStr);
-          if (body.accessToken || body.access_token) {
-            const [session, decodedJwt] = await createSessionFromAccessToken(body);
-            if (session) {
-              const sessionCookie = CookieManager.createCookie({
-                value: session,
-                expires: new Date(decodedJwt.exp * 1000),
-                isSecured,
-              });
-              cookies.push(...sessionCookie);
+          if (bodyStr && bodyStr.length > 0) {
+            const body = JSON.parse(bodyStr);
+            if (body.accessToken || body.access_token) {
+              const [session, decodedJwt] = await createSessionFromAccessToken(body);
+              if (session) {
+                const sessionCookie = CookieManager.createCookie({
+                  value: session,
+                  expires: new Date(decodedJwt.exp * 1000),
+                  isSecured,
+                });
+                cookies.push(...sessionCookie);
+              }
             }
           }
         } catch (e) {
@@ -98,7 +108,10 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
            * - Does not have accessToken / access_token
            * - Not json response
            */
-          console.log('failed to create session', e);
+          console.log('[FronteggMiddleware] failed to create session', e, {
+            url,
+            statusCode,
+          });
         }
         Object.keys(proxyRes.headers)
           .filter((header) => header !== 'cookie')
@@ -108,7 +121,7 @@ const proxyResCallback: Server.ProxyResCallback<IncomingMessage, NextApiResponse
         res.setHeader('set-cookie', cookies);
         res.status(statusCode).end(bodyStr);
       } else {
-        if (statusCode >= 400) {
+        if (statusCode >= 400 && statusCode !== 404) {
           console.error('[ERROR] FronteggMiddleware', { url, statusCode });
         }
         Object.keys(proxyRes.headers)
