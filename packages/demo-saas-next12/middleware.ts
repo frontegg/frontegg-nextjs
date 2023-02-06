@@ -10,11 +10,7 @@ export const middleware = async (request: NextRequest) => {
 
   const pathname = request.nextUrl.pathname;
 
-  if (
-    shouldByPassMiddleware(pathname, {
-      bypassImageOptimization: false,
-    })
-  ) {
+  if (shouldByPassMiddleware(pathname /*, options: optional bypass configuration */)) {
     return NextResponse.next();
   }
 
