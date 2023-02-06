@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
-const path = require('path');
-const fse = require('fs-extra');
-const glob = require('fast-glob');
+const path = require("path");
+const fse = require("fs-extra");
+const glob = require("fast-glob");
 const fs = require("fs");
 
 const packagePath = process.cwd();
-const pkg = JSON.parse(fs.readFileSync(path.join(packagePath, 'package.json'), "utf-8"));
-const buildPath = path.join(__dirname, '../dist', pkg.name);
-const srcPath = path.join(packagePath, './src');
+const pkg = JSON.parse(fs.readFileSync(path.join(packagePath, "package.json"), "utf-8"));
+const buildPath = path.join(__dirname, "../dist", pkg.name);
+const srcPath = path.join(packagePath, "./src");
 
 async function includeFileInBuild(file) {
   const sourcePath = path.resolve(packagePath, file);
@@ -28,31 +28,33 @@ async function includeFileInBuild(file) {
  * @param {string} param0.to
  */
 async function createModulePackages({ from, to }) {
-  const directoryPackages = glob.sync('*/index.{js,ts,tsx}', { cwd: from }).map(path.dirname);
+  const directoryPackages = glob.sync("*/index.{js,ts,tsx}", { cwd: from }).map(path.dirname);
 
   await Promise.all(
     directoryPackages.map(async (directoryPackage) => {
-      const packageJsonPath = path.join(to, directoryPackage, 'package.json');
+      const packageJsonPath = path.join(to, directoryPackage, "package.json");
       const topLevelPathImportsAreCommonJSModules = await fse.pathExists(
-        path.resolve(path.dirname(packageJsonPath), '../esm'),
+        path.resolve(path.dirname(packageJsonPath), "../esm")
       );
 
       const packageJson = {
         sideEffects: false,
-        module: topLevelPathImportsAreCommonJSModules
-          ? path.posix.join('../esm', directoryPackage, 'index.js')
-          : './index.js',
-        main: topLevelPathImportsAreCommonJSModules
-          ? './index.js'
-          : path.posix.join('../node', directoryPackage, 'index.js'),
-        types: './index.d.ts',
+        module: "./index.js",
+        //  topLevelPathImportsAreCommonJSModules
+        // ? path.posix.join('../esm', directoryPackage, 'index.js')
+        // : './index.js',
+        main: "./index.js",
+          // topLevelPathImportsAreCommonJSModules
+          // ? "./index.js"
+          // : path.posix.join("../node", directoryPackage, "index.js"),
+        types: "./index.d.ts"
       };
 
       const [typingsEntryExist, moduleEntryExists, mainEntryExists] = await Promise.all([
         fse.pathExists(path.resolve(path.dirname(packageJsonPath), packageJson.types)),
         fse.pathExists(path.resolve(path.dirname(packageJsonPath), packageJson.module)),
         fse.pathExists(path.resolve(path.dirname(packageJsonPath), packageJson.main)),
-        fse.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2)),
+        fse.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2))
       ]);
 
       const manifestErrorMessages = [];
@@ -67,12 +69,12 @@ async function createModulePackages({ from, to }) {
       }
       if (manifestErrorMessages.length > 0) {
         // TODO: AggregateError
-        console.error(`${packageJsonPath}:\n${manifestErrorMessages.join('\n')}`)
+        console.error(`${packageJsonPath}:\n${manifestErrorMessages.join("\n")}`);
         // throw new Error(`${packageJsonPath}:\n${manifestErrorMessages.join('\n')}`);
       }
 
       return packageJsonPath;
-    }),
+    })
   );
 }
 
@@ -82,13 +84,13 @@ async function typescriptCopy({ from, to }) {
     return [];
   }
 
-  const files = await glob('**/*.d.ts', { cwd: from });
+  const files = await glob("**/*.d.ts", { cwd: from });
   const cmds = files.map((file) => fse.copy(path.resolve(from, file), path.resolve(to, file)));
   return Promise.all(cmds);
 }
 
 async function createPackageFile() {
-  const packageData = await fse.readFile(path.resolve(packagePath, './package.json'), 'utf8');
+  const packageData = await fse.readFile(path.resolve(packagePath, "./package.json"), "utf8");
   const { nyc, scripts, devDependencies, workspaces, ...packageDataOther } =
     JSON.parse(packageData);
 
@@ -97,28 +99,28 @@ async function createPackageFile() {
     private: false,
     ...(packageDataOther.main
       ? {
-        main: fse.existsSync(path.resolve(buildPath, './node/index.js'))
-          ? './node/index.js'
-          : './index.js',
-        module: fse.existsSync(path.resolve(buildPath, './esm/index.js'))
-          ? './esm/index.js'
-          : './index.js',
+        main: fse.existsSync(path.resolve(buildPath, "./node/index.js"))
+          ? "./node/index.js"
+          : "./index.js",
+        module: fse.existsSync(path.resolve(buildPath, "./esm/index.js"))
+          ? "./esm/index.js"
+          : "./index.js"
       }
       : {}),
-    types: './index.d.ts',
+    types: "./index.d.ts"
   };
 
-  const targetPath = path.resolve(buildPath, './package.json');
+  const targetPath = path.resolve(buildPath, "./package.json");
 
-  await fse.writeFile(targetPath, JSON.stringify(newPackageData, null, 2), 'utf8');
+  await fse.writeFile(targetPath, JSON.stringify(newPackageData, null, 2), "utf8");
   console.log(`Created package.json in ${targetPath}`);
 
   return newPackageData;
 }
 
 async function prepend(file, string) {
-  const data = await fse.readFile(file, 'utf8');
-  await fse.writeFile(file, string + data, 'utf8');
+  const data = await fse.readFile(file, "utf8");
+  await fse.writeFile(file, string + data, "utf8");
 }
 
 async function addLicense(packageData) {
@@ -130,19 +132,19 @@ async function addLicense(packageData) {
 `;
   await Promise.all(
     [
-      './index.js',
-      './node/index.js',
+      "./index.js",
+      "./node/index.js"
     ].map(async (file) => {
       try {
         await prepend(path.resolve(buildPath, file), license);
       } catch (err) {
-        if (err.code === 'ENOENT') {
+        if (err.code === "ENOENT") {
           console.log(`Skipped license for ${file}`);
         } else {
           throw err;
         }
       }
-    }),
+    })
   );
 }
 

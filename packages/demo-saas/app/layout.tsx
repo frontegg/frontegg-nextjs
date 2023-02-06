@@ -5,8 +5,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html>
       <head></head>
       <body>
-        {/*@ts-ignore typescript not familiar with server components*/}
-        <FronteggAppProvider hostedLoginBox>{children}</FronteggAppProvider>
+        {/*@ts-expect-error typescript not familiar with server components*/}
+        <FronteggAppProvider hostedLoginBox authOptions={{ keepSessionAlive: true }}>
+          {children}
+        </FronteggAppProvider>
       </body>
     </html>
   );

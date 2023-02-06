@@ -58,8 +58,8 @@ async function run(argv) {
   if (largeFiles) {
     babelArgs.push('--compact false');
   }
-  if (watch) {
     babelArgs.push('--source-maps');
+  if (watch) {
     babelArgs.push('--watch');
     babelArgs.push('--skip-initial-build');
   }
