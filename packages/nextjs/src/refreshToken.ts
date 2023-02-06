@@ -1,9 +1,25 @@
 import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession, createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
-import fronteggConfig from './common/FronteggConfig';
+import {
+  FronteggNextJSSession,
+  createSessionFromAccessToken,
+  getTokensFromCookie,
+  CookieManager,
+  FronteggUserTokens,
+  RequestType,
+  createGetSession,
+} from './common';
 import nextjsPkg from 'next/package.json';
 import sdkVersion from './sdkVersion';
+import { unsealData } from 'iron-session';
+import FronteggConfig from './common/FronteggConfig';
+
+async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
+  const jwt: string = await unsealData(cookie, {
+    password: FronteggConfig.passwordsAsMap,
+  });
+  return JSON.parse(jwt);
+}
 
 async function refreshTokenHostedLogin(
   ctx: NextPageContext,
@@ -46,7 +62,7 @@ async function refreshTokenEmbedded(
   headers: Record<string, string>,
   cookies: Record<string, any>
 ): Promise<Response | null> {
-  const refreshTokenKey = `fe_refresh_${fronteggConfig.clientId}`.replace(/-/g, '');
+  const refreshTokenKey = `fe_refresh_${FronteggConfig.clientId}`.replace(/-/g, '');
   const cookieKey = Object.keys(cookies).find((cookie) => {
     return cookie.replace(/-/g, '') === refreshTokenKey;
   });
@@ -80,7 +96,27 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       return null;
     }
 
-    const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
+    /**
+     * If referer header exist means that the user trying to navigate
+     * to a new nextjs page, in this scenario no need to refresh toke
+     * we can just return the actual stateless session from
+     * the encrypted cookie
+     */
+    if (request.headers.referer) {
+      try {
+        const session = await createGetSession({
+          getCookie: () => CookieManager.getParsedCookieFromRequest(request),
+          cookieResolver: getTokensFromCookieOnEdge,
+        });
+        if (session) {
+          return session;
+        }
+      } catch (e) {
+        console.log('no nextjs session, will refresh token');
+      }
+    }
+
+    const isSecured = new URL(FronteggConfig.appUrl).protocol === 'https:';
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
 
@@ -88,7 +124,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       return null;
     }
     let response: Response | null;
-    if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
+    if (FronteggConfig.fronteggAppOptions.hostedLoginBox) {
       response = await refreshTokenHostedLogin(ctx, headers);
     } else {
       response = await refreshTokenEmbedded(ctx, headers, cookies);
@@ -97,7 +133,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     if (response === null || !response.ok) {
       CookieManager.removeCookies({
         isSecured,
-        cookieDomain: fronteggConfig.cookieDomain,
+        cookieDomain: FronteggConfig.cookieDomain,
         res: ctx.res!,
         req: ctx.req,
       });
