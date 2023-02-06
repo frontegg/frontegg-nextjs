@@ -6,7 +6,6 @@ import {
   getTokensFromCookie,
   CookieManager,
   FronteggUserTokens,
-  RequestType,
   createGetSession,
 } from './common';
 import nextjsPkg from 'next/package.json';
@@ -97,12 +96,12 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     }
 
     /**
-     * If referer header exist means that the user trying to navigate
+     * If url starts with /_next/ header exist means that the user trying to navigate
      * to a new nextjs page, in this scenario no need to refresh toke
      * we can just return the actual stateless session from
      * the encrypted cookie
      */
-    if (request.headers.referer) {
+    if (request.url?.startsWith('/_next/')) {
       try {
         const session = await createGetSession({
           getCookie: () => CookieManager.getParsedCookieFromRequest(request),
@@ -143,7 +142,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     const data = await response.json();
 
     // @ts-ignore
-    const cookieHeader = response.headers.raw()['set-cookie'];
+    const cookieHeader = response.headers?.raw?.()['set-cookie'];
     const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
     const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
 
