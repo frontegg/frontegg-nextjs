@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/demo-saas",
-  "version": "6.7.14",
+  "version": "6.7.15",
   "private": true,
   "scripts": {
     "clean": "rm -rf  ./node_modules && rm -rf ./.next",

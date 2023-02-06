@@ -1,5 +1,19 @@
 # Change Log
 
+## [6.7.15](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.14...v6.7.15) (2023-2-6)
+
+
+### NextJS Wrapper 6.7.15:
+- FR-10557 - Fix logout bug, Fix errors in embedded
+- FR-10557 - Improve NextJS navigation
+- FR-10557 - update middleware example code, add option to check if should bypass middleware
+- FR-10557 - Fix url for hosted login refresh token
+- FR-10557 - Fix jose import JWK key
+- FR-10557 - Fix social login embedded mode
+- FR-10557 - Add playwright tests for FornteggMiddleware
+- Bump http-cache-semantics from 4.1.0 to 4.1.1
+- FR-10557 - Add playwright for testing + Fix cookie parsing
+
 ## [6.7.14](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.13...v6.7.14) (2023-2-1)
 
 
