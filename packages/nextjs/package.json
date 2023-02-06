@@ -7,9 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "clean": "rimraf ./tsconfig.build.tsbuildinfo ./node_modules",
-    "build": "rimraf ./tsconfig.build.tsbuildinfo && concurrently -s all \"yarn build:stable\" \"yarn build:types\" && yarn build:copy-files",
-    "build:watch": "rimraf ./tsconfig.build.tsbuildinfo && concurrently -s all \"yarn build:stable --watch\" \"yarn build:types --watch --preserveWatchOutput\"",
+    "clean": "rm -rf ./tsconfig.build.tsbuildinfo && rm -rf ./node_modules",
+    "build": "rm -rf ./tsconfig.build.tsbuildinfo && concurrently -s all \"yarn build:stable\" \"yarn build:types\" && yarn build:copy-files",
+    "build:watch": "rm -rf ./tsconfig.build.tsbuildinfo && concurrently -s all \"yarn build:stable --watch\" \"yarn build:types --watch --preserveWatchOutput\"",
     "build:stable": "node ../../scripts/build stable",
     "build:types": "tsc -b tsconfig.build.json",
     "build:copy-files": "node ../../scripts/copy-files.js"
