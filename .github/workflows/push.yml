@@ -28,6 +28,8 @@ jobs:
       - run: yarn clean
       - run: yarn install
       - run: yarn build
+      - run: sudo sed -i 's/azure\.//' /etc/apt/sources.list
+      - run: sudo apt-get update
       - name: Install Playwright Browsers
         run: npx playwright install-deps chromium
       - name: Run Playwright tests
