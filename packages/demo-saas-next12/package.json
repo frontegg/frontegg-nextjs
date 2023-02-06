@@ -3,10 +3,10 @@
   "version": "6.7.14",
   "private": true,
   "scripts": {
+    "clean": "rimraf ./node_modules ./.next",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "clean": "rm -rf ./node_modules && rm -rf ./.next",
     "lint": "next lint"
   },
   "dependencies": {
