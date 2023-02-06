@@ -4,6 +4,7 @@
 const nextConfig = {
   experimental: {
     appDir: true,
+    enableUndici: true,
   },
 };
 

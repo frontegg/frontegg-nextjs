@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext } from 'react';
 import type { FronteggApp } from '@frontegg/js';
 

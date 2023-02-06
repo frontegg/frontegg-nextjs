@@ -7,10 +7,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && mkdir dist && rollup -c ./rollup.config.js && node ../../scripts/update-entry.js",
-    "build:watch": "rm -rf dist && mkdir dist && rollup -w -c ./rollup.config.js",
-    "clean": "rm -rf ./node_modules && rm -rf ./dist",
-    "test": "jest --runInBand --passWithNoTests -c ../../scripts/jest.config.json --rootDir ."
+    "build": "concurrently -s all \"yarn build:node\" \"yarn build:stable\" \"yarn build:types\" && yarn build:copy-files",
+    "build:watch": "concurrently -s all \"yarn build:node --watch\" \"yarn build:stable --watch\" \"yarn build:types --watch --preserveWatchOutput\"",
+    "build:node": "node ../../scripts/build node",
+    "build:stable": "node ../../scripts/build stable",
+    "build:types": "tsc -b tsconfig.build.json",
+    "build:copy-files": "node ../../scripts/copy-files.js"
   },
   "dependencies": {
     "@frontegg/js": "6.69.0",

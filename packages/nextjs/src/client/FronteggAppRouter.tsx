@@ -1,3 +1,5 @@
+'use client';
+
 import { FronteggConfig } from '../common';
 import { AppContext } from '../common/client';
 import { authInitialState } from '@frontegg/redux-store';

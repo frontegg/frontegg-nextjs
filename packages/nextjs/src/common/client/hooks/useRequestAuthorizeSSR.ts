@@ -1,3 +1,5 @@
+'use client';
+
 import { FronteggApp } from '@frontegg/js';
 import { useEffect } from 'react';
 import { AllUserData } from '../../types';

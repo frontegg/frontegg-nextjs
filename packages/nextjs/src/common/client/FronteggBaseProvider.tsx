@@ -1,3 +1,5 @@
+'use client';
+
 import { FronteggStoreProvider } from '@frontegg/react-hooks';
 import { AuthState } from '@frontegg/redux-store';
 import { ContextHolder, RedirectOptions } from '@frontegg/rest-api';

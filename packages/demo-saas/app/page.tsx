@@ -7,7 +7,7 @@ export default function MainPage() {
       <h3>Next JS application with frontegg</h3>
       <br />
       <br />
-      <UserState />
+      {/*<UserState />*/}
       <br />
       <br />
       <Link href='/session'>check session</Link>

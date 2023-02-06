@@ -1,3 +1,5 @@
+'use client';
+
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
 import {
   createFronteggStore,

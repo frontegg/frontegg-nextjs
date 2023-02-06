@@ -23,14 +23,15 @@ export const FronteggAppProvider = async ({
     throw Error('@frontegg/nextjs: .env.local must contain FRONTEGG_CLIENT_ID');
   }
 
-  const reqHeaders = {} as any;
-  headers().forEach((value: string, key: string) => (reqHeaders[key] = value));
+  // const reqHeaders = {} as any;
+  // headers().forEach((value: string, key: string) => (reqHeaders[key] = value));
 
-  const { user, tenants, session } = await getAllUserData({ getSession, reqHeaders });
-
+  // const { user, tenants, session } = await getAllUserData({ getSession, reqHeaders });
+  const { user, tenants, session } = {} as any;
+  console.log(user, tenants, session, headers().get('referer'));
   return (
     <FronteggClientProviderNext13 {...{ session, envAppUrl, envBaseUrl, envClientId, user, tenants }} {...options}>
-      {children}
+      <>{children}</>
     </FronteggClientProviderNext13>
   );
 };

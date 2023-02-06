@@ -1,3 +1,5 @@
+'use client';
+
 import { FronteggProviderProps } from '../common';
 import { FronteggBaseProvider } from '../common/client';
 import { useRouter } from 'next/navigation';
