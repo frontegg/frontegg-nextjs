@@ -95,7 +95,7 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
 
   1. Visit `https://vercel.com/[ACCOUNT_ID]/[PROJECT_ID]/settings/environment-variables`
   2. Add `FRONTEGG_APP_URL` environment variable for each Vercel Environment
-  ![vercel-settings-pages](https://github.com/frontegg/frontegg-nextjs/blob/master/vercel-environment.png)
+  ![vercel-settings-pages](https://github.com/frontegg/frontegg-nextjs/blob/master/assets/vercel-environment.png)
  
 
 ## Getting Started
