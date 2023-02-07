@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useAuth, useLoginWithRedirect } from '@frontegg/nextjs';
+import { useAuth, useLoginWithRedirect, AdminPortal } from '@frontegg/nextjs';
 import { useState } from 'react';
 
 export function Index() {
@@ -24,6 +24,14 @@ export function Index() {
         }}
       >
         Hosted login
+      </button>
+      <br />
+      <button
+        onClick={() => {
+          AdminPortal.show();
+        }}
+      >
+        Open AdminPortal
       </button>
       <br />
       <br />

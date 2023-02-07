@@ -42,6 +42,10 @@ class FronteggConfig {
     return new URL(process.env['FRONTEGG_BASE_URL'] ?? '').hostname;
   }
 
+  get baseUrl(): string {
+    return process.env['FRONTEGG_BASE_URL']!;
+  }
+
   getEnvAppUrl(): string | undefined {
     let url: string | undefined = undefined;
     if (process.env['FRONTEGG_APP_URL']) {
