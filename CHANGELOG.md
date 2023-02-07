@@ -1,5 +1,13 @@
 # Change Log
 
+## [6.7.16](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.15...v6.7.16) (2023-2-7)
+
+- Fixed go-to-sign-up message position in speedy login layout
+- Added an input component to the library for adding members to a tenant
+- Fix filtering SSO providers according to the vendor selection
+- Added user groups card header component to the library
+- Improved the admin portal and login box performance and bundle size
+
 ## [6.7.15](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.14...v6.7.15) (2023-2-6)
 
 
