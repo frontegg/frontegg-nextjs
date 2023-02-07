@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clean": "lerna run clean && rm -rf ./node_modules",
+    "clean": "lerna run clean && rm -rf ./node_modules && rm -rf ./dist",
     "postinstall": "node scripts/link.js",
     "dev": "lerna run build:watch --stream --scope '@frontegg/nextjs'",
     "demo": "lerna run dev --stream --scope '@frontegg/demo-saas'",
