@@ -11,7 +11,8 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   const isSSR = typeof window === 'undefined';
   const { user, session, tenants } = props;
   const baseName = props.basename ?? '';
-  const storeHolder = useRef({});
+  const ssrStoreHolder = useRef({});
+  const storeHolder = isSSR ? ssrStoreHolder.current : undefined;
 
   const onRedirectTo: AuthState['onRedirectTo'] = useCallback((_path: string, opts?: RedirectOptions) => {
     let path = _path;

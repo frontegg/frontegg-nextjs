@@ -76,8 +76,8 @@ class FronteggConfig {
     if (!this._jwtPublicKey) {
       const response = await fetch(`${process.env['FRONTEGG_BASE_URL']}/.well-known/jwks.json`);
       const data = await response.json();
-      const publicKey = data.keys.find((key: any) => key.kty === 'RSA');
-      this._jwtPublicKey = await importJWK(publicKey);
+      const publicKey = data.keys[0];
+      this._jwtPublicKey = await importJWK(publicKey, publicKey.alg);
     }
     return this._jwtPublicKey;
   }

@@ -84,8 +84,8 @@ class CookieManager {
 
   splitValueToChunks(cookieName: string | undefined, value: string, options: CookieSerializeOptions): string[] {
     const cookieOptionLength = cookie.serialize(this.getCookieName(1, cookieName), '', options).length;
-    const maxValueLength = COOKIE_MAX_LENGTH - cookieOptionLength;
-    return chunkString(value, maxValueLength);
+    const chunkSize = COOKIE_MAX_LENGTH - cookieOptionLength - 1;
+    return chunkString(value, chunkSize);
   }
 
   mapValueChunksToCookies = (
@@ -93,7 +93,9 @@ class CookieManager {
     valueChunks: string[],
     options: CookieSerializeOptions
   ): string[] =>
-    valueChunks.map((chunk, index) => cookie.serialize(this.getCookieName(index + 1, cookieName), chunk, options));
+    valueChunks.map(
+      (chunk, index) => cookie.serialize(this.getCookieName(index + 1, cookieName), chunk, options) + ';'
+    );
 
   getCookieStringFromRequest = (req: RequestType) =>
     'credentials' in req ? req.headers.get('cookie') || '' : req.headers.cookie || '';
@@ -212,14 +214,16 @@ class CookieManager {
           cookie = cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None');
         }
 
-        return cookie
-          .map((property) => {
-            if (property.toLowerCase() === `domain=${fronteggConfig.baseUrlHost}`) {
-              return `Domain=${fronteggConfig.cookieDomain}`;
-            }
-            return property;
-          })
-          .join(';');
+        return (
+          cookie
+            .map((property) => {
+              if (property.toLowerCase() === `domain=${fronteggConfig.baseUrlHost}`) {
+                return `Domain=${fronteggConfig.cookieDomain}`;
+              }
+              return property;
+            })
+            .join(';') + ';'
+        );
       });
     }
     return setCookieValue;

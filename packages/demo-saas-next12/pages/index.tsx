@@ -1,9 +1,11 @@
 import Link from 'next/link';
-import { useAuthUserOrNull, useLoginWithRedirect } from '@frontegg/nextjs';
+import { useAuth, useLoginWithRedirect } from '@frontegg/nextjs';
+import { useState } from 'react';
 
 export function Index() {
-  const user = useAuthUserOrNull();
+  const { user, isAuthenticated } = useAuth();
   const loginWithRedirect = useLoginWithRedirect();
+  const [state, setState] = useState({ userAgent: '', id: -1 });
   /*
    * Replace the elements below with your own.
    *
@@ -14,7 +16,7 @@ export function Index() {
       Next JS V12 application with frontegg
       <br />
       <br />
-      <div>{user?.email ?? 'not logged in'}</div>
+      <div>{isAuthenticated ? user?.email : 'not logged in'}</div>
       <br />
       <button
         onClick={() => {
@@ -23,6 +25,25 @@ export function Index() {
       >
         Hosted login
       </button>
+      <br />
+      <br />
+      <button
+        data-testid='test-middleware-button'
+        onClick={() => {
+          fetch('/api/frontegg/middleware-test', {
+            method: 'POST',
+          }).then((data) => {
+            data.json().then((response) => {
+              setState(response);
+            });
+          });
+        }}
+      >
+        Test Middleware
+      </button>
+      <br />
+      <input data-testid='test-middleware-useragent' readOnly value={state.userAgent} />
+      <input data-testid='test-middleware-id' readOnly value={state.id} />
       <br />
       <br />
       <Link href='/force-session'>check force session</Link>

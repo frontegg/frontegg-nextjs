@@ -1,9 +1,24 @@
-import { fronteggRefreshTokenUrl, fronteggSilentRefreshTokenUrl } from '@frontegg/rest-api';
+import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import { createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
-import fronteggConfig from './common/FronteggConfig';
-import { FronteggNextJSSession } from './common/types';
-import { getSession } from './session';
+import {
+  FronteggNextJSSession,
+  createSessionFromAccessToken,
+  getTokensFromCookie,
+  CookieManager,
+  FronteggUserTokens,
+  createGetSession,
+} from './common';
+import nextjsPkg from 'next/package.json';
+import sdkVersion from './sdkVersion';
+import { unsealData } from 'iron-session';
+import FronteggConfig from './common/FronteggConfig';
+
+async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
+  const jwt: string = await unsealData(cookie, {
+    password: FronteggConfig.passwordsAsMap,
+  });
+  return JSON.parse(jwt);
+}
 
 async function refreshTokenHostedLogin(
   ctx: NextPageContext,
@@ -15,7 +30,7 @@ async function refreshTokenHostedLogin(
     if (!tokens?.refreshToken) {
       return null;
     }
-    return await fetch(`${process.env['FRONTEGG_BASE_URL']}/frontegg${fronteggSilentRefreshTokenUrl}`, {
+    return await fetch(`${process.env['FRONTEGG_BASE_URL']}/frontegg/oauth/token`, {
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify({
@@ -25,14 +40,18 @@ async function refreshTokenHostedLogin(
       headers: {
         'accept-encoding': headers['accept-encoding'],
         'accept-language': headers['accept-language'],
-        cookie: headers['cookie'],
         accept: headers['accept'],
+        'content-type': 'application/json',
+        origin: headers['origin'],
         'user-agent': headers['user-agent'],
         connection: headers['connection'],
         'cache-control': headers['cache-control'],
+        'x-frontegg-framework': `next@${nextjsPkg.version}`,
+        'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
       },
     });
   } catch (e) {
+    console.error('refreshTokenHostedLogin', e);
     return null;
   }
 }
@@ -42,14 +61,12 @@ async function refreshTokenEmbedded(
   headers: Record<string, string>,
   cookies: Record<string, any>
 ): Promise<Response | null> {
-  const refreshTokenKey = `fe_refresh_${fronteggConfig.clientId}`.replace(/-/g, '');
+  const refreshTokenKey = `fe_refresh_${FronteggConfig.clientId}`.replace(/-/g, '');
   const cookieKey = Object.keys(cookies).find((cookie) => {
     return cookie.replace(/-/g, '') === refreshTokenKey;
   });
 
   if (!cookieKey) {
-    // ctx.res?.setHeader('set-cookie', removedCookies);
-    // remove all fe_nextjs-session cookies
     return null;
   }
 
@@ -65,6 +82,8 @@ async function refreshTokenEmbedded(
       'user-agent': headers['user-agent'],
       connection: headers['connection'],
       'cache-control': headers['cache-control'],
+      'x-frontegg-framework': `next@${nextjsPkg.version}`,
+      'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
     },
   });
 }
@@ -75,15 +94,28 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     if (!request) {
       return null;
     }
-    try {
-      const session = await getSession(ctx.req as any);
-      if (session) {
-        return session;
+
+    /**
+     * If url starts with /_next/ header exist means that the user trying to navigate
+     * to a new nextjs page, in this scenario no need to refresh toke
+     * we can just return the actual stateless session from
+     * the encrypted cookie
+     */
+    if (request.url?.startsWith('/_next/')) {
+      try {
+        const session = await createGetSession({
+          getCookie: () => CookieManager.getParsedCookieFromRequest(request),
+          cookieResolver: getTokensFromCookieOnEdge,
+        });
+        if (session) {
+          return session;
+        }
+      } catch (e) {
+        console.log('no nextjs session, will refresh token');
       }
-    } catch (e) {
-      // ignore error catch
     }
-    const isSecured = new URL(fronteggConfig.appUrl).protocol === 'https:';
+
+    const isSecured = new URL(FronteggConfig.appUrl).protocol === 'https:';
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
 
@@ -91,54 +123,47 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       return null;
     }
     let response: Response | null;
-    if (fronteggConfig.fronteggAppOptions.hostedLoginBox) {
+    if (FronteggConfig.fronteggAppOptions.hostedLoginBox) {
       response = await refreshTokenHostedLogin(ctx, headers);
     } else {
       response = await refreshTokenEmbedded(ctx, headers, cookies);
     }
-    if (!response) {
+
+    if (response === null || !response.ok) {
       CookieManager.removeCookies({
         isSecured,
-        cookieDomain: fronteggConfig.cookieDomain,
+        cookieDomain: FronteggConfig.cookieDomain,
         res: ctx.res!,
         req: ctx.req,
       });
       return null;
     }
 
-    if (response.ok) {
-      const data = await response.text();
-      const rewriteCookieDomainConfig = {
-        [fronteggConfig.baseUrlHost]: fronteggConfig.cookieDomain,
-      };
-      // @ts-ignore
-      const cookieHeader = response.headers.raw()['set-cookie'];
-      let newSetCookie = CookieManager.rewriteCookieProperty(cookieHeader, rewriteCookieDomainConfig, 'domain');
-      const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
-      if (!session) {
-        return null;
-      }
-      const cookieValue = CookieManager.createCookie({
-        value: session,
-        expires: new Date(decodedJwt.exp * 1000),
-        isSecured,
-      });
-      if (typeof newSetCookie === 'string') {
-        newSetCookie = [newSetCookie];
-      }
-      newSetCookie.push(...cookieValue);
-      ctx.res?.setHeader('set-cookie', newSetCookie);
-      return {
-        accessToken: JSON.parse(data).accessToken,
-        user: decodedJwt,
-        refreshToken,
-      };
-    } else {
-      // remove all fe_nextjs-session cookies
-      // ctx.res?.setHeader('set-cookie', removedCookies);
+    const data = await response.json();
+
+    // @ts-ignore
+    const cookieHeader = response.headers?.raw?.()['set-cookie'];
+    const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
+    const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
+
+    if (!session) {
       return null;
     }
+    const cookieValue = CookieManager.createCookie({
+      value: session,
+      expires: new Date(decodedJwt.exp * 1000),
+      isSecured,
+    });
+    newSetCookie.push(...cookieValue);
+    ctx.res?.setHeader('set-cookie', newSetCookie);
+
+    return {
+      accessToken: data.accessToken ?? data.access_token,
+      user: decodedJwt,
+      refreshToken,
+    };
   } catch (e) {
+    console.error('Failed to create session e', e);
     return null;
   }
 }

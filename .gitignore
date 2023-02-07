@@ -79,3 +79,7 @@ cypress/screenshots
 .env
 .env.local
 .next
+
+/test-results/
+/playwright-report/
+/playwright/.cache/

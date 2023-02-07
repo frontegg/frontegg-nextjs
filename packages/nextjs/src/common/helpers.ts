@@ -1,9 +1,9 @@
 import { sealData, unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { getTenants, getUsers } from './api';
-import { calculateExpiresInFromExp } from './client/ExpireInListener';
 import FronteggConfig from './FronteggConfig';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
+const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -51,7 +51,8 @@ export const getAllUserData = async ({ getSession, reqHeaders }: UserDataArgumen
           }
         : undefined;
     return { user, session, tenants };
-  } catch {
+  } catch (e) {
+    console.error(e);
     return {};
   }
 };

@@ -1,13 +1,13 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "6.7.10",
+  "version": "6.7.15",
   "author": "Frontegg LTD",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && mkdir dist && rollup -c ./rollup.config.js",
+    "build": "rm -rf dist && mkdir dist && rollup -c ./rollup.config.js && node ../../scripts/update-entry.js",
     "build:watch": "rm -rf dist && mkdir dist && rollup -w -c ./rollup.config.js",
     "clean": "rm -rf ./node_modules && rm -rf ./dist",
     "test": "jest --runInBand --passWithNoTests -c ../../scripts/jest.config.json --rootDir ."
