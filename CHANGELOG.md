@@ -1,5 +1,22 @@
 # Change Log
 
+## [6.7.16](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.15...v6.7.16) (2023-2-7)
+
+- FR-10662 - fix sign up message
+
+- FR-10431 - input component for adding members
+- FR-10414 - fix filter SSO providers according to the vendor choice
+- FR-10430 - user groups card header
+- FR-9271 - hosted login improvements
+
+### NextJS Wrapper 6.7.16:
+- FR-10557 - Fix logout bug, Fix errors in embedded
+- FR-10557 - Improve NextJS navigation
+- FR-10557 - update middleware example code, add option to check if should bypass middleware
+- FR-10557 - Fix url for hosted login refresh token
+- FR-10557 - Fix jose import JWK key
+- FR-10557 - Fix social login embedded mode
+
 ## [6.7.15](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.14...v6.7.15) (2023-2-6)
 
 
