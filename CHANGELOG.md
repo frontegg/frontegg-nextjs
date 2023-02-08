@@ -1,5 +1,11 @@
 # Change Log
 
+## [6.7.17](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.16...v6.7.17) (2023-2-8)
+
+- FR-10682 - change m2m strategy to be from identity
+- FR-10660 - ui for prompt passkeys
+
+
 ## [6.7.16](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.15...v6.7.16) (2023-2-7)
 
 - Fixed go-to-sign-up message position in speedy login layout
