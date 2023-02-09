@@ -19,7 +19,7 @@
         "dom"
       ],
       "target": "es5",
-      "module": "es6",
+      "module": "esnext",
       "noEmitHelpers": true,
       "importHelpers": true,
       "allowJs": true,
@@ -36,4 +36,3 @@
       "types": ["jest"],
     }
   }
-  
