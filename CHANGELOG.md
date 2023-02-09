@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.7.17](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.16...v6.7.17) (2023-2-8)
+
+- Updated M2M tokens to reflect the vendor choice
+
 ## [6.7.16](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.15...v6.7.16) (2023-2-7)
 
 - Fixed go-to-sign-up message position in speedy login layout
