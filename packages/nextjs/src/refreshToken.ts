@@ -11,11 +11,11 @@ import {
 import nextjsPkg from 'next/package.json';
 import sdkVersion from './sdkVersion';
 import { unsealData } from 'iron-session';
-import FronteggConfig from './common/FronteggConfig';
+import FronteggConfig from './utils/FronteggConfig';
 
 async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
   const jwt: string = await unsealData(cookie, {
-    password: FronteggConfig.passwordsAsMap,
+    password: FronteggConfig.password,
   });
   return JSON.parse(jwt);
 }

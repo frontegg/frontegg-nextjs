@@ -1,11 +1,10 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { ServerResponse } from 'http';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import FronteggConfig from './FronteggConfig';
-import { RequestType } from './types';
-import { chunkString } from './utils';
-import { COOKIE_MAX_LENGTH } from './consts';
-import fronteggConfig from './FronteggConfig';
+import FronteggConfig from '../FronteggConfig';
+import { RequestType } from '../../common/types';
+import { chunkString } from '../../common/utils';
+import { COOKIE_MAX_LENGTH } from '../../common/consts';
 
 type CreateCookieArguments = {
   cookieName?: string;
@@ -25,7 +24,7 @@ type RemoveCookiesArguments = {
   req?: RequestType;
 };
 
-class CookieManager {
+class Index {
   constructor() {}
 
   getCookieName = (cookieNumber?: number, cookieName = FronteggConfig.cookieName) =>
@@ -149,22 +148,14 @@ class CookieManager {
       allEmptyCookies.push(...this.createEmptySingleCookie(name, isSecured, cookieDomain));
     });
     // TODO: remove replace in the next major v7
-    const fixedRefreshToken = this.createEmptySingleCookie(
-      `fe_refresh_${fronteggConfig.clientId}`,
-      isSecured,
-      cookieDomain
-    );
-    const refreshTokenCookie = this.createEmptySingleCookie(
-      `fe_refresh_${fronteggConfig.clientId.replace('-', '')}`,
-      isSecured,
-      cookieDomain
-    );
-    const solidRefreshTokenCookie = this.createEmptySingleCookie(
-      `fe_refresh_${fronteggConfig.clientId.replace(/-/g, '')}`,
-      isSecured,
-      cookieDomain
-    );
-    const refreshTokenCookies: string[] = [...fixedRefreshToken, ...refreshTokenCookie, ...solidRefreshTokenCookie];
+
+    const refreshTokenCookies: string[] = [
+      `fe_refresh_${FronteggConfig.clientId}`,
+      `fe_refresh_${FronteggConfig.clientId.replace('-', '')}`,
+      `fe_refresh_${FronteggConfig.clientId.replace(/-/g, '')}`,
+    ]
+      .map((cookieName) => this.createEmptySingleCookie(cookieName, isSecured, cookieDomain))
+      .reduce((p, n) => [...p, ...n]);
     allEmptyCookies.push(...refreshTokenCookies);
     return allEmptyCookies;
   };
@@ -217,8 +208,8 @@ class CookieManager {
         return (
           cookie
             .map((property) => {
-              if (property.toLowerCase() === `domain=${fronteggConfig.baseUrlHost}`) {
-                return `Domain=${fronteggConfig.cookieDomain}`;
+              if (property.toLowerCase() === `domain=${FronteggConfig.baseUrlHost}`) {
+                return `Domain=${FronteggConfig.cookieDomain}`;
               }
               return property;
             })
@@ -230,4 +221,4 @@ class CookieManager {
   };
 }
 
-export default new CookieManager();
+export default new Index();
