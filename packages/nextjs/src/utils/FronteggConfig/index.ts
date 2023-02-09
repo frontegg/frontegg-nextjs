@@ -1,7 +1,7 @@
 import { AuthPageRoutes } from '@frontegg/redux-store';
 import { FronteggAppOptions } from '@frontegg/types';
 import { AppEnvConfig, FronteggEnvVariables, PasswordsMap } from './types';
-import { getEnvVariables } from './utils';
+import { getEnvVariables } from './helpers';
 
 class Config {
   public authRoutes: Partial<AuthPageRoutes> = {};
@@ -45,8 +45,9 @@ class Config {
   }
 
   get cookieDomain(): string {
-    return this.envVariables.cookieDomain
+    return this.envVariables.cookieDomain;
   }
 }
 
+export { EnvVariables } from './constants';
 export default new Config();

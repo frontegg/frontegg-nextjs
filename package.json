@@ -11,7 +11,7 @@
     "demo": "lerna run dev --stream --scope '@frontegg/demo-saas'",
     "demo12": "lerna run dev --stream --scope '@frontegg/demo-saas-next12'",
     "build": "cross-env NODE_ENV='production' lerna run build --stream --ignore '@frontegg/demo-saas' --ignore '@frontegg/demo-saas-next12'",
-    "test": "jest ./packages/nextjs/test/**",
+    "test": "jest packages/nextjs/tests/**",
     "start:mock-server": "node tests/mock-server.js",
     "start:test-demo12": "concurrently \"yarn start:mock-server\" \"yarn demo12\"",
     "test-middleware": "export FRONTEGG_TEST_URL='http://localhost:3001' export DEBUG=pw:webserver && yarn build && npx playwright test",

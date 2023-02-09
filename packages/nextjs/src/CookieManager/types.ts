@@ -1,0 +1,20 @@
+import { IncomingMessage, ServerResponse } from 'http';
+import { CookieSerializeOptions } from 'cookie';
+
+export type RequestType = IncomingMessage | Request;
+export type ResponseType = ServerResponse;
+
+export interface CreateCookieOptions extends Pick<CookieSerializeOptions, 'domain' | 'httpOnly' | 'path'> {
+  cookieName?: string;
+  value: string;
+  secure: boolean;
+  expires: Date;
+}
+
+export interface RemoveCookiesArguments {
+  cookieNames?: string[];
+  isSecured: boolean;
+  cookieDomain: string;
+  res: ResponseType;
+  req?: RequestType;
+}

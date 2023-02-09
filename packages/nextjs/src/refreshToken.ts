@@ -59,7 +59,7 @@ async function refreshTokenHostedLogin(
   headers: Record<string, string>
 ): Promise<Response | null> {
   try {
-    const sealFromCookies = CookieManager.getParsedCookieFromRequest(ctx?.req);
+    const sealFromCookies = CookieManager.getSessionCookieFromRequest(ctx?.req);
     const tokens = await getTokensFromCookie(sealFromCookies);
     if (!tokens?.refreshToken) {
       return null;
@@ -138,7 +138,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     if (request.url?.startsWith('/_next/')) {
       try {
         const session = await createGetSession({
-          getCookie: () => CookieManager.getParsedCookieFromRequest(request),
+          getCookie: () => CookieManager.getSessionCookieFromRequest(request),
           cookieResolver: getTokensFromCookieOnEdge,
         });
         if (session) {
@@ -183,10 +183,10 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     if (!session) {
       return null;
     }
-    const cookieValue = CookieManager.createCookie({
+    const cookieValue = CookieManager.create({
       value: session,
       expires: new Date(decodedJwt.exp * 1000),
-      isSecured,
+      secure: isSecured,
     });
     newSetCookie.push(...cookieValue);
     ctx.res?.setHeader('set-cookie', newSetCookie);

@@ -6,7 +6,7 @@ import { CookieManager, getTokensFromCookie, createGetSession, FronteggConfig } 
 
 export const getSession = (req: RequestType) =>
   createGetSession({
-    getCookie: () => CookieManager.getParsedCookieFromRequest(req),
+    getCookie: () => CookieManager.getSessionCookieFromRequest(req),
     cookieResolver: getTokensFromCookie,
   });
 

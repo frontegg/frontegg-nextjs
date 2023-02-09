@@ -15,6 +15,7 @@
     "build:copy-files": "node ../../scripts/copy-files.js"
   },
   "dependencies": {
+    "winston": "^3.8.2",
     "@frontegg/js": "6.71.0",
     "@frontegg/react-hooks": "6.71.0",
     "@types/http-proxy": "^1.17.9",

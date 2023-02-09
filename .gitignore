@@ -84,3 +84,4 @@ cypress/screenshots
 /playwright-report/
 /playwright/.cache/
 tsconfig.build.tsbuildinfo
+playwright-report/
