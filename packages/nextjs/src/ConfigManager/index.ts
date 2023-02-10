@@ -3,7 +3,7 @@ import { FronteggAppOptions } from '@frontegg/types';
 import { AppEnvConfig, FronteggEnvVariables, PasswordsMap } from './types';
 import { getEnvVariables } from './helpers';
 
-class Config {
+class ConfigManager {
   public authRoutes: Partial<AuthPageRoutes> = {};
   public fronteggAppOptions: Partial<FronteggAppOptions> = {};
   private envVariables: FronteggEnvVariables;
@@ -50,4 +50,4 @@ class Config {
 }
 
 export { EnvVariables } from './constants';
-export default new Config();
+export default new ConfigManager();

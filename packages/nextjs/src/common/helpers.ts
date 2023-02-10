@@ -1,7 +1,7 @@
 import { sealData, unsealData } from 'iron-session';
 import { jwtVerify } from 'jose';
 import { getTenants, getUsers } from './api';
-import FronteggConfig from '../utils/FronteggConfig';
+import ConfigManager from '../ConfigManager';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
 import JwtPublicKey from '../utils/JwtPublicKey';
 const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
@@ -15,7 +15,7 @@ export async function createSessionFromAccessToken(data: any): Promise<[string, 
 
   const stringifySession = JSON.stringify({ accessToken, refreshToken });
   const session = await sealData(stringifySession, {
-    password: FronteggConfig.password,
+    password: ConfigManager.password,
     ttl: decodedJwt.exp,
   });
   return [session, decodedJwt, refreshToken];
@@ -26,7 +26,7 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
     return undefined;
   }
   const stringifyJwt: string = await unsealData(cookie, {
-    password: FronteggConfig.password,
+    password: ConfigManager.password,
   });
   return JSON.parse(stringifyJwt);
 }

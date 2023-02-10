@@ -11,11 +11,11 @@ import {
 import nextjsPkg from 'next/package.json';
 import sdkVersion from './sdkVersion';
 import { unsealData } from 'iron-session';
-import FronteggConfig from './utils/FronteggConfig';
+import ConfigManager from './ConfigManager';
 
 async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
   const jwt: string = await unsealData(cookie, {
-    password: FronteggConfig.password,
+    password: ConfigManager.password,
   });
   return JSON.parse(jwt);
 }
@@ -64,7 +64,7 @@ async function refreshTokenHostedLogin(
     if (!tokens?.refreshToken) {
       return null;
     }
-    return await fetch(`${FronteggConfig.baseUrl}/frontegg/oauth/token`, {
+    return await fetch(`${ConfigManager.baseUrl}/frontegg/oauth/token`, {
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify({
@@ -76,7 +76,7 @@ async function refreshTokenHostedLogin(
         'accept-language': headers['accept-language'],
         accept: headers['accept'],
         'content-type': 'application/json',
-        origin: FronteggConfig.baseUrl,
+        origin: ConfigManager.baseUrl,
         'user-agent': headers['user-agent'],
         'cache-control': headers['cache-control'],
         'x-frontegg-framework': `next@${nextjsPkg.version}`,
@@ -94,7 +94,7 @@ async function refreshTokenEmbedded(
   headers: Record<string, string>,
   cookies: Record<string, any>
 ): Promise<Response | null> {
-  const refreshTokenKey = `fe_refresh_${FronteggConfig.clientId}`.replace(/-/g, '');
+  const refreshTokenKey = `fe_refresh_${ConfigManager.clientId}`.replace(/-/g, '');
   const cookieKey = Object.keys(cookies).find((cookie) => {
     return cookie.replace(/-/g, '') === refreshTokenKey;
   });
@@ -103,7 +103,7 @@ async function refreshTokenEmbedded(
     return null;
   }
 
-  return await fetch(`${FronteggConfig.baseUrl}/frontegg${fronteggRefreshTokenUrl}`, {
+  return await fetch(`${ConfigManager.baseUrl}/frontegg${fronteggRefreshTokenUrl}`, {
     method: 'POST',
     credentials: 'include',
     body: '{}',
@@ -113,7 +113,7 @@ async function refreshTokenEmbedded(
       cookie: headers['cookie'],
       accept: headers['accept'],
       'content-type': 'application/json',
-      origin: FronteggConfig.baseUrl,
+      origin: ConfigManager.baseUrl,
       'user-agent': headers['user-agent'],
       'cache-control': headers['cache-control'],
       'x-frontegg-framework': `next@${nextjsPkg.version}`,
@@ -149,7 +149,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       }
     }
 
-    const isSecured = new URL(FronteggConfig.appUrl).protocol === 'https:';
+    const isSecured = new URL(ConfigManager.appUrl).protocol === 'https:';
     const headers = request.headers as Record<string, string>;
     const cookies = (request as NextApiRequest).cookies;
 
@@ -157,7 +157,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
       return null;
     }
     let response: Response | null;
-    if (FronteggConfig.fronteggAppOptions.hostedLoginBox) {
+    if (ConfigManager.fronteggAppOptions.hostedLoginBox) {
       response = await refreshTokenHostedLogin(ctx, headers);
     } else {
       response = await refreshTokenEmbedded(ctx, headers, cookies);
@@ -166,7 +166,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
     if (response === null || !response.ok) {
       CookieManager.removeCookies({
         isSecured,
-        cookieDomain: FronteggConfig.cookieDomain,
+        cookieDomain: ConfigManager.cookieDomain,
         res: ctx.res!,
         req: ctx.req,
       });

@@ -1,5 +1,5 @@
 import { jwtVerify } from 'jose';
-import FronteggConfig from '../utils/FronteggConfig';
+import ConfigManager from '../ConfigManager';
 import { FronteggNextJSSession, FronteggUserTokens } from './types';
 import JwtPublicKey from '../utils/JwtPublicKey';
 

@@ -1,17 +1,17 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { COOKIE_MAX_LENGTH } from './constants';
 import { chunkString } from '../common/utils';
-import FronteggConfig from '../utils/FronteggConfig';
+import ConfigManager from '../ConfigManager';
 import { RequestType } from './types';
 
 /**
  * Return a cookieName with index, used for divided cookies.
  *
  * @param {number} index - The index of the cookie, starts with '1'
- * @param {string} _cookieName - Default is {@link FronteggConfig.cookieName}
+ * @param {string} _cookieName - Default is {@link ConfigManager.cookieName}
  */
 export const getIndexedCookieName = (index: number, _cookieName?: string) => {
-  let cookieName = _cookieName ?? FronteggConfig.cookieName;
+  let cookieName = _cookieName ?? ConfigManager.cookieName;
   return `${cookieName}-${index}`;
 };
 
@@ -56,7 +56,7 @@ export const getCookieHeader = (request: RequestType): string => {
 };
 
 export const getRefreshTokenCookieNameVariants = () => [
-  `fe_refresh_${FronteggConfig.clientId}`,
-  `fe_refresh_${FronteggConfig.clientId.replace('-', '')}`,
-  `fe_refresh_${FronteggConfig.clientId.replace(/-/g, '')}`,
+  `fe_refresh_${ConfigManager.clientId}`,
+  `fe_refresh_${ConfigManager.clientId.replace('-', '')}`,
+  `fe_refresh_${ConfigManager.clientId.replace(/-/g, '')}`,
 ];

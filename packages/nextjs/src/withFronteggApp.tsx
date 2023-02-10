@@ -2,9 +2,10 @@ import { FronteggAppOptions } from '@frontegg/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import type { AppContextType, AppPropsType, NextComponentType } from 'next/dist/shared/lib/utils';
 import React from 'react';
-import { FronteggConfig, fronteggErrors, getAllUserData, AllUserData } from './common';
+import { fronteggErrors, getAllUserData, AllUserData } from './common';
 import { FronteggProvider } from './FronteggProvider';
 import { refreshToken } from './refreshToken';
+import ConfigManager from './ConfigManager';
 
 type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
 export const withFronteggApp = (
@@ -27,7 +28,7 @@ export const withFronteggApp = (
       appContext.session = session;
       appContext.user = user;
       appContext.tenants = tenants;
-      const { envAppUrl, envBaseUrl, envClientId } = FronteggConfig.appEnvConfig;
+      const { envAppUrl, envBaseUrl, envClientId } = ConfigManager.appEnvConfig;
       if (!envAppUrl) {
         throw Error(fronteggErrors.envAppUrl);
       }
@@ -60,8 +61,8 @@ export const withFronteggApp = (
     }
   };
 
-  FronteggConfig.authRoutes = options?.authOptions?.routes ?? {};
-  FronteggConfig.fronteggAppOptions = options ?? {};
+  ConfigManager.authRoutes = options?.authOptions?.routes ?? {};
+  ConfigManager.fronteggAppOptions = options ?? {};
 
   function CustomFronteggApp(appProps: AppProps) {
     const { user, tenants, session, envAppUrl, envBaseUrl, envClientId } = appProps.pageProps;

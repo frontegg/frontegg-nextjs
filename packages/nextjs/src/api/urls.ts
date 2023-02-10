@@ -1,7 +1,7 @@
-import FronteggConfig from '../utils/FronteggConfig';
+import ConfigManager from '../ConfigManager';
 
 export const ApiUrls = {
   WellKnown: {
-    jwks: `${FronteggConfig.baseUrl}/.well-known/jwks.json`,
+    jwks: `${ConfigManager.baseUrl}/.well-known/jwks.json`,
   },
 };

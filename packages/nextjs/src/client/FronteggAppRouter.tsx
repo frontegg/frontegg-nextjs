@@ -1,6 +1,6 @@
 'use client';
 
-import { FronteggConfig } from '../common';
+import ConfigManager from '../ConfigManager';
 import { AppContext } from '../common/client';
 import { authInitialState } from '@frontegg/redux-store';
 import { useContext, useEffect } from 'react';
@@ -16,7 +16,7 @@ interface FronteggRouterProps {
 export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] }, searchParams }: FronteggRouterProps) {
   const routesObj = {
     ...authInitialState.routes,
-    ...FronteggConfig.authRoutes,
+    ...ConfigManager.authRoutes,
   };
   const routesArr: string[] = Object.keys(routesObj).reduce(
     (p: string[], key: string) => [...p, (routesObj as any)[key]],
@@ -37,7 +37,7 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
   }
 
   if (
-    FronteggConfig.fronteggAppOptions.hostedLoginBox &&
+    ConfigManager.fronteggAppOptions.hostedLoginBox &&
     routesObj.loginUrl !== pathname &&
     routesObj.logoutUrl !== pathname &&
     routesObj.hostedLoginRedirectUrl !== pathname

@@ -1,6 +1,6 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import FronteggConfig from '../utils/FronteggConfig';
+import ConfigManager from '../ConfigManager';
 import { CreateCookieOptions, RemoveCookiesArguments, RequestType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';
 import {
@@ -12,24 +12,24 @@ import {
 import FronteggLogger from '../FronteggLogger';
 
 class CookieManager {
-  getCookieName = (cookieNumber?: number, cookieName = FronteggConfig.cookieName) =>
+  getCookieName = (cookieNumber?: number, cookieName = ConfigManager.cookieName) =>
     cookieNumber ? `${cookieName}-${cookieNumber}` : cookieName;
 
   /**
    * Validate and create new cookie headers.
-   * The default value of `cookieName` is {@link FronteggConfig.cookieName}
+   * The default value of `cookieName` is {@link ConfigManager.cookieName}
    * @param {CreateCookieOptions} options - Create cookie options
    */
   create(options: CreateCookieOptions): string[] {
     const logger = FronteggLogger.child({ tag: 'CookieManager.create' });
-    const cookieName = options.cookieName ?? FronteggConfig.cookieName;
+    const cookieName = options.cookieName ?? ConfigManager.cookieName;
     const cookieValue = options.value;
     logger.info(`Creating new cookie for '${cookieName}'`);
 
     const serializeOptions: CookieSerializeOptions = {
       expires: options.expires,
       httpOnly: options.httpOnly ?? true,
-      domain: options.domain ?? FronteggConfig.cookieDomain,
+      domain: options.domain ?? ConfigManager.cookieDomain,
       path: options.path ?? '/',
       priority: 'high',
     };
@@ -170,8 +170,8 @@ class CookieManager {
         return (
           cookie
             .map((property) => {
-              if (property.toLowerCase() === `domain=${FronteggConfig.baseUrlHost}`) {
-                return `Domain=${FronteggConfig.cookieDomain}`;
+              if (property.toLowerCase() === `domain=${ConfigManager.baseUrlHost}`) {
+                return `Domain=${ConfigManager.cookieDomain}`;
               }
               return property;
             })

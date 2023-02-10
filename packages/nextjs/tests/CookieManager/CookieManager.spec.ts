@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import FronteggConfig from '../../src/utils/FronteggConfig';
+import ConfigManager from '../../src/ConfigManager';
 import { LARGE_COOKIE_VALUE, SMALL_COOKIE_VALUE, commonTestsForCookie, extractValueOutOfCookie } from './utils';
 import CookieManager from '../../src/CookieManager';
 import { getIndexedCookieName } from '../../src/CookieManager/helpers';
 import { COOKIE_MAX_LENGTH } from '../../src/CookieManager/constants';
 
-const COOKIE_NAME = FronteggConfig.cookieName;
-const COOKIE_DOMAIN = FronteggConfig.cookieDomain;
+const COOKIE_NAME = ConfigManager.cookieName;
+const COOKIE_DOMAIN = ConfigManager.cookieDomain;
 
 test.describe('CookieManager tests', () => {
   test('should create a fe_session cookie', async () => {
@@ -15,7 +15,7 @@ test.describe('CookieManager tests', () => {
       value: SMALL_COOKIE_VALUE,
       secure: true,
       expires,
-      domain: FronteggConfig.cookieDomain,
+      domain: ConfigManager.cookieDomain,
     });
 
     expect(createdCookies.length).toEqual(1);

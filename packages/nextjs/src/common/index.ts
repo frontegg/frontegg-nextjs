@@ -1,4 +1,4 @@
-export { default as FronteggConfig } from '../utils/FronteggConfig';
+export { default as ConfigManager } from '../ConfigManager';
 export * from './types';
 export * from './helpers';
 export * from './createGetSession';
