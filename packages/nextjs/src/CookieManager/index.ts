@@ -7,8 +7,8 @@ import {
   getCookieHeader,
   getIndexedCookieName,
   getRefreshTokenCookieNameVariants,
-  splitValueToChunks
-} from "./helpers";
+  splitValueToChunks,
+} from './helpers';
 import FronteggLogger from '../FronteggLogger';
 
 class CookieManager {
@@ -20,7 +20,7 @@ class CookieManager {
    * The default value of `cookieName` is {@link FronteggConfig.cookieName}
    * @param {CreateCookieOptions} options - Create cookie options
    */
-  create(options: CreateCookieOptions) {
+  create(options: CreateCookieOptions): string[] {
     const logger = FronteggLogger.child({ tag: 'CookieManager.create' });
     const cookieName = options.cookieName ?? FronteggConfig.cookieName;
     const cookieValue = options.value;
@@ -40,8 +40,8 @@ class CookieManager {
       serializeOptions.sameSite = 'none';
     }
 
-    const indexedCookieName = getIndexedCookieName(1, cookieName);
-    const serializedCookie = cookie.serialize(indexedCookieName, cookieValue, options);
+    // const indexedCookieName = getIndexedCookieName(1, cookieName);
+    const serializedCookie = cookie.serialize(cookieName, cookieValue, serializeOptions);
 
     if (serializedCookie.length <= COOKIE_MAX_LENGTH) {
       logger.info(`Successfully create a cookie header, '${cookieName}'`);
@@ -49,7 +49,7 @@ class CookieManager {
     } else {
       logger.verbose('Going to split cookie into chunks');
       /** Create chunked cookie headers and store value as array of headers */
-      const cookies = splitValueToChunks(cookieName, cookieValue, options);
+      const cookies = splitValueToChunks(cookieName, cookieValue, serializeOptions);
       logger.info(`Successfully create chunked cookie headers, '${cookieName}' (count: ${cookies.length})`);
       return cookies;
     }

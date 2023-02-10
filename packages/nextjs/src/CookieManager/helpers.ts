@@ -3,13 +3,12 @@ import { COOKIE_MAX_LENGTH } from './constants';
 import { chunkString } from '../common/utils';
 import FronteggConfig from '../utils/FronteggConfig';
 import { RequestType } from './types';
-import FronteggLogger from '../FronteggLogger';
 
 /**
  * Return a cookieName with index, used for divided cookies.
  *
  * @param {number} index - The index of the cookie, starts with '1'
- * @param {string} cookieName - Default is {@link FronteggConfig.cookieName}
+ * @param {string} _cookieName - Default is {@link FronteggConfig.cookieName}
  */
 export const getIndexedCookieName = (index: number, _cookieName?: string) => {
   let cookieName = _cookieName ?? FronteggConfig.cookieName;
@@ -26,7 +25,7 @@ export const getIndexedCookieName = (index: number, _cookieName?: string) => {
  */
 export const splitValueToChunks = (cookieName: string, value: string, options: CookieSerializeOptions): string[] => {
   const cookieOptionLength = cookie.serialize(getIndexedCookieName(1, cookieName), '', options).length;
-  const chunkSize = COOKIE_MAX_LENGTH - cookieOptionLength;
+  const chunkSize = COOKIE_MAX_LENGTH - cookieOptionLength - 1;
 
   const valueChunks = chunkString(value, chunkSize);
 
