@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig",
-  "include": ["src/**/*",
-    "tests/**/*"
+  "include": [
+    "src/**/*",
+    "unit-tests/**/*"
   ],
-  "exclude": ["build"]
+  "exclude": [
+    "build"
+  ]
 }
