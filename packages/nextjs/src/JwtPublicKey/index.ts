@@ -1,6 +1,6 @@
 import type { KeyLike } from 'jose';
 import { importJWK } from 'jose';
-import { ApiUrls } from '../../api';
+import { ApiUrls } from '../api';
 
 /**
  * Get the JWT public key from Frontegg service
