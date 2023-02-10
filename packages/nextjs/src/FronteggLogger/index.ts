@@ -5,7 +5,16 @@ import nextjsPkg from 'next/package.json';
 const { combine, timestamp, label, printf } = format;
 
 const myFormat = printf(({ level, message, tag, timestamp }) => {
-  return `[@frontegg/nextjs] ${timestamp} ${level.toUpperCase()} ${tag ? `${tag} ` : ''}- ${message}`;
+  let _level = level
+    .replace('error', 'error  ')
+    .replace('warn', 'warn   ')
+    .replace('info', 'info   ')
+    .replace('debug', 'debug  ')
+    .replace('verbose', 'verbose');
+
+  let _tag = (tag ?? '').length > 40 ? `${tag.slice(0, 37)}...` : tag;
+
+  return `@frontegg/nextjs | ${timestamp} | ${_level} | ${_tag ? `${_tag} | ` : ''}${message}`;
 });
 /**
  * @see [enabling-debug-logging](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging)
@@ -16,7 +25,7 @@ const isGithubRunnerDebugMode =
 
 const FronteggLogger: Logger = createLogger({
   level: isGithubRunnerDebugMode ? 'verbose' : process.env.FRONTEGG_LOG_LEVEL ?? 'info',
-  format: combine(label({ label: 'right meow!' }), timestamp(), myFormat),
+  format: combine(format.colorize(), timestamp(), myFormat),
   exitOnError: false,
   transports: [new transports.Console()],
 });
