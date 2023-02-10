@@ -5,7 +5,7 @@ import nextjsPkg from 'next/package.json';
 const { combine, timestamp, label, printf } = format;
 
 const myFormat = printf(({ level, message, tag, timestamp }) => {
-  return `[@frontegg/nextjs] ${timestamp} ${level.toUpperCase()}: ${tag} - ${message}`;
+  return `[@frontegg/nextjs] ${timestamp} ${level.toUpperCase()} ${tag ? `${tag} ` : ''}- ${message}`;
 });
 /**
  * @see [enabling-debug-logging](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging)
