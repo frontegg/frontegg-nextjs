@@ -1,13 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fronteggPathRewrite, FronteggProxy, fronteggSSOPathRewrite, rewritePath } from './common/FronteggProxy';
-
-export const config = {
-  api: {
-    externalResolver: true,
-    bodyParser: true,
-    responseLimit: false,
-  },
-};
+import { FronteggProxy } from './FronteggProxy';
+import { fronteggSSOPathRewrite, fronteggPathRewrite } from './constants';
+import { rewritePath } from './helpers';
 
 const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
   new Promise<void>((resolve) => {
@@ -28,9 +22,9 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
 /**
  * Next.js HTTP Proxy Middleware
  * @see https://nextjs.org/docs/api-routes/api-middlewares
- * @param {NextApiRequest} req
- * @param {NextApiResponse} res
+ * @param {NextApiRequest} req - NextJS api request passed from api routing
+ * @param {NextApiResponse} res - NextJS api response passed from api routing
  */
-export async function fronteggMiddleware(req: NextApiRequest, res: NextApiResponse) {
+export async function FronteggApiMiddleware(req: NextApiRequest, res: NextApiResponse) {
   return await middlewarePromise(req, res);
 }

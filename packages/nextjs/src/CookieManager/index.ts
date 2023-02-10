@@ -56,6 +56,21 @@ class CookieManager {
   }
 
   /**
+   * Receive incoming http request, and extract the cookie header.
+   * @return cookie as string if exists, else empty string
+   *
+   * @param {RequestType} request - Incoming HTTP Request
+   */
+  parseCookieHeader(request: RequestType): Record<string, string> {
+    const logger = FronteggLogger.child({ tag: 'CookieManager.parseCookieHeader' });
+
+    logger.info('Going to extract all cookies header from request');
+    const cookieHeader = getCookieHeader(request);
+    logger.info('Parsing cookie header to map');
+    return cookie.parse(cookieHeader);
+  }
+
+  /**
    * Loop over cookie headers, extract, parse cookies and merged divided cookies from incoming http request,
    * @return full session cookie headers if exists, else return undefined
    * @param {RequestType} request - Incoming HTTP Request
