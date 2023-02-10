@@ -3,7 +3,6 @@ export interface GeneratedEnvVariables {
   cookieDomain: string;
 }
 
-
 /**
  * PasswordMap used for JWT encryption, you can create multiple passwords
  * to be used for encrypting session cookie as round-robin strategy.

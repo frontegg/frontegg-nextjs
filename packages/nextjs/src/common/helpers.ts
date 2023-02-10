@@ -3,7 +3,7 @@ import { jwtVerify } from 'jose';
 import { getTenants, getUsers } from './api';
 import FronteggConfig from '../utils/FronteggConfig';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
-import JwtPublicKey from "../utils/JwtPublicKey";
+import JwtPublicKey from '../utils/JwtPublicKey';
 const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {

@@ -1,10 +1,9 @@
 export * from './FronteggProvider';
 export * from './FronteggProviderNoSSR';
 export * from './AuthorizedContent';
-export * from './FronteggRouter';
+export * from './middlewares';
 export * from './withFronteggApp';
 export * from './session';
-export * from './FronteggMiddleware';
 export * from './common';
 
 export { AdminPortal } from '@frontegg/js';

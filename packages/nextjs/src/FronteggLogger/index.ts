@@ -16,15 +16,10 @@ const isGithubRunnerDebugMode =
 
 const FronteggLogger: Logger = createLogger({
   level: isGithubRunnerDebugMode ? 'verbose' : process.env.FRONTEGG_LOG_LEVEL ?? 'info',
-  format: combine(
-    label({ label: 'right meow!' }),
-    timestamp(),
-    myFormat
-  ),
+  format: combine(label({ label: 'right meow!' }), timestamp(), myFormat),
   exitOnError: false,
   transports: [new transports.Console()],
 });
 
-
-FronteggLogger.warn(`Frontegg Next.js Wrapper (${pkg.version}), Next.js version (${nextjsPkg.version})`)
+FronteggLogger.warn(`Frontegg Next.js Wrapper (${pkg.version}), Next.js version (${nextjsPkg.version})`);
 export default FronteggLogger;

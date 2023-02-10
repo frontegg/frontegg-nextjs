@@ -13,7 +13,7 @@
     "build:stable": "node ../../scripts/build stable",
     "build:types": "tsc -b tsconfig.build.json",
     "build:copy-files": "node ../../scripts/copy-files.js",
-    "test": "CI=true npx playwright test"
+    "test": "cp .env.test .env && CI=true npx playwright test"
   },
   "dependencies": {
     "winston": "^3.8.2",

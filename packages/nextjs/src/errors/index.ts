@@ -1,2 +1,2 @@
-export * from './FronteggEnvNotFound'
-export * from './InvalidFronteggEnv'
+export * from './FronteggEnvNotFound';
+export * from './InvalidFronteggEnv';

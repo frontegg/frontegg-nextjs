@@ -1,6 +1,7 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+// @ts-ignore
 require('dotenv').config();
 
 const config: PlaywrightTestConfig = {

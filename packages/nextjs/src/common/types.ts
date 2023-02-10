@@ -50,7 +50,6 @@ export interface FronteggNextJSSession extends FronteggUserTokens {
   user: FronteggUserSession;
 }
 
-
 export interface FronteggProviderOptions extends Omit<FronteggAppOptions, 'contextOptions'>, AllUserData {
   envAppUrl: string;
   envBaseUrl: string;
