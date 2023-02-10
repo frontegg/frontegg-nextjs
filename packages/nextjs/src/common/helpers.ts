@@ -3,14 +3,14 @@ import { jwtVerify } from 'jose';
 import { getTenants, getUsers } from './api';
 import ConfigManager from '../ConfigManager';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
-import JwtPublicKey from '../JwtPublicKey';
+import JwtManager from '../JwtManager';
+
 const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
   const refreshToken = data.refreshToken ?? data.refresh_token;
-  const publicKey = await JwtPublicKey.getKey();
-  const { payload: decodedJwt }: any = await jwtVerify(accessToken, publicKey);
+  const { payload: decodedJwt }: any = await JwtManager.verify(accessToken);
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
   const stringifySession = JSON.stringify({ accessToken, refreshToken });

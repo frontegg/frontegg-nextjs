@@ -1,7 +1,7 @@
 import { jwtVerify } from 'jose';
 import ConfigManager from '../ConfigManager';
 import { FronteggNextJSSession, FronteggUserTokens } from './types';
-import JwtPublicKey from '../JwtPublicKey';
+import JwtManager from '../JwtManager';
 
 type CreateGetSessionParams = {
   getCookie: () => string | undefined;
@@ -22,8 +22,7 @@ export const createGetSession = async ({
       return undefined;
     }
     const { accessToken, refreshToken } = tokens;
-    const publicKey = await JwtPublicKey.getKey();
-    const { payload }: any = await jwtVerify(accessToken, publicKey);
+    const { payload } = await JwtManager.verify(accessToken);
 
     const session: FronteggNextJSSession = {
       accessToken,

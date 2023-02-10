@@ -11,7 +11,7 @@ export interface CreateCookieOptions extends Pick<CookieSerializeOptions, 'domai
   expires: Date;
 }
 
-export interface RemoveCookiesArguments {
+export interface RemoveCookiesOptions {
   cookieNames?: string[];
   isSecured: boolean;
   cookieDomain: string;

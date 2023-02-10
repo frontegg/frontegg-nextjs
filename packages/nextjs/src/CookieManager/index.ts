@@ -1,7 +1,7 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import ConfigManager from '../ConfigManager';
-import { CreateCookieOptions, RemoveCookiesArguments, RequestType } from './types';
+import { CreateCookieOptions, RemoveCookiesOptions, RequestType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';
 import {
   getCookieHeader,
@@ -160,7 +160,7 @@ class CookieManager {
     }
   };
 
-  removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesArguments): void {
+  removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesOptions): void {
     const cookiesToRemove = this.getCookiesToRemove(req);
     const cookieValue = this.createEmptyCookies(isSecured, cookieDomain, cookieNames ?? cookiesToRemove);
     let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
