@@ -6,7 +6,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head></head>
       <body>
         {/*@ts-expect-error typescript not familiar with server components*/}
-        <FronteggAppProvider hostedLoginBox authOptions={{ keepSessionAlive: true }}>
+        <FronteggAppProvider hostedLoginBox={false} authOptions={{ keepSessionAlive: true }}>
           {children}
         </FronteggAppProvider>
       </body>

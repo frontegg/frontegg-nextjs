@@ -1,5 +1,3 @@
-import { jwtVerify } from 'jose';
-import ConfigManager from '../ConfigManager';
 import { FronteggNextJSSession, FronteggUserTokens } from './types';
 import JwtManager from '../JwtManager';
 
@@ -22,7 +20,7 @@ export const createGetSession = async ({
       return undefined;
     }
     const { accessToken, refreshToken } = tokens;
-    const { payload } = await JwtManager.verify(accessToken);
+    const { payload }: any = await JwtManager.verify(accessToken);
 
     const session: FronteggNextJSSession = {
       accessToken,

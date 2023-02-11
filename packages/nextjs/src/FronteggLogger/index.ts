@@ -1,8 +1,8 @@
 import { Logger, createLogger, format, transports } from 'winston';
-import pkg from '../../package.json';
+import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
 
-const { combine, timestamp, label, printf } = format;
+const { combine, timestamp, printf } = format;
 
 const myFormat = printf(({ level, message, tag, timestamp }) => {
   let _level = level
@@ -30,5 +30,5 @@ const FronteggLogger: Logger = createLogger({
   transports: [new transports.Console()],
 });
 
-FronteggLogger.warn(`Frontegg Next.js Wrapper (${pkg.version}), Next.js version (${nextjsPkg.version})`);
+FronteggLogger.warn(`Frontegg Next.js Wrapper (${sdkVersion.version}), Next.js version (${nextjsPkg.version})`);
 export default FronteggLogger;
