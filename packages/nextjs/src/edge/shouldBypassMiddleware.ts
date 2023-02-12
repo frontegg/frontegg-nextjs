@@ -6,7 +6,7 @@ const fronteggRoutesRegex = new RegExp('^/(account/|oauth/callback).*');
 
 interface ByPassOptions {
   bypassStaticFiles?: boolean; // default: true
-  bypassImageOptimization?: boolean; // default: false
+  bypassImageOptimization?: boolean; // default: true
   bypassHeaderRequests?: boolean; // default: true
 }
 /**

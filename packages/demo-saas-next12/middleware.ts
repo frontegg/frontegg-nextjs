@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getSession, shouldByPassMiddleware } from '@frontegg/nextjs/edge';
+import { getSession, shouldByPassMiddleware, redirectToLogin } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
   // this if for frontegg middleware tests
@@ -16,9 +16,7 @@ export const middleware = async (request: NextRequest) => {
 
   const session = await getSession(request);
   if (!session) {
-    //  redirect unauthenticated user to /account/login page
-    const loginUrl = `/account/login?redirectUrl=${encodeURIComponent(pathname)}`;
-    return NextResponse.redirect(new URL(loginUrl, process.env['FRONTEGG_APP_URL']));
+    return redirectToLogin(pathname);
   }
   return NextResponse.next();
 };
