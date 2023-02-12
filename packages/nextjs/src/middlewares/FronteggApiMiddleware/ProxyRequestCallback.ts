@@ -17,16 +17,16 @@ const logger = FronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCa
  */
 const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (proxyReq, req) => {
   try {
-    logger.info(`| ${req.url} | Going to proxy request`);
+    logger.info(`${req.url} | Going to proxy request`);
 
-    logger.verbose(`| ${req.url} | parsing request cookies`);
+    logger.debug(`${req.url} | parsing request cookies`);
     const allCookies = CookieManager.parseCookieHeader(req);
-    logger.verbose(`| ${req.url} | found ${allCookies} cookies`);
+    logger.debug(`${req.url} | found ${allCookies} cookies`);
     const fronteggCookiesNames = Object.keys(allCookies).filter((cookieName) => {
       return cookieName.startsWith('fe_') && !cookieName.startsWith(ConfigManager.cookieName);
     });
 
-    logger.verbose(`| ${req.url} | proxy FronteggCookies (${fronteggCookiesNames.join(', ')})`);
+    logger.debug(`${req.url} | proxy FronteggCookies (${fronteggCookiesNames.join(', ')})`);
     fronteggCookiesNames.forEach((cookieName: string) => {
       proxyReq.setHeader(cookieName, allCookies[cookieName]);
     });
@@ -35,9 +35,9 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
 
-    logger.verbose(`| ${req.url} | check if request has body`);
+    logger.debug(`${req.url} | check if request has body`);
     if (req.body) {
-      logger.verbose(`| ${req.url} | writing request body to proxyReq`);
+      logger.debug(`${req.url} | writing request body to proxyReq`);
       const bodyData = JSON.stringify(req.body);
       // in case if content-type is application/x-www-form-urlencoded -> we need to change to application/json
       proxyReq.setHeader('Content-Type', 'application/json');
@@ -46,7 +46,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       proxyReq.write(bodyData);
     }
   } catch (e) {
-    logger.error(`| ${req.url} | Failt to proxy request`, e);
+    logger.error(`${req.url} | Failt to proxy request`, e);
   }
 };
 

@@ -18,7 +18,8 @@
   "dependencies": {
     "@frontegg/js": "6.72.0",
     "@frontegg/react-hooks": "6.72.0",
-    "winston": "^3.8.2",
+    "pino": "^8.10.0",
+    "pino-pretty": "^9.2.0",
     "@types/http-proxy": "^1.17.9",
     "cookie": "^0.5.0",
     "http-proxy": "^1.18.1",

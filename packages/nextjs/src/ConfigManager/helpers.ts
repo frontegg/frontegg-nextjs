@@ -1,5 +1,5 @@
 import { InvalidFronteggEnv, FronteggEnvNotFound } from '../errors';
-import { PasswordsMap, FronteggEnvVariables } from './types';
+import { PasswordsMap } from './types';
 import { EnvVariables } from './constants';
 
 /**
@@ -20,7 +20,7 @@ export const getEnv = (name: string): string => {
  * @param {string} name - the name from environment variable {@link EnvVariables}
  * @param {optional string} defaultValue - default value if not exists
  */
-export const getEnvOrDefault = (name: string, defaultValue?: string | undefined): string | undefined => {
+export const getEnvOrDefault = <T>(name: string, defaultValue: T): string | T => {
   try {
     return getEnv(name);
   } catch (e) {
@@ -54,9 +54,9 @@ export function normalizeStringPasswordToMap(password: string | PasswordsMap): P
  * and calculate the appUrl based on Vercel Environment variables.
  */
 export function generateAppUrl() {
-  const appUrlEnv = getEnvOrDefault(EnvVariables.FRONTEGG_APP_URL);
-  const isVercel = getEnvOrDefault(EnvVariables.VERCEL) != null;
-  const vercelUrl = getEnvOrDefault(EnvVariables.VERCEL_URL);
+  const appUrlEnv = getEnvOrDefault(EnvVariables.FRONTEGG_APP_URL, undefined);
+  const isVercel = getEnvOrDefault(EnvVariables.VERCEL, undefined) != undefined;
+  const vercelUrl = getEnvOrDefault(EnvVariables.VERCEL_URL, undefined);
 
   let appUrl: string | undefined;
   if (appUrlEnv) {
@@ -85,25 +85,3 @@ export function generateAppUrl() {
 
   return appUrl;
 }
-
-export const getEnvVariables = (): FronteggEnvVariables => {
-  const baseUrl = getEnv(EnvVariables.FRONTEGG_BASE_URL);
-  const testUrl = getEnvOrDefault(EnvVariables.FRONTEGG_TEST_URL);
-  const clientId = getEnv(EnvVariables.FRONTEGG_CLIENT_ID);
-  const encryptionPasswordEnv = getEnv(EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD);
-  const cookieName = getEnv(EnvVariables.FRONTEGG_COOKIE_NAME);
-
-  const appUrl = generateAppUrl();
-  const cookieDomain = generateCookieDomain(appUrl);
-  const encryptionPassword = normalizeStringPasswordToMap(encryptionPasswordEnv);
-
-  return {
-    appUrl,
-    testUrl,
-    baseUrl,
-    clientId,
-    encryptionPassword,
-    cookieName,
-    cookieDomain,
-  };
-};

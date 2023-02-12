@@ -9,6 +9,7 @@ export interface CreateCookieOptions extends Pick<CookieSerializeOptions, 'domai
   value: string;
   secure: boolean;
   expires: Date;
+  silent?: boolean;
 }
 
 export interface RemoveCookiesOptions {

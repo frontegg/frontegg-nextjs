@@ -2,8 +2,9 @@ import { authInitialState } from '@frontegg/redux-store';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import type { FronteggNextJSSession, RequestType } from './common';
-import { CookieManager, getTokensFromCookie, createGetSession } from './common';
+import { getTokensFromCookie, createGetSession } from './common';
 import ConfigManager from './ConfigManager';
+import CookieManager from './CookieManager';
 
 export const getSession = (req: RequestType) =>
   createGetSession({

@@ -1,8 +1,9 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
-import { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
+import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import ConfigManager from '../ConfigManager';
 import { CreateCookieOptions, RemoveCookiesOptions, RequestType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';
+
 import {
   getCookieHeader,
   getIndexedCookieName,
@@ -21,7 +22,10 @@ class CookieManager {
    * @param {CreateCookieOptions} options - Create cookie options
    */
   create(options: CreateCookieOptions): string[] {
-    const logger = FronteggLogger.child({ tag: 'CookieManager.create' });
+    const logger = FronteggLogger.child(
+      { tag: 'CookieManager.create' },
+      { msgPrefix: 'CookieManager.create: ', level: options.silent ? 'error' : undefined }
+    );
     const cookieName = options.cookieName ?? ConfigManager.cookieName;
     const cookieValue = options.value;
     logger.info(`Creating new cookie for '${cookieName}'`);
@@ -35,7 +39,7 @@ class CookieManager {
     };
 
     if (options.secure) {
-      logger.verbose(`Set cookie '${cookieName}' as secure`);
+      logger.debug(`Set cookie '${cookieName}' as secure`);
       serializeOptions.secure = options.secure;
       serializeOptions.sameSite = 'none';
     }
@@ -47,7 +51,7 @@ class CookieManager {
       logger.info(`Successfully create a cookie header, '${cookieName}'`);
       return [serializedCookie];
     } else {
-      logger.verbose('Going to split cookie into chunks');
+      logger.debug('Going to split cookie into chunks');
       /** Create chunked cookie headers and store value as array of headers */
       const cookies = splitValueToChunks(cookieName, cookieValue, serializeOptions);
       logger.info(`Successfully create chunked cookie headers, '${cookieName}' (count: ${cookies.length})`);
@@ -84,26 +88,28 @@ class CookieManager {
       return undefined;
     }
 
+    logger.debug('Getting cookie header');
     const cookieStr = getCookieHeader(request);
 
-    logger.verbose('Parsing cookie header string');
+    logger.debug('Parsing cookie header string');
     const cookies = cookie.parse(cookieStr);
 
-    logger.verbose('Loop over session cookie headers');
+    logger.debug('Loop over session cookie headers');
     let i = 1;
     let sessionCookies = '';
     let sessionCookieChunk: string | undefined;
     do {
       sessionCookieChunk = cookies[getIndexedCookieName(i++)];
       sessionCookies += sessionCookieChunk;
-    } while (!sessionCookieChunk);
+    } while (sessionCookieChunk);
 
-    if (sessionCookies.length > 0) {
+    if (sessionCookies.length === 0) {
       logger.info('Session cookie NOT found');
       return undefined;
     }
 
-    logger.info(`Session cookie found, (count: ${i})`);
+    debugger;
+    logger.info(`Session cookie found, (count: ${sessionCookies.length})`);
     return sessionCookies;
   }
 
@@ -121,7 +127,14 @@ class CookieManager {
   }
 
   createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) => {
-    return this.create({ cookieName, value: '', expires: new Date(), secure: isSecured, domain: cookieDomain });
+    return this.create({
+      cookieName,
+      value: '',
+      expires: new Date(),
+      secure: isSecured,
+      domain: cookieDomain,
+      silent: true,
+    });
   };
 
   createEmptyCookies = (isSecured: boolean, cookieDomain: string, _cookiesToRemove: string[]): string[] => {

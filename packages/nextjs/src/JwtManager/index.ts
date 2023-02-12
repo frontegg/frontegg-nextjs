@@ -2,6 +2,8 @@ import type { KeyLike } from 'jose';
 import { importJWK, jwtVerify } from 'jose';
 import { ApiUrls } from '../api';
 import { JWTVerifyResult } from 'jose/dist/types/types';
+import ConfigManager from '../ConfigManager';
+import fronteggLogger from '../FronteggLogger';
 
 class JwtManager {
   private publicKey: (KeyLike | Uint8Array) | undefined;
@@ -12,9 +14,13 @@ class JwtManager {
    * in getServerSideProps and ServerComponents
    */
   private async loadPublicKey(): Promise<KeyLike | Uint8Array> {
-    const response = await fetch(ApiUrls.WellKnown.jwks);
+    const logger = fronteggLogger.child({ tag: 'JwtManager.loadPublicKey' });
+
+    logger.info('Going to load public key from frontegg jwks');
+    const response = await fetch(`${ConfigManager.baseUrl}${ApiUrls.WellKnown.jwks}`);
     const data = await response.json();
     const publicKey = data.keys[0];
+    logger.info('Public key loaded, importing to jose');
     this.publicKey = await importJWK(publicKey, publicKey.alg);
     return this.publicKey;
   }

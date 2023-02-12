@@ -1,13 +1,13 @@
 import { unsealData } from 'iron-session/edge';
 import ConfigManager from '../ConfigManager';
-import { FronteggUserTokens, RequestType } from '../common/types';
 import CookieManager from '../CookieManager';
+import type { FronteggUserTokens, RequestType } from '../common';
 import { createGetSession } from '../common/createGetSession';
 
 async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
-  const jwt: string = await unsealData(cookie, {
-    password: ConfigManager.password,
-  });
+  const password = ConfigManager.password;
+  console.log('password', password);
+  const jwt: string = await unsealData(cookie, { password });
   return JSON.parse(jwt);
 }
 

@@ -1,10 +1,24 @@
 import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession, createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
+import {
+  FronteggNextJSSession,
+  createSessionFromAccessToken,
+  getTokensFromCookie,
+  FronteggUserTokens,
+  createGetSession,
+} from './common';
 import nextjsPkg from 'next/package.json';
 import sdkVersion from './sdkVersion';
+import { unsealData } from 'iron-session';
 import ConfigManager from './ConfigManager';
-import { getSession } from './session';
+import CookieManager from './CookieManager';
+
+async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
+  const jwt: string = await unsealData(cookie, {
+    password: ConfigManager.password,
+  });
+  return JSON.parse(jwt);
+}
 
 // tokenRegExp and headerCharRegex have been lifted from
 // https://github.com/nodejs/node/blob/main/lib/_http_common.js
@@ -123,7 +137,10 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
      */
     if (request.url?.startsWith('/_next/')) {
       try {
-        const session = await getSession(request);
+        const session = await createGetSession({
+          getCookie: () => CookieManager.getSessionCookieFromRequest(request),
+          cookieResolver: getTokensFromCookieOnEdge,
+        });
         if (session) {
           return session;
         }
