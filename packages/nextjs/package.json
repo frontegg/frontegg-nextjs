@@ -1,7 +1,7 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "6.7.16",
+  "version": "6.7.17",
   "author": "Frontegg LTD",
   "license": "MIT",
   "main": "dist/index.js",
@@ -13,8 +13,8 @@
     "test": "jest --runInBand --passWithNoTests -c ../../scripts/jest.config.json --rootDir ."
   },
   "dependencies": {
-    "@frontegg/js": "6.71.0",
-    "@frontegg/react-hooks": "6.71.0",
+    "@frontegg/js": "6.72.0",
+    "@frontegg/react-hooks": "6.72.0",
     "@types/http-proxy": "^1.17.9",
     "cookie": "^0.5.0",
     "http-proxy": "^1.18.1",
