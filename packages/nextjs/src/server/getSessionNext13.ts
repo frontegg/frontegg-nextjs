@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import type { FronteggUserSession, FronteggUserTokens } from '../common';
-import { getTokensFromCookie, CookieManager, createGetSession } from '../common';
+import { getTokensFromCookie, createGetSession } from '../common';
+import CookieManager from '../utils/cookies';
 
 const getCookie = () => {
   const allCookies = cookies().getAll();

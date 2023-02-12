@@ -3,8 +3,8 @@
   // Actual .ts source files are transpiled via babel
   "extends": "./tsconfig",
   "compilerOptions": {
-    "composite": true,
     "declaration": true,
+    "incremental": true,
     "noEmit": false,
     "emitDeclarationOnly": true,
     "outDir": "../../dist/@frontegg/nextjs",

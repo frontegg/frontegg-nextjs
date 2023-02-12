@@ -1,4 +1,4 @@
-import { InvalidFronteggEnv, FronteggEnvNotFound } from '../errors';
+import { InvalidFronteggEnv, FronteggEnvNotFound } from '../utils/errors';
 import { PasswordsMap } from './types';
 import { EnvVariables } from './constants';
 

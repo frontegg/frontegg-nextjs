@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
-import ConfigManager from '../../src/ConfigManager';
+import config from '../../src/config';
 import { LARGE_COOKIE_VALUE, SMALL_COOKIE_VALUE, commonTestsForCookie, extractValueOutOfCookie } from './utils';
-import CookieManager from '../../src/CookieManager';
-import { getIndexedCookieName } from '../../src/CookieManager/helpers';
-import { COOKIE_MAX_LENGTH } from '../../src/CookieManager/constants';
+import CookieManager from '../../src/utils/cookies';
+import { getIndexedCookieName } from '../../src/utils/cookies/helpers';
+import { COOKIE_MAX_LENGTH } from '../../src/utils/cookies/constants';
 
-const COOKIE_NAME = ConfigManager.cookieName;
-const COOKIE_DOMAIN = ConfigManager.cookieDomain;
+const COOKIE_NAME = config.cookieName;
+const COOKIE_DOMAIN = config.cookieDomain;
 
 test.describe('CookieManager tests', () => {
   test('should create a fe_session cookie', async () => {
@@ -15,7 +15,7 @@ test.describe('CookieManager tests', () => {
       value: SMALL_COOKIE_VALUE,
       secure: true,
       expires,
-      domain: ConfigManager.cookieDomain,
+      domain: config.cookieDomain,
     });
 
     expect(createdCookies.length).toEqual(1);

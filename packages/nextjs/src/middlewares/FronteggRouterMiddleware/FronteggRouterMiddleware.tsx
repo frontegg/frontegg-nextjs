@@ -1,4 +1,4 @@
-import ConfigManager from '../../ConfigManager';
+import config from '../../config';
 import { AppContext } from '../../common/client';
 import { authInitialState } from '@frontegg/redux-store';
 import { parse } from 'url';
@@ -19,7 +19,7 @@ export function FronteggRouterMiddleware() {
     if (app.options.hostedLoginBox) {
       const routesObj = {
         ...authInitialState.routes,
-        ...ConfigManager.authRoutes,
+        ...config.authRoutes,
       };
 
       const { 'frontegg-router': pathArr, ...queryParams } = query as any;
@@ -49,7 +49,7 @@ export function FronteggRouterMiddleware() {
 export function FronteggRouterMiddlewareProps(context: any) {
   const routesObj = {
     ...authInitialState.routes,
-    ...ConfigManager.authRoutes,
+    ...config.authRoutes,
   };
   const routesArr: string[] = Object.keys(routesObj).reduce(
     (p: string[], key: string) => [...p, (routesObj as any)[key]],
@@ -63,7 +63,7 @@ export function FronteggRouterMiddlewareProps(context: any) {
   }
   const notFound = routesArr.indexOf(pathname as string) === -1;
 
-  if (ConfigManager.fronteggAppOptions.hostedLoginBox) {
+  if (config.fronteggAppOptions.hostedLoginBox) {
     const notFound = !(
       routesObj.loginUrl === pathname ||
       routesObj.logoutUrl === pathname ||

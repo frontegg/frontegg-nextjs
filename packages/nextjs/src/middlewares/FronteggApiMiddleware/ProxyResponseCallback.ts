@@ -1,13 +1,13 @@
 import { ProxyResCallback } from 'http-proxy';
 import { IncomingMessage } from 'http';
 import { NextApiResponse, NextApiRequest } from 'next';
-import ConfigManager from '../../ConfigManager';
-import CookieManager from '../../CookieManager';
+import config from '../../config';
+import CookieManager from '../../utils/cookies';
 import { createSessionFromAccessToken } from '../../common';
 import { isFronteggLogoutUrl } from './helpers';
-import FronteggLogger from '../../FronteggLogger';
+import fronteggLogger from '../../utils/fronteggLogger';
 
-const logger = FronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
+const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 
 /**
  * Proxy response callback fired on after each response from Frontegg services,
@@ -20,7 +20,7 @@ const logger = FronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseC
 const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> = (proxyRes, req, res) => {
   let buffer = new Buffer('');
   let totalLength: number = 0;
-  const isSecured = new URL(ConfigManager.appUrl).protocol === 'https:';
+  const isSecured = new URL(config.appUrl).protocol === 'https:';
 
   proxyRes.on('data', (chunk: Buffer) => {
     totalLength += chunk.length;
@@ -37,7 +37,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
       if (isLogout) {
         CookieManager.removeCookies({
           isSecured,
-          cookieDomain: ConfigManager.cookieDomain,
+          cookieDomain: config.cookieDomain,
           res,
           req,
         });

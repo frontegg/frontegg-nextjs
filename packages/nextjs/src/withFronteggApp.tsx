@@ -5,7 +5,7 @@ import React from 'react';
 import { fronteggErrors, getAllUserData, AllUserData } from './common';
 import { FronteggProvider } from './FronteggProvider';
 import { refreshToken } from './refreshToken';
-import ConfigManager from './ConfigManager';
+import config from './config';
 
 type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
 export const withFronteggApp = (
@@ -28,7 +28,7 @@ export const withFronteggApp = (
       appContext.session = session;
       appContext.user = user;
       appContext.tenants = tenants;
-      const { envAppUrl, envBaseUrl, envClientId } = ConfigManager.appEnvConfig;
+      const { envAppUrl, envBaseUrl, envClientId } = config.appEnvConfig;
       if (!envAppUrl) {
         throw Error(fronteggErrors.envAppUrl);
       }
@@ -61,8 +61,8 @@ export const withFronteggApp = (
     }
   };
 
-  ConfigManager.authRoutes = options?.authOptions?.routes ?? {};
-  ConfigManager.fronteggAppOptions = options ?? {};
+  config.authRoutes = options?.authOptions?.routes ?? {};
+  config.fronteggAppOptions = options ?? {};
 
   function CustomFronteggApp(appProps: AppProps) {
     const { user, tenants, session, envAppUrl, envBaseUrl, envClientId } = appProps.pageProps;

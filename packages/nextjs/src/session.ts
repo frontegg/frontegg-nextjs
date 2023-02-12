@@ -3,8 +3,8 @@ import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import type { FronteggNextJSSession, RequestType } from './common';
 import { getTokensFromCookie, createGetSession } from './common';
-import ConfigManager from './ConfigManager';
-import CookieManager from './CookieManager';
+import config from './config';
+import CookieManager from './utils/cookies';
 
 export const getSession = (req: RequestType) =>
   createGetSession({
@@ -26,7 +26,7 @@ export function withSSRSession<
     if (session) {
       return handler(context, session);
     } else {
-      let loginUrl = ConfigManager.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
+      let loginUrl = config.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
 
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`;

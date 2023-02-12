@@ -3,11 +3,11 @@ import { ProxyReqCallback } from 'http-proxy';
 import { ClientRequest } from 'http';
 import { NextApiRequest } from 'next';
 import sdkVersion from '../../sdkVersion';
-import ConfigManager from '../../ConfigManager';
-import CookieManager from '../../CookieManager';
-import FronteggLogger from '../../FronteggLogger';
+import config from '../../config';
+import CookieManager from '../../utils/cookies';
+import fronteggLogger from '../../utils/fronteggLogger';
 
-const logger = FronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
+const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
 /**
  * Proxy request callback fired on before each request to Frontegg services,
  * to transport frontegg cookies.
@@ -23,7 +23,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     const allCookies = CookieManager.parseCookieHeader(req);
     logger.debug(`${req.url} | found ${allCookies} cookies`);
     const fronteggCookiesNames = Object.keys(allCookies).filter((cookieName) => {
-      return cookieName.startsWith('fe_') && !cookieName.startsWith(ConfigManager.cookieName);
+      return cookieName.startsWith('fe_') && !cookieName.startsWith(config.cookieName);
     });
 
     logger.debug(`${req.url} | proxy FronteggCookies (${fronteggCookiesNames.join(', ')})`);

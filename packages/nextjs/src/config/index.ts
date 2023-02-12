@@ -14,7 +14,7 @@ const setupEnvVariables = {
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
 };
-class ConfigManager {
+class Config {
   public authRoutes: Partial<AuthPageRoutes> = {};
   public fronteggAppOptions: Partial<FronteggAppOptions> = {};
 
@@ -66,4 +66,4 @@ class ConfigManager {
 }
 
 export { EnvVariables } from './constants';
-export default new ConfigManager();
+export default new Config();

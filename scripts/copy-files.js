@@ -28,7 +28,7 @@ async function includeFileInBuild(file) {
  * @param {string} param0.to
  */
 async function createModulePackages({ from, to }) {
-  const directoryPackages = glob.sync("*/index.{js,ts,tsx}", { cwd: from }).map(path.dirname);
+  const directoryPackages = glob.sync("**/index.{js,ts,tsx}", { cwd: from }).map(path.dirname);
 
   await Promise.all(
     directoryPackages.map(async (directoryPackage) => {
@@ -152,17 +152,17 @@ async function run() {
   try {
     const packageData = await createPackageFile();
 
-    // await Promise.all(
-    //   [
-    //     packageData.name === '@frontegg/js' ? '../../README.md' : './README.md',
-    //     '../../CHANGELOG.md',
-    //   ].map((file) => includeFileInBuild(file)),
-    // );
+    await Promise.all(
+      [
+        packageData.name === '@frontegg/nextjs' ? '../../README.md' : './README.md',
+        '../../CHANGELOG.md',
+      ].map((file) => includeFileInBuild(file)),
+    );
 
     await addLicense(packageData);
 
     // TypeScript
-    // await typescriptCopy({ from: srcPath, to: buildPath });
+    await typescriptCopy({ from: srcPath, to: buildPath });
 
     await createModulePackages({ from: srcPath, to: buildPath });
   } catch (err) {

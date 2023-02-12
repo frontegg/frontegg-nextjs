@@ -1,6 +1,6 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
-import ConfigManager from '../ConfigManager';
+import config from '../../config';
 import { CreateCookieOptions, RemoveCookiesOptions, RequestType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';
 
@@ -10,30 +10,30 @@ import {
   getRefreshTokenCookieNameVariants,
   splitValueToChunks,
 } from './helpers';
-import FronteggLogger from '../FronteggLogger';
+import fronteggLogger from '../fronteggLogger';
 
-class CookieManager {
-  getCookieName = (cookieNumber?: number, cookieName = ConfigManager.cookieName) =>
-    cookieNumber ? `${cookieName}-${cookieNumber}` : cookieName;
+class CookiesUtils {
+  getCookieName = (cookieNumber?: number, cookieName = config.cookieName) =>
+    cookieNumber ? getIndexedCookieName(cookieNumber, cookieName) : cookieName;
 
   /**
    * Validate and create new cookie headers.
-   * The default value of `cookieName` is {@link ConfigManager.cookieName}
+   * The default value of `cookieName` is {@link config.cookieName}
    * @param {CreateCookieOptions} options - Create cookie options
    */
   create(options: CreateCookieOptions): string[] {
-    const logger = FronteggLogger.child(
+    const logger = fronteggLogger.child(
       { tag: 'CookieManager.create' },
       { msgPrefix: 'CookieManager.create: ', level: options.silent ? 'error' : undefined }
     );
-    const cookieName = options.cookieName ?? ConfigManager.cookieName;
+    const cookieName = options.cookieName ?? config.cookieName;
     const cookieValue = options.value;
     logger.info(`Creating new cookie for '${cookieName}'`);
 
     const serializeOptions: CookieSerializeOptions = {
       expires: options.expires,
       httpOnly: options.httpOnly ?? true,
-      domain: options.domain ?? ConfigManager.cookieDomain,
+      domain: options.domain ?? config.cookieDomain,
       path: options.path ?? '/',
       priority: 'high',
     };
@@ -66,7 +66,7 @@ class CookieManager {
    * @param {RequestType} request - Incoming HTTP Request
    */
   parseCookieHeader(request: RequestType): Record<string, string> {
-    const logger = FronteggLogger.child({ tag: 'CookieManager.parseCookieHeader' });
+    const logger = fronteggLogger.child({ tag: 'CookieManager.parseCookieHeader' });
 
     logger.info('Going to extract all cookies header from request');
     const cookieHeader = getCookieHeader(request);
@@ -80,7 +80,7 @@ class CookieManager {
    * @param {RequestType} request - Incoming HTTP Request
    */
   getSessionCookieFromRequest(request?: RequestType): string | undefined {
-    const logger = FronteggLogger.child({ tag: 'CookieManager.getSessionCookieFromRequest' });
+    const logger = fronteggLogger.child({ tag: 'CookieManager.getSessionCookieFromRequest' });
     logger.info('Going to extract session cookies header from request');
 
     if (!request) {
@@ -198,8 +198,8 @@ class CookieManager {
         return (
           cookie
             .map((property) => {
-              if (property.toLowerCase() === `domain=${ConfigManager.baseUrlHost}`) {
-                return `Domain=${ConfigManager.cookieDomain}`;
+              if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
+                return `Domain=${config.cookieDomain}`;
               }
               return property;
             })
@@ -211,4 +211,4 @@ class CookieManager {
   };
 }
 
-export default new CookieManager();
+export default new CookiesUtils();
