@@ -3,6 +3,8 @@ import { jwtVerify } from 'jose';
 import { getTenants, getUsers } from './api';
 import FronteggConfig from './FronteggConfig';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
+import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
+
 const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
@@ -56,3 +58,9 @@ export const getAllUserData = async ({ getSession, reqHeaders }: UserDataArgumen
     return {};
   }
 };
+
+export const isAuthPath = (path: string) =>
+  fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin');
+
+export const isSocialLoginPath = (path: string) =>
+  RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path);

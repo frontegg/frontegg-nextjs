@@ -1,10 +1,11 @@
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
 import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
-import { fronteggAuthApiRoutes, KeyValuePair } from '@frontegg/rest-api';
+import { KeyValuePair } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import sdkVersion from '../../sdkVersion';
 import { FronteggProviderOptions } from '../types';
 import nextjsPkg from 'next/package.json';
+import { isAuthPath, isSocialLoginPath } from '../helpers';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -12,11 +13,6 @@ type CreateOrGetFronteggAppParams = {
   appName?: string;
   storeHolder: any;
 };
-
-const isAuthPath = (path: string) =>
-  fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin');
-const isSocialLoginPath = (path: string) =>
-  RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path);
 
 export const createOrGetFronteggApp = ({
   options,
