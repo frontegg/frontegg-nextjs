@@ -1,24 +1,10 @@
 import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import {
-  FronteggNextJSSession,
-  createSessionFromAccessToken,
-  getTokensFromCookie,
-  CookieManager,
-  FronteggUserTokens,
-  createGetSession,
-} from './common';
+import { FronteggNextJSSession, createSessionFromAccessToken, getTokensFromCookie, CookieManager } from './common';
 import nextjsPkg from 'next/package.json';
 import sdkVersion from './sdkVersion';
-import { unsealData } from 'iron-session';
 import FronteggConfig from './common/FronteggConfig';
-
-async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
-  const jwt: string = await unsealData(cookie, {
-    password: FronteggConfig.passwordsAsMap,
-  });
-  return JSON.parse(jwt);
-}
+import { getSession } from './session';
 
 async function refreshTokenHostedLogin(
   ctx: NextPageContext,
@@ -103,10 +89,7 @@ export async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJS
      */
     if (request.url?.startsWith('/_next/')) {
       try {
-        const session = await createGetSession({
-          getCookie: () => CookieManager.getParsedCookieFromRequest(request),
-          cookieResolver: getTokensFromCookieOnEdge,
-        });
+        const session = await getSession(request);
         if (session) {
           return session;
         }
