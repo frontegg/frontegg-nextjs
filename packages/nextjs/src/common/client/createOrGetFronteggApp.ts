@@ -1,10 +1,5 @@
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
-import {
-  createFronteggStore,
-  AuthState,
-  tenantsState as defaultTenantsState,
-  authInitialState,
-} from '@frontegg/redux-store';
+import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
 import { fronteggAuthApiRoutes, KeyValuePair } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import sdkVersion from '../../sdkVersion';
@@ -17,6 +12,11 @@ type CreateOrGetFronteggAppParams = {
   appName?: string;
   storeHolder: any;
 };
+
+const isAuthPath = (path: string) =>
+  fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin');
+const isSocialLoginPath = (path: string) =>
+  RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path);
 
 export const createOrGetFronteggApp = ({
   options,
@@ -53,16 +53,8 @@ export const createOrGetFronteggApp = ({
       return additionalHeaders;
     },
     baseUrl: (path: string) => {
-      if (path.endsWith('/oauth/logout')) {
-        return `${options.envAppUrl}/api`;
-      }
-      if (fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin')) {
-        /**
-         * Exclude social login redirects from nextjs middleware
-         */
-        if (RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path)) {
-          return options.envBaseUrl;
-        }
+      const shouldGoThroughFronteggMiddleWare = isAuthPath(path) && !isSocialLoginPath(path);
+      if (shouldGoThroughFronteggMiddleWare) {
         return `${options.envAppUrl}/api`;
       } else {
         return options.envBaseUrl;
