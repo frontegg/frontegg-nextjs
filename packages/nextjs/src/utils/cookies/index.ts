@@ -44,7 +44,6 @@ class CookiesUtils {
       serializeOptions.sameSite = 'none';
     }
 
-    // const indexedCookieName = getIndexedCookieName(1, cookieName);
     const serializedCookie = cookie.serialize(cookieName, cookieValue, serializeOptions);
 
     if (serializedCookie.length <= COOKIE_MAX_LENGTH) {
@@ -114,19 +113,26 @@ class CookiesUtils {
   }
 
   parseCookieFromArray(cookies: RequestCookie[]): string | undefined {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.parseCookieFromArray' });
     const cookieChunks = cookies.filter((c) => c.name.includes(this.getCookieName()));
-    if (!cookieChunks) {
+    logger.info('Parsing session cookie from RequestCookie for Next.JS 13+')
+
+    if (!cookieChunks || cookieChunks.length === 0) {
+      logger.info(`No session cookies found`);
       return undefined;
     }
+    logger.debug(`Found ${cookieChunks.length} chunks`)
     cookieChunks.sort((a, b) => {
       const firstCookieNumber = parseInt(a.name.slice(-1));
       const secondCookieNumber = parseInt(b.name.slice(-1));
       return firstCookieNumber > secondCookieNumber ? 1 : -1;
     });
+
+    logger.info(`Concatenate session cookies chunks`);
     return cookieChunks.map((c) => c.value).join('');
   }
 
-  createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) => {
+  private createEmptySingleCookie = (cookieName: string, isSecured: boolean, cookieDomain: string) => {
     return this.create({
       cookieName,
       value: '',
@@ -150,7 +156,7 @@ class CookiesUtils {
     return allEmptyCookies;
   };
 
-  getCookiesToRemove = (request?: RequestType): string[] => {
+  private getCookiesToRemove = (request?: RequestType): string[] => {
     if (!request) {
       return [];
     }
@@ -173,41 +179,59 @@ class CookiesUtils {
     }
   };
 
+  /**
+   * Take a list of cookieNames and modify request/response headers
+   * to proxy the cookies from Next.js to Frontegg Services and vice-versa
+   * @param {string[]} setCookieValue - list of cookies to modify
+   * @param {boolean} isSecured - if the running application behind SSL
+   */
   removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesOptions): void {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.removeCookies' });
+    logger.debug('Setting empty cookie headers remove cookies from client side');
     const cookiesToRemove = this.getCookiesToRemove(req);
     const cookieValue = this.createEmptyCookies(isSecured, cookieDomain, cookieNames ?? cookiesToRemove);
     let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
     if (typeof existingSetCookie === 'string') {
       existingSetCookie = [existingSetCookie];
     }
-    res.setHeader('set-cookie', [...existingSetCookie, ...cookieValue]);
+
+    const setCookieHeaders = [...existingSetCookie, ...cookieValue];
+    logger.debug(`removing headers (count: ${setCookieHeaders.length})`);
+    res.setHeader('set-cookie', setCookieHeaders);
   }
 
+  /**
+   * Take a list of cookie headers and modify the Domain / Secure / SameSite
+   * to proxy the cookies to Frontegg Services and vice-versa
+   * @param {string[]} setCookieValue - list of cookies to modify
+   * @param {boolean} isSecured - if the running application behind SSL
+   */
   modifySetCookie = (setCookieValue: string[] | undefined, isSecured: boolean): string[] | undefined => {
-    if (!setCookieValue) {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.modifySetCookie' });
+    if (!setCookieValue || setCookieValue.length === 0) {
+      logger.info(`No headers to modify`);
       return setCookieValue;
     }
-    if (setCookieValue.length > 0) {
-      return setCookieValue.map((c) => {
-        let cookie = c.split('; ');
+    logger.info(`modifying cookie headers (count: ${setCookieValue.length})`);
+    return setCookieValue.map((c) => {
+      let cookie = c.split('; ');
 
-        if (!isSecured) {
-          cookie = cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None');
-        }
+      logger.debug(`modifying cookie ${cookie[0]}, isSecured: ${isSecured}`);
+      if (!isSecured) {
+        cookie = cookie.filter((property) => property !== 'Secure' && property !== 'SameSite=None');
+      }
 
-        return (
-          cookie
-            .map((property) => {
-              if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
-                return `Domain=${config.cookieDomain}`;
-              }
-              return property;
-            })
-            .join(';') + ';'
-        );
-      });
-    }
-    return setCookieValue;
+      return (
+        cookie
+          .map((property) => {
+            if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
+              return `Domain=${config.cookieDomain}`;
+            }
+            return property;
+          })
+          .join(';') + ';'
+      );
+    });
   };
 }
 

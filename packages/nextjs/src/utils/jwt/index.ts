@@ -11,6 +11,7 @@ class JwtUtils {
    * Get the JWT public key from Frontegg service
    * to verify user's access token when calling getSession
    * in getServerSideProps and ServerComponents
+   * @private
    */
   private async loadPublicKey(): Promise<KeyLike | Uint8Array> {
     const logger = fronteggLogger.child({ tag: 'JwtManager.loadPublicKey' });
@@ -22,6 +23,10 @@ class JwtUtils {
     return this.publicKey;
   }
 
+  /**
+   * Load public key from Frontegg services if not cahced
+   * @private
+   */
   private async getPublicKey(): Promise<KeyLike | Uint8Array> {
     if (this.publicKey === undefined) {
       return await this.loadPublicKey();
