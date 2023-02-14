@@ -4,7 +4,7 @@ import type { AppContextType, AppPropsType, NextComponentType } from 'next/dist/
 import React from 'react';
 import { fronteggErrors, getAllUserData, AllUserData } from './common';
 import { FronteggProvider } from './FronteggProvider';
-import { refreshToken } from './refreshToken';
+import refreshToken from './utils/refreshToken';
 import config from './config';
 
 type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
