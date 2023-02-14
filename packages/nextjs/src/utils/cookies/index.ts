@@ -12,9 +12,13 @@ import {
 } from './helpers';
 import fronteggLogger from '../fronteggLogger';
 
-class CookiesUtils {
+class CookieManager {
   getCookieName = (cookieNumber?: number, cookieName = config.cookieName) =>
     cookieNumber ? getIndexedCookieName(cookieNumber, cookieName) : cookieName;
+
+  get refreshTokenKey():string {
+    return `fe_refresh_${config.clientId}`.replace(/-/g, '');
+  }
 
   /**
    * Validate and create new cookie headers.
@@ -115,13 +119,13 @@ class CookiesUtils {
   parseCookieFromArray(cookies: RequestCookie[]): string | undefined {
     const logger = fronteggLogger.child({ tag: 'CookieManager.parseCookieFromArray' });
     const cookieChunks = cookies.filter((c) => c.name.includes(this.getCookieName()));
-    logger.info('Parsing session cookie from RequestCookie for Next.JS 13+')
+    logger.info('Parsing session cookie from RequestCookie for Next.JS 13+');
 
     if (!cookieChunks || cookieChunks.length === 0) {
       logger.info(`No session cookies found`);
       return undefined;
     }
-    logger.debug(`Found ${cookieChunks.length} chunks`)
+    logger.debug(`Found ${cookieChunks.length} chunks`);
     cookieChunks.sort((a, b) => {
       const firstCookieNumber = parseInt(a.name.slice(-1));
       const secondCookieNumber = parseInt(b.name.slice(-1));
@@ -235,4 +239,4 @@ class CookiesUtils {
   };
 }
 
-export default new CookiesUtils();
+export default new CookieManager();
