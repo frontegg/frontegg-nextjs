@@ -53,6 +53,6 @@ export async function sendRefreshTokenHostedLogin(
  * we can just return the actual stateless session from
  * the encrypted cookie
  */
-export function isRuntimeNextRequest(url:string):boolean {
+export function isRuntimeNextRequest(url: string): boolean {
   return url.startsWith('/_next/');
 }

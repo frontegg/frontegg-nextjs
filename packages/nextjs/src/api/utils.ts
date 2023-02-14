@@ -1,4 +1,3 @@
-
 /**
  * Matches if val contains an invalid field-vchar
  *  field-value    = *( field-content / obs-fold )

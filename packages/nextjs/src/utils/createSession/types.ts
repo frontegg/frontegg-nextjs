@@ -1,5 +1,4 @@
-import { FronteggUserSession } from "../../common";
-
+import { FronteggUserSession } from '../../common';
 
 export interface FronteggUserTokens {
   accessToken: string;

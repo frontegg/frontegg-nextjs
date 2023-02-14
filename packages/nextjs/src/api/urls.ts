@@ -1,11 +1,11 @@
-import { fronteggRefreshTokenUrl } from "@frontegg/rest-api";
+import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 
 export const ApiUrls = {
   WellKnown: {
     jwks: `/.well-known/jwks.json`,
   },
-  refreshToken:{
+  refreshToken: {
     embedded: `/frontegg/${fronteggRefreshTokenUrl}`,
-    hosted: `/frontegg/oauth/token`
-  }
+    hosted: `/frontegg/oauth/token`,
+  },
 };

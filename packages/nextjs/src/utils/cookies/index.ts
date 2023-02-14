@@ -16,7 +16,7 @@ class CookieManager {
   getCookieName = (cookieNumber?: number, cookieName = config.cookieName) =>
     cookieNumber ? getIndexedCookieName(cookieNumber, cookieName) : cookieName;
 
-  get refreshTokenKey():string {
+  get refreshTokenKey(): string {
     return `fe_refresh_${config.clientId}`.replace(/-/g, '');
   }
 

@@ -3,7 +3,7 @@
 
 import { unsealData, sealData } from 'iron-session';
 import config from '../../config';
-import { FronteggUserTokens } from "../createSession/types";
+import { FronteggUserTokens } from '../createSession/types';
 
 const unsealTokens = async (cookie: string): Promise<FronteggUserTokens | undefined> => {
   const jwtData: string = await unsealData(cookie, {

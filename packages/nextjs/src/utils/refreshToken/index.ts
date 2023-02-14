@@ -1,15 +1,10 @@
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import {
-  FronteggNextJSSession,
-  createSessionFromAccessToken,
-  createGetSession,
-} from '../../common';
+import { FronteggNextJSSession, createSessionFromAccessToken, createGetSession } from '../../common';
 import config from '../../config';
 import CookieManager from '../cookies';
-import { isRuntimeNextRequest, sendRefreshTokenEmbedded, sendRefreshTokenHostedLogin } from "./helpers";
+import { isRuntimeNextRequest, sendRefreshTokenEmbedded, sendRefreshTokenHostedLogin } from './helpers';
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
-
 
 export default async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken' });
@@ -21,14 +16,12 @@ export default async function refreshToken(ctx: NextPageContext): Promise<Fronte
     return null;
   }
 
-
   try {
     logger.info(`Check if should request made from first application load`);
 
-
     if (isRuntimeNextRequest(url)) {
       logger.debug(`Detect runtime next.js request, resolving existing session from cookies if exists`);
-      const sessionFromCookies = createSessionFromCookieHeaders()
+      const sessionFromCookies = createSessionFromCookieHeaders();
       try {
         const session = await createGetSession({
           getCookie: () => CookieManager.getSessionCookieFromRequest(request),

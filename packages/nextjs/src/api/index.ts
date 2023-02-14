@@ -67,5 +67,5 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
 export default {
   loadPublicKey,
   refreshTokenEmbedded,
-  refreshTokenHostedLogin
+  refreshTokenHostedLogin,
 };
