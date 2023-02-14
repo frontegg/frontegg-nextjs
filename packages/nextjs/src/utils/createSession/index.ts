@@ -1,5 +1,5 @@
-import { FronteggNextJSSession, FronteggUserTokens } from './types';
-import JwtManager from '../utils/jwt';
+import JwtManager from '../jwt';
+import { FronteggNextJSSession, FronteggUserTokens } from "./types";
 
 type CreateGetSessionParams = {
   getCookie: () => string | undefined;
