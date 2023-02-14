@@ -1,21 +1,15 @@
 import JwtManager from '../jwt';
-import { FronteggNextJSSession, FronteggUserTokens } from './types';
+import { EncryptionUtils, FronteggNextJSSession } from './types';
 
-type CreateGetSessionParams = {
-  getCookie: () => string | undefined;
-  cookieResolver: (cookie: string) => Promise<FronteggUserTokens | undefined>;
-};
-
-export default async function createSession({
-  getCookie,
-  cookieResolver,
-}: CreateGetSessionParams): Promise<FronteggNextJSSession | undefined> {
+export default async function createSession(
+  cookie: string | undefined,
+  encryption: EncryptionUtils
+): Promise<FronteggNextJSSession | undefined> {
   try {
-    const cookie = getCookie();
     if (!cookie) {
       return undefined;
     }
-    const tokens = await cookieResolver(cookie);
+    const tokens = await encryption.unsealTokens(cookie);
     if (!tokens?.accessToken) {
       return undefined;
     }

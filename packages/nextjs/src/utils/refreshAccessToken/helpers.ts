@@ -1,8 +1,10 @@
 import fronteggLogger from '../fronteggLogger';
 import CookieManager from '../cookies';
-import { NextPageContext } from 'next/dist/shared/lib/utils';
+import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
 import api from '../../api';
 import { getTokensFromCookie } from '../../common';
+import { NextRequest } from 'next/server';
+import { IncomingMessage } from 'http';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
@@ -16,12 +18,12 @@ export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   return exists;
 }
 
-export async function refreshAccessTokenEmbedded(
-  ctx: NextPageContext,
-  headers: Record<string, string>,
-  cookies: Record<string, any>
-): Promise<Response | null> {
+export async function refreshAccessTokenEmbedded(request: IncomingMessage): Promise<Response | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenEmbedded' });
+
+  const headers = request.headers as Record<string, string>;
+  const cookies = (request as NextApiRequest).cookies;
+
   logger.info('check if has refresh token headers');
   if (hasRefreshTokenCookie(cookies)) {
     logger.info('going to refresh token (embedded mode)');
@@ -30,14 +32,13 @@ export async function refreshAccessTokenEmbedded(
   return null;
 }
 
-export async function refreshAccessTokenHostedLogin(
-  ctx: NextPageContext,
-  headers: Record<string, string>
-): Promise<Response | null> {
+export async function refreshAccessTokenHostedLogin(request: IncomingMessage): Promise<Response | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenHostedLogin' });
   try {
+    const headers = request.headers as Record<string, string>;
+
     logger.info('trying to get token from cookies');
-    const sealFromCookies = CookieManager.getSessionCookieFromRequest(ctx?.req);
+    const sealFromCookies = CookieManager.getSessionCookieFromRequest(request);
     const tokens = await getTokensFromCookie(sealFromCookies);
     if (!tokens?.refreshToken) {
       logger.info('refresh token not found');
@@ -53,11 +54,19 @@ export async function refreshAccessTokenHostedLogin(
 }
 
 /**
- * If url starts with /_next/ header exist means that the user trying to navigate
- * to a new nextjs page, in this scenario no need to refresh toke
+ * If url starts with /_next/ means that the user trying to navigate
+ * to a new nextjs page, in this scenario no need to refresh token
  * we can just return the actual stateless session from
  * the encrypted cookie
  */
 export function isRuntimeNextRequest(url: string): boolean {
   return url.startsWith('/_next/');
+}
+
+/**
+ * If url starts with '/oauth/callback' means that the user navigated back
+ * from frontegg hosted login, in this scenario no need to refresh token
+ */
+export function isOauthCallback(url: string): boolean {
+  return url.startsWith('/oauth/callback');
 }

@@ -4,6 +4,7 @@
 import { unsealData, sealData } from 'iron-session/edge';
 import { FronteggUserTokens } from '../../common';
 import config from '../../config';
+import { EncryptionUtils } from '../createSession/types';
 
 const unsealTokens = async (cookie: string): Promise<FronteggUserTokens | undefined> => {
   const jwtData: string = await unsealData(cookie, {
@@ -20,7 +21,9 @@ const sealTokens = async (tokens: FronteggUserTokens, ttl: number): Promise<stri
   });
 };
 
-export default {
+const encryptionUtils: EncryptionUtils = {
   unsealTokens,
   sealTokens,
 };
+
+export default encryptionUtils;

@@ -8,3 +8,9 @@ export interface FronteggUserTokens {
 export interface FronteggNextJSSession extends FronteggUserTokens {
   user: FronteggUserSession;
 }
+
+export interface EncryptionUtils {
+  unsealTokens(data: string): Promise<FronteggUserTokens | undefined>;
+
+  sealTokens(tokens: FronteggUserTokens, ttl: number): Promise<string>;
+}

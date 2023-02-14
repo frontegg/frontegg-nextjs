@@ -1,18 +1,30 @@
-import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
+import type { NextPageContext } from 'next/dist/shared/lib/utils';
 import { FronteggNextJSSession, createSessionFromAccessToken } from '../../common';
 import config from '../../config';
 import CookieManager from '../cookies';
-import { isRuntimeNextRequest, refreshAccessTokenEmbedded, refreshAccessTokenHostedLogin } from './helpers';
+import {
+  isOauthCallback,
+  isRuntimeNextRequest,
+  refreshAccessTokenEmbedded,
+  refreshAccessTokenHostedLogin,
+} from './helpers';
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
 import createSession from '../createSession';
 
+/**
+ * Refreshes the access token for the current session.
+ *
+ * @param {NextPageContext} ctx - The Next.js Page Context object.
+ * @returns {Promise<FronteggNextJSSession | null>} A Promise that resolves to the updated session object, or `null` if the refresh failed.
+ */
 export default async function refreshAccessToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken' });
   logger.info(`Refreshing token by for PageContext ${ctx.pathname}`);
-  const request = ctx.req;
-  const url = request?.url;
-  if (!request || !url) {
+  const nextJsRequest = ctx.req;
+  const nextJsResponse = ctx.res;
+  const url = nextJsRequest?.url;
+  if (!nextJsResponse || !nextJsRequest || !url) {
     logger.debug(`abandon refreshToken due to PageContext.req = null`);
     return null;
   }
@@ -22,42 +34,38 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
 
     if (isRuntimeNextRequest(url)) {
       logger.debug(`Detect runtime next.js request, resolving existing session from cookies if exists`);
-      // const sessionFromCookies = createSessionFromCookieHeaders();
-      try {
-        const session = await createSession({
-          getCookie: () => CookieManager.getSessionCookieFromRequest(request),
-          cookieResolver: encryption.unsealTokens,
-        });
-        if (session) {
-          logger.debug(`session resolved from session cookie`);
-          return session;
-        }
-      } catch (e) {
-        console.log('no NextJS session, will refresh token');
+
+      const cookies = CookieManager.getSessionCookieFromRequest(nextJsRequest);
+      const session = await createSession(cookies, encryption);
+
+      if (session) {
+        logger.debug(`session resolved from session cookie`);
+        return session;
+      } else {
+        logger.info('Failed to resolve session from cookie, going to refresh token');
       }
     }
 
-    const isSecured = new URL(config.appUrl).protocol === 'https:';
-    const headers = request.headers as Record<string, string>;
-    const cookies = (request as NextApiRequest).cookies;
-
-    if (ctx.req!.url!.startsWith('/oauth/callback')) {
+    if (isOauthCallback(url)) {
+      /* Prevent refresh token due to oauth login callback */
+      logger.debug(`abandon refreshToken for url='/oauth/callback'`);
       return null;
     }
 
     let response: Response | null;
-    if (config.fronteggAppOptions.hostedLoginBox) {
-      response = await refreshAccessTokenHostedLogin(ctx, headers);
+    if (config.isHostedLogin) {
+      response = await refreshAccessTokenHostedLogin(nextJsRequest);
     } else {
-      response = await refreshAccessTokenEmbedded(ctx, headers, cookies);
+      response = await refreshAccessTokenEmbedded(nextJsRequest);
     }
 
+    const isSecured = config.isSSL;
     if (response === null || !response.ok) {
       CookieManager.removeCookies({
-        isSecured,
         cookieDomain: config.cookieDomain,
-        res: ctx.res!,
-        req: ctx.req,
+        isSecured,
+        req: nextJsRequest,
+        res: nextJsResponse,
       });
       return null;
     }

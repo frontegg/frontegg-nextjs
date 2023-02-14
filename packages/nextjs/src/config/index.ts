@@ -56,6 +56,14 @@ class Config {
     return normalizeStringPasswordToMap(encryptionPasswordEnv);
   }
 
+  get isSSL(): boolean {
+    return new URL(this.appUrl).protocol === 'https:';
+  }
+
+  get isHostedLogin(): boolean {
+    return this.fronteggAppOptions.hostedLoginBox ?? false;
+  }
+
   get appEnvConfig(): AppEnvConfig {
     return {
       envAppUrl: this.appUrl,
