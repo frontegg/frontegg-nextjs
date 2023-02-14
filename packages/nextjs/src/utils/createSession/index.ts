@@ -6,10 +6,10 @@ type CreateGetSessionParams = {
   cookieResolver: (cookie: string) => Promise<FronteggUserTokens | undefined>;
 };
 
-export const createGetSession = async ({
+export default async function createSession({
   getCookie,
   cookieResolver,
-}: CreateGetSessionParams): Promise<FronteggNextJSSession | undefined> => {
+}: CreateGetSessionParams): Promise<FronteggNextJSSession | undefined> {
   try {
     const cookie = getCookie();
     if (!cookie) {
@@ -35,4 +35,4 @@ export const createGetSession = async ({
     console.error(e);
     return undefined;
   }
-};
+}

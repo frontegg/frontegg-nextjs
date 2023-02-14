@@ -1,12 +1,13 @@
 import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession, createSessionFromAccessToken, createGetSession } from '../../common';
+import { FronteggNextJSSession, createSessionFromAccessToken } from '../../common';
 import config from '../../config';
 import CookieManager from '../cookies';
-import { isRuntimeNextRequest, sendRefreshTokenEmbedded, sendRefreshTokenHostedLogin } from './helpers';
+import { isRuntimeNextRequest, refreshAccessTokenEmbedded, refreshAccessTokenHostedLogin } from './helpers';
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
+import createSession from '../createSession';
 
-export default async function refreshToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
+export default async function refreshAccessToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken' });
   logger.info(`Refreshing token by for PageContext ${ctx.pathname}`);
   const request = ctx.req;
@@ -21,9 +22,9 @@ export default async function refreshToken(ctx: NextPageContext): Promise<Fronte
 
     if (isRuntimeNextRequest(url)) {
       logger.debug(`Detect runtime next.js request, resolving existing session from cookies if exists`);
-      const sessionFromCookies = createSessionFromCookieHeaders();
+      // const sessionFromCookies = createSessionFromCookieHeaders();
       try {
-        const session = await createGetSession({
+        const session = await createSession({
           getCookie: () => CookieManager.getSessionCookieFromRequest(request),
           cookieResolver: encryption.unsealTokens,
         });
@@ -46,9 +47,9 @@ export default async function refreshToken(ctx: NextPageContext): Promise<Fronte
 
     let response: Response | null;
     if (config.fronteggAppOptions.hostedLoginBox) {
-      response = await sendRefreshTokenHostedLogin(ctx, headers);
+      response = await refreshAccessTokenHostedLogin(ctx, headers);
     } else {
-      response = await sendRefreshTokenEmbedded(ctx, headers, cookies);
+      response = await refreshAccessTokenEmbedded(ctx, headers, cookies);
     }
 
     if (response === null || !response.ok) {
@@ -89,3 +90,5 @@ export default async function refreshToken(ctx: NextPageContext): Promise<Fronte
     return null;
   }
 }
+
+console.log('a');

@@ -16,12 +16,12 @@ export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   return exists;
 }
 
-export async function sendRefreshTokenEmbedded(
+export async function refreshAccessTokenEmbedded(
   ctx: NextPageContext,
   headers: Record<string, string>,
   cookies: Record<string, any>
 ): Promise<Response | null> {
-  const logger = fronteggLogger.child({ tag: 'refreshToken.refreshTokenEmbedded' });
+  const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenEmbedded' });
   logger.info('check if has refresh token headers');
   if (hasRefreshTokenCookie(cookies)) {
     logger.info('going to refresh token (embedded mode)');
@@ -30,16 +30,21 @@ export async function sendRefreshTokenEmbedded(
   return null;
 }
 
-export async function sendRefreshTokenHostedLogin(
+export async function refreshAccessTokenHostedLogin(
   ctx: NextPageContext,
   headers: Record<string, string>
 ): Promise<Response | null> {
+  const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenHostedLogin' });
   try {
+    logger.info('trying to get token from cookies');
     const sealFromCookies = CookieManager.getSessionCookieFromRequest(ctx?.req);
     const tokens = await getTokensFromCookie(sealFromCookies);
     if (!tokens?.refreshToken) {
+      logger.info('refresh token not found');
       return null;
     }
+
+    logger.info('going to refresh token (hosted-login mode)');
     return await api.refreshTokenHostedLogin(headers, tokens.refreshToken);
   } catch (e) {
     console.error('refreshTokenHostedLogin', e);

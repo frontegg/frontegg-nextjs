@@ -4,7 +4,7 @@ import type { AppContextType, AppPropsType, NextComponentType } from 'next/dist/
 import React from 'react';
 import { fronteggErrors, getAllUserData, AllUserData } from './common';
 import { FronteggProvider } from './FronteggProvider';
-import refreshToken from './utils/refreshToken';
+import refreshAccessToken from './utils/refreshAccessToken';
 import config from './config';
 
 type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
@@ -22,7 +22,7 @@ export const withFronteggApp = (
     const { ctx, Component } = appContext;
     if (ctx.req) {
       const { user, tenants, session } = await getAllUserData({
-        getSession: async () => await refreshToken(ctx),
+        getSession: async () => await refreshAccessToken(ctx),
         reqHeaders: ctx.req?.headers,
       });
       appContext.session = session;
