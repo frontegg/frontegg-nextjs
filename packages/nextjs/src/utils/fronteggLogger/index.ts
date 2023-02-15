@@ -17,11 +17,10 @@ const fronteggLogger = Logger(
   {
     write(messageJson: string) {
       const { msg, time, level, tag } = JSON.parse(messageJson);
-      const args = [new Date(time), '|'];
+      const args = [new Date(time), `|${LEVELS[level]}|`, msg];
       if (tag) {
-        args.push(tag);
+        args.push(`[${tag}]`);
       }
-      args.push(LEVELS[level], ':', msg);
       console.log.apply(console, args);
     },
   }

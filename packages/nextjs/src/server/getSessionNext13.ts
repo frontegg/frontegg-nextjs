@@ -1,7 +1,9 @@
 import { cookies } from 'next/headers';
 import type { FronteggUserSession, FronteggUserTokens } from '../common';
-import { getTokensFromCookie, createGetSession } from '../common';
+import { getTokensFromCookie } from '../common';
 import CookieManager from '../utils/cookies';
+import createSession from '../utils/createSession';
+import encryption from '../utils/encryption';
 
 const getCookie = () => {
   const allCookies = cookies().getAll();
@@ -9,7 +11,10 @@ const getCookie = () => {
   return cookie;
 };
 
-export const getSession = () => createGetSession({ getCookie, cookieResolver: getTokensFromCookie });
+export const getSession = () => {
+  const cookies = getCookie();
+  return createSession(cookies, encryption);
+};
 
 export async function getUserSession(): Promise<FronteggUserSession | undefined> {
   const session = await getSession();

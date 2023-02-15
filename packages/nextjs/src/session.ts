@@ -2,15 +2,15 @@ import { authInitialState } from '@frontegg/redux-store';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import type { FronteggNextJSSession, RequestType } from './common';
-import { getTokensFromCookie, createGetSession } from './common';
 import config from './config';
 import CookieManager from './utils/cookies';
+import createSession from './utils/createSession';
+import encryption from './utils/encryption';
 
-export const getSession = (req: RequestType) =>
-  createGetSession({
-    getCookie: () => CookieManager.getSessionCookieFromRequest(req),
-    cookieResolver: getTokensFromCookie,
-  });
+export const getSession = (req: RequestType) => {
+  const cookies = CookieManager.getSessionCookieFromRequest(req);
+  return createSession(cookies, encryption);
+};
 
 export function withSSRSession<
   P extends { [key: string]: any } = { [key: string]: any },

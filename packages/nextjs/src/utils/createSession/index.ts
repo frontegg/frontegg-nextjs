@@ -1,6 +1,8 @@
 import JwtManager from '../jwt';
 import { EncryptionUtils, FronteggNextJSSession } from './types';
 
+export type { FronteggNextJSSession, FronteggUserTokens } from './types';
+
 export default async function createSession(
   cookie: string | undefined,
   encryption: EncryptionUtils

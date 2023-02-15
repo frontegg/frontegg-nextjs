@@ -28,7 +28,7 @@ class CookieManager {
   create(options: CreateCookieOptions): string[] {
     const logger = fronteggLogger.child(
       { tag: 'CookieManager.create' },
-      { msgPrefix: 'CookieManager.create: ', level: options.silent ? 'error' : undefined }
+      { level: options.silent ? 'error' : undefined }
     );
     const cookieName = options.cookieName ?? config.cookieName;
     const cookieValue = options.value;
@@ -103,7 +103,9 @@ class CookieManager {
     let sessionCookieChunk: string | undefined;
     do {
       sessionCookieChunk = cookies[getIndexedCookieName(i++)];
-      sessionCookies += sessionCookieChunk;
+      if(sessionCookieChunk) {
+        sessionCookies += sessionCookieChunk;
+      }
     } while (sessionCookieChunk);
 
     if (sessionCookies.length === 0) {
