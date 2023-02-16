@@ -33,7 +33,6 @@ export const shouldByPassMiddleware = (pathname: string, options?: ByPassOptions
     bypassFronteggRoutes: true,
   };
 
-  debugger;
   const isStaticFiles = staticFilesRegex.test(pathname);
   const isImageOptimization = imageOptimizationRegex.test(pathname);
   const isHeaderRequests = headerRequestsRegex.test(pathname);

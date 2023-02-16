@@ -6,6 +6,5 @@ import { IncomingMessage } from 'http';
 
 export const getSession = (req: IncomingMessage | Request): Promise<FronteggNextJSSession | undefined> => {
   const cookies = CookieManager.getSessionCookieFromRequest(req);
-  debugger;
   return createSession(cookies, encryptionEdge);
 };

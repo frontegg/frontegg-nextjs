@@ -113,7 +113,6 @@ class CookieManager {
       return undefined;
     }
 
-    debugger;
     logger.info(`Session cookie found, (count: ${sessionCookies.length})`);
     return sessionCookies;
   }

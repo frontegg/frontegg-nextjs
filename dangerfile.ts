@@ -91,16 +91,15 @@ async function checkCode() {
         const data = diffForFile.after;
 
         const debuggerLines = checkContains(data, /\bdebugger\b/g);
-        // const consoleLines = checkContains(data, /\bconsole\.\b/g);
+        const consoleLines = checkContains(data, /\bconsole\.\b/g);
 
         debuggerLines.forEach((line) => {
-          console.log('Remove debugger symbols', file, line);
           fail('Remove debugger symbols', file, line);
         });
 
-        // consoleLines.forEach((line) => {
-        //   fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
-        // });
+        consoleLines.forEach((line) => {
+          fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
+        });
       }
     })
   );
