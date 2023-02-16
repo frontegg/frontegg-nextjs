@@ -28,6 +28,7 @@ schedule(
 
 schedule(
   spellcheck({
+    codeSpellCheck: ['packages/nextjs/**/*.ts', 'packages/nextjs/**/*.js'],
     ignore: [
       'withSSRSession',
       'frontegg',
@@ -41,6 +42,7 @@ schedule(
       'getSession',
       'fronteggMiddleware',
       'api',
+      '/*.ts',
       'frontegg-middleware',
       'middlewares',
     ],
