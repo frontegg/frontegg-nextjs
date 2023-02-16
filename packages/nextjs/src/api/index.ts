@@ -3,6 +3,16 @@ import { ApiUrls } from './urls';
 import { buildRequestHeaders } from './utils';
 import { fronteggTenantsUrl, fronteggUsersUrl, ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
 
+const Get = ({
+  url,
+  credentials = 'include',
+  headers,
+}: {
+  url: string;
+  credentials?: RequestCredentials;
+  headers?: HeadersInit;
+}) => fetch(url, { method: 'GET', credentials, headers });
+
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
  */
@@ -46,12 +56,12 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
  * @param headers
  */
 export const getUsers = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
-  const res = await Get({ url: `${BASE_URL}${fronteggUsersUrl}`, headers: extractHeaders(headers) });
+  const res = await Get({ url: `${config.baseUrl}${fronteggUsersUrl}`, headers: extractHeaders(headers) });
   return parseResponse(res);
 };
 
 export const getTenants = async (headers: Record<string, string>): Promise<ITenantsResponse[] | undefined> => {
-  const res = await Get({ url: `${BASE_URL}${fronteggTenantsUrl}`, headers: extractHeaders(headers) });
+  const res = await Get({ url: `${config.baseUrl}${fronteggTenantsUrl}`, headers: extractHeaders(headers) });
   return parseResponse(res);
 };
 
