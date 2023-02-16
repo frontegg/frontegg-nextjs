@@ -24,7 +24,7 @@ class JwtUtils {
   }
 
   /**
-   * Load public key from Frontegg services if not cahced
+   * Load public key from Frontegg services if not cached
    * @private
    */
   private async getPublicKey(): Promise<KeyLike | Uint8Array> {

@@ -76,7 +76,7 @@ export function generateAppUrl() {
   /**
    * In some cases the {@link EnvVariables.VERCEL_URL} value does not
    * include the URL protocol, bellow code to verify that the appUrl
-   * must have a valid http protocl
+   * must have a valid http protocol
    */
   if (!appUrl.startsWith('http')) {
     const protocol = appUrl.startsWith('localhost') ? 'http://' : 'https://';
