@@ -7,6 +7,7 @@ export const FronteggProvider: FC<Omit<FronteggProviderProps, 'router'>> = ({ ch
   const router = useRouter();
   const baseName = basename ?? router.basePath;
 
+  debugger;
   return (
     <FronteggBaseProvider router={router} basename={baseName} {...props}>
       {children}

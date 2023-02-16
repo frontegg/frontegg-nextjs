@@ -1,5 +1,5 @@
 // import { markdown, danger, warn, fail, schedule, message } from 'danger';
-import { danger, fail, markdown, message, warn } from 'danger';
+import { danger, fail, markdown, message, schedule, warn } from 'danger';
 
 // import yarn from 'danger-plugin-yarn';
 
@@ -113,7 +113,7 @@ checkYarnLock();
 checkPackageLock();
 checkDependencies();
 checkAssignee();
-checkCode();
+schedule(checkCode());
 
 // message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
 //   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),

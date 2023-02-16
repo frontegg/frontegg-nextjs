@@ -25,6 +25,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
     try {
       createdApp = AppHolder.getInstance(appName ?? 'default');
     } catch (e) {
+      debugger;
       createdApp = initialize(
         {
           ...props,

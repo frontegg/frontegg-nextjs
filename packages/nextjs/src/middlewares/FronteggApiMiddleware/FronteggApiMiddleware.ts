@@ -8,7 +8,7 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
     const fronteggUrlPath = rewritePath(req.url ?? '/', fronteggPathRewrite);
     const rewriteUrl = rewritePath(fronteggUrlPath ?? '/', fronteggSSOPathRewrite);
     req.url = rewriteUrl;
-
+    debugger;
     res.on('close', () => resolve());
     const options = {
       target: process.env['FRONTEGG_BASE_URL'],
@@ -16,6 +16,7 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
     if (process.env['FRONTEGG_TEST_URL'] && req.url == '/frontegg/middleware-test') {
       options.target = process.env['FRONTEGG_TEST_URL'];
     }
+    debugger;
     FronteggProxy.web(req, res, options);
   });
 

@@ -18,7 +18,7 @@ const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCa
 const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (proxyReq, req) => {
   try {
     logger.info(`${req.url} | Going to proxy request`);
-
+    debugger;
     logger.debug(`${req.url} | parsing request cookies`);
     const allCookies = CookieManager.parseCookieHeader(req);
     logger.debug(`${req.url} | found ${allCookies} cookies`);
@@ -30,11 +30,12 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     fronteggCookiesNames.forEach((cookieName: string) => {
       proxyReq.setHeader(cookieName, allCookies[cookieName]);
     });
+    debugger;
 
     proxyReq.setHeader('x-frontegg-middleware', 'true');
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
-
+    debugger;
     logger.debug(`${req.url} | check if request has body`);
     if (req.body) {
       logger.debug(`${req.url} | writing request body to proxyReq`);
