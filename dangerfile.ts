@@ -80,29 +80,32 @@ function checkContains(data: string, regex: RegExp): number[] {
   return lines;
 }
 
+const delay = (time: number = 200) => new Promise((resolve) => setTimeout(resolve, time));
+
 async function checkCode() {
   const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
   console.log(editedFiles);
 
-  await Promise.all(
-    editedFiles.map(async (file) => {
-      const diffForFile = await danger.git.diffForFile(file);
-      if (diffForFile != null) {
-        const data = diffForFile.after;
+  for (const file in editedFiles) {
+    const diffForFile = await danger.git.diffForFile(file);
+    if (diffForFile != null) {
+      const data = diffForFile.after;
 
-        const debuggerLines = checkContains(data, /\bdebugger\b/g);
-        const consoleLines = checkContains(data, /\bconsole\.\b/g);
+      const debuggerLines = checkContains(data, /\bdebugger\b/g);
+      const consoleLines = checkContains(data, /\bconsole\.\b/g);
 
-        debuggerLines.forEach((line) => {
-          fail('Remove debugger symbols', file, line);
-        });
+      debuggerLines.forEach((line) => {
+        fail('Remove debugger symbols', file, line);
+      });
 
-        consoleLines.forEach((line) => {
-          fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
-        });
+      consoleLines.forEach((line) => {
+        fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
+      });
+      if (debuggerLines.length > 0 || consoleLines.length > 0) {
+        await delay();
       }
-    })
-  );
+    }
+  }
 }
 
 markdown('## Frontegg Doctor :heart: report:');
