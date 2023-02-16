@@ -1,5 +1,6 @@
 // import { danger, fail } from "danger";
-const danger = global.danger;
+// @ts-ignore
+const { danger, fail } = global.danger;
 
 const dependencyCodeOwners = ['frontegg-david'];
 
