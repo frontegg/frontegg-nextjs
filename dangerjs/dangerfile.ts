@@ -30,7 +30,23 @@ function checkYarnLock() {
   }
 }
 
-function checkDebugger() {}
+async function checkDebugger() {
+  const editedFiles = danger.git.created_files.concat(danger.git.modified_files);
+
+  await Promise.all(
+    editedFiles.map(async (file) => {
+      const diffForFile = await danger.git.diffForFile(file);
+      if (diffForFile != null) {
+        const data = diffForFile.after;
+        const matches = /\bdebugger\b/.exec(data);
+        if (matches?.index != null) {
+          const line = data.substring(0, matches.index).split('\n').length;
+          fail('Remove debugger symbols', file, line);
+        }
+      }
+    })
+  );
+}
 
 function checkPackageLock() {
   const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
@@ -60,6 +76,13 @@ function checkDependencies() {
   }
 }
 
+// Always ensure we assign someone, so that our Slackbot can do its work correctly
+function checkAssignee() {
+  if (danger.github.pr.assignee === null) {
+    fail('Please assign someone to merge this PR, and optionally include people who should review.');
+  }
+}
+
 markdown('## Frontegg Doctor :heart: report:');
 
 printSummary();
@@ -67,16 +90,13 @@ checkYarnLock();
 checkDebugger();
 checkPackageLock();
 checkDependencies();
+checkAssignee();
 
 // message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
 //   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
 //   line: 4,
 // });
 
-// // // Always ensure we assign someone, so that our Slackbot can do its work correctly
-// // if (danger.github.pr.assignee === null) {
-// //   fail('Please assign someone to merge this PR, and optionally include people who should review.');
-// // }
 // //
 // // // TODO: add no console logs detection
 // // // TODO: add no debugger detection

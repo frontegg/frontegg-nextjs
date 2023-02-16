@@ -31,6 +31,7 @@ export function withSSRSession<
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`;
       }
+      debugger;
       return {
         redirect: {
           permanent: false,
