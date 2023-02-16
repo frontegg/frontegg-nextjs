@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import type { FronteggUserSession, FronteggUserTokens } from '../common';
+import type { FronteggUserSession, FronteggUserTokens } from '../types';
 import { getTokensFromCookie } from '../common';
 import CookieManager from '../utils/cookies';
 import createSession from '../utils/createSession';
@@ -7,21 +7,20 @@ import encryption from '../utils/encryption';
 
 const getCookie = () => {
   const allCookies = cookies().getAll();
-  const cookie = CookieManager.parseCookieFromArray(allCookies);
-  return cookie;
+  return CookieManager.parseCookieFromArray(allCookies);
 };
 
-export const getSession = () => {
+const getSession = () => {
   const cookies = getCookie();
   return createSession(cookies, encryption);
 };
 
-export async function getUserSession(): Promise<FronteggUserSession | undefined> {
+async function getUserSession(): Promise<FronteggUserSession | undefined> {
   const session = await getSession();
   return session?.user;
 }
 
-export async function getUserTokens(): Promise<FronteggUserTokens | undefined> {
+async function getUserTokens(): Promise<FronteggUserTokens | undefined> {
   try {
     const cookie = getCookie();
     return getTokensFromCookie(cookie);
@@ -30,3 +29,5 @@ export async function getUserTokens(): Promise<FronteggUserTokens | undefined> {
     return undefined;
   }
 }
+
+export { getSession, getUserSession, getUserTokens };

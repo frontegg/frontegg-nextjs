@@ -1,9 +1,8 @@
 import fronteggLogger from '../fronteggLogger';
 import CookieManager from '../cookies';
-import { NextApiRequest, NextPageContext } from 'next/dist/shared/lib/utils';
+import { NextApiRequest } from 'next/dist/shared/lib/utils';
 import api from '../../api';
 import { getTokensFromCookie } from '../../common';
-import { NextRequest } from 'next/server';
 import { IncomingMessage } from 'http';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {

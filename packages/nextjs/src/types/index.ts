@@ -1,9 +1,24 @@
-import { FronteggAppOptions } from '@frontegg/types';
-import { ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
-import { IncomingMessage } from 'http';
-import { ReactNode } from 'react';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
-import { NextRouter } from 'next/router';
+import type { FronteggAppOptions } from '@frontegg/types';
+import type { ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
+import type { IncomingMessage } from 'http';
+import type { ReactNode } from 'react';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+import type { NextRouter } from 'next/router';
+
+export interface EncryptionUtils {
+  unsealTokens(data: string): Promise<FronteggUserTokens | undefined>;
+
+  sealTokens(tokens: FronteggUserTokens, ttl: number): Promise<string>;
+}
+
+export interface FronteggUserTokens {
+  accessToken: string;
+  refreshToken?: string;
+}
+
+export interface FronteggNextJSSession extends FronteggUserTokens {
+  user: FronteggUserSession;
+}
 
 export type RequestType = IncomingMessage | Request;
 

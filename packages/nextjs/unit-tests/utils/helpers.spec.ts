@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { chunkString } from '../../src/common/utils';
+import { chunkString } from '../../src/utils/common';
 
 test.describe('utils', () => {
   test('chunkString should return array of strings with the right chunk size', () => {

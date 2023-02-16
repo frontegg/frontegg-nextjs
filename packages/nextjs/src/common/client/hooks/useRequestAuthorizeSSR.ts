@@ -2,7 +2,7 @@
 
 import { FronteggApp } from '@frontegg/js';
 import { useEffect } from 'react';
-import { AllUserData } from '../../types';
+import { AllUserData } from '../../../types';
 
 export const useRequestAuthorizeSSR = ({ app, user, tenants, session }: { app: FronteggApp } & AllUserData) => {
   useEffect(() => {

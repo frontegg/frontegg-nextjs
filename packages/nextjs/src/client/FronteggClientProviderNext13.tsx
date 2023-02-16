@@ -1,6 +1,6 @@
 'use client';
 
-import { FronteggProviderProps } from '../common';
+import type { FronteggProviderProps } from '../types';
 import { FronteggBaseProvider } from '../common/client';
 import { useRouter } from 'next/navigation';
 import React, { FC } from 'react';

@@ -1,5 +1,6 @@
 import type { NextPageContext } from 'next/dist/shared/lib/utils';
-import { FronteggNextJSSession, createSessionFromAccessToken } from '../../common';
+import type { FronteggNextJSSession } from '../../types';
+import { createSessionFromAccessToken } from '../../common';
 import config from '../../config';
 import CookieManager from '../cookies';
 import {

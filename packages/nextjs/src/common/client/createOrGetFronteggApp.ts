@@ -5,7 +5,7 @@ import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } f
 import { KeyValuePair } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import sdkVersion from '../../sdkVersion';
-import { FronteggProviderOptions } from '../types';
+import type { FronteggProviderOptions } from '../../types';
 import nextjsPkg from 'next/package.json';
 import { isAuthPath, isSocialLoginPath } from '../helpers';
 

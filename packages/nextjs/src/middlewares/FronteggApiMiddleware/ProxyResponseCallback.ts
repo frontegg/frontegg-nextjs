@@ -5,9 +5,6 @@ import config from '../../config';
 import CookieManager from '../../utils/cookies';
 import { createSessionFromAccessToken } from '../../common';
 import { isFronteggLogoutUrl } from './helpers';
-import fronteggLogger from '../../utils/fronteggLogger';
-
-const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 
 /**
  * Proxy response callback fired on after each response from Frontegg services,

@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { RedirectOptions } from '@frontegg/rest-api';
 import type { NextRouter } from 'next/router';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
-const useOnRedirectTo = (baseName: string, router: NextRouter) => {
+const useOnRedirectTo = (baseName: string, router: AppRouterInstance | NextRouter) => {
   return useCallback((_path: string, opts?: RedirectOptions) => {
     const isSSR = typeof window == undefined;
     let path = _path;

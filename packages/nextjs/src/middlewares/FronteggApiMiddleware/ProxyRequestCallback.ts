@@ -46,7 +46,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       proxyReq.write(bodyData);
     }
   } catch (e) {
-    logger.error(`${req.url} | Failt to proxy request`, e);
+    logger.error(`${req.url} | Failed to proxy request`, e);
   }
 };
 

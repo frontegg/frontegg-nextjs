@@ -1,6 +1,6 @@
 import cookie, { CookieSerializeOptions } from 'cookie';
 import { COOKIE_MAX_LENGTH } from './constants';
-import { chunkString } from '../../common/utils';
+import { chunkString } from '../common';
 import config from '../../config';
 import { RequestType } from './types';
 

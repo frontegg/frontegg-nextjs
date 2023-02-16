@@ -1,13 +1,13 @@
 'use client';
 
 import { FronteggStoreProvider } from '@frontegg/react-hooks';
-import { AuthState } from '@frontegg/redux-store';
-import { ContextHolder, RedirectOptions } from '@frontegg/rest-api';
-import React, { FC, useCallback, useMemo, useRef } from 'react';
-import { FronteggProviderProps } from '../types';
+import { ContextHolder } from '@frontegg/rest-api';
+import React, { FC, useMemo, useRef } from 'react';
+import type { FronteggProviderProps } from '../../types';
 import AppContext from './AppContext';
 import { createOrGetFronteggApp } from './createOrGetFronteggApp';
 import { useRequestAuthorizeSSR } from './hooks';
+import useOnRedirectTo from '../../utils/useOnRedirectTo';
 
 const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...props }) => {
   const isSSR = typeof window === 'undefined';
@@ -16,21 +16,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   const ssrStoreHolder = useRef({});
   const storeHolder = isSSR ? ssrStoreHolder.current : undefined;
 
-  const onRedirectTo: AuthState['onRedirectTo'] = useCallback((_path: string, opts?: RedirectOptions) => {
-    let path = _path;
-    if (path.startsWith(baseName)) {
-      path = path.substring(baseName.length);
-    }
-    if (opts?.preserveQueryParams) {
-      path = `${path}${window.location.search}`;
-    }
-    if (opts?.refresh && !isSSR) {
-      // @ts-ignore
-      window.Cypress ? router.push(path) : (window.location.href = path);
-    } else {
-      opts?.replace ? router.replace(path) : router.push(path);
-    }
-  }, []);
+  const onRedirectTo = useOnRedirectTo(baseName, router);
 
   const app = useMemo(
     () =>

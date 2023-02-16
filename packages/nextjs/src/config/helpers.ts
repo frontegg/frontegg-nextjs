@@ -79,6 +79,7 @@ export function generateAppUrl() {
    * must have a valid http protocol
    */
   if (!appUrl.startsWith('http')) {
+    // noinspection HttpUrlsUsage
     const protocol = appUrl.startsWith('localhost') ? 'http://' : 'https://';
     appUrl = `${protocol}${appUrl}`;
   }

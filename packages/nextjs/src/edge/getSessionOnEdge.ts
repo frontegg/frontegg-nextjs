@@ -1,5 +1,6 @@
 import CookieManager from '../utils/cookies';
-import createSession, { FronteggNextJSSession } from '../utils/createSession';
+import createSession from '../utils/createSession';
+import { FronteggNextJSSession } from '../types';
 import encryptionEdge from '../utils/encryption-edge';
 import { IncomingMessage } from 'http';
 
