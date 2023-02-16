@@ -1,0 +1,32 @@
+name: Push Workflow
+on:
+  pull_request_target:
+    branches-ignore:
+      - master
+    types: [ assigned, opened, synchronize, reopened ]
+
+concurrency:
+  group: ci-general-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+
+env:
+  CI: true
+jobs:
+  init:
+    name: 'Install, Build and Test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+      - name: Use Node.js (.nvmrc)
+        uses: actions/setup-node@v3
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+      - run: yarn clean
+      - run: yarn install
+      - run: yarn danger ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
