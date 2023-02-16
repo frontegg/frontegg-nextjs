@@ -10,9 +10,10 @@ import { danger, message, warn } from 'danger';
 // const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
 console.log(danger.git.created_files);
-message('Testing comment on file', {
+message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
-  line: 5,
+  line: 4,
+  icon: ':no_entry_sign:',
 });
 
 //
