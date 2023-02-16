@@ -1,9 +1,6 @@
 import config from '../config';
 import { ApiUrls } from './urls';
-import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
-import nextjsPkg from 'next/package.json';
-import sdkVersion from '../sdkVersion';
-import { removeInvalidHeaders } from './utils';
+import { buildRequestHeaders } from './utils';
 
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
@@ -23,18 +20,7 @@ const refreshTokenEmbedded = async (headers: Record<string, string>) => {
     method: 'POST',
     credentials: 'include',
     body: '{}',
-    headers: removeInvalidHeaders({
-      'accept-encoding': headers['accept-encoding'],
-      'accept-language': headers['accept-language'],
-      cookie: headers['cookie'],
-      accept: headers['accept'],
-      'content-type': 'application/json',
-      origin: config.baseUrl,
-      'user-agent': headers['user-agent'],
-      'cache-control': headers['cache-control'],
-      'x-frontegg-framework': `next@${nextjsPkg.version}`,
-      'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
-    }),
+    headers: buildRequestHeaders(headers),
   });
 };
 
@@ -50,17 +36,7 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
       grant_type: 'refresh_token',
       refresh_token,
     }),
-    headers: removeInvalidHeaders({
-      'accept-encoding': headers['accept-encoding'],
-      'accept-language': headers['accept-language'],
-      accept: headers['accept'],
-      'content-type': 'application/json',
-      origin: config.baseUrl,
-      'user-agent': headers['user-agent'],
-      'cache-control': headers['cache-control'],
-      'x-frontegg-framework': `next@${nextjsPkg.version}`,
-      'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
-    }),
+    headers: buildRequestHeaders(headers, { cookie: headers['cookie'] }),
   });
 };
 

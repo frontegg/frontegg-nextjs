@@ -8,7 +8,7 @@ export interface AuthorizationProps {
   children?: ReactNode;
 }
 
-export const AuthorizedContent: FC<AuthorizationProps> = (props) => {
+const AuthorizedContent: FC<AuthorizationProps> = (props) => {
   let isAuthorized = true; // Initially
   const user = useAuthUserOrNull();
 
@@ -44,3 +44,6 @@ export const AuthorizedContent: FC<AuthorizationProps> = (props) => {
 
   return isAuthorized ? <>{props.children}</> : null;
 };
+
+
+export default AuthorizedContent

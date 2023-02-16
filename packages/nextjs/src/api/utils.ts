@@ -1,3 +1,7 @@
+import config from '../config';
+import sdkVersion from '../sdkVersion';
+import nextjsPkg from 'next/package.json';
+
 /**
  * Matches if val contains an invalid field-vchar
  *  field-value    = *( field-content / obs-fold )
@@ -31,4 +35,26 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
     }
   });
   return newHeaders;
+}
+
+export function buildRequestHeaders(
+  headers: Record<string, string>,
+  additionalHeaders: Record<string, string> = {}
+): Record<string, string> {
+  const preparedHeaders: Record<string, string> = {
+    'accept-encoding': headers['accept-encoding'],
+    'accept-language': headers['accept-language'],
+    accept: headers['accept'],
+    'content-type': 'application/json',
+    origin: config.baseUrl,
+    'user-agent': headers['user-agent'],
+    'cache-control': headers['cache-control'],
+    'x-frontegg-framework': `next@${nextjsPkg.version}`,
+    'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
+  };
+
+  return removeInvalidHeaders({
+    ...preparedHeaders,
+    ...additionalHeaders,
+  });
 }

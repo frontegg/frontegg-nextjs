@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { buildLoginRoute } from '../api/urls';
 
 export const redirectToLogin = (pathname: string) => {
-  const loginUrl = `/account/login?redirectUrl=${encodeURIComponent(pathname)}`;
-  return NextResponse.redirect(new URL(loginUrl, process.env['FRONTEGG_APP_URL']));
+  const { asUrl: loginUrl } = buildLoginRoute(pathname);
+  return NextResponse.redirect(loginUrl);
 };
