@@ -1,9 +1,7 @@
 name: Push Workflow
 on:
-  pull_request_target:
-    branches-ignore:
-      - master
-    types: [ assigned, opened, synchronize, reopened ]
+  pull_request:
+    types: [ assigned, unassigned, labeled, unlabeled, opened, edited, reopened, synchronize, ready_for_review, review_requested ]
 
 concurrency:
   group: ci-general-checks-${{ github.ref }}
