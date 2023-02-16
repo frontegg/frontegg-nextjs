@@ -230,7 +230,7 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 
 ## Next.js 13
 ### wrapping your application
-```ts
+```tsx
 // ./app/layout.tsx
 import { FronteggAppProvider } from '@frontegg/nextjs/server';
 
@@ -247,14 +247,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 ### routing
-```ts
+```tsx
 // ./app/[...frontegg-router]/page.tsx
 export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
 ```
 
 ### server component
 notice that this session is not part of the state and therefore wont trigger ui changes when it changes
-```ts
+```tsx
 // ./app/ServerComponent.tsx
 import { getSession } from "@frontegg/nextjs/server";
 
@@ -267,7 +267,7 @@ export const ServerComponent = async () => {
 ```
 
 ### client component
-```ts
+```tsx
 // ./app/ClientComponent.tsx
 "use client";
 import { useAuth, useLoginWithRedirect } from "@frontegg/nextjs";
@@ -311,7 +311,7 @@ export const ClientComponent = ({ baseUrl }: { baseUrl?: string }) => {
 ```
 
 ### Page
-```ts
+```tsx
 // ./app/page.tsx
 import { ClientComponent } from "./client";
 import { ServerComponent } from "./server";

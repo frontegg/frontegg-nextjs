@@ -45,5 +45,4 @@ const AuthorizedContent: FC<AuthorizationProps> = (props) => {
   return isAuthorized ? <>{props.children}</> : null;
 };
 
-
-export default AuthorizedContent
+export default AuthorizedContent;

@@ -103,7 +103,7 @@ class CookieManager {
     let sessionCookieChunk: string | undefined;
     do {
       sessionCookieChunk = cookies[getIndexedCookieName(i++)];
-      if(sessionCookieChunk) {
+      if (sessionCookieChunk) {
         sessionCookies += sessionCookieChunk;
       }
     } while (sessionCookieChunk);
