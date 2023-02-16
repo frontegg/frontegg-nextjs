@@ -9,11 +9,11 @@ import { danger, message, warn } from 'danger';
 // const tests = danger.git.fileMatch('*/unit-tests/*');
 // const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
-warn(
-  'Testing comment on file',
-  danger.git.modified_files.find((t) => t.indexOf('general-checks.yml') !== -1),
-  5
-);
+console.log(danger.git.modified_files);
+message('Testing comment on file', {
+  file: danger.git.modified_files.find((t) => t.indexOf('general-checks.yml') !== -1),
+  line: 5,
+});
 
 //
 // markdown('## Frontegg Doctor :heart: report:');
