@@ -1,4 +1,4 @@
-import { message, danger, warn, fail, schedule } from 'danger';
+import { markdown, danger, warn, fail, schedule } from 'danger';
 import yarn from 'danger-plugin-yarn';
 
 const docs = danger.git.fileMatch('**/*.md');
@@ -7,7 +7,7 @@ const tests = danger.git.fileMatch('*/unit-tests/*');
 const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
 if (docs.edited) {
-  message('Thanks - We :heart: our [documentarians](http://www.writethedocs.org/)!');
+  markdown('Thanks - We :heart: our [documentations](https://docs.frontegg.com/nextjs)!');
 }
 
 if (app.modified && !tests.modified) {

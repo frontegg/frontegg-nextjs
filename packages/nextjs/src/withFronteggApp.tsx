@@ -2,10 +2,11 @@ import { FronteggAppOptions } from '@frontegg/types';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import type { AppContextType, AppPropsType, NextComponentType } from 'next/dist/shared/lib/utils';
 import React from 'react';
-import { fronteggErrors, getAllUserData, AllUserData } from './common';
+import { getAllUserData, AllUserData } from './common';
 import { FronteggProvider } from './FronteggProvider';
 import refreshAccessToken from './utils/refreshAccessToken';
-import config from './config';
+import config, { EnvVariables } from './config';
+import { FronteggEnvNotFound } from './utils/errors';
 
 type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
 export const withFronteggApp = (
@@ -30,13 +31,13 @@ export const withFronteggApp = (
       appContext.tenants = tenants;
       const { envAppUrl, envBaseUrl, envClientId } = config.appEnvConfig;
       if (!envAppUrl) {
-        throw Error(fronteggErrors.envAppUrl);
+        throw new FronteggEnvNotFound(EnvVariables.FRONTEGG_APP_URL);
       }
       if (!envBaseUrl) {
-        throw Error(fronteggErrors.envBaseUrl);
+        throw new FronteggEnvNotFound(EnvVariables.FRONTEGG_BASE_URL);
       }
       if (!envClientId) {
-        throw Error(fronteggErrors.envClientId);
+        throw new FronteggEnvNotFound(EnvVariables.FRONTEGG_CLIENT_ID);
       }
       return {
         pageProps: {
