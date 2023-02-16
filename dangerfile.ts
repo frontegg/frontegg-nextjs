@@ -1,5 +1,5 @@
 // import { markdown, danger, warn, fail, schedule, message } from 'danger';
-import { danger, message } from 'danger';
+import { danger, message, warn } from 'danger';
 // import yarn from 'danger-plugin-yarn';
 
 // const docs = danger.git.fileMatch('**/*.md');
@@ -9,7 +9,12 @@ import { danger, message } from 'danger';
 // const tests = danger.git.fileMatch('*/unit-tests/*');
 // const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
-message('Testing comment on file', { file: danger.git.modified_files[0], line: 5 });
+warn(
+  'Testing comment on file',
+  danger.git.modified_files.find((t) => t.indexOf('general-checks.yml') !== -1),
+  5
+);
+
 //
 // markdown('## Frontegg Doctor :heart: report:');
 //
