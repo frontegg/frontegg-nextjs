@@ -27,26 +27,28 @@ library.edited && summery.push('- Detected change in `@frontegg/nextjs`.');
 
 markdown(summery.join('\n'));
 
-// if (npmLockFiles.edited) {
-//   fail(`Detected package-lock file. remove all package-lock.json and use \`yarn install\` for installing dependencies`);
-// }
-//
+if (npmLockFiles.edited) {
+  fail(`Detected package-lock file. remove all package-lock.json and use \`yarn install\` for installing dependencies`);
+}
+
 // schedule(
 //   yarn({
 //     disableCheckForLockfileDiff: true,
 //     pathToPackageJSON: './packages/nextjs/package.json',
 //   })
 // );
-//
-//
-// const packageChanged = danger.git.modified_files.includes('package.json');
-// const lockfileChanged = danger.git.modified_files.includes('yarn.lock');
-// if (packageChanged && !lockfileChanged) {
-//   const message = 'Changes were made to package.json, but not to yarn.lock';
-//   const idea = 'Perhaps you need to run `yarn install`?';
-//   warn(`${message} - <i>${idea}</i>`);
-// }
-//
+
+/**
+ * Check if package json changed and forgot to run yarn install
+ */
+const packageChanged = danger.git.modified_files.includes('package.json');
+const lockfileChanged = danger.git.modified_files.includes('yarn.lock');
+if (packageChanged && !lockfileChanged) {
+  const message = 'Changes were made to package.json, but not to yarn.lock';
+  const idea = 'Perhaps you need to run `yarn install`?';
+  warn(`${message} - <i>${idea}</i>`);
+}
+
 // // Always ensure we assign someone, so that our Slackbot can do its work correctly
 // if (danger.github.pr.assignee === null) {
 //   fail('Please assign someone to merge this PR, and optionally include people who should review.');
