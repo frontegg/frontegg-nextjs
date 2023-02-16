@@ -50,6 +50,7 @@ function checkDependencies() {
   const reviews = danger.github.reviews;
 
   reviews.find((review) => review.state === 'APPROVED' && review.user.login);
+  console.log(reviews);
   if (packageChanged) {
     const title = ':lock: package.json';
     const mentions = dependencyCodeOwners.map((mention) => `@${mention}`).join(', ');
