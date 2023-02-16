@@ -49,9 +49,10 @@ function checkDependencies() {
   const packageChanged = danger.git.modified_files.includes('package.json');
   const reviews = danger.github.reviews;
 
-  reviews.find((review) => review.state === 'APPROVED' && review.user.login);
-  console.log(reviews);
-  if (packageChanged) {
+  const approvedBy = reviews.find(
+    (review) => review.state === 'APPROVED' && dependencyCodeOwners.indexOf(review.user.login) !== -1
+  );
+  if (packageChanged && !approvedBy) {
     const title = ':lock: package.json';
     const mentions = dependencyCodeOwners.map((mention) => `@${mention}`).join(', ');
     const idea = `Changes made to package.json should be reviewed by DependencyCodeOwners. (${mentions}).`;
