@@ -13,7 +13,7 @@ Thank you for considering contributing to `@frontegg/nextjs`! We welcome all con
 - All contributions will be subject to review by the project maintainers before being merged.
 
 ## Environment variables
-Setup the environment variable for demo porjects:
+Setup the environment variable for demo projects:
 - `/packages/demo-saas/.env.local`
 - `/packages/demo-saas-next12/.env.local`
 

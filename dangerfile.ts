@@ -29,7 +29,20 @@ schedule(
 schedule(
   spellcheck({
     codeSpellCheck: ['./packages/nextjs/**'],
-    ignore: ['frontegg', 'nextjs', 'npm', 'next.js'],
+    ignore: [
+      'frontegg',
+      'nextjs',
+      'npm',
+      'next.js',
+      'SaaS',
+      'Vercel',
+      'ClientID',
+      'AccessToken',
+      'fronteggMiddleware',
+      'api',
+      'frontegg-middleware',
+      'middlewares',
+    ],
   })
 );
 
