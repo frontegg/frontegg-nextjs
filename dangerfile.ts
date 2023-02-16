@@ -1,5 +1,5 @@
 // import { markdown, danger, warn, fail, schedule, message } from 'danger';
-import { danger, message, warn } from 'danger';
+import { danger, markdown, message, warn } from 'danger';
 // import yarn from 'danger-plugin-yarn';
 
 const docs = danger.git.fileMatch('**/*.md');
@@ -15,7 +15,7 @@ message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request
   line: 4,
 });
 
-// markdown('## Frontegg Doctor :heart: report:');
+markdown('## Frontegg Doctor :heart: report:');
 //
 // const summery = ['### Summary:'];
 //
