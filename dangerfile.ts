@@ -84,7 +84,6 @@ const delay = (time: number = 200) => new Promise((resolve) => setTimeout(resolv
 
 async function checkCode() {
   const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
-  console.log(editedFiles);
 
   for (const file in editedFiles) {
     const diffForFile = await danger.git.diffForFile(file);
@@ -101,6 +100,8 @@ async function checkCode() {
       consoleLines.forEach((line) => {
         fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
       });
+
+      console.log(`file: ${file}`, { consoleLines, debuggerLines });
       if (debuggerLines.length > 0 || consoleLines.length > 0) {
         await delay();
       }
