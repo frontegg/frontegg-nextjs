@@ -9,9 +9,9 @@ import { danger, message, warn } from 'danger';
 // const tests = danger.git.fileMatch('*/unit-tests/*');
 // const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
-console.log(danger.git.modified_files);
+console.log(danger.git.created_files);
 message('Testing comment on file', {
-  file: danger.git.modified_files.find((t) => t.indexOf('general-checks.yml') !== -1),
+  file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
   line: 5,
 });
 
