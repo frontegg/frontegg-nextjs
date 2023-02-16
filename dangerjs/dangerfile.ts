@@ -3,11 +3,13 @@ import { danger, fail, markdown, message, warn } from 'danger';
 
 // import yarn from 'danger-plugin-yarn';
 
+const sourceCodeFileMatcher = 'packages/nextjs/**/*';
+
 function printSummary() {
   const docs = danger.git.fileMatch('**/*.md');
   const next12App = danger.git.fileMatch('packages/demo-saas/**/*');
   const next13App = danger.git.fileMatch('packages/demo-saas-next12/**/*');
-  const library = danger.git.fileMatch('packages/nextjs/**/*');
+  const library = danger.git.fileMatch(sourceCodeFileMatcher);
   const tests = danger.git.fileMatch('*/unit-tests/*');
 
   const summery = ['### Summary:'];
@@ -31,7 +33,8 @@ function checkYarnLock() {
 }
 
 async function checkDebugger() {
-  const editedFiles = danger.git.created_files.concat(danger.git.modified_files);
+  const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
+  console.log(editedFiles);
 
   await Promise.all(
     editedFiles.map(async (file) => {
