@@ -5,6 +5,7 @@ import { FronteggAppOptions } from '@frontegg/types';
 import { NextRouter, useRouter } from 'next/router';
 import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo } from 'react';
 import { AppContext, ExpireInListener } from './common/client';
+import useOnRedirectTo from './utils/useOnRedirectTo';
 
 export type FronteggProviderNoSSRProps = PropsWithChildren<FronteggAppOptions>;
 
@@ -15,25 +16,9 @@ type ConnectorProps = PropsWithChildren<FronteggAppOptions> & {
 
 const Connector: FC<ConnectorProps> = (_props) => {
   const { router, appName, hostedLoginBox, customLoginBox, ...props } = _props;
-  const isSSR = typeof window === 'undefined';
-
   const baseName = props.basename ?? router.basePath;
 
-  const onRedirectTo = useCallback((_path: string, opts?: RedirectOptions) => {
-    let path = _path;
-    if (path.startsWith(baseName)) {
-      path = path.substring(baseName.length);
-    }
-    if (opts?.preserveQueryParams) {
-      path = `${path}${window.location.search}`;
-    }
-    if (opts?.refresh && !isSSR) {
-      // @ts-ignore
-      window.Cypress ? router.push(path) : (window.location.href = path);
-    } else {
-      opts?.replace ? router.replace(path) : router.push(path);
-    }
-  }, []);
+  const onRedirectTo = useOnRedirectTo(baseName, router);
 
   const app = useMemo(() => {
     let createdApp;

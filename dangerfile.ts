@@ -1,14 +1,15 @@
 import { message, danger, warn, fail, schedule } from 'danger';
 import yarn from 'danger-plugin-yarn';
+import spellcheck from 'danger-plugin-spellcheck';
 
 const docs = danger.git.fileMatch('**/*.md');
 const app = danger.git.fileMatch('src/**/*.ts');
 const tests = danger.git.fileMatch('*/unit-tests/*');
 const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
-if (docs.edited) {
-  message('Thanks - We :heart: our [documentarians](http://www.writethedocs.org/)!');
-}
+// if (docs.edited) {
+  // message('Thanks - We :heart: our [documentarians](http://www.writethedocs.org/)!');
+// }
 
 if (app.modified && !tests.modified) {
   warn('You have app changes without tests.');
@@ -18,10 +19,22 @@ if (npmLockFiles.edited) {
   fail(`Detected package-lock file. remove all package-lock.json and use \`yarn install\` for installing dependencies`);
 }
 
-// noinspection JSIgnoredPromiseFromCall
 schedule(
   yarn({
     disableCheckForLockfileDiff: true,
+    pathToPackageJSON: './packages/nextjs/package.json'
+  })
+);
+
+schedule(
+  spellcheck({
+    codeSpellCheck: ['./packages/nextjs/**'],
+    ignore:[
+      'frontegg',
+      'nextjs',
+      'npm',
+      'next.js'
+    ]
   })
 );
 
@@ -37,6 +50,8 @@ if (packageChanged && !lockfileChanged) {
 if (danger.github.pr.assignee === null) {
   fail('Please assign someone to merge this PR, and optionally include people who should review.');
 }
+
+
 
 // TODO: add no console logs detection
 // TODO: add no debugger detection

@@ -44,6 +44,7 @@
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
     "danger": "11.2.3",
+    "danger-plugin-spellcheck": "^2.1.0",
     "danger-plugin-yarn": "1.6.0",
     "eslint": "^8.30.0",
     "eslint-plugin-react": "^7.17.0",
