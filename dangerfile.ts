@@ -1,4 +1,4 @@
-import { markdown, danger, warn, fail, schedule } from 'danger';
+import { markdown, danger, warn, fail, schedule, message } from 'danger';
 import yarn from 'danger-plugin-yarn';
 
 const docs = danger.git.fileMatch('**/*.md');
@@ -30,6 +30,8 @@ schedule(
     pathToPackageJSON: './packages/nextjs/package.json',
   })
 );
+
+message('Testing comment on file', { file: danger.git.modified_files[0], line: 5 });
 
 const packageChanged = danger.git.modified_files.includes('package.json');
 const lockfileChanged = danger.git.modified_files.includes('yarn.lock');
