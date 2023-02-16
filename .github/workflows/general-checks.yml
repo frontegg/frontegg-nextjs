@@ -25,6 +25,6 @@ jobs:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - run: yarn clean
       - run: yarn install
-      - run: yarn danger ci
+      - run: yarn danger ci -i 'Code Quality Check'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
