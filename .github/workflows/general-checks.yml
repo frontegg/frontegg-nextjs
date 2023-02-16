@@ -2,6 +2,8 @@ name: General Checks
 on:
   pull_request:
     types: [ assigned, unassigned, labeled, unlabeled, opened, edited, reopened, synchronize, ready_for_review, review_requested ]
+  pull_request_review:
+    types: [ submitted, edited, dismissed ]
 
 concurrency:
   group: ci-general-checks-${{ github.ref }}

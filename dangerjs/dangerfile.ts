@@ -42,7 +42,7 @@ function checkPackageLock() {
   }
 }
 
-const dependencyCodeOwners = ['frontegg-david'];
+const dependencyCodeOwners = ['frontegg-david', 'rotemzif1'];
 
 function checkDependencies() {
   // Warns if there are changes to package.json, and tags the team.
