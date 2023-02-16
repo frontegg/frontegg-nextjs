@@ -2,17 +2,23 @@ import { markdown, danger, warn, fail, schedule } from 'danger';
 import yarn from 'danger-plugin-yarn';
 
 const docs = danger.git.fileMatch('**/*.md');
-const app = danger.git.fileMatch('src/**/*.ts');
+const next12App = danger.git.fileMatch('packages/demo-saas/**/*');
+const next13App = danger.git.fileMatch('packages/demo-saas-next12/**/*');
+const library = danger.git.fileMatch('packages/nextjs/**/*');
 const tests = danger.git.fileMatch('*/unit-tests/*');
 const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
-if (docs.edited) {
-  markdown('Thanks - We :heart: our [documentations](https://docs.frontegg.com/nextjs)!');
-}
+markdown('## Frontegg Doctor :heart: report:');
 
-if (app.modified && !tests.modified) {
-  warn('You have app changes without tests.');
-}
+const summery = ['### Summery:'];
+
+docs.edited && summery.push('- Detect changes in docs.');
+tests.edited && summery.push('- Detect changes in Unit Tests.');
+next12App.edited && summery.push('- Detected changes in `Next.js 12` example project.');
+next13App.edited && summery.push('- Detected changes in `Next.js 13` example project.');
+library.edited && summery.push('- Detected change in `@frontegg/nextjs`.');
+
+markdown(summery.join('\n'));
 
 if (npmLockFiles.edited) {
   fail(`Detected package-lock file. remove all package-lock.json and use \`yarn install\` for installing dependencies`);
