@@ -1,17 +1,7 @@
 import config from '../config';
 import { ApiUrls } from './urls';
-import { buildRequestHeaders } from './utils';
+import { buildRequestHeaders, Get, parseHttpResponse, Post } from './utils';
 import { fronteggTenantsUrl, fronteggUsersUrl, ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
-
-const Get = ({
-  url,
-  credentials = 'include',
-  headers,
-}: {
-  url: string;
-  credentials?: RequestCredentials;
-  headers?: HeadersInit;
-}) => fetch(url, { method: 'GET', credentials, headers });
 
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
@@ -27,9 +17,8 @@ const loadPublicKey = async () => {
  * by providing client's fe_ cookies
  */
 const refreshTokenEmbedded = async (headers: Record<string, string>) => {
-  return fetch(`${config.baseUrl}${ApiUrls.refreshToken.embedded}`, {
-    method: 'POST',
-    credentials: 'include',
+  return Post({
+    url: `${config.baseUrl}${ApiUrls.refreshToken.embedded}`,
     body: '{}',
     headers: buildRequestHeaders(headers),
   });
@@ -40,9 +29,8 @@ const refreshTokenEmbedded = async (headers: Record<string, string>) => {
  * by providing client's fe_ as body with grant_type.
  */
 const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_token: string) => {
-  return fetch(`${config.baseUrl}${ApiUrls.refreshToken.hosted}`, {
-    method: 'POST',
-    credentials: 'include',
+  return Post({
+    url: `${config.baseUrl}${ApiUrls.refreshToken.hosted}`,
     body: JSON.stringify({
       grant_type: 'refresh_token',
       refresh_token,
@@ -56,17 +44,29 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
  * @param headers
  */
 export const getUsers = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
-  const res = await Get({ url: `${config.baseUrl}${fronteggUsersUrl}`, headers: extractHeaders(headers) });
-  return parseResponse(res);
+  const res = await Get({
+    url: `${config.baseUrl}${fronteggUsersUrl}`,
+    headers: buildRequestHeaders(headers),
+  });
+  return parseHttpResponse(res);
 };
 
+/**
+ *
+ * @param headers
+ */
 export const getTenants = async (headers: Record<string, string>): Promise<ITenantsResponse[] | undefined> => {
-  const res = await Get({ url: `${config.baseUrl}${fronteggTenantsUrl}`, headers: extractHeaders(headers) });
-  return parseResponse(res);
+  const res = await Get({
+    url: `${config.baseUrl}${fronteggTenantsUrl}`,
+    headers: buildRequestHeaders(headers),
+  });
+  return parseHttpResponse(res);
 };
 
 export default {
   loadPublicKey,
   refreshTokenEmbedded,
   refreshTokenHostedLogin,
+  getUsers,
+  getTenants,
 };

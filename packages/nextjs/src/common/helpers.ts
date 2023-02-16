@@ -1,5 +1,5 @@
 import { sealData, unsealData } from 'iron-session';
-import { getTenants, getUsers } from './api';
+import { getTenants, getUsers } from '../api';
 import config from '../config';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
 import JwtManager from '../utils/jwt';

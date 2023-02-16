@@ -1,15 +1,14 @@
 import { message, danger, warn, fail, schedule } from 'danger';
 import yarn from 'danger-plugin-yarn';
-import spellcheck from 'danger-plugin-spellcheck';
 
 const docs = danger.git.fileMatch('**/*.md');
 const app = danger.git.fileMatch('src/**/*.ts');
 const tests = danger.git.fileMatch('*/unit-tests/*');
 const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
-// if (docs.edited) {
-// message('Thanks - We :heart: our [documentarians](http://www.writethedocs.org/)!');
-// }
+if (docs.edited) {
+  message('Thanks - We :heart: our [documentarians](http://www.writethedocs.org/)!');
+}
 
 if (app.modified && !tests.modified) {
   warn('You have app changes without tests.');
@@ -23,36 +22,6 @@ schedule(
   yarn({
     disableCheckForLockfileDiff: true,
     pathToPackageJSON: './packages/nextjs/package.json',
-  })
-);
-
-schedule(
-  spellcheck({
-    codeSpellCheck: ['packages/nextjs/src/**/*.ts', 'packages/nextjs/src/**/*.js'],
-    ignore: [
-      'withSSRSession',
-      'frontegg',
-      'nextjs',
-      'npm',
-      'next.js',
-      'SaaS',
-      'Vercel',
-      'ClientID',
-      'AccessToken',
-      'getSession',
-      'fronteggMiddleware',
-      'api',
-      'frontegg-middleware',
-      'middlewares',
-      'consts',
-      'jwks',
-      'prelogin',
-      '/SaaS/',
-      'vchar',
-      '/HTAB/',
-      'undici',
-      'pino',
-    ],
   })
 );
 

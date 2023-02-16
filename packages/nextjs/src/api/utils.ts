@@ -2,6 +2,22 @@ import config from '../config';
 import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
 
+interface GetRequestOptions {
+  url: string;
+  credentials?: RequestCredentials;
+  headers?: HeadersInit;
+}
+
+export const Get = ({ url, credentials = 'include', headers }: GetRequestOptions) =>
+  fetch(url, { method: 'GET', credentials, headers });
+
+interface PostRequestOptions extends GetRequestOptions {
+  body: string;
+}
+
+export const Post = ({ url, credentials = 'include', headers, body }: PostRequestOptions) =>
+  fetch(url, { method: 'POST', credentials, headers, body });
+
 /**
  * Matches if val contains an invalid field-vchar
  *  field-value    = *( field-content / obs-fold )
@@ -37,6 +53,11 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
   return newHeaders;
 }
 
+/**
+ * Build fetch request headers, remove invalid http headers
+ * @param headers - Incoming request headers
+ * @param additionalHeaders - Specify additional headers
+ */
 export function buildRequestHeaders(
   headers: Record<string, string>,
   additionalHeaders: Record<string, string> = {}
@@ -58,3 +79,14 @@ export function buildRequestHeaders(
     ...additionalHeaders,
   });
 }
+
+/**
+ * Return parsed json response if http status code = 200
+ * @param res
+ */
+export const parseHttpResponse = async <T>(res: Response): Promise<T | undefined> => {
+  if (!res.ok) {
+    return undefined;
+  }
+  return await res.json();
+};
