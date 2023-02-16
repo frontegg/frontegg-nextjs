@@ -28,8 +28,8 @@ schedule(
 
 schedule(
   spellcheck({
-    codeSpellCheck: ['./packages/nextjs/**'],
     ignore: [
+      'withSSRSession',
       'frontegg',
       'nextjs',
       'npm',
@@ -38,6 +38,7 @@ schedule(
       'Vercel',
       'ClientID',
       'AccessToken',
+      'getSession',
       'fronteggMiddleware',
       'api',
       'frontegg-middleware',
