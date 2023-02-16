@@ -24,6 +24,7 @@ export function withSSRSession<
   return async (context: GetServerSidePropsContext<Q>): Promise<GetServerSidePropsResult<P>> => {
     const session = await getSession(context.req);
     if (session) {
+      debugger;
       return handler(context, session);
     } else {
       let loginUrl = config.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;

@@ -32,25 +32,6 @@ function checkYarnLock() {
   }
 }
 
-async function checkDebugger() {
-  const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
-  console.log(editedFiles);
-
-  await Promise.all(
-    editedFiles.map(async (file) => {
-      const diffForFile = await danger.git.diffForFile(file);
-      if (diffForFile != null) {
-        const data = diffForFile.after;
-        const matches = /\bdebugger\b/.exec(data);
-        if (matches?.index != null) {
-          const line = data.substring(0, matches.index).split('\n').length;
-          fail('Remove debugger symbols', file, line);
-        }
-      }
-    })
-  );
-}
-
 function checkPackageLock() {
   const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
@@ -86,14 +67,52 @@ function checkAssignee() {
   }
 }
 
+function checkContains(data: string, regex: RegExp): number[] {
+  const lines: number[] = [];
+
+  const iterator = data.matchAll(regex);
+  let match = iterator.next();
+  while (!match.done) {
+    const line = data.substring(0, match.value.index).split('\n').length;
+    lines.push(line);
+    match = iterator.next();
+  }
+  return lines;
+}
+
+async function checkCode() {
+  const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
+  console.log(editedFiles);
+
+  await Promise.all(
+    editedFiles.map(async (file) => {
+      const diffForFile = await danger.git.diffForFile(file);
+      if (diffForFile != null) {
+        const data = diffForFile.after;
+
+        const debuggerLines = checkContains(data, /\bdebugger\b/);
+        const consoleLines = checkContains(data, /\bconsole\.\b/);
+
+        debuggerLines.forEach((line) => {
+          fail('Remove debugger symbols', file, line);
+        });
+
+        consoleLines.forEach((line) => {
+          fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
+        });
+      }
+    })
+  );
+}
+
 markdown('## Frontegg Doctor :heart: report:');
 
 printSummary();
 checkYarnLock();
-checkDebugger();
 checkPackageLock();
 checkDependencies();
 checkAssignee();
+checkCode();
 
 // message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
 //   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
