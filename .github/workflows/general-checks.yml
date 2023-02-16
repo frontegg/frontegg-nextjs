@@ -25,7 +25,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
-      - run: yarn global add danger@11.2.3 danger-plugin-yarn@1.6.0
-      - run: danger ci -i 'Code-Quality-Check' --verbose
+      - uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - run: yarn install
+      - run: yarn danger ci -i 'Code-Quality-Check' --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
