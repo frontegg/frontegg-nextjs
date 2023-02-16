@@ -24,6 +24,6 @@ jobs:
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
       - run: yarn global add danger@11.2.3 danger-plugin-yarn@1.6.0
-      - run: danger ci -i 'Code-Quality-Check' --verbose
+      - run: danger ci -i 'Code-Quality-Check' --verbose -d dangerjs/dangerfile.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
