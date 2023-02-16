@@ -90,8 +90,8 @@ async function checkCode() {
       if (diffForFile != null) {
         const data = diffForFile.after;
 
-        const debuggerLines = checkContains(data, /\bdebugger\b/);
-        const consoleLines = checkContains(data, /\bconsole\.\b/);
+        const debuggerLines = checkContains(data, /\bdebugger\b/g);
+        const consoleLines = checkContains(data, /\bconsole\.\b/g);
 
         debuggerLines.forEach((line) => {
           fail('Remove debugger symbols', file, line);
