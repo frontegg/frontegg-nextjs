@@ -1,4 +1,4 @@
-name: Push Workflow
+name: General Checks
 on:
   pull_request:
     types: [ assigned, unassigned, labeled, unlabeled, opened, edited, reopened, synchronize, ready_for_review, review_requested ]
@@ -12,7 +12,7 @@ env:
   CI: true
 jobs:
   init:
-    name: 'Install, Build and Test'
+    name: 'Code Quality Check'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

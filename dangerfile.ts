@@ -10,7 +10,7 @@ const npmLockFiles = danger.git.fileMatch('**/package-lock.json');
 
 markdown('## Frontegg Doctor :heart: report:');
 
-const summery = ['### Summery:'];
+const summery = ['### Summary:'];
 
 docs.edited && summery.push('- Detect changes in docs.');
 tests.edited && summery.push('- Detect changes in Unit Tests.');
