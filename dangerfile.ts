@@ -16,17 +16,17 @@ message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request
 });
 
 markdown('## Frontegg Doctor :heart: report:');
-//
-// const summery = ['### Summary:'];
-//
-// docs.edited && summery.push('- Detect changes in docs.');
-// tests.edited && summery.push('- Detect changes in Unit Tests.');
-// next12App.edited && summery.push('- Detected changes in `Next.js 12` example project.');
-// next13App.edited && summery.push('- Detected changes in `Next.js 13` example project.');
-// library.edited && summery.push('- Detected change in `@frontegg/nextjs`.');
-//
-// markdown(summery.join('\n'));
-//
+
+const summery = ['### Summary:'];
+
+docs.edited && summery.push('- Detect changes in docs.');
+tests.edited && summery.push('- Detect changes in Unit Tests.');
+next12App.edited && summery.push('- Detected changes in `Next.js 12` example project.');
+next13App.edited && summery.push('- Detected changes in `Next.js 13` example project.');
+library.edited && summery.push('- Detected change in `@frontegg/nextjs`.');
+
+markdown(summery.join('\n'));
+
 // if (npmLockFiles.edited) {
 //   fail(`Detected package-lock file. remove all package-lock.json and use \`yarn install\` for installing dependencies`);
 // }
