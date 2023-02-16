@@ -14,7 +14,7 @@ env:
   CI: true
 jobs:
   init:
-    name: 'Code Quality Check'
+    name: 'DangerJS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
