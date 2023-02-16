@@ -23,8 +23,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
-      - run: yarn clean
-      - run: yarn add -DW danger@11.2.3 danger-plugin-yarn@1.6.0
+      - run: yarn global add -DW danger@11.2.3 danger-plugin-yarn@1.6.0
       - run: yarn danger ci -i 'Code Quality Check'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
