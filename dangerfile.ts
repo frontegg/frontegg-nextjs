@@ -103,9 +103,13 @@ async function checkCode() {
               if (/\bdebugger\b/.test(data)) {
                 const message = 'No debugger';
                 fails.push({ message, file, line: change.ln });
-              } else if (/\bconsole\.\b/.test(data)) {
-                const message = 'No console.log';
-                fails.push({ message, file, line: change.ln });
+              } else if (/console\.(log|error|warn|info)/.test(data)) {
+                if (data.indexOf('node -e "console.log(crypto.randomBytes(32).toString(\'hex\'))"') !== -1) {
+                  // skip for docs
+                } else {
+                  const message = 'No console.log';
+                  fails.push({ message, file, line: change.ln });
+                }
               }
             }
           }
