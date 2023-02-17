@@ -13,7 +13,8 @@
     "build:stable": "node ../../scripts/build stable",
     "build:types": "tsc -b tsconfig.build.json",
     "build:copy-files": "node ../../scripts/copy-files.js",
-    "test": "cp .env.test .env && CI=true npx playwright test"
+    "test": "cp .env.test .env && CI=true npx playwright test",
+    "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
     "@frontegg/js": "6.73.0",

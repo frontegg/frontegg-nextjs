@@ -191,7 +191,7 @@ async function checkIronSessionImports() {
 
       const message =
         `Don't use iron-session directly, this may break SSR and Edge runtime, to use \`sealData/unsealData\`:\n\n` +
-        `\`\`\`tsx\n  import {unsealTokens, sealTokens} from '${relativePath}' \n\`\`\``;
+        `\`\`\`tsx\n  import { sealTokens, unsealTokens } from '${relativePath}' \n\`\`\``;
       fails.push({ message, file, line: change.ln });
       return;
     }
@@ -213,9 +213,6 @@ checkAssignee();
 disableNewJsFiles();
 schedule(Promise.all([checkCode(), checkIronSessionImports()]));
 
-// //
-// // // TODO: add no console logs detection
-// // // TODO: add no debugger detection
 // // // TODO: add critical changes detection:
 // // //       - lerna config
 // // //       - lib package version
@@ -226,5 +223,4 @@ schedule(Promise.all([checkCode(), checkIronSessionImports()]));
 // // //       - .snyk
 // // //       - all .dot files
 // //
-// // // TODO: add iron-session incorrect imports detection
 // // // TODO: add check for main exported methods

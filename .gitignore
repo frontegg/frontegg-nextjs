@@ -85,3 +85,4 @@ cypress/screenshots
 /playwright/.cache/
 tsconfig.build.tsbuildinfo
 playwright-report/
+lint-report.json
