@@ -203,22 +203,15 @@ async function checkIronSessionImports() {
     await delay(100);
   }
 }
-
 markdown('## Frontegg Doctor :heart: report:');
-
 printSummary();
+
 checkYarnLock();
 checkPackageLock();
 checkDependencies();
 checkAssignee();
-checkCode();
 disableNewJsFiles();
-checkIronSessionImports();
-
-// message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
-//   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
-//   line: 4,
-// });
+schedule(Promise.all([checkCode(), checkIronSessionImports()]));
 
 // //
 // // // TODO: add no console logs detection
