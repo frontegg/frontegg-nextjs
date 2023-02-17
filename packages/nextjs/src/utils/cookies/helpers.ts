@@ -11,7 +11,7 @@ import { RequestType } from './types';
  * @param {string} _cookieName - Default is {@link config.cookieName}
  */
 export const getIndexedCookieName = (index: number, _cookieName?: string) => {
-  let cookieName = _cookieName ?? config.cookieName;
+  const cookieName = _cookieName ?? config.cookieName;
   return `${cookieName}-${index}`;
 };
 

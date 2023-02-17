@@ -27,7 +27,6 @@ export const FronteggAppProvider = async ({
   headers().forEach((value: string, key: string) => (reqHeaders[key] = value));
 
   const { user, tenants, session } = await getAllUserData({ getSession, reqHeaders });
-  console.log(user, tenants, session, reqHeaders['referer']);
 
   return (
     <FronteggClientProviderNext13 {...{ session, envAppUrl, envBaseUrl, envClientId, user, tenants }} {...options}>

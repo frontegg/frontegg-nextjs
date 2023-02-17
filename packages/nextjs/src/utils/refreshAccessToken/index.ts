@@ -99,5 +99,3 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
     return null;
   }
 }
-
-console.log('a');

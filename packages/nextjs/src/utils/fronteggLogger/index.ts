@@ -21,7 +21,7 @@ const fronteggLogger = Logger(
       if (tag) {
         args.push(`[${tag}]`);
       }
-      console.log.apply(console, args);
+      console.log(...args);
     },
   }
 );
