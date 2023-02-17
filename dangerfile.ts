@@ -92,10 +92,10 @@ async function checkCode() {
   await Promise.all(
     editedFiles.map(async (file) => {
       const diffForFile = await danger.git.diffForFile(file);
-      if (file.indexOf('client/FronteggBaseProvider.tsx') !== -1) {
-        console.log(diffForFile);
+      if (file.indexOf('/FronteggProviderNext13.tsx') !== -1) {
+        const structuredDiff = await danger.git.structuredDiffForFile(file);
+        console.log(structuredDiff);
       }
-
       if (diffForFile != null) {
         const data = diffForFile.added;
 
