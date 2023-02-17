@@ -94,7 +94,7 @@ async function checkCode() {
       const diffForFile = await danger.git.diffForFile(file);
       if (file.indexOf('/FronteggProviderNext13.tsx') !== -1) {
         const structuredDiff = await danger.git.structuredDiffForFile(file);
-        console.log(structuredDiff);
+        console.log(JSON.stringify(structuredDiff, null, 2));
       }
       if (diffForFile != null) {
         const data = diffForFile.added;
@@ -137,7 +137,7 @@ checkYarnLock();
 checkPackageLock();
 checkDependencies();
 checkAssignee();
-schedule(checkCode());
+checkCode();
 
 // message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
 //   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
