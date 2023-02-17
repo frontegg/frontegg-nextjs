@@ -1,5 +1,6 @@
-// import { markdown, danger, warn, fail, schedule, message } from 'danger';
 import { danger, fail, markdown, message, schedule, warn } from 'danger';
+import type { AddChange, Change } from 'parse-diff';
+import path from 'path';
 
 // import yarn from 'danger-plugin-yarn';
 
@@ -84,39 +85,49 @@ const delay = (time: number = 200) => new Promise((resolve) => setTimeout(resolv
 
 type CodeCheckFailed = { message: string; file: string; line: number };
 
-async function checkCode() {
-  const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
+const loopOverChanges = async (fileMatch: string, checkChange: (file: string, change: AddChange) => Promise<void>) => {
+  // get all affected files
+  const editedFiles = danger.git.fileMatch(fileMatch).getKeyedPaths().edited;
+  const fileChecker = editedFiles.map(async (file) => {
+    // get diff changes
+    const diffForFile = await danger.git.structuredDiffForFile(file);
+    if (!diffForFile) {
+      // no chunks
+      return;
+    }
 
+    // merge all added changes from chunks
+    const changes = diffForFile.chunks.reduce((p: Change[], chunk) => {
+      return [...p, ...chunk.changes.filter((change) => change.type === 'add')];
+    }, []);
+
+    await Promise.all(changes.map((change) => checkChange(file, change as AddChange)));
+  });
+  await Promise.all(fileChecker);
+};
+
+async function checkCode() {
   const fails: CodeCheckFailed[] = [];
 
-  await Promise.all(
-    editedFiles.map(async (file) => {
-      const diffForFile = await danger.git.structuredDiffForFile(file);
-      if (diffForFile != null) {
-        for (let chunkIdx = 0; chunkIdx < diffForFile.chunks.length; chunkIdx++) {
-          const chunk = diffForFile.chunks[chunkIdx];
-          for (let changeIdx = 0; changeIdx < chunk.changes.length; changeIdx++) {
-            const change = chunk.changes[changeIdx];
-            if (change.type === 'add') {
-              const data = change.content;
+  await loopOverChanges(sourceCodeFileMatcher, async (file, change) => {
+    const data = change.content;
 
-              if (/\bdebugger\b/.test(data)) {
-                const message = 'No debugger';
-                fails.push({ message, file, line: change.ln });
-              } else if (/console\.(log|error|warn|info)/.test(data)) {
-                if (data.indexOf('node -e "console.log(crypto.randomBytes(32).toString(\'hex\'))"') !== -1) {
-                  // skip for docs
-                } else {
-                  const message = 'No console.log';
-                  fails.push({ message, file, line: change.ln });
-                }
-              }
-            }
-          }
-        }
+    if (/\bdebugger\b/.test(data)) {
+      const message = 'No debugger';
+      fails.push({ message, file, line: change.ln });
+      return;
+    }
+
+    if (/console\.(log|error|warn|info)/.test(data)) {
+      if (data.indexOf('node -e "console.log(crypto.randomBytes(32).toString(\'hex\'))"') !== -1) {
+        // skip for docs
+      } else {
+        const message = 'No console.log';
+        fails.push({ message, file, line: change.ln });
       }
-    })
-  );
+      return;
+    }
+  });
 
   if (fails.length < 20) {
     for (let i = 0; i < fails.length; i++) {
@@ -145,6 +156,46 @@ function disableNewJsFiles() {
   }
 }
 
+function getRelativePath(from: string, to: string): string {
+  const relativePath = path.relative(from, to);
+  const correctPath = relativePath.substring('../'.length);
+  if (!relativePath.startsWith('../')) {
+    return `./${correctPath}`;
+  }
+  return correctPath;
+}
+
+async function checkIronSessionImports() {
+  const fails: CodeCheckFailed[] = [];
+
+  await loopOverChanges(sourceCodeFileMatcher, async (file, change) => {
+    const data = change.content;
+
+    if (/\biron-session\b/.test(data)) {
+      const pathFromSrc = file.substring('packages/nextjs/src'.length);
+
+      let relativePath;
+      if (file.indexOf('src/edge/')) {
+        relativePath = getRelativePath(pathFromSrc, '/utils/encryption-edge');
+      } else {
+        relativePath = getRelativePath(pathFromSrc, '/utils/encryption');
+      }
+
+      const message =
+        `Don't use iron-session directly, this may break SSR and Edge runtime, to use \`sealData/unsealData\`:\n\n` +
+        `\`\`\`tsx\n  import {unsealTokens, sealTokens} from '${relativePath}' \n\`\`\``;
+      fails.push({ message, file, line: change.ln });
+      return;
+    }
+  });
+
+  for (let i = 0; i < fails.length; i++) {
+    const fileData = fails[i];
+    fail(fileData.message, fileData.file, fileData.line);
+    await delay(100);
+  }
+}
+
 markdown('## Frontegg Doctor :heart: report:');
 
 printSummary();
@@ -152,8 +203,9 @@ checkYarnLock();
 checkPackageLock();
 checkDependencies();
 checkAssignee();
-disableNewJsFiles();
 checkCode();
+disableNewJsFiles();
+checkIronSessionImports();
 
 // message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
 //   file: danger.git.created_files.find((t) => t.indexOf('general-checks.yml') !== -1),
