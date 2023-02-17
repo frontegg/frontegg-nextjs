@@ -92,8 +92,12 @@ async function checkCode() {
   await Promise.all(
     editedFiles.map(async (file) => {
       const diffForFile = await danger.git.diffForFile(file);
+      if (file.indexOf('client/FronteggBaseProvider.tsx') !== -1) {
+        console.log(diffForFile);
+      }
+
       if (diffForFile != null) {
-        const data = diffForFile.after;
+        const data = diffForFile.added;
 
         const debuggerLines = checkContains(data, /\bdebugger\b/g);
         const consoleLines = checkContains(data, /\bconsole\.\b/g);
@@ -115,6 +119,7 @@ async function checkCode() {
     for (let i = 0; i < fails.length; i++) {
       const fileData = fails[i];
       fail(fileData.message, fileData.file, fileData.line);
+      await delay(100);
     }
   } else {
     warn(`Skip commenting on line due to many fails: ${fails.length}`);
