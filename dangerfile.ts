@@ -203,7 +203,7 @@ async function checkIronSessionImports() {
     await delay(100);
   }
 }
-markdown('## Frontegg Doctor :heart: report:');
+markdown('## Frontegg Pull Request Review:');
 printSummary();
 
 checkYarnLock();
