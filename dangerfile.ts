@@ -82,30 +82,46 @@ function checkContains(data: string, regex: RegExp): number[] {
 
 const delay = (time: number = 200) => new Promise((resolve) => setTimeout(resolve, time));
 
+type CodeCheckFailed = { message: string; file: string; line: number };
+
 async function checkCode() {
   const editedFiles = danger.git.fileMatch(sourceCodeFileMatcher).getKeyedPaths().edited;
 
-  for (const file in editedFiles) {
-    const diffForFile = await danger.git.diffForFile(file);
-    if (diffForFile != null) {
-      const data = diffForFile.after;
+  const fails: CodeCheckFailed[] = [];
 
-      const debuggerLines = checkContains(data, /\bdebugger\b/g);
-      const consoleLines = checkContains(data, /\bconsole\.\b/g);
+  await Promise.all(
+    editedFiles.map(async (file) => {
+      const diffForFile = await danger.git.diffForFile(file);
+      if (diffForFile != null) {
+        const data = diffForFile.after;
 
-      debuggerLines.forEach((line) => {
-        fail('Remove debugger symbols', file, line);
-      });
+        const debuggerLines = checkContains(data, /\bdebugger\b/g);
+        const consoleLines = checkContains(data, /\bconsole\.\b/g);
 
-      consoleLines.forEach((line) => {
-        fail('Remove console.logs, create child logger from ./utils/fronteggLogin', file, line);
-      });
+        debuggerLines.forEach((line) => {
+          const message = 'No debugger';
+          fails.push({ message, file, line });
+        });
 
-      console.log(`file: ${file}`, { consoleLines, debuggerLines });
-      if (debuggerLines.length > 0 || consoleLines.length > 0) {
-        await delay();
+        consoleLines.forEach((line) => {
+          const message = 'No console.log';
+          fails.push({ message, file, line });
+        });
       }
+    })
+  );
+
+  if (fails.length < 20) {
+    for (let i = 0; i < fails.length; i++) {
+      const fileData = fails[i];
+      fail(fileData.message, fileData.file, fileData.line);
     }
+  } else {
+    warn(`Skip commenting on line due to many fails: ${fails.length}`);
+    const failedRows = fails
+      .map((failData) => `- ${failData.message} - <i>file:${failData.file}#${failData.line}</i>`)
+      .join('\n');
+    fail(`Code Quality Failed:\n${failedRows}`);
   }
 }
 
