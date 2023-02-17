@@ -92,7 +92,7 @@ async function checkCode() {
   await Promise.all(
     editedFiles.map(async (file) => {
       const diffForFile = await danger.git.diffForFile(file);
-      if (file.indexOf('/FronteggProviderNext13.tsx') !== -1) {
+      if (file.indexOf('src/session.ts') !== -1) {
         const structuredDiff = await danger.git.structuredDiffForFile(file);
         console.log(JSON.stringify(structuredDiff, null, 2));
       }

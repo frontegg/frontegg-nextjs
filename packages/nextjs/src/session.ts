@@ -28,6 +28,7 @@ export function withSSRSession<
     } else {
       let loginUrl = config.authRoutes.loginUrl ?? authInitialState.routes.loginUrl;
 
+      console.log('test auto code review');
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`;
       }
