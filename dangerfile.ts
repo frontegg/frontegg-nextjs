@@ -169,6 +169,14 @@ async function checkIronSessionImports() {
   const fails: CodeCheckFailed[] = [];
 
   await loopOverChanges(sourceCodeFileMatcher, async (file, change) => {
+    if (
+      file === 'packages/nextjs/src/utils/encryption/index.ts' ||
+      file === 'packages/nextjs/src/utils/encryption-edge/index.ts'
+    ) {
+      // ignored files. these files can direct import iron-session
+      return;
+    }
+
     const data = change.content;
 
     if (/\biron-session\b/.test(data)) {

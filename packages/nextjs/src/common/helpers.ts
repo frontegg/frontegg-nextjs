@@ -1,10 +1,11 @@
-import { sealData, unsealData } from 'iron-session';
 import { getTenants, getUsers } from '../api';
 import config from '../config';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from '../types';
 import JwtManager from '../utils/jwt';
+import { sealData, unsealData, IronSession } from 'iron-session';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 
+type TestSession = { session: IronSession };
 const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
