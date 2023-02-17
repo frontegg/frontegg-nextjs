@@ -183,7 +183,7 @@ async function checkIronSessionImports() {
       const pathFromSrc = file.substring('packages/nextjs/src'.length);
 
       let relativePath;
-      if (file.indexOf('src/edge/')) {
+      if (file.indexOf('src/edge/') !== -1) {
         relativePath = getRelativePath(pathFromSrc, '/utils/encryption-edge');
       } else {
         relativePath = getRelativePath(pathFromSrc, '/utils/encryption');
