@@ -91,26 +91,25 @@ async function checkCode() {
 
   await Promise.all(
     editedFiles.map(async (file) => {
-      const diffForFile = await danger.git.diffForFile(file);
-      if (file.indexOf('src/session.ts') !== -1) {
-        const structuredDiff = await danger.git.structuredDiffForFile(file);
-        console.log(JSON.stringify(structuredDiff, null, 2));
-      }
+      const diffForFile = await danger.git.structuredDiffForFile(file);
       if (diffForFile != null) {
-        const data = diffForFile.added;
+        for (let chunkIdx = 0; chunkIdx < diffForFile.chunks.length; chunkIdx++) {
+          const chunk = diffForFile.chunks[chunkIdx];
+          for (let changeIdx = 0; changeIdx < chunk.changes.length; changeIdx++) {
+            const change = chunk.changes[changeIdx];
+            if (change.type === 'add') {
+              const data = change.content;
 
-        const debuggerLines = checkContains(data, /\bdebugger\b/g);
-        const consoleLines = checkContains(data, /\bconsole\.\b/g);
-
-        debuggerLines.forEach((line) => {
-          const message = 'No debugger';
-          fails.push({ message, file, line });
-        });
-
-        consoleLines.forEach((line) => {
-          const message = 'No console.log';
-          fails.push({ message, file, line });
-        });
+              if (/\bdebugger\b/.test(data)) {
+                const message = 'No debugger';
+                fails.push({ message, file, line: change.ln });
+              } else if (/\bconsole\.\b/.test(data)) {
+                const message = 'No console.log';
+                fails.push({ message, file, line: change.ln });
+              }
+            }
+          }
+        }
       }
     })
   );
@@ -130,6 +129,18 @@ async function checkCode() {
   }
 }
 
+function disableNewJsFiles() {
+  const JS_EXT = /\.jsx?$/;
+  const hasJS = danger.git
+    .fileMatch(sourceCodeFileMatcher)
+    .getKeyedPaths()
+    .created.some((file) => JS_EXT.test(file));
+
+  if (hasJS) {
+    fail('JavaScript detected. All new files must be TypeScript.');
+  }
+}
+
 markdown('## Frontegg Doctor :heart: report:');
 
 printSummary();
@@ -137,6 +148,7 @@ checkYarnLock();
 checkPackageLock();
 checkDependencies();
 checkAssignee();
+disableNewJsFiles();
 checkCode();
 
 // message(`Remove \`ready_for_review\`, \`review_requested\` from  on:pull_request:types`, {
