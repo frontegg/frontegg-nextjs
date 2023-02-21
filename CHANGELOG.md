@@ -1,5 +1,15 @@
 # Change Log
 
+## [6.7.18](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.17...v6.7.18) (2023-2-21)
+
+- FR-10851 - Admin portal SSO providers options are wrong
+- FR-10821 - Fix background for table pivot column
+- FR-10799 - Add-refresh
+- FR-10799 - Remove redirect from imperosnation
+- FR-10804 - Fix style reorder bug when using @emotion/react and Frontegg Next.JS 
+- FR-10530 - add functionality for prompt passkeys
+
+
 ## [6.7.17](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.16...v6.7.17) (2023-2-8)
 
 - Updated M2M tokens to reflect the vendor choice
