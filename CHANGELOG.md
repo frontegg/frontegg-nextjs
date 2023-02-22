@@ -1,5 +1,12 @@
 # Change Log
 
+## [6.7.18](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.17...v6.7.18) (2023-2-21)
+
+- Fixed Admin portal SSO provider's options to be correlated with the vendor choice
+- Fixed background for table pivot column
+- Fixed impersonation by removing unnecessary redirects and adding a refresh call
+- Fixed style reorder bug when using @emotion/react and Frontegg Next.JS
+
 ## [6.7.17](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.16...v6.7.17) (2023-2-8)
 
 - Updated M2M tokens to reflect the vendor choice
