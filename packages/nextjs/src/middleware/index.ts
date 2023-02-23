@@ -10,7 +10,7 @@
  * Create new file under `./pages/api/frontegg/[...frontegg-middleware].ts` and paste the snippet below:
  *
  * ```typescript
- *    export { FronteggApiMiddleware as default } from '@frontegg/nextjs/middlewares';
+ *    export { FronteggApiMiddleware as default } from '@frontegg/nextjs/middleware';
  *
  *    export const config = {
  *      api: {

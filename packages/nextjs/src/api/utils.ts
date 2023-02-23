@@ -63,6 +63,7 @@ export function buildRequestHeaders(
   additionalHeaders: Record<string, string> = {}
 ): Record<string, string> {
   const preparedHeaders: Record<string, string> = {
+    authorization: headers['authorization'],
     'accept-encoding': headers['accept-encoding'],
     'accept-language': headers['accept-language'],
     accept: headers['accept'],

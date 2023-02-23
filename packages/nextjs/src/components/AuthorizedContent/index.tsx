@@ -9,7 +9,7 @@ export interface AuthorizationProps {
 }
 
 const AuthorizedContent: FC<AuthorizationProps> = (props) => {
-  let isAuthorized = true; // Initially
+  let isAuthorized = true;
   const user = useAuthUserOrNull();
   if (!user?.superUser) {
     if (props.requiredPermissions) {

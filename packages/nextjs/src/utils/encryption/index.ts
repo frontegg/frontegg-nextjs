@@ -5,6 +5,11 @@ import { unsealData, sealData } from 'iron-session';
 import config from '../../config';
 import type { EncryptionUtils, FronteggUserTokens } from '../../types';
 
+/**
+ * IMPORTANT NOTE:
+ * This utils can be used only in server/client runtime, for edge runtime use the ./utils/encryption-edge
+ **/
+
 const unsealTokens = async (data: string): Promise<FronteggUserTokens | undefined> => {
   const jwtData: string = await unsealData(data, {
     password: config.password,

@@ -24,6 +24,7 @@ export const middleware = async (request: NextRequest) => {
   //   const loginUrl = `/account/login?redirectUrl=${encodeURIComponent(pathname)}`;
   //   return NextResponse.redirect(new URL(loginUrl, process.env['FRONTEGG_APP_URL']));
   // }
+
   return NextResponse.next();
 };
 

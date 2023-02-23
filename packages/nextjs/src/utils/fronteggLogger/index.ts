@@ -17,14 +17,15 @@ const fronteggLogger = Logger(
   {
     write(messageJson: string) {
       const { msg, time, level, tag } = JSON.parse(messageJson);
-      const args = [new Date(time), `|${LEVELS[level]}|`, msg];
-      if (tag) {
-        args.push(`[${tag}]`);
+      const args = [new Date(time), `|${LEVELS[level]}|:`];
+      if (tag && fronteggLogger.level === 'debug') {
+        args.push(`${tag}:`);
       }
+      args.push(msg);
       console.log(...args);
     },
   }
 );
 
-fronteggLogger.warn(`Frontegg Next.js Wrapper (${sdkVersion.version}), Next.js version (${nextjsPkg.version})`);
+fronteggLogger.debug(`Frontegg Next.js Wrapper (${sdkVersion.version}), Next.js version (${nextjsPkg.version})`);
 export default fronteggLogger;

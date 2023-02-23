@@ -1,11 +1,9 @@
 import { getTenants, getUsers } from '../api';
-import config from '../config';
 import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from '../types';
 import JwtManager from '../utils/jwt';
-import { sealData, unsealData, IronSession } from 'iron-session';
+import encryptionUtils from '../utils/encryption';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 
-type TestSession = { session: IronSession };
 const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
@@ -14,11 +12,8 @@ export async function createSessionFromAccessToken(data: any): Promise<[string, 
   const { payload: decodedJwt }: any = await JwtManager.verify(accessToken);
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
-  const stringifySession = JSON.stringify({ accessToken, refreshToken });
-  const session = await sealData(stringifySession, {
-    password: config.password,
-    ttl: decodedJwt.exp,
-  });
+  const tokens = { accessToken, refreshToken };
+  const session = await encryptionUtils.sealTokens(tokens, decodedJwt.exp);
   return [session, decodedJwt, refreshToken];
 }
 
@@ -26,10 +21,7 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
   if (!cookie) {
     return undefined;
   }
-  const stringifyJwt: string = await unsealData(cookie, {
-    password: config.password,
-  });
-  return JSON.parse(stringifyJwt);
+  return await encryptionUtils.unsealTokens(cookie);
 }
 
 type UserDataArguments = {
@@ -41,8 +33,10 @@ export const getAllUserData = async ({ getSession, reqHeaders }: UserDataArgumen
   try {
     const session = await getSession();
     if (!session) return {};
-    const headers = { ...reqHeaders, Authorization: `Bearer ${session.accessToken}` };
+
+    const headers = { ...reqHeaders, authorization: `Bearer ${session.accessToken}` };
     const [baseUser, tenants] = await Promise.all([getUsers(headers), getTenants(headers)]);
+
     if (!baseUser || !tenants) return {};
     const user =
       baseUser && session

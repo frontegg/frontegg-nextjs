@@ -1,12 +1,11 @@
 'use client';
 
-import config from '../config';
 import { AppContext } from '../common/client';
-import { authInitialState } from '@frontegg/redux-store';
 import { useContext, useEffect } from 'react';
 import { useRouter, notFound } from 'next/navigation';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { ParsedUrlQuery } from 'querystring';
+import { getAuthRoutes, isAuthRoute } from '../utils/routing';
 
 interface FronteggRouterProps {
   params: ParsedUrlQuery & { 'frontegg-router'?: string[] };
@@ -14,35 +13,27 @@ interface FronteggRouterProps {
 }
 
 export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] }, searchParams }: FronteggRouterProps) {
-  const routesObj = {
-    ...authInitialState.routes,
-    ...config.authRoutes,
-  };
-  const routesArr: string[] = Object.keys(routesObj).reduce(
-    (p: string[], key: string) => [...p, (routesObj as any)[key]],
-    []
-  );
   const app = useContext(AppContext);
+
   const { replace } = useRouter();
+  const { routesObj } = getAuthRoutes();
   const loginWithRedirect = useLoginWithRedirect();
   const { logout } = useLoginActions();
+
   let pathname = `/${pathArr.join('/')}`;
-
-  if (searchParams && (!pathname || pathname.startsWith('/_next/data'))) {
-    const query = searchParams[Object.keys(searchParams)[0]];
-    pathname = `/${Array.isArray(query) ? query.join('/') : query}`;
+  if (!pathname || pathname.startsWith('/_next/data')) {
+    if (searchParams) {
+      const query = searchParams[Object.keys(searchParams)[0]];
+      pathname = `/${Array.isArray(query) ? query.join('/') : query}`;
+    } else {
+      notFound();
+      return null;
+    }
   }
-  if (routesArr.indexOf(pathname as string) === -1) {
-    notFound();
-  }
 
-  if (
-    config.fronteggAppOptions.hostedLoginBox &&
-    routesObj.loginUrl !== pathname &&
-    routesObj.logoutUrl !== pathname &&
-    routesObj.hostedLoginRedirectUrl !== pathname
-  ) {
+  if (!isAuthRoute(pathname)) {
     notFound();
+    return null;
   }
 
   useEffect(() => {
@@ -52,7 +43,7 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
     if (app.options.hostedLoginBox) {
       if (pathname === routesObj.loginUrl) {
         if (searchParams?.redirectUrl) {
-          localStorage.setItem(
+          window.localStorage.setItem(
             'FRONTEGG_AFTER_AUTH_REDIRECT_URL',
             `${window.location.origin}${searchParams?.redirectUrl}`
           );
@@ -69,5 +60,5 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
       }
     }
   }, [app, searchParams, loginWithRedirect, logout, replace]);
-  return '';
+  return null;
 }

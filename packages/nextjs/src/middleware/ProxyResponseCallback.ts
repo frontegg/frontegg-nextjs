@@ -1,9 +1,9 @@
 import { ProxyResCallback } from 'http-proxy';
 import { IncomingMessage } from 'http';
 import { NextApiResponse, NextApiRequest } from 'next';
-import config from '../../config';
-import CookieManager from '../../utils/cookies';
-import { createSessionFromAccessToken } from '../../common';
+import config from '../config';
+import CookieManager from '../utils/cookies';
+import { createSessionFromAccessToken } from '../common';
 import { isFronteggLogoutUrl } from './helpers';
 
 /**

@@ -44,9 +44,10 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
  * @param headers
  */
 export const getUsers = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
+  const headersToSend = buildRequestHeaders(headers);
   const res = await Get({
     url: `${config.baseUrl}${fronteggUsersUrl}`,
-    headers: buildRequestHeaders(headers),
+    headers: headersToSend,
   });
   return parseHttpResponse(res);
 };

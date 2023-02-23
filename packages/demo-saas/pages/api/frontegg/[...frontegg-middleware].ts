@@ -1,4 +1,4 @@
-export { FronteggApiMiddleware as default } from '@frontegg/nextjs/middlewares';
+export { FronteggApiMiddleware as default } from '@frontegg/nextjs/middleware';
 
 export const config = {
   api: {

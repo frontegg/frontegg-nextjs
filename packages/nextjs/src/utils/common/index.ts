@@ -16,3 +16,11 @@ function chunkString(str: string, chunkSize: number) {
 }
 
 export { chunkString };
+
+/**
+ * Calculates the time until an expiration time based on the current time.
+ *
+ * @param {number} exp - The expiration time in seconds since the Unix epoch.
+ * @returns {number} The time until expiration in seconds.
+ */
+export const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);

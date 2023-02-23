@@ -1,8 +1,8 @@
 export * from './FronteggProvider';
 export * from './FronteggProviderNoSSR';
 export * from './components/AuthorizedContent';
-export * from './middlewares';
-export * from './withFronteggApp';
+export * from './middleware';
+export * from './pages/withFronteggApp';
 export * from './session';
 export * from './common';
 

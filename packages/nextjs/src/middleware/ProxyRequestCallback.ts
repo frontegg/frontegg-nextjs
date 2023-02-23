@@ -2,10 +2,10 @@ import NextJsPkg from 'next/package.json';
 import { ProxyReqCallback } from 'http-proxy';
 import { ClientRequest } from 'http';
 import { NextApiRequest } from 'next';
-import sdkVersion from '../../sdkVersion';
-import config from '../../config';
-import CookieManager from '../../utils/cookies';
-import fronteggLogger from '../../utils/fronteggLogger';
+import sdkVersion from '../sdkVersion';
+import config from '../config';
+import CookieManager from '../utils/cookies';
+import fronteggLogger from '../utils/fronteggLogger';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
 /**

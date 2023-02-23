@@ -1,4 +1,4 @@
-import { FronteggRouterMiddleware, FronteggRouterMiddlewareProps } from '@frontegg/nextjs/middlewares';
+import { FronteggAppRouter, FronteggAppRouterProps } from '@frontegg/nextjs/pages';
 
-export const getServerSideProps = FronteggRouterMiddlewareProps;
-export default FronteggRouterMiddleware;
+export const getServerSideProps = FronteggAppRouterProps;
+export default FronteggAppRouter;
