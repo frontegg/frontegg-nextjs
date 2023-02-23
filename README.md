@@ -22,25 +22,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 
 ## Installation
 
-### Create new NextJS project
-
-To start a new Create Next App project with TypeScript, you can run:
-
-```bash
-  npx create-next-app --example "https://github.com/frontegg/frontegg-nextjs" --example-path "apps/example" my-nextjs-app-name
-```
-
-or
-
-```bash
-  yarn create next-app --example "https://github.com/frontegg/frontegg-nextjs" --example-path "apps/example" my-nextjs-app-name
-```
-
-> If you've previously installed `create-react-app` globally via `npm install -g create-next-app`, we recommend you uninstall the package using `npm uninstall -g create-next-app` or `yarn global remove create-next-app` to ensure that `npx` always uses the latest version.
->
-> Global installations of `create-next-app` are no longer supported.
-
-### Add to existing project
+### Add Frontegg to Next.JS project
 
 To Add Frontegg to your existing Next.JS project, follow below steps:
 

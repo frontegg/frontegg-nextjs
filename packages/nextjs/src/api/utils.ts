@@ -1,6 +1,7 @@
 import config from '../config';
 import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
+import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
 
 interface GetRequestOptions {
   url: string;
@@ -91,3 +92,23 @@ export const parseHttpResponse = async <T>(res: Response): Promise<T | undefined
   }
   return await res.json();
 };
+
+/**
+ * Checks if the given path is a frontegg authentication API route, ends with '/postlogin', or ends with '/prelogin'.
+ *
+ * @param {string} path - The path to check for authentication API routes.
+ * @returns {boolean} Returns true if the path is a frontegg authentication API route or ends with '/postlogin' or '/prelogin'; otherwise, returns false.
+ */
+export function isAuthPath(path: string): boolean {
+  return fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin');
+}
+
+/**
+ * Checks if the given path matches the pattern for a social login prelogin route.
+ *
+ * @param {string} path - The path to check for a social login prelogin route pattern.
+ * @returns {boolean} Returns true if the path matches the social login prelogin route pattern; otherwise, returns false.
+ */
+export function isSocialLoginPath(path: string): boolean {
+  return RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path);
+}

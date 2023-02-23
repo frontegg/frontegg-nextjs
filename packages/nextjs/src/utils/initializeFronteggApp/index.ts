@@ -1,5 +1,3 @@
-'use client';
-
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
 import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
 import { KeyValuePair } from '@frontegg/rest-api';
@@ -7,7 +5,7 @@ import { FronteggAppOptions } from '@frontegg/types';
 import sdkVersion from '../../sdkVersion';
 import type { FronteggProviderOptions } from '../../types';
 import nextjsPkg from 'next/package.json';
-import { isAuthPath, isSocialLoginPath } from '../helpers';
+import { isAuthPath, isSocialLoginPath } from '../../api/utils';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -16,7 +14,7 @@ type CreateOrGetFronteggAppParams = {
   storeHolder: any;
 };
 
-export const createOrGetFronteggApp = ({
+const initializeFronteggApp = ({
   options,
   onRedirectTo,
   appName,
@@ -120,3 +118,5 @@ export const createOrGetFronteggApp = ({
   }
   return createdApp;
 };
+
+export default initializeFronteggApp;

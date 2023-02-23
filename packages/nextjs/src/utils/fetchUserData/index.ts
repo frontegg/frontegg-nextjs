@@ -21,7 +21,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const { accessToken } = session;
     const reqHeaders = await getHeaders();
-    const headers = { ...reqHeaders, Authorization: `Bearer ${accessToken}` };
+    const headers = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     logger.debug('Retrieving user data...');
     const [baseUserResult, tenantsResult] = await Promise.allSettled([getUsers(headers), getTenants(headers)]);

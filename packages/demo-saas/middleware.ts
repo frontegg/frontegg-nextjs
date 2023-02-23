@@ -8,22 +8,23 @@ export const middleware = async (request: NextRequest) => {
   //   return NextResponse.next();
   // }
   //
-  // const pathname = request.nextUrl.pathname;
+  const pathname = request.nextUrl.pathname;
   //
-  // if (
-  //   shouldByPassMiddleware(pathname, {
-  //     bypassImageOptimization: false,
-  //   })
-  // ) {
-  //   return NextResponse.next();
-  // }
+  if (
+    shouldByPassMiddleware(pathname, {
+      bypassImageOptimization: false,
+    })
+  ) {
+    return NextResponse.next();
+  }
   //
-  // const session = await getSession(request);
-  // if (!session) {
-  //   //  redirect unauthenticated user to /account/login page
-  //   const loginUrl = `/account/login?redirectUrl=${encodeURIComponent(pathname)}`;
-  //   return NextResponse.redirect(new URL(loginUrl, process.env['FRONTEGG_APP_URL']));
-  // }
+  const session = await getSession(request);
+  console.log(session);
+  if (!session) {
+    //  redirect unauthenticated user to /account/login page
+    const loginUrl = `/account/login?redirectUrl=${encodeURIComponent(pathname)}`;
+    return NextResponse.redirect(new URL(loginUrl, process.env['FRONTEGG_APP_URL']));
+  }
 
   return NextResponse.next();
 };

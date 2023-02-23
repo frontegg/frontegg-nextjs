@@ -2,10 +2,10 @@
 
 import { FronteggStoreProvider } from '@frontegg/react-hooks';
 import { ContextHolder } from '@frontegg/rest-api';
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
 import type { FronteggProviderProps } from '../../types';
 import AppContext from './AppContext';
-import { createOrGetFronteggApp } from './createOrGetFronteggApp';
+import initializeFronteggApp from './../../utils/initializeFronteggApp';
 import { useRequestAuthorizeSSR } from './hooks';
 import useOnRedirectTo from '../../utils/useOnRedirectTo';
 
@@ -20,7 +20,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
 
   const app = useMemo(
     () =>
-      createOrGetFronteggApp({
+      initializeFronteggApp({
         options: { ...props, basename: baseName },
         onRedirectTo,
         appName,
@@ -30,6 +30,11 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   );
   ContextHolder.setOnRedirectTo(onRedirectTo);
 
+  // useEffect(() => {
+  //   if(window.location.pathname == '/account/login') {
+  //     app.store.dispatch({ type: 'auth/requestAuthorize', payload: true });
+  //   }
+  // }, [app]);
   useRequestAuthorizeSSR({ app, user, tenants, session });
   return (
     <AppContext.Provider value={app}>
