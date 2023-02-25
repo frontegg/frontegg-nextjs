@@ -5,7 +5,7 @@ import { devices } from '@playwright/test';
 require('dotenv').config();
 
 const config: PlaywrightTestConfig = {
-  testDir: './unit-tests',
+  testDir: './tests',
   /* Maximum time one test can run for. */
   timeout: 5000,
   expect: {

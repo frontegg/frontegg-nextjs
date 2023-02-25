@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
-import config from '../../src/config';
+import config from '../../../src/config';
 import { LARGE_COOKIE_VALUE, SMALL_COOKIE_VALUE, commonTestsForCookie, extractValueOutOfCookie } from './utils';
-import CookieManager from '../../src/utils/cookies';
-import { getIndexedCookieName } from '../../src/utils/cookies/helpers';
-import { COOKIE_MAX_LENGTH } from '../../src/utils/cookies/constants';
+import CookieManager from '../../../src/utils/cookies';
+import { getIndexedCookieName } from '../../../src/utils/cookies/helpers';
+import { COOKIE_MAX_LENGTH } from '../../../src/utils/cookies/constants';
 
 const COOKIE_NAME = config.cookieName;
 const COOKIE_DOMAIN = config.cookieDomain;

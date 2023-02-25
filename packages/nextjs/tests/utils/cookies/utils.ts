@@ -1,4 +1,4 @@
-import config from '../../src/config';
+import config from '../../../src/config';
 import { expect } from '@playwright/test';
 
 export const SMALL_COOKIE_VALUE: string = 'value';
