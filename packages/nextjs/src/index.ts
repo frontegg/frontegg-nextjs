@@ -1,11 +1,13 @@
-export * from './FronteggProvider';
-export * from './FronteggProviderNoSSR';
-export * from './components/AuthorizedContent';
+export * from './app';
+// export * from './common';
+// export * from './components';
+export * from './config';
+export * from './edge';
 export * from './middleware';
-export * from './pages/withFronteggApp';
-export * from './session';
-export * from './common';
+export * from './no-ssr';
+export * from './pages';
+export * from './types';
 
-export { AdminPortal } from '@frontegg/js';
+export { AdminPortal, AppHolder, HostedLogin } from '@frontegg/js';
 export * from '@frontegg/react-hooks';
 export * from '@frontegg/types';

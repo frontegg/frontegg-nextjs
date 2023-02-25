@@ -1,14 +1,11 @@
-import { FronteggAppOptions } from '@frontegg/types';
-import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import React from 'react';
-import { getAllUserData } from '../../common';
-import type { FronteggCustomApp, WithFronteggAppOptions } from './types';
-import { FronteggProvider } from '../../FronteggProvider';
+import type { AppContext, AppInitialProps, AppProps } from 'next/app';
+import type { FronteggCustomAppClass, FronteggCustomApp, WithFronteggAppOptions } from './types';
+import FronteggProvider from '../FronteggPagesProvider';
 import refreshAccessToken from '../../utils/refreshAccessToken';
+import fetchUserData from '../../utils/fetchUserData';
 import config from '../../config';
-import { FronteggCustomAppClass } from './types';
 import { AllUserData } from '../../types';
-import * as process from 'process';
 
 export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFronteggAppOptions): FronteggCustomApp => {
   const originalGetInitialProps = app.getInitialProps;
@@ -25,9 +22,9 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
 
     if (ctx.req) {
       appEnvConfig = config.appEnvConfig;
-      const userData = await getAllUserData({
+      const userData = await fetchUserData({
         getSession: async () => await refreshAccessToken(ctx),
-        reqHeaders: ctx.req?.headers,
+        getHeaders: async () => ctx.req?.headers ?? {},
       });
       Object.assign(appContextSessionData, userData);
     }

@@ -7,9 +7,9 @@ import { useRouter } from 'next/router';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { isAuthRoute } from '../../utils/routing';
 import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../../utils/common/constants';
-import { ApiUrls, buildLoginRoute, buildLogoutRoute } from '../../api/urls';
+import { buildLogoutRoute } from '../../api/urls';
 
-export function FronteggAppRouter() {
+export function FronteggRouter() {
   const app = useContext(AppContext);
   const { query, replace } = useRouter();
   const loginWithRedirect = useLoginWithRedirect();
@@ -33,18 +33,14 @@ export function FronteggAppRouter() {
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
-        const _baseUrl = app.options.contextOptions.baseUrl;
-        const baseUrl = typeof _baseUrl === 'string' ? _baseUrl : _baseUrl('');
-        logout(() => {
-          window.location.href = buildLogoutRoute(window.location.origin).asPath;
-        });
+        logout(() => (window.location.href = buildLogoutRoute(window.location.origin).asPath));
       }
     }
   }, [app, query, loginWithRedirect, logout, replace]);
   return '';
 }
 
-export function FronteggAppRouterProps(context: any) {
+export function FronteggRouterProps(context: any) {
   let { pathname } = URL.parse(context.resolvedUrl ?? context.req.url, true);
   if (!pathname || pathname.startsWith('/_next/data')) {
     const query = context.req.query[Object.keys(context.req.query)[0]];

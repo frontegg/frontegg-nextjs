@@ -3,11 +3,13 @@ const imageOptimizationRegex = new RegExp('^/(_next/image).*');
 const headerRequestsRegex = new RegExp('^/(favicon.ico).*');
 const fronteggMiddlewareRegex = new RegExp('^/(api/frontegg).*');
 const fronteggRoutesRegex = new RegExp('^/(account/|oauth/callback).*');
+
 interface ByPassOptions {
   bypassStaticFiles?: boolean; // default: true
   bypassImageOptimization?: boolean; // default: true
   bypassHeaderRequests?: boolean; // default: true
 }
+
 /**
  * Use `shouldByPassMiddleware` in the middleware.ts file
  * to protect all application's routes.

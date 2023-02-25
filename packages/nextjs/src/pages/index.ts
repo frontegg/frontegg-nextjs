@@ -1,1 +1,1 @@
-export * from './FronteggAppRouter';
+export * from './FronteggRouter';

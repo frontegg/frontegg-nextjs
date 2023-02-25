@@ -1,11 +1,11 @@
 import { authInitialState } from '@frontegg/redux-store';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { ParsedUrlQuery } from 'querystring';
-import type { FronteggNextJSSession, RequestType } from './types';
-import config from './config';
-import CookieManager from './utils/cookies';
-import createSession from './utils/createSession';
-import encryption from './utils/encryption';
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import type { ParsedUrlQuery } from 'querystring';
+import type { FronteggNextJSSession, RequestType } from '../types';
+import config from '../config';
+import CookieManager from '../utils/cookies';
+import createSession from '../utils/createSession';
+import encryption from '../utils/encryption';
 
 export const getSession = (req: RequestType) => {
   const cookies = CookieManager.getSessionCookieFromRequest(req);

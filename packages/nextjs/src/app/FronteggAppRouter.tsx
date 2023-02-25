@@ -6,6 +6,7 @@ import { useRouter, notFound } from 'next/navigation';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { ParsedUrlQuery } from 'querystring';
 import { getAuthRoutes, isAuthRoute } from '../utils/routing';
+import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../utils/common/constants';
 
 interface FronteggRouterProps {
   params: ParsedUrlQuery & { 'frontegg-router'?: string[] };
@@ -44,7 +45,7 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
       if (pathname === routesObj.loginUrl) {
         if (searchParams?.redirectUrl) {
           window.localStorage.setItem(
-            'FRONTEGG_AFTER_AUTH_REDIRECT_URL',
+            FRONTEGG_AFTER_AUTH_REDIRECT_URL,
             `${window.location.origin}${searchParams?.redirectUrl}`
           );
         }

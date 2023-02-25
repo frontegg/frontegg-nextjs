@@ -4,8 +4,8 @@ import { ContextHolder } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import { NextRouter, useRouter } from 'next/router';
 import React, { FC, PropsWithChildren, useEffect, useMemo } from 'react';
-import { AppContext, ExpireInListener } from './common/client';
-import useOnRedirectTo from './utils/useOnRedirectTo';
+import { AppContext, ExpireInListener } from '../common/client';
+import useOnRedirectTo from '../utils/useOnRedirectTo';
 
 export type FronteggProviderNoSSRProps = PropsWithChildren<FronteggAppOptions>;
 
