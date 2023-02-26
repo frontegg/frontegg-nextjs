@@ -47,7 +47,7 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
     logger.info('going to refresh token (hosted-login mode)');
     return await api.refreshTokenHostedLogin(headers, tokens.refreshToken);
   } catch (e) {
-    console.error('refreshTokenHostedLogin', e);
+    logger.error(e);
     return null;
   }
 }

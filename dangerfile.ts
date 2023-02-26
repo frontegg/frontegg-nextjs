@@ -112,6 +112,9 @@ async function checkCode() {
   await loopOverChanges(sourceCodeFileMatcher, async (file, change) => {
     const data = change.content;
 
+    if (file.indexOf('utils/fronteggLogger/index.ts') !== -1) {
+      return;
+    }
     if (/\bdebugger\b/.test(data)) {
       const message = 'No debugger';
       fails.push({ message, file, line: change.ln });
@@ -203,6 +206,7 @@ async function checkIronSessionImports() {
     await delay(100);
   }
 }
+
 markdown('## Frontegg Pull Request Review:');
 printSummary();
 

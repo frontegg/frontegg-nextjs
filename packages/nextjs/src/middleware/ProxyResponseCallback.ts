@@ -5,7 +5,9 @@ import config from '../config';
 import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';
 import { isFronteggLogoutUrl } from './helpers';
+import fronteggLogger from '../utils/fronteggLogger';
 
+const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**
  * Proxy response callback fired on after each response from Frontegg services,
  * to transport frontegg modify cookies and generating encrypted JWT session cookie.
@@ -78,7 +80,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
              * Ignore saml postLogin response with redirect
              */
           } else {
-            console.log('[FronteggMiddleware] failed to create session', e, {
+            logger.error('failed to create session', e, {
               url,
               statusCode,
             });
@@ -93,7 +95,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
         res.status(statusCode).end(bodyStr);
       } else {
         if (statusCode >= 400 && statusCode !== 404) {
-          console.error('[ERROR] FronteggMiddleware', { url, statusCode });
+          logger.error(`Middleware request failed statusCode: ${statusCode} for url: ${url}`);
         }
         Object.keys(proxyRes.headers)
           .filter((header) => header !== 'cookie')
@@ -103,7 +105,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
         res.status(statusCode).end(bodyStr);
       }
     } catch (e: any) {
-      console.error('[ERROR] FronteggMiddleware', 'proxy failed to send request', e);
+      logger.error('proxy failed to send request', e);
       res.status(500).end('Internal Server Error');
     }
   });
