@@ -1,10 +1,10 @@
 'use client';
 
-import { FronteggApp } from '@frontegg/js';
 import { useEffect } from 'react';
-import { AllUserData } from '../../../types';
+import { FronteggApp } from '@frontegg/js';
+import { AllUserData } from '../types';
 
-export const useRequestAuthorizeSSR = ({ app, user, tenants, session }: { app: FronteggApp } & AllUserData) => {
+export default function useRequestAuthorizeSSR({ app, user, tenants, session }: { app: FronteggApp } & AllUserData) {
   useEffect(() => {
     app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
@@ -15,4 +15,4 @@ export const useRequestAuthorizeSSR = ({ app, user, tenants, session }: { app: F
       },
     });
   }, [app]);
-};
+}

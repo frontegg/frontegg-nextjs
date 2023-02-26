@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { FC } from 'react';
-import { FronteggBaseProvider } from '../../common/client';
+import { FronteggBaseProvider } from '../../common';
 import { FronteggProviderProps } from '../../types';
 
 const FronteggPagesProvider: FC<Omit<FronteggProviderProps, 'router'>> = ({ children, basename, ...props }) => {

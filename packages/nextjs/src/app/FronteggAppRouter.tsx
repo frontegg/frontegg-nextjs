@@ -1,6 +1,6 @@
 'use client';
 
-import { AppContext } from '../common/client';
+import { AppContext } from '../common';
 import { useContext, useEffect } from 'react';
 import { useRouter, notFound } from 'next/navigation';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';

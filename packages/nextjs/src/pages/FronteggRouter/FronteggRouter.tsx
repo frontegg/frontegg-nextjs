@@ -1,5 +1,5 @@
 import config from '../../config';
-import { AppContext } from '../../common/client';
+import { AppContext } from '../../common';
 import { authInitialState } from '@frontegg/redux-store';
 import URL from 'url';
 import { useContext, useEffect } from 'react';

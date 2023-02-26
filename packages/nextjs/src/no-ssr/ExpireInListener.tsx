@@ -2,10 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { useAuthActions, useAuthUserOrNull } from '@frontegg/react-hooks';
+import { calculateExpiresInFromExp } from '../utils/common';
 
-export const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
-
-export const ExpireInListener = () => {
+export default function ExpireInListener() {
   const user = useAuthUserOrNull();
   const actions = useAuthActions();
   useEffect(() => {
@@ -18,4 +17,4 @@ export const ExpireInListener = () => {
   }, [actions, user]);
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <></>;
-};
+}

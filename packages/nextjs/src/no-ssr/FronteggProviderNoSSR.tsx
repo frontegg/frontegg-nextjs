@@ -1,11 +1,14 @@
+'use client';
+
 import { AppHolder, initialize } from '@frontegg/js';
 import { FronteggStoreProvider } from '@frontegg/react-hooks';
 import { ContextHolder } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import { NextRouter, useRouter } from 'next/router';
 import React, { FC, PropsWithChildren, useEffect, useMemo } from 'react';
-import { AppContext, ExpireInListener } from '../common/client';
+import AppContext from '../common/AppContext';
 import useOnRedirectTo from '../utils/useOnRedirectTo';
+import ExpireInListener from './ExpireInListener';
 
 export type FronteggProviderNoSSRProps = PropsWithChildren<FronteggAppOptions>;
 
