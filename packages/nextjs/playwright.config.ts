@@ -27,7 +27,10 @@ const config: PlaywrightTestConfig = {
   workers: process.env.CI ? 4 : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['list', { printSteps: true }],
+    ['html', { open: 'never' }],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 
   /* Configure projects for major browsers */
@@ -39,6 +42,7 @@ const config: PlaywrightTestConfig = {
       },
     },
   ],
+  globalSetup: './tests/global-setup.ts',
 };
 
 export default config;
