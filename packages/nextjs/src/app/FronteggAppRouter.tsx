@@ -19,7 +19,7 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
   const { replace } = useRouter();
   const { routesObj } = getAuthRoutes();
   const loginWithRedirect = useLoginWithRedirect();
-  const { logout } = useLoginActions();
+  const { requestAuthorize, logout } = useLoginActions();
 
   let pathname = `/${pathArr.join('/')}`;
   if (!pathname || pathname.startsWith('/_next/data')) {
@@ -59,7 +59,11 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
           )}`;
         });
       }
+    } else {
+      if (pathname === routesObj.loginUrl) {
+        requestAuthorize(true);
+      }
     }
-  }, [app, searchParams, loginWithRedirect, logout, replace]);
+  }, [app, searchParams, loginWithRedirect, logout, replace, requestAuthorize]);
   return null;
 }

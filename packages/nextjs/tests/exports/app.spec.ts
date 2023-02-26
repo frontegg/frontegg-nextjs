@@ -4,9 +4,10 @@ import * as Exports from '../../src/app';
 test('@frontegg/nextjs/app exports test', () => {
   const requiredExports: Set<string> = new Set<string>([
     'FronteggAppProvider',
-    'getSession',
-    'getUserSession',
-    'getUserTokens',
+    'FronteggAppRouter',
+    'getAppSession',
+    'getAppUserSession',
+    'getAppUserTokens',
   ]);
 
   const additionalExports = Object.keys(Exports).filter((exported: string) => {

@@ -9,24 +9,24 @@ const getCookie = () => {
   return CookieManager.parseCookieFromArray(allCookies);
 };
 
-export const getSession = () => {
+export const getAppSession = () => {
   const cookies = getCookie();
   return createSession(cookies, encryption);
 };
 
-export const getHeaders = async (): Promise<Record<string, string>> => {
+export const getAppHeaders = async (): Promise<Record<string, string>> => {
   const reqHeaders: Record<string, string> = {};
   headers().forEach((value, key) => (reqHeaders[key] = value));
   return reqHeaders;
 };
 
-export async function getUserSession(): Promise<FronteggUserSession | undefined> {
-  const session = await getSession();
+export async function getAppUserSession(): Promise<FronteggUserSession | undefined> {
+  const session = await getAppSession();
   return session?.user;
 }
 
-export async function getUserTokens(): Promise<FronteggUserTokens | undefined> {
-  const session = await getSession();
+export async function getAppUserTokens(): Promise<FronteggUserTokens | undefined> {
+  const session = await getAppSession();
   if (!session) {
     return undefined;
   }

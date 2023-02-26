@@ -1,4 +1,4 @@
-import { FronteggAppProvider } from '@frontegg/nextjs/server';
+import { FronteggAppProvider } from '@frontegg/nextjs/app';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

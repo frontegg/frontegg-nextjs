@@ -8,8 +8,8 @@ const sourceCodeFileMatcher = 'packages/nextjs/**/*';
 
 function printSummary() {
   const docs = danger.git.fileMatch('**/*.md');
-  const next12App = danger.git.fileMatch('packages/demo-saas/**/*');
-  const next13App = danger.git.fileMatch('packages/demo-saas-next12/**/*');
+  const next12App = danger.git.fileMatch('packages/example-app-directory/**/*');
+  const next13App = danger.git.fileMatch('packages/example-pages/**/*');
   const library = danger.git.fileMatch(sourceCodeFileMatcher);
   const tests = danger.git.fileMatch('*/unit-tests/*');
 

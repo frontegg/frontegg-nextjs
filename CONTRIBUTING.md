@@ -14,8 +14,8 @@ Thank you for considering contributing to `@frontegg/nextjs`! We welcome all con
 
 ## Environment variables
 Setup the environment variable for demo projects:
-- `/packages/demo-saas/.env.local`
-- `/packages/demo-saas-next12/.env.local`
+- `/packages/example-app-directory/.env.local`
+- `/packages/example-pages/.env.local`
 
 ```bash
 # The AppUrl is to tell Frontegg your application hostname

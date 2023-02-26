@@ -1,4 +1,5 @@
 export { FronteggAppProvider } from './FronteggAppProvider';
 export type { FronteggAppProviderProps } from './FronteggAppProvider';
+export { FronteggAppRouter } from './FronteggAppRouter';
 
-export { getSession, getUserSession, getUserTokens } from './helpers';
+export { getAppSession, getAppUserSession, getAppUserTokens } from './helpers';

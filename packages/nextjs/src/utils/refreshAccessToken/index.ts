@@ -20,7 +20,7 @@ import createSession from '../createSession';
  * @returns {Promise<FronteggNextJSSession | null>} A Promise that resolves to the updated session object, or `null` if the refresh failed.
  */
 export default async function refreshAccessToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
-  const logger = fronteggLogger.child({ tag: 'refreshToken' });
+  const logger = fronteggLogger.child({ tag: 'refreshAccessToken' });
   logger.info(`Refreshing token by for PageContext ${ctx.pathname}`);
   const nextJsRequest = ctx.req;
   const nextJsResponse = ctx.res;
@@ -95,7 +95,7 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
       refreshToken,
     };
   } catch (e) {
-    console.error('[refreshToken] Failed to create session e', e);
+    logger.error('[refreshToken] Failed to create session e', e);
     return null;
   }
 }

@@ -1,8 +1,8 @@
-import { getUserSession, getUserTokens } from '@frontegg/nextjs/server';
+import { getAppUserSession, getAppUserTokens } from '@frontegg/nextjs/app';
 
 export const ServerSession = async () => {
-  const userSession = await getUserSession();
-  const tokens = await getUserTokens();
+  const userSession = await getAppUserSession();
+  const tokens = await getAppUserTokens();
   return (
     <div>
       <div>user session server side: {JSON.stringify(userSession)}</div>;

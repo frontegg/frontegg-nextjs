@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { getSession } from '@frontegg/nextjs';
+import { getSession } from '@frontegg/nextjs/pages';
 
 export default function ManualRedirect({ ssrSession }) {
   return (

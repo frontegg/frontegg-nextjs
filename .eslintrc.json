@@ -15,8 +15,8 @@
     "es6": true
   },
   "ignorePatterns": [
-    "packages/demo-saas/**/*",
-    "packages/demo-saas-next12/**/*"
+    "packages/example-app-directory/**/*",
+    "packages/example-pages/**/*"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

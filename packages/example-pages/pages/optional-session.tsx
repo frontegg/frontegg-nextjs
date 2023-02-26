@@ -1,5 +1,6 @@
 import { GetServerSideProps } from 'next';
-import { AdminPortal, getSession, useAuthUserOrNull, useLoginWithRedirect } from '@frontegg/nextjs';
+import { AdminPortal, useAuthUserOrNull, useLoginWithRedirect } from '@frontegg/nextjs';
+import { getSession } from '@frontegg/nextjs/pages';
 
 export default function OptionalSession({ ssrSession }) {
   const user = useAuthUserOrNull();

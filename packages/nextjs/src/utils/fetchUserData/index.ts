@@ -51,7 +51,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     return { user, session, tenants };
   } catch (e: any) {
-    logger.error(e.message, e);
+    // logger.error(e.message, e);
     return {};
   }
 }

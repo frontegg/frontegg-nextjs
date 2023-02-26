@@ -7,7 +7,9 @@ import { fronteggTenantsUrl, fronteggUsersUrl, ILoginResponse, ITenantsResponse 
  * Send HTTP GET to frontegg domain public route to download the JWT public key
  */
 const loadPublicKey = async () => {
-  const response = await fetch(`${config.baseUrl}${ApiUrls.WellKnown.jwks}`);
+  const response = await fetch(`${config.baseUrl}${ApiUrls.WellKnown.jwks}`, {
+    cache: 'force-cache',
+  });
   const data = await response.json();
   return data.keys[0];
 };

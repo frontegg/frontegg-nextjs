@@ -1,5 +1,5 @@
 import { AppProps } from 'next/app';
-import { withFronteggApp } from '@frontegg/nextjs';
+import { withFronteggApp } from '@frontegg/nextjs/pages';
 import './app.css';
 
 function CustomApp({ Component, pageProps }: AppProps) {

@@ -162,10 +162,12 @@ class CookieManager {
   };
 
   private getCookiesToRemove = (request?: RequestType): string[] => {
+    const logger = fronteggLogger.child({ tag: 'getCookiesToRemove' });
     if (!request) {
       return [];
     }
     try {
+      logger.info('extract cookie from request headers');
       const cookieStr = getCookieHeader(request);
       const cookies = cookieStr && cookie.parse(cookieStr);
       if (!cookies) {
@@ -177,9 +179,10 @@ class CookieManager {
         cookieToRemove.push(this.getCookieName(cookieNumber));
         cookieNumber++;
       }
+      logger.info(`number of cookies to remove: ${cookieToRemove.length}`);
       return cookieToRemove;
     } catch (e) {
-      console.error(e);
+      logger.error(e);
       return [];
     }
   };

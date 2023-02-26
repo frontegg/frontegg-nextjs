@@ -10,22 +10,9 @@ import { LEVELS } from './constants';
 const isGithubRunnerDebugMode =
   process.env.ACTIONS_STEP_DEBUG === 'true' || process.env.ACTIONS_RUNNER_DEBUG === 'true';
 
-const fronteggLogger = Logger(
-  {
-    level: isGithubRunnerDebugMode ? 'debug' : process.env.FRONTEGG_LOG_LEVEL ?? 'info',
-  },
-  {
-    write(messageJson: string) {
-      const { msg, time, level, tag } = JSON.parse(messageJson);
-      const args = [new Date(time), `|${LEVELS[level]}|:`];
-      if (tag && fronteggLogger.level === 'debug') {
-        args.push(`${tag}:`);
-      }
-      args.push(msg);
-      console.log(...args);
-    },
-  }
-);
+const fronteggLogger = Logger({
+  level: isGithubRunnerDebugMode ? 'debug' : process.env.FRONTEGG_LOG_LEVEL ?? 'warn',
+});
 
 fronteggLogger.debug(`Frontegg Next.js Wrapper (${sdkVersion.version}), Next.js version (${nextjsPkg.version})`);
 export default fronteggLogger;
