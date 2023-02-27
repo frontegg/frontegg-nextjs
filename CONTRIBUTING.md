@@ -25,14 +25,14 @@ FRONTEGG_APP_URL='http://localhost:3000'
 FRONTEGG_BASE_URL='[YOUR_FRONTEGG_DOMAIN]'
 
 # Your Frontegg application's Client ID
-FRONTEGG_CLIENT_ID='b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca'
+FRONTEGG_CLIENT_ID='[YOUR_FRONTEGG_CLIENT_ID]'
 
 # The stateless session encryption password, used to encrypt
 # jwt before sending it to the client side.
 #
 # For quick password generation use the following command:
 #    node -e "console.log(crypto.randomBytes(32).toString('hex'))"
-FRONTEGG_ENCRYPTION_PASSWORD='7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba'
+FRONTEGG_ENCRYPTION_PASSWORD='[SESSION_ENCRYPTION_PASSWORD]'
 
 # The stateless session cookie name
 FRONTEGG_COOKIE_NAME='fe_session'

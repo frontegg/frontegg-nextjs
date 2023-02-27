@@ -3,6 +3,7 @@ import { FronteggAppOptions } from '@frontegg/types';
 import { AppEnvConfig, PasswordsMap } from './types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
 import { EnvVariables } from './constants';
+import { InvalidFronteggEnv } from '../utils/errors';
 
 const setupEnvVariables = {
   FRONTEGG_APP_URL: process.env.FRONTEGG_APP_URL,
@@ -14,9 +15,15 @@ const setupEnvVariables = {
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
 };
+
 class Config {
   public authRoutes: Partial<AuthPageRoutes> = {};
   public fronteggAppOptions: Partial<FronteggAppOptions> = {};
+  constructor() {
+    if (typeof window === 'undefined') {
+      this.validatePassword();
+    }
+  }
 
   get appUrl(): string {
     return generateAppUrl();
@@ -50,9 +57,22 @@ class Config {
     return generateCookieDomain(this.appUrl);
   }
 
+  private validatePassword() {
+    const passwordMaps = this.password;
+    for (let key of Object.keys(passwordMaps)) {
+      const password = passwordMaps[key];
+      if (!password.match(/[0-9A-Fa-f]{6}/g) || password.length !== 64) {
+        throw new InvalidFronteggEnv(
+          EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD,
+          `Hex string.\n\nFor quick password generation use the following command:\nnode -e "console.log(crypto.randomBytes(32).toString('hex'))"`
+        );
+      }
+    }
+  }
   get password(): PasswordsMap {
     const encryptionPasswordEnv =
       getEnv(EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD) ?? setupEnvVariables.FRONTEGG_ENCRYPTION_PASSWORD;
+
     return normalizeStringPasswordToMap(encryptionPasswordEnv);
   }
 
