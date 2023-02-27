@@ -3,6 +3,7 @@ import { importJWK, jwtVerify } from 'jose';
 import api from '../../api';
 import type { JWTVerifyResult } from 'jose/dist/types/types';
 import fronteggLogger from '../fronteggLogger';
+import config from '../../config';
 
 class JwtUtils {
   private publicKey: (KeyLike | Uint8Array) | undefined;
@@ -16,8 +17,15 @@ class JwtUtils {
   private async loadPublicKey(): Promise<KeyLike | Uint8Array> {
     const logger = fronteggLogger.child({ tag: 'JwtManager.loadPublicKey' });
 
-    logger.info('Going to load public key from frontegg jwks');
-    const publicKey = await api.loadPublicKey();
+    let publicKey;
+    try {
+      logger.info('Check if public key env variable found');
+      publicKey = JSON.parse(config.jwtPublicKeyJson ?? '{}');
+      publicKey.alg;
+    } catch (e) {
+      logger.info('Going to load public key from frontegg jwks');
+      publicKey = await api.loadPublicKey();
+    }
     logger.info('Public key loaded, importing to jose');
     this.publicKey = await importJWK(publicKey, publicKey.alg);
     return this.publicKey;

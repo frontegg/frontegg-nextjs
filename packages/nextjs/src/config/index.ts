@@ -12,6 +12,7 @@ const setupEnvVariables = {
   FRONTEGG_CLIENT_ID: process.env.FRONTEGG_CLIENT_ID,
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
+  FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
 };
@@ -43,6 +44,10 @@ class Config {
 
   get clientId(): string {
     return getEnv(EnvVariables.FRONTEGG_CLIENT_ID) ?? setupEnvVariables.FRONTEGG_CLIENT_ID;
+  }
+
+  get jwtPublicKeyJson(): string | undefined {
+    return getEnv(EnvVariables.FRONTEGG_JWT_PUBLIC_KEY);
   }
 
   get cookieName(): string {

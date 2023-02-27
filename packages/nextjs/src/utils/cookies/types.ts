@@ -1,5 +1,4 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { CookieSerializeOptions } from 'cookie';
 
 export type RequestType = IncomingMessage | Request;
 export type ResponseType = ServerResponse;
@@ -18,4 +17,18 @@ export interface RemoveCookiesOptions {
   cookieDomain: string;
   res: ResponseType;
   req?: RequestType;
+}
+
+/**
+ * Cookie serialization options
+ */
+export interface CookieSerializeOptions {
+  domain?: string | undefined;
+  expires?: Date | undefined;
+  httpOnly?: boolean | undefined;
+  maxAge?: number | undefined;
+  path?: string | undefined;
+  priority?: 'low' | 'medium' | 'high' | undefined;
+  sameSite?: true | false | 'lax' | 'strict' | 'none' | undefined;
+  secure?: boolean | undefined;
 }

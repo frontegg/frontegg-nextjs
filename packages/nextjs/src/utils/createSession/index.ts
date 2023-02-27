@@ -6,7 +6,7 @@ export default async function createSession(
   cookie: string | undefined,
   encryption: EncryptionUtils
 ): Promise<FronteggNextJSSession | undefined> {
-  const logger = fronteggLogger.child({ tag: 'createSession' });
+  const logger = fronteggLogger.child({ tag: 'SessionCreator.createSession' });
   logger.info('Creating new session');
   try {
     if (!cookie) {

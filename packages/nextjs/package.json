@@ -19,15 +19,13 @@
   "dependencies": {
     "@frontegg/js": "6.74.0",
     "@frontegg/react-hooks": "6.74.0",
-    "pino": "^8.10.0",
-    "@types/http-proxy": "^1.17.9",
-    "cookie": "^0.5.0",
     "http-proxy": "^1.18.1",
     "iron-session": "^6.3.1",
-    "jose": "^4.9.2"
+    "jose": "^4.12.2"
   },
   "devDependencies": {
-    "next": ">10.0.0"
+    "next": ">10.0.0",
+    "@types/http-proxy": "^1.17.9"
   },
   "peerDependencies": {
     "next": ">10.0.0",

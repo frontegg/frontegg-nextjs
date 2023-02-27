@@ -1,7 +1,7 @@
-import cookie, { CookieSerializeOptions } from 'cookie';
+import cookieSerializer from './serializer';
 import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import config from '../../config';
-import { CreateCookieOptions, RemoveCookiesOptions, RequestType } from './types';
+import { CookieSerializeOptions, CreateCookieOptions, RemoveCookiesOptions, RequestType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';
 
 import {
@@ -26,10 +26,7 @@ class CookieManager {
    * @param {CreateCookieOptions} options - Create cookie options
    */
   create(options: CreateCookieOptions): string[] {
-    const logger = fronteggLogger.child(
-      { tag: 'CookieManager.create' },
-      { level: options.silent ? 'error' : undefined }
-    );
+    const logger = fronteggLogger.child({ tag: 'CookieManager.create', level: options.silent ? 'error' : undefined });
     const cookieName = options.cookieName ?? config.cookieName;
     const cookieValue = options.value;
     logger.info(`Creating new cookie for '${cookieName}'`);
@@ -48,7 +45,7 @@ class CookieManager {
       serializeOptions.sameSite = 'none';
     }
 
-    const serializedCookie = cookie.serialize(cookieName, cookieValue, serializeOptions);
+    const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
 
     if (serializedCookie.length <= COOKIE_MAX_LENGTH) {
       logger.info(`Successfully create a cookie header, '${cookieName}'`);
@@ -74,7 +71,7 @@ class CookieManager {
     logger.info('Going to extract all cookies header from request');
     const cookieHeader = getCookieHeader(request);
     logger.info('Parsing cookie header to map');
-    return cookie.parse(cookieHeader);
+    return cookieSerializer.parse(cookieHeader);
   }
 
   /**
@@ -95,7 +92,7 @@ class CookieManager {
     const cookieStr = getCookieHeader(request);
 
     logger.debug('Parsing cookie header string');
-    const cookies = cookie.parse(cookieStr);
+    const cookies = cookieSerializer.parse(cookieStr);
 
     logger.debug('Loop over session cookie headers');
     let i = 1;
@@ -169,7 +166,7 @@ class CookieManager {
     try {
       logger.info('extract cookie from request headers');
       const cookieStr = getCookieHeader(request);
-      const cookies = cookieStr && cookie.parse(cookieStr);
+      const cookies = cookieStr && cookieSerializer.parse(cookieStr);
       if (!cookies) {
         return [];
       }

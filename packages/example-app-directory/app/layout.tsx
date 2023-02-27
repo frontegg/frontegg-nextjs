@@ -11,8 +11,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
-// 1) middleware.ts httpCall => session =>  NextResponse.next()
-// 2) page.tsx render
-// 3) layout.tsx render
-// 4) hooks in `use client` files;

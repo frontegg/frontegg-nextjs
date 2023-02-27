@@ -2,6 +2,7 @@ import config from '../config';
 import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
 import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
+import { headerCharRegex } from '../utils/common/constants';
 
 interface GetRequestOptions {
   url: string;
@@ -18,17 +19,6 @@ interface PostRequestOptions extends GetRequestOptions {
 
 export const Post = ({ url, credentials = 'include', headers, body }: PostRequestOptions) =>
   fetch(url, { method: 'POST', credentials, headers, body });
-
-/**
- * Matches if val contains an invalid field-vchar
- *  field-value    = *( field-content / obs-fold )
- *  field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]
- *  field-vchar    = VCHAR / obs-text
- *
- *  headerCharRegex have been lifted from
- *  https://github.com/nodejs/node/blob/main/lib/_http_common.js
- */
-const headerCharRegex = /[^\t\x20-\x7e\x80-\xff]/;
 
 /**
  * NodeJS 18 start using undici as http request handler,

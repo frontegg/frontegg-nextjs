@@ -1,8 +1,8 @@
-import cookie, { CookieSerializeOptions } from 'cookie';
+import cookieSerializer from './serializer';
 import { COOKIE_MAX_LENGTH } from './constants';
 import { chunkString } from '../common';
 import config from '../../config';
-import { RequestType } from './types';
+import { CookieSerializeOptions, RequestType } from './types';
 
 /**
  * Return a cookieName with index, used for divided cookies.
@@ -24,14 +24,14 @@ export const getIndexedCookieName = (index: number, _cookieName?: string) => {
  * @param {CookieSerializeOptions} options - {@link CookieSerializeOptions} for serializing
  */
 export const splitValueToChunks = (cookieName: string, value: string, options: CookieSerializeOptions): string[] => {
-  const cookieOptionLength = cookie.serialize(getIndexedCookieName(1, cookieName), '', options).length;
+  const cookieOptionLength = cookieSerializer.serialize(getIndexedCookieName(1, cookieName), '', options).length;
   const chunkSize = COOKIE_MAX_LENGTH - cookieOptionLength - 1;
 
   const valueChunks = chunkString(value, chunkSize);
 
   return valueChunks.map((chunk, index) => {
     const indexedCookieName = getIndexedCookieName(index + 1, cookieName);
-    return cookie.serialize(indexedCookieName, chunk, options) + ';';
+    return cookieSerializer.serialize(indexedCookieName, chunk, options) + ';';
   });
 };
 
