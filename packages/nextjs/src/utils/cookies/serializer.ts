@@ -80,7 +80,7 @@ function serialize(name: string, val: string, options?: CookieSerializeOptions):
   const opt = options || {};
 
   if (!cookieContentRegExp.test(name)) {
-    throw new TypeError('argument name is invalid');
+    throw new TypeError('argument name is invalid: ' + name);
   }
 
   const value = encodeURIComponent(val);
