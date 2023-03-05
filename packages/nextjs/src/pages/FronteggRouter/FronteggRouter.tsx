@@ -33,7 +33,10 @@ export function FronteggRouter() {
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
-        logout(() => (window.location.href = buildLogoutRoute(window.location.origin).asPath));
+        const _baseUrl = app.options.contextOptions.baseUrl;
+        const baseUrl = typeof _baseUrl === 'string' ? _baseUrl : _baseUrl('');
+
+        logout(() => (window.location.href = buildLogoutRoute(window.location.origin, baseUrl).asPath));
       }
     }
   }, [app, query, loginWithRedirect, logout, replace]);

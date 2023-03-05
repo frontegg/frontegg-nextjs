@@ -97,14 +97,17 @@ class CookieManager {
     logger.debug('Loop over session cookie headers');
     let i = 1;
     let sessionCookies = '';
-    let sessionCookieChunk: string | undefined;
-    do {
-      sessionCookieChunk = cookies[getIndexedCookieName(i++)];
-      if (sessionCookieChunk) {
-        sessionCookies += sessionCookieChunk;
-      }
-    } while (sessionCookieChunk);
+    let sessionCookieChunk: string | undefined = cookies[this.getCookieName()];
+    if (sessionCookieChunk === undefined) {
+      do {
+        sessionCookieChunk = cookies[getIndexedCookieName(i++)];
+        if (sessionCookieChunk) {
+          sessionCookies += sessionCookieChunk;
+        }
+      } while (sessionCookieChunk);
+    }
 
+    debugger;
     if (sessionCookies.length === 0) {
       logger.info('Session cookie NOT found');
       return undefined;

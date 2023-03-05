@@ -48,7 +48,7 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
 export const getUsers = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
   const headersToSend = buildRequestHeaders(headers);
   const res = await Get({
-    url: `${config.baseUrl}${fronteggUsersUrl}`,
+    url: `${config.baseUrl}/frontegg${fronteggUsersUrl}`,
     headers: headersToSend,
   });
   return parseHttpResponse(res);
@@ -60,7 +60,7 @@ export const getUsers = async (headers: Record<string, string>): Promise<ILoginR
  */
 export const getTenants = async (headers: Record<string, string>): Promise<ITenantsResponse[] | undefined> => {
   const res = await Get({
-    url: `${config.baseUrl}${fronteggTenantsUrl}`,
+    url: `${config.baseUrl}/frontegg${fronteggTenantsUrl}`,
     headers: buildRequestHeaders(headers),
   });
   return parseHttpResponse(res);

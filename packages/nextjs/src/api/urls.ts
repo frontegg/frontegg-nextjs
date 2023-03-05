@@ -41,9 +41,9 @@ export function buildLoginRoute(redirectUrl: string): BuildRouteResult {
  *
  *  @throws {TypeError} If redirectUrl is not a string.
  */
-export function buildLogoutRoute(redirectUrl: string): BuildRouteResult {
+export function buildLogoutRoute(redirectUrl: string, baseUrl: string): BuildRouteResult {
   const asPath = `/oauth/logout?post_logout_redirect_uri=${encodeURIComponent(redirectUrl)}`;
-  const asUrl = new URL(asPath, config.baseUrl);
+  const asUrl = new URL(asPath, baseUrl);
   return {
     asPath,
     asUrl,
