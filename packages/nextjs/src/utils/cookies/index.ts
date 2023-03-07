@@ -107,7 +107,6 @@ class CookieManager {
       } while (sessionCookieChunk);
     }
 
-    debugger;
     if (sessionCookies.length === 0) {
       logger.info('Session cookie NOT found');
       return undefined;
