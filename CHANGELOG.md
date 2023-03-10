@@ -2,7 +2,7 @@
 
 ## [6.7.19](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.18...v6.7.19) (2023-3-10)
 
-- Refactored reCaptcha mechanism to load tokens correctly
+- Fixed resend OTC with reCaptcha
 - Added  support to let tenants create a manage user groups in the admin portal under a FF
 - Added support to login with passkeys and manage passkeys in the admin portal under a FF
 - Fixed invite users issue when the vendor is not forcing roles and permissions
