@@ -1,5 +1,18 @@
 # Change Log
 
+## [6.7.19](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.18...v6.7.19) (2023-3-10)
+
+- Fixed resend OTC with reCaptcha
+- Added  support to let tenants create a manage user groups in the admin portal under a FF
+- Added support to login with passkeys and manage passkeys in the admin portal under a FF
+- Fixed invite users issue when the vendor is not forcing roles and permissions
+- Support auth strategy and social logins for login per tenants
+- Refactored feature flag mechanism to be based on rest-api package
+- Fixed validation for postcode in admin portal forms
+- Fixed SMS code input to have input type number
+- Improved auth screens form UX 
+
+
 ## [6.7.18](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.17...v6.7.18) (2023-2-21)
 
 - Fixed Admin portal SSO provider's options to be correlated with the vendor choice
