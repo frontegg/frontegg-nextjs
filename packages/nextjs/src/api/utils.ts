@@ -50,9 +50,13 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
  * @param additionalHeaders - Specify additional headers
  */
 export function buildRequestHeaders(
-  headers: Record<string, string>,
+  headers: Record<string, any>,
   additionalHeaders: Record<string, string> = {}
 ): Record<string, string> {
+  let cookie = headers['cookie'];
+  if (cookie != null && typeof cookie === 'string') {
+    cookie = cookie.replace(/fe_session-[^=]*=[^;]*$/, '').replace(/fe_session-[^=]*=[^;]*;/, '');
+  }
   const preparedHeaders: Record<string, string> = {
     authorization: headers['authorization'],
     'accept-encoding': headers['accept-encoding'],
@@ -60,6 +64,7 @@ export function buildRequestHeaders(
     accept: headers['accept'],
     'content-type': 'application/json',
     origin: config.baseUrl,
+    cookie,
     'user-agent': headers['user-agent'],
     'cache-control': headers['cache-control'],
     'x-frontegg-framework': `next@${nextjsPkg.version}`,

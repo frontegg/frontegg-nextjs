@@ -22,6 +22,7 @@ const refreshTokenEmbedded = async (headers: Record<string, string>) => {
   return Post({
     url: `${config.baseUrl}${ApiUrls.refreshToken.embedded}`,
     body: '{}',
+    credentials: 'include',
     headers: buildRequestHeaders(headers),
   });
 };

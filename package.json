@@ -12,9 +12,10 @@
     "demo12": "lerna run dev --stream --scope '@frontegg/example-pages'",
     "build": "cross-env NODE_ENV='production' lerna run build --stream --ignore '@frontegg/example-app-directory' --ignore '@frontegg/example-pages'",
     "test": "lerna run test --stream --scope '@frontegg/nextjs'",
-    "start:middleware-test-server": "node middleware-test/middleware-test-server.js",
+    "start:middleware-test-server": "node tests/middleware-test/middleware-test-server.js",
     "start:test-demo12": "concurrently \"yarn start:middleware-test-server\" \"yarn demo12\"",
     "test-middleware": "export FRONTEGG_TEST_URL='http://localhost:3001' export DEBUG=pw:webserver && yarn build && npx playwright test",
+    "test:demo12": "export FRONTEGG_BASE_URL='http://localhost:4001' && yarn demo12",
     "prettier": "pretty-quick",
     "prettier-check": "pretty-quick --check"
   },

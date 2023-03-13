@@ -6,7 +6,7 @@ export const ApiUrls = {
     jwks: `/.well-known/jwks.json`,
   },
   refreshToken: {
-    embedded: `/frontegg/${fronteggRefreshTokenUrl}`,
+    embedded: `/frontegg${fronteggRefreshTokenUrl}`,
     hosted: `/frontegg/oauth/token`,
   },
 };

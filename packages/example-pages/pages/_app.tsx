@@ -6,10 +6,20 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
 }
 
-export default withFronteggApp(CustomApp, {
-  hostedLoginBox: true,
+const options = {
+  hostedLoginBox: false,
   customLoader: true,
   authOptions: {
     keepSessionAlive: true,
   },
-});
+};
+export default withFronteggApp(
+  CustomApp,
+  typeof window === 'undefined'
+    ? options
+    : {
+        ...options,
+        // @ts-ignore
+        ...window.FRONTEGG_APP_OPTIONS,
+      }
+);

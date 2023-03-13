@@ -7,7 +7,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:dev-1": "export FRONTEGG_APP_URL='http://localhost:3001' && export FRONTEGG_BASE_URL='http://localhost:4001' && next dev -p 3001",
+    "test:dev-2": "export FRONTEGG_APP_URL='http://localhost:3002' && export FRONTEGG_BASE_URL='http://localhost:4002' && next dev -p 3002",
+    "test:dev-3": "export FRONTEGG_APP_URL='http://localhost:3003' && export FRONTEGG_BASE_URL='http://localhost:4003' && next dev -p 3003",
+    "test:dev": "concurrently \"yarn test:dev-1\" \"yarn test:dev-2\" \"yarn test:dev-3\""
   },
   "dependencies": {
     "next": "^12.2.0",
