@@ -96,7 +96,7 @@ jobs:
           version=$(node -p 'require("./lerna.json").version')
           echo "LIB_VERSION=${version}" >> $GITHUB_OUTPUT
           echo "Publishing DEV version - v${version}-alpha.${{ github.run_id }}"
-          
+          alphaVersion="${version}-alpha.${{ github.run_id }}"
           yarn lerna version --no-git-tag-version --yes --no-push --exact "${alphaVersion}"
           yarn update-version
           yarn build
