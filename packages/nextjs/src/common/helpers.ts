@@ -1,22 +1,15 @@
-import { sealData, unsealData } from 'iron-session';
-import { jwtVerify } from 'jose';
-import { getTenants, getUsers } from './api';
-import FronteggConfig from './FronteggConfig';
-import { FronteggNextJSSession, FronteggUserTokens, AllUserData } from './types';
-const calculateExpiresInFromExp = (exp: number) => Math.floor((exp * 1000 - Date.now()) / 1000);
+import type { FronteggUserTokens } from '../types';
+import JwtManager from '../utils/jwt';
+import encryptionUtils from '../utils/encryption';
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
   const refreshToken = data.refreshToken ?? data.refresh_token;
-  const publicKey = await FronteggConfig.getJwtPublicKey();
-  const { payload: decodedJwt }: any = await jwtVerify(accessToken, publicKey);
+  const { payload: decodedJwt }: any = await JwtManager.verify(accessToken);
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
-  const stringifySession = JSON.stringify({ accessToken, refreshToken });
-  const session = await sealData(stringifySession, {
-    password: FronteggConfig.passwordsAsMap,
-    ttl: decodedJwt.exp,
-  });
+  const tokens = { accessToken, refreshToken };
+  const session = await encryptionUtils.sealTokens(tokens, decodedJwt.exp);
   return [session, decodedJwt, refreshToken];
 }
 
@@ -24,35 +17,5 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
   if (!cookie) {
     return undefined;
   }
-  const stringifyJwt: string = await unsealData(cookie, {
-    password: FronteggConfig.passwordsAsMap,
-  });
-  return JSON.parse(stringifyJwt);
+  return await encryptionUtils.unsealTokens(cookie);
 }
-
-type UserDataArguments = {
-  getSession: () => Promise<FronteggNextJSSession | undefined | null>;
-  reqHeaders: Record<string, string | string[] | undefined>;
-};
-
-export const getAllUserData = async ({ getSession, reqHeaders }: UserDataArguments): Promise<Partial<AllUserData>> => {
-  try {
-    const session = await getSession();
-    if (!session) return {};
-    const headers = { ...reqHeaders, Authorization: `Bearer ${session.accessToken}` };
-    const [baseUser, tenants] = await Promise.all([getUsers(headers), getTenants(headers)]);
-    if (!baseUser || !tenants) return {};
-    const user =
-      baseUser && session
-        ? {
-            ...session.user,
-            ...baseUser,
-            expiresIn: calculateExpiresInFromExp(session.user.exp),
-          }
-        : undefined;
-    return { user, session, tenants };
-  } catch (e) {
-    console.error(e);
-    return {};
-  }
-};

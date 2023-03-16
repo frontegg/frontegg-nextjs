@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - master
-    types: [closed]
+    types: [ closed ]
 jobs:
   createReleasePullRequest:
     if: "!contains(join(github.event.pull_request.labels.*.name, ','), 'Release') && github.event.pull_request.merged == true"
@@ -15,12 +15,12 @@ jobs:
         with:
           fetch-depth: "0"
       - name: Read .nvmrc
-        run: echo "##[set-output name=NVMRC;]$(cat .nvmrc)"
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
         id: nvm
-      - name: Use Node.js (.nvmrc)
-        uses: actions/setup-node@v1
+      - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
+        uses: actions/setup-node@v2
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
       - name: Install Dependencies and Build Packages
         run: |
           yarn install
@@ -49,7 +49,8 @@ jobs:
       - name: Commit Version UP
         run: |
           yarn lerna version patch --no-git-tag-version --yes --no-push --force-publish
-          yarn prettier-hook
+          yarn update-version
+          yarn prettier
       - name: "Set Generated changelog"
         uses: actions/github-script@v6
         id: 'generated-changelog'
@@ -93,25 +94,27 @@ jobs:
         id: publish_pre_release_version
         run: |
           version=$(node -p 'require("./lerna.json").version')
-          echo "::set-output name=LIB_VERSION::${version}"
+          echo "LIB_VERSION=${version}" >> $GITHUB_OUTPUT
           echo "Publishing DEV version - v${version}-alpha.${{ github.run_id }}"
-          make move-package-json-to-dist
-          make prerelease-version-upgrade-${version}-alpha.${{ github.run_id }}
-          make pretty
-          git add .
-          git commit -m "chore: prelrease version"
-          make publish-packages-next
+          alphaVersion="${version}-alpha.${{ github.run_id }}"
+          yarn lerna version --no-git-tag-version --yes --no-push --exact "${alphaVersion}"
+          yarn update-version
+          yarn build
+          
+          cp "./.npmrc" "./dist/@frontegg/nextjs/.npmrc"
+          cp "./.npmignore" "./dist/@frontegg/nextjs/.npmignore"
+          cd "./dist/@frontegg/nextjs" && npm publish --tag next
         env:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-      - name : Notify Slack on alpha version deployment
-        uses : rtCamp/action-slack-notify@v2
-        env :
-          SLACK_CHANNEL : frontegg-alpha-versions
-          SLACK_COLOR : ${{ job.status }}
-          SLACK_ICON : https://avatars.githubusercontent.com/u/67857107?s=40&v=4
-          SLACK_MESSAGE : '${{ steps.publish_pre_release_version.outputs.LIB_VERSION }}-alpha.${{ github.run_id }} has been released :rocket:'
-          SLACK_TITLE : 'A new @frontegg/nextjs alpha version!'
-          SLACK_USERNAME : ${{ github.actor }}
-          SLACK_WEBHOOK : ${{ secrets.ROTEM_SLACK_WEBHOOK }}
+      - name: Notify Slack on alpha version deployment
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: frontegg-alpha-versions
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://avatars.githubusercontent.com/u/67857107?s=40&v=4
+          SLACK_MESSAGE: '${{ steps.publish_pre_release_version.outputs.LIB_VERSION }}-alpha.${{ github.run_id }} has been released :rocket:'
+          SLACK_TITLE: 'A new @frontegg/nextjs alpha version!'
+          SLACK_USERNAME: ${{ github.actor }}
+          SLACK_WEBHOOK: ${{ secrets.ROTEM_SLACK_WEBHOOK }}
           MSG_MINIMAL: true

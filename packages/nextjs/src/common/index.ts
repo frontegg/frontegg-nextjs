@@ -1,6 +1,4 @@
-export { default as FronteggConfig } from './FronteggConfig';
-export * from './types';
 export * from './helpers';
-export * from './createGetSession';
-export * from './consts';
-export { default as CookieManager } from './CookieManager';
+export { default as AppContext } from './AppContext';
+export { FronteggBaseProvider } from './FronteggBaseProvider';
+export { default as AuthorizedContent } from './AuthorizedContent';

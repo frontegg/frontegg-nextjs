@@ -1,0 +1,16 @@
+{
+  // This config is for emitting declarations (.d.ts) only
+  // Actual .ts source files are transpiled via babel
+  "extends": "./tsconfig",
+  "compilerOptions": {
+    "declaration": true,
+    "incremental": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "../../dist/@frontegg/nextjs",
+    "tsBuildInfoFile": "./tsconfig.build.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*.ts*"],
+  "exclude": ["src/**/*.spec.ts*", "src/**/*.test.ts*"]
+}

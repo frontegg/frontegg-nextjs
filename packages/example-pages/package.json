@@ -1,0 +1,41 @@
+{
+  "name": "@frontegg/example-pages",
+  "version": "6.7.20",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf  ./node_modules && rm -rf ./.next",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:dev-1": "export FRONTEGG_APP_URL='http://localhost:3001' && export FRONTEGG_BASE_URL='http://localhost:4001' && next dev -p 3001",
+    "test:dev-2": "export FRONTEGG_APP_URL='http://localhost:3002' && export FRONTEGG_BASE_URL='http://localhost:4002' && next dev -p 3002",
+    "test:dev-3": "export FRONTEGG_APP_URL='http://localhost:3003' && export FRONTEGG_BASE_URL='http://localhost:4003' && next dev -p 3003",
+    "test:dev": "concurrently \"yarn test:dev-1\" \"yarn test:dev-2\" \"yarn test:dev-3\""
+  },
+  "dependencies": {
+    "next": "^12.2.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "16.11.7",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "eslint": "^8.30.0",
+    "eslint-config-next": "13.0.4",
+    "typescript": "4.9.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

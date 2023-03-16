@@ -2,3 +2,5 @@
 exclude:
  global:
    - tests/**
+   - scripts/**
+   - packages/nextjs/tests/**

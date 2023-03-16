@@ -1,27 +1,30 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "6.7.19",
+  "version": "6.7.20",
   "author": "Frontegg LTD",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && mkdir dist && rollup -c ./rollup.config.js && node ../../scripts/update-entry.js",
-    "build:watch": "rm -rf dist && mkdir dist && rollup -w -c ./rollup.config.js",
-    "clean": "rm -rf ./node_modules && rm -rf ./dist",
-    "test": "jest --runInBand --passWithNoTests -c ../../scripts/jest.config.json --rootDir ."
+    "clean": "rm -rf ./tsconfig.build.tsbuildinfo && rm -rf ./node_modules",
+    "build": "rm -rf ./tsconfig.build.tsbuildinfo && concurrently -s all \"yarn build:stable\" \"yarn build:types\" && yarn build:copy-files",
+    "build:watch": "yarn build && concurrently -s all \"yarn build:stable --watch\" \"yarn build:types --watch --preserveWatchOutput\"",
+    "build:stable": "node ../../scripts/build node",
+    "build:types": "tsc -b tsconfig.build.json",
+    "build:copy-files": "node ../../scripts/copy-files.js",
+    "test": "cp .env.test .env && CI=true npx playwright test",
+    "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
-    "@frontegg/js": "6.77.0",
-    "@frontegg/react-hooks": "6.77.0",
-    "@types/http-proxy": "^1.17.9",
-    "cookie": "^0.5.0",
+    "@frontegg/js": "6.80.0",
+    "@frontegg/react-hooks": "6.80.0",
     "http-proxy": "^1.18.1",
     "iron-session": "^6.3.1",
-    "jose": "^4.9.2"
+    "jose": "^4.12.2"
   },
   "devDependencies": {
+    "@types/http-proxy": "^1.17.9",
     "next": ">10.0.0"
   },
   "peerDependencies": {

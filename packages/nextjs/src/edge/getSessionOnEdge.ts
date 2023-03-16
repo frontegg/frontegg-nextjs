@@ -1,18 +1,10 @@
-import { unsealData } from 'iron-session/edge';
-import FronteggConfig from '../common/FronteggConfig';
-import { FronteggUserTokens, RequestType } from '../common/types';
-import CookieManager from '../common/CookieManager';
-import { createGetSession } from '../common/createGetSession';
+import type { IncomingMessage } from 'http';
+import { FronteggNextJSSession } from '../types';
+import CookieManager from '../utils/cookies';
+import createSession from '../utils/createSession';
+import encryptionEdge from '../utils/encryption-edge';
 
-async function getTokensFromCookieOnEdge(cookie: string): Promise<FronteggUserTokens | undefined> {
-  const jwt: string = await unsealData(cookie, {
-    password: FronteggConfig.passwordsAsMap,
-  });
-  return JSON.parse(jwt);
-}
-
-export const getSession = (req: RequestType) =>
-  createGetSession({
-    getCookie: () => CookieManager.getParsedCookieFromRequest(req),
-    cookieResolver: getTokensFromCookieOnEdge,
-  });
+export const getSessionOnEdge = (req: IncomingMessage | Request): Promise<FronteggNextJSSession | undefined> => {
+  const cookies = CookieManager.getSessionCookieFromRequest(req);
+  return createSession(cookies, encryptionEdge);
+};

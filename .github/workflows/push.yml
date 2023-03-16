@@ -20,16 +20,17 @@ jobs:
       - uses: actions/checkout@v3
       - name: Read .nvmrc
         id: nvm
-        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
-      - name: Use Node.js (.nvmrc)
-        uses: actions/setup-node@v3
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+      - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
+        uses: actions/setup-node@v2
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-      - run: make clean
-      - run: make install
-      - run: make build
+          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+      - run: yarn clean
+      - run: yarn install
+      - run: yarn build
+      - run: sudo apt-get update
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium
       - name: Run Playwright tests
         run: npx playwright test
         env:
@@ -39,6 +40,8 @@ jobs:
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
           FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
           FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
+      - name: Run Playwright tests
+        run: cd packages/nextjs && yarn test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
