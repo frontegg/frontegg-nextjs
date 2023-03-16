@@ -33,9 +33,9 @@ async function createModulePackages({ from, to }) {
   await Promise.all(
     directoryPackages.map(async (directoryPackage) => {
       const packageJsonPath = path.join(to, directoryPackage, "package.json");
-      const topLevelPathImportsAreCommonJSModules = await fse.pathExists(
-        path.resolve(path.dirname(packageJsonPath), "../esm")
-      );
+      if (packageJsonPath.endsWith("dist/@frontegg/nextjs/package.json")) {
+        return;
+      }
 
       const packageJson = {
         sideEffects: false,
@@ -44,9 +44,9 @@ async function createModulePackages({ from, to }) {
         // ? path.posix.join('../esm', directoryPackage, 'index.js')
         // : './index.js',
         main: "./index.js",
-          // topLevelPathImportsAreCommonJSModules
-          // ? "./index.js"
-          // : path.posix.join("../node", directoryPackage, "index.js"),
+        // topLevelPathImportsAreCommonJSModules
+        // ? "./index.js"
+        // : path.posix.join("../node", directoryPackage, "index.js"),
         types: "./index.d.ts"
       };
 
@@ -72,8 +72,6 @@ async function createModulePackages({ from, to }) {
         console.error(`${packageJsonPath}:\n${manifestErrorMessages.join("\n")}`);
         // throw new Error(`${packageJsonPath}:\n${manifestErrorMessages.join('\n')}`);
       }
-
-      return packageJsonPath;
     })
   );
 }
@@ -154,9 +152,9 @@ async function run() {
 
     await Promise.all(
       [
-        packageData.name === '@frontegg/nextjs' ? '../../README.md' : './README.md',
-        '../../CHANGELOG.md',
-      ].map((file) => includeFileInBuild(file)),
+        packageData.name === "@frontegg/nextjs" ? "../../README.md" : "./README.md",
+        "../../CHANGELOG.md"
+      ].map((file) => includeFileInBuild(file))
     );
 
     await addLicense(packageData);
