@@ -2,9 +2,13 @@
 
 ## [6.7.20](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.19...v6.7.20) (2023-3-16)
 
-- FR-10976 - Remove idle session export from default items
-
-- FR-9469 - Added support for customized social login providers
+- Fixed use permission regex issue to accept a wild card
+- User groups design fixes
+- Fixed passkeys loading mode and login flow with MFA
+- Update dependencies between passkeys and MFA on the privacy page
+- Added support to reset Idle session timeout by post messages from the client iFrame
+- Added an option to enforce redirect URLs to the same site only to avoid security issues
+- Added support for customized social login providers
 
 
 ## [6.7.19](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.18...v6.7.19) (2023-3-10)
