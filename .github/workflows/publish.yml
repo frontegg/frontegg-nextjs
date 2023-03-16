@@ -96,7 +96,9 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Publish
         run: |
-          make publish-packages-latest
+          cp "./.npmrc" "./dist/@frontegg/nextjs/.npmrc"
+          cp "./.npmignore" "./dist/@frontegg/nextjs/.npmignore"
+          cd "./dist/@frontegg/nextjs" && npm publish --tag latest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
