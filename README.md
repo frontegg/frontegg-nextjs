@@ -10,7 +10,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
   - [Add to existing project](#add-to-existing-project)
   - [Using Vercel platform with custom domain](#using-vercel-platform-with-custom-domain)
 - [Getting Started](#getting-started)
-  - [Create Frontegg worksapce](#create-frontegg-worksapce)
+  - [Create Frontegg workspace](#create-frontegg-workspace)
   - [Setup environment](#setup-environment)
 - [Documentation](#documentation)
   - [API Reference](#api-reference)
@@ -22,27 +22,9 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 
 ## Installation
 
-### Create new NextJS project
+### Add Frontegg to Next.JS project
 
-To start a new Create Next App project with TypeScript, you can run:
-
-```bash
-  npx create-next-app --example "https://github.com/frontegg/frontegg-nextjs" --example-path "apps/example" my-nextjs-app-name
-```
-
-or
-
-```bash
-  yarn create next-app --example "https://github.com/frontegg/frontegg-nextjs" --example-path "apps/example" my-nextjs-app-name
-```
-
-> If you've previously installed `create-react-app` globally via `npm install -g create-next-app`, we recommend you uninstall the package using `npm uninstall -g create-next-app` or `yarn global remove create-next-app` to ensure that `npx` always uses the latest version.
->
-> Global installations of `create-next-app` are no longer supported.
-
-### Add to existing project
-
-To Add Frontegg to your existing Nextjs project, follow below steps:
+To Add Frontegg to your existing Next.JS project, follow below steps:
 
 1. Use package manager to install Frontegg Next.JS library.
 
@@ -61,15 +43,15 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
    ```tsx
    // ./pages/_app.tsx
 
-   import { withFronteggApp } from '@frontegg/nextjs';
+   import { withFronteggApp } from "@frontegg/nextjs";
 
    function CustomApp({ Component, pageProps }: AppProps) {
      return <Component {...pageProps} />;
    }
 
-  export default withFronteggApp(CustomApp, {
+    export default withFronteggApp(CustomApp, {
     hostedLoginBox: true
-  });
+    });
    ```
 
 3. Create files for frontegg middleware under `./pages/api/frontegg/[...frontegg-middleware].ts`:
@@ -93,16 +75,16 @@ To Add Frontegg to your existing Nextjs project, follow below steps:
 
 ### Using Vercel platform with custom domain
 
-  1. Visit `https://vercel.com/[ACCOUNT_ID]/[PROJECT_ID]/settings/environment-variables`
-  2. Add `FRONTEGG_APP_URL` environment variable for each Vercel Environment
-  ![vercel-settings-pages](https://github.com/frontegg/frontegg-nextjs/blob/master/vercel-environment.png)
- 
+1. Visit `https://vercel.com/[ACCOUNT_ID]/[PROJECT_ID]/settings/environment-variables`
+2. Add `FRONTEGG_APP_URL` environment variable for each Vercel Environment
+   ![vercel-settings-pages](https://github.com/frontegg/frontegg-nextjs/blob/master/assets/vercel-environment.png)
+
 
 ## Getting Started
 
-### Create Frontegg worksapce
+### Create Frontegg workspace
 
-Navigate to [Frontegg Portal Settgins](https://portal.frontegg.com/development/settings), If you don't have application
+Navigate to [Frontegg Portal Settings](https://portal.frontegg.com/development/settings), If you don't have application
 follow integration steps after signing up.
 
 Next, configure the "Allowed Origins" in your application under "Domain" tab of the "Settings" page :
@@ -114,7 +96,7 @@ Copy ClientID, Frontegg Domain from "Settings" page, You'll need these values in
 
 ### Setup environment
 
-To setup your Next.js application to communicate with Frontegg, you have to create a new file named `.env.local` under
+To set up your Next.js application to communicate with Frontegg, you have to create a new file named `.env.local` under
 your root project directory, this file will be used to store environment variables that will be used, configuration
 options:
 
@@ -230,7 +212,7 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 
 ## Next.js 13
 ### wrapping your application
-```ts
+```tsx
 // ./app/layout.tsx
 import { FronteggAppProvider } from '@frontegg/nextjs/server';
 
@@ -247,14 +229,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 ### routing
-```ts
+```tsx
 // ./app/[...frontegg-router]/page.tsx
 export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
 ```
 
 ### server component
-notice that this session is not part of the state and therefore wont trigger ui changes when it changes
-```ts
+notice that this session is not part of the state and therefore won't trigger ui changes when it changes
+```tsx
 // ./app/ServerComponent.tsx
 import { getSession } from "@frontegg/nextjs/server";
 
@@ -267,7 +249,7 @@ export const ServerComponent = async () => {
 ```
 
 ### client component
-```ts
+```tsx
 // ./app/ClientComponent.tsx
 "use client";
 import { useAuth, useLoginWithRedirect } from "@frontegg/nextjs";
@@ -311,7 +293,7 @@ export const ClientComponent = ({ baseUrl }: { baseUrl?: string }) => {
 ```
 
 ### Page
-```ts
+```tsx
 // ./app/page.tsx
 import { ClientComponent } from "./client";
 import { ServerComponent } from "./server";

@@ -1,0 +1,60 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks"
+  ],
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "settings": {
+    "react": {
+      "createClass": "createReactClass",
+      // Regex for Component Factory to use,
+      // default to "createReactClass"
+      "pragma": "React",
+      // Pragma to use, default to "React"
+      "fragment": "Fragment",
+      // Fragment to use (maybe a property of <pragma>), default to "Fragment"
+      "version": "detect"
+      // React version. "detect" automatically picks the version you have installed.
+      // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+      // It will default to "latest" and warn if missing, and to "detect" in the future
+    }
+  },
+  "ignorePatterns": [
+    "packages/example-app-directory/**/*",
+    "packages/example-pages/**/*"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/ban-types": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": "off",
+    "react/display-name": "off",
+    "react/prop-types": "off",
+    "react/no-children-prop": "off",
+    "react/require-default-props": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "no-bitwise": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "no-console": "warn"
+  }
+}
