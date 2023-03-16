@@ -1,46 +1,14 @@
-import config from '../../config';
-import { AppContext } from '../../common';
-import { authInitialState } from '@frontegg/redux-store';
+import React from 'react';
 import URL from 'url';
-import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { isAuthRoute } from '../../utils/routing';
-import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../../utils/common/constants';
-import { buildLogoutRoute } from '../../api/urls';
+import { FronteggRouterBase } from '../../common/FronteggRouterBase';
 
 export function FronteggRouter() {
-  const app = useContext(AppContext);
-  const { query, replace } = useRouter();
-  const loginWithRedirect = useLoginWithRedirect();
-  const { logout } = useLoginActions();
+  const { query } = useRouter();
+  const { 'frontegg-router': pathArr, ...queryParams } = query as any;
 
-  useEffect(() => {
-    if (!app) {
-      return;
-    }
-    if (app.options.hostedLoginBox) {
-      const routesObj = {
-        ...authInitialState.routes,
-        ...config.authRoutes,
-      };
-
-      const { 'frontegg-router': pathArr, ...queryParams } = query as any;
-      const pathname = `/${pathArr.join('/')}`;
-      if (pathname === routesObj.loginUrl) {
-        if (queryParams.redirectUrl) {
-          localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, `${window.location.origin}${queryParams.redirectUrl}`);
-        }
-        loginWithRedirect();
-      } else if (pathname === routesObj.logoutUrl) {
-        const _baseUrl = app.options.contextOptions.baseUrl;
-        const baseUrl = typeof _baseUrl === 'string' ? _baseUrl : _baseUrl('');
-
-        logout(() => (window.location.href = buildLogoutRoute(window.location.origin, baseUrl).asPath));
-      }
-    }
-  }, [app, query, loginWithRedirect, logout, replace]);
-  return '';
+  return <FronteggRouterBase pathArr={pathArr} queryParams={queryParams} />;
 }
 
 export function FronteggRouterProps(context: any) {

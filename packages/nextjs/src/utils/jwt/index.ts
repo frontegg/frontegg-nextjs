@@ -19,14 +19,13 @@ class JwtUtils {
 
     let publicKey;
     try {
-      logger.info('Check if public key env variable found');
       publicKey = JSON.parse(config.jwtPublicKeyJson ?? '{}');
-      publicKey.alg;
+      logger.info('Public key loaded from env variable');
     } catch (e) {
       logger.info('Going to load public key from frontegg jwks');
       publicKey = await api.loadPublicKey();
     }
-    logger.info('Public key loaded, importing to jose');
+    logger.info('Importing Public key into jose');
     this.publicKey = await importJWK(publicKey, publicKey.alg);
     return this.publicKey;
   }
