@@ -41,8 +41,8 @@ async function run(argv) {
   const outDir = path.resolve(
     relativeOutDir + (pkg.name.startsWith('@frontegg') ? `/${pkg.name}` : ''),
     {
-      node: './node',
-      stable: './',
+      node: './',
+      stable: './esm',
     }[bundle],
   );
 
