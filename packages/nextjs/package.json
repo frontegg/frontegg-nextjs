@@ -13,8 +13,8 @@
     "test": "jest --runInBand --passWithNoTests -c ../../scripts/jest.config.json --rootDir ."
   },
   "dependencies": {
-    "@frontegg/js": "6.77.0",
-    "@frontegg/react-hooks": "6.77.0",
+    "@frontegg/js": "6.80.0",
+    "@frontegg/react-hooks": "6.80.0",
     "@types/http-proxy": "^1.17.9",
     "cookie": "^0.5.0",
     "http-proxy": "^1.18.1",
