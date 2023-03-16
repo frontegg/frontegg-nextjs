@@ -3,7 +3,7 @@ const { writeFileSync } = require('fs');
 const path = require('path');
 
 function getCurrentVersion() {
-  const pkg = require('../libs/nextjs/package.json');
+  const pkg = require('../packages/nextjs/package.json');
   const [major = 0, minor = 0, patch = 0] = pkg.version.split('.').map(Number);
   return { major, minor, patch };
 }
@@ -14,6 +14,7 @@ function isAdminPortalPackageUpdated() {
   );
   return (
     yarnLockChanges.toString().indexOf('@frontegg/rest-api@') !== -1 ||
+    yarnLockChanges.toString().indexOf('@frontegg/react-hooks@') !== -1 ||
     yarnLockChanges.toString().indexOf('@frontegg/redux-store@') !== -1 ||
     yarnLockChanges.toString().indexOf('@frontegg/js@') !== -1
   );

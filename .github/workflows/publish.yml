@@ -96,7 +96,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Publish
         run: |
-          make move-package-json-to-dist
           make publish-packages-latest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
