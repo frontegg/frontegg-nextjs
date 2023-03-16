@@ -17,7 +17,8 @@
     "test-middleware": "export FRONTEGG_TEST_URL='http://localhost:3001' export DEBUG=pw:webserver && yarn build && npx playwright test",
     "test:demo12": "export FRONTEGG_BASE_URL='http://localhost:4001' && yarn demo12",
     "prettier": "pretty-quick",
-    "prettier-check": "pretty-quick --check"
+    "prettier-check": "pretty-quick --check",
+    "update-version": "node scripts/update-entry.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
