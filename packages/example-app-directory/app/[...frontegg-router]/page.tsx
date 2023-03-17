@@ -1,1 +1,3 @@
-export { FronteggAppRouter as default } from '@frontegg/nextjs/app';
+import { FronteggAppRouter } from '@frontegg/nextjs/app';
+
+export default FronteggAppRouter;
