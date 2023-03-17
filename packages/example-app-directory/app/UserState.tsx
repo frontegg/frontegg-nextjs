@@ -1,5 +1,5 @@
 'use client';
-import { useAuthUserOrNull, useLoginWithRedirect } from '@frontegg/nextjs';
+import { useAuthUserOrNull, useLoginWithRedirect, AdminPortal } from '@frontegg/nextjs';
 
 export const UserState = () => {
   const user = useAuthUserOrNull();
@@ -12,6 +12,16 @@ export const UserState = () => {
   return (
     <div>
       <div>{user?.email ?? 'not logged in'}</div>
+
+      <br />
+      <br />
+      <button
+        onClick={() => {
+          AdminPortal.show();
+        }}
+      >
+        Open AdminPortal
+      </button>
       <br />
       <button
         onClick={() => {

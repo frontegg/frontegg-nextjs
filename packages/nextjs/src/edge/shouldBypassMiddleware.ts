@@ -1,8 +1,10 @@
+import config from '../config';
+import { initialState as authInitialState } from '@frontegg/redux-store/auth/initialState';
+
 const staticFilesRegex = new RegExp('^/(_next/static).*');
 const imageOptimizationRegex = new RegExp('^/(_next/image).*');
 const headerRequestsRegex = new RegExp('^/(favicon.ico).*');
 const fronteggMiddlewareRegex = new RegExp('^/(api/frontegg).*');
-const fronteggRoutesRegex = new RegExp('^/(account/|oauth/callback).*');
 
 interface ByPassOptions {
   bypassStaticFiles?: boolean; // default: true
@@ -32,13 +34,16 @@ export const shouldByPassMiddleware = (pathname: string, options?: ByPassOptions
     ...options,
     bypassFronteggMiddleware: true,
     bypassFronteggRoutes: true,
+    bypassAuthSamlCallback: true,
   };
 
   const isStaticFiles = staticFilesRegex.test(pathname);
   const isImageOptimization = imageOptimizationRegex.test(pathname);
   const isHeaderRequests = headerRequestsRegex.test(pathname);
   const isFronteggMiddleware = fronteggMiddlewareRegex.test(pathname);
-  const isFronteggRoutes = fronteggRoutesRegex.test(pathname);
+
+  const { authenticatedUrl, ...authRoutes } = authInitialState.routes;
+  const isFronteggRoutes = Object.values(authRoutes).find((path) => pathname.startsWith(path)) != null;
 
   if (isStaticFiles) return _options.bypassStaticFiles;
   if (isImageOptimization) return _options.bypassImageOptimization;
