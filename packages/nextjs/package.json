@@ -4,6 +4,16 @@
   "version": "6.7.20",
   "author": "Frontegg LTD",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frontegg/frontegg-nextjs.git",
+    "directory": "packages/nextjs"
+  },
+  "homepage": "https://github.com/frontegg/frontegg-nextjs#readme",
+  "bugs": {
+    "url": "https://github.com/frontegg/frontegg-nextjs/issues",
+    "email": "support@frontegg.com"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -24,11 +34,9 @@
     "jose": "^4.12.2"
   },
   "devDependencies": {
-    "@types/http-proxy": "^1.17.9",
-    "next": ">10.0.0"
+    "@types/http-proxy": "^1.17.9"
   },
   "peerDependencies": {
-    "next": ">10.0.0",
     "react": ">16.9.0",
     "react-dom": ">16.9.0"
   }
