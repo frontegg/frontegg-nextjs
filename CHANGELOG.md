@@ -1,5 +1,17 @@
 # Change Log
 
+## [6.7.21](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.20...v6.7.21) (2023-3-18)
+
+
+### NextJS Wrapper 6.7.21:
+- FR-10654 - Add missing requestAuthorize for appDir architecture
+- FR-10654 - Use CJS build instead of ESM
+- FR-10654 - Prevent overriding default package.json file in dist folder
+- FR-10654 - Add missing alpha version in pre-release script
+- FR-10654 - Update nvmrc load and fix deprecated set-output
+- FR-10654 - Fix build script
+- FR-10654 - Add update-sdk-version script and fix prettier command
+
 ## [6.7.20](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.19...v6.7.20) (2023-3-16)
 
 - Fixed use permission regex issue to accept a wild card
