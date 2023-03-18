@@ -1,4 +1,4 @@
-![alt text](https://github.com/frontegg/frontegg-nextjs/blob/master/logo.png)
+![alt text](https://raw.githubusercontent.com/frontegg/frontegg-nextjs/master/logo.png)
 
 Frontegg is a web platform where SaaS companies can set up their fully managed, scalable and brand aware - SaaS features
 and integrate them into their SaaS portals in up to 5 lines of code.

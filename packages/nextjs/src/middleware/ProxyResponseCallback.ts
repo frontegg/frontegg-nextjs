@@ -75,7 +75,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
            * - Does not have accessToken / access_token
            * - Not json response
            */
-          if (statusCode === 302 && url === '/auth/saml/callback') {
+          if (statusCode === 302 && url === '/frontegg/auth/saml/callback') {
             /**
              * Ignore saml postLogin response with redirect
              */

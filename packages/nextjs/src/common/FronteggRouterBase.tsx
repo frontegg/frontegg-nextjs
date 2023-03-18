@@ -12,25 +12,26 @@ import { ParsedUrlQuery } from 'querystring';
 interface FronteggRouterBaseProps {
   queryParams?: ParsedUrlQuery;
   pathArr: string[];
+  isAppDirEnabled?: boolean;
 }
 
 export function FronteggRouterBase(props: FronteggRouterBaseProps) {
-  const { queryParams = {}, pathArr } = props;
+  const { queryParams = {}, pathArr, isAppDirEnabled } = props;
   const app = useContext(AppContext);
   const loginWithRedirect = useLoginWithRedirect();
-  const { logout } = useLoginActions();
+  const { logout, requestAuthorize } = useLoginActions();
 
   useEffect(() => {
     if (!app) {
       return;
     }
-    if (app.options.hostedLoginBox) {
-      const routesObj = {
-        ...authInitialState.routes,
-        ...config.authRoutes,
-      };
+    const pathname = `/${pathArr.join('/')}`;
+    const routesObj = {
+      ...authInitialState.routes,
+      ...config.authRoutes,
+    };
 
-      const pathname = `/${pathArr.join('/')}`;
+    if (app.options.hostedLoginBox) {
       if (pathname === routesObj.loginUrl) {
         if (queryParams.redirectUrl) {
           localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, `${window.location.origin}${queryParams.redirectUrl}`);
@@ -38,6 +39,17 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
         logout(() => (window.location.href = window.location.origin));
+      }
+    } else {
+      if (pathname.startsWith(routesObj.hostedLoginRedirectUrl ?? '/oauth/callback')) {
+        // if not hosted login, redirect the user to the authenticated url
+        window.location.href = routesObj.authenticatedUrl;
+      } else {
+        const isSamlCallback = pathname === routesObj.samlCallbackUrl;
+        const isLoginPage = pathname.startsWith(routesObj.loginUrl);
+        if ((isAppDirEnabled && isLoginPage) || isSamlCallback) {
+          requestAuthorize(true);
+        }
       }
     }
   }, [app, queryParams, pathArr, loginWithRedirect, logout]);
