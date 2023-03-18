@@ -34,11 +34,9 @@
     "jose": "^4.12.2"
   },
   "devDependencies": {
-    "@types/http-proxy": "^1.17.9",
-    "next": ">10.0.0"
+    "@types/http-proxy": "^1.17.9"
   },
   "peerDependencies": {
-    "next": ">10.0.0",
     "react": ">16.9.0",
     "react-dom": ">16.9.0"
   }
