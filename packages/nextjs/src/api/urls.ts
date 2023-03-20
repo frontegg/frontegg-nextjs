@@ -1,4 +1,4 @@
-import { fronteggAuthApiRoutes, fronteggRefreshTokenUrl } from '@frontegg/rest-api';
+import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import config from '../config';
 
 export const ApiUrls = {

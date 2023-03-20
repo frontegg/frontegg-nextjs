@@ -1,7 +1,7 @@
 import config from '../config';
 import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
-import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
+import { fronteggAuthApiRoutesRegex } from '@frontegg/rest-api';
 import { headerCharRegex } from '../utils/common/constants';
 
 interface GetRequestOptions {
@@ -95,7 +95,15 @@ export const parseHttpResponse = async <T>(res: Response): Promise<T | undefined
  * @returns {boolean} Returns true if the path is a frontegg authentication API route or ends with '/postlogin' or '/prelogin'; otherwise, returns false.
  */
 export function isAuthPath(path: string): boolean {
-  return fronteggAuthApiRoutes.indexOf(path) !== -1 || path.endsWith('/postlogin') || path.endsWith('/prelogin');
+  return (
+    fronteggAuthApiRoutesRegex.find((pathRegex) => {
+      if (typeof pathRegex === 'string') {
+        return pathRegex === path;
+      } else {
+        return pathRegex.test(path);
+      }
+    }) != null
+  );
 }
 
 /**
