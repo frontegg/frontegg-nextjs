@@ -85,7 +85,7 @@ const initializeFronteggApp = ({
   };
 
   const sharedStore = createFronteggStore(
-    { context: contextOptions },
+    { context: contextOptions, appName: appName ?? 'default' },
     storeHolder,
     options.previewMode,
     authOptions,
