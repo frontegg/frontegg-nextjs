@@ -120,10 +120,5 @@ export function isMiddlewarePath(path: string): boolean {
     isAuthPath = (path.endsWith('/postlogin') || path.endsWith('/prelogin')) && !isSocialLoginPath;
   }
 
-  if (isAuthPath) {
-    console.warn('isAuthPath', path, isAuthPath);
-  } else {
-    console.log('isAuthPath', path, isAuthPath);
-  }
   return isAuthPath;
 }
