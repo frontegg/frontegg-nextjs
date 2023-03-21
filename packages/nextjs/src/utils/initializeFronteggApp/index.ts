@@ -49,8 +49,7 @@ const initializeFronteggApp = ({
       return additionalHeaders;
     },
     baseUrl: (path: string) => {
-      const shouldGoThroughFronteggMiddleware = isMiddlewarePath(path);
-      if (shouldGoThroughFronteggMiddleware) {
+      if (isMiddlewarePath(path)) {
         return `${options.envAppUrl}/api`;
       } else {
         return options.envBaseUrl;
