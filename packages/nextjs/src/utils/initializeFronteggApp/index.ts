@@ -5,7 +5,7 @@ import { FronteggAppOptions } from '@frontegg/types';
 import sdkVersion from '../../sdkVersion';
 import type { FronteggProviderOptions } from '../../types';
 import nextjsPkg from 'next/package.json';
-import { isAuthPath, isSocialLoginPath } from '../../api/utils';
+import { isMiddlewarePath } from '../../api/utils';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -49,8 +49,7 @@ const initializeFronteggApp = ({
       return additionalHeaders;
     },
     baseUrl: (path: string) => {
-      const shouldGoThroughFronteggMiddleWare = isAuthPath(path) && !isSocialLoginPath(path);
-      if (shouldGoThroughFronteggMiddleWare) {
+      if (isMiddlewarePath(path)) {
         return `${options.envAppUrl}/api`;
       } else {
         return options.envBaseUrl;
