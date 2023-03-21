@@ -89,29 +89,36 @@ export const parseHttpResponse = async <T>(res: Response): Promise<T | undefined
 };
 
 /**
- * Checks if the given path is a frontegg authentication API route, ends with '/postlogin', or ends with '/prelogin'.
+ * Checks if the given path should be forwarded to the Next.js server middleware.
+ *
  *
  * @param {string} path - The path to check for authentication API routes.
  * @returns {boolean} Returns true if the path is a frontegg authentication API route or ends with '/postlogin' or '/prelogin'; otherwise, returns false.
  */
-export function isAuthPath(path: string): boolean {
-  return (
+export function isMiddlewarePath(path: string): boolean {
+  let isAuthPath =
     fronteggAuthApiRoutesRegex.find((pathRegex) => {
       if (typeof pathRegex === 'string') {
         return pathRegex === path;
       } else {
         return pathRegex.test(path);
       }
-    }) != null
-  );
-}
+    }) != null;
 
-/**
- * Checks if the given path matches the pattern for a social login prelogin route.
- *
- * @param {string} path - The path to check for a social login prelogin route pattern.
- * @returns {boolean} Returns true if the path matches the social login prelogin route pattern; otherwise, returns false.
- */
-export function isSocialLoginPath(path: string): boolean {
-  return RegExp('^/identity/resources/auth/v[0-9]*/user/sso/default/.*/prelogin$').test(path);
+  // if(!isAuthPath){
+  //   isAuthPath = /^\/identity\/resources\/auth\/v[0-9]*\/user\/sso\/[^\/]*\/postlogin$/g.test(path)
+  // }
+  // if(!isAuthPath){
+  //   isAuthPath = /^\/identity\/resources\/auth\/v[0-9]*\/passwordless\/[^\/]*\/prelogin$/g.test(path)
+  // }
+  // if(!isAuthPath){
+  //   isAuthPath = /^\/identity\/resources\/auth\/v[0-9]*\/[^\/]*\/prelogin$/g.test(path)
+  // }
+
+  if (!isAuthPath) {
+    const isSocialLoginPath = /^\/identity\/resources\/auth\/v[0-9]*\/user\/sso\/default\/[^\/]*\/prelogin$/.test(path);
+    isAuthPath = (path.endsWith('/postlogin') || path.endsWith('/prelogin')) && !isSocialLoginPath;
+  }
+
+  return isAuthPath;
 }
