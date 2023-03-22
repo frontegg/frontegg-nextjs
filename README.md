@@ -46,7 +46,7 @@ To Add Frontegg to your existing Next.JS project, follow below steps:
    ```tsx
    // ./pages/_app.tsx
 
-   import { withFronteggApp } from "@frontegg/nextjs";
+   import { withFronteggApp } from "@frontegg/nextjs/pages";
 
    function CustomApp({ Component, pageProps }: AppProps) {
      return <Component {...pageProps} />;
@@ -62,7 +62,7 @@ To Add Frontegg to your existing Next.JS project, follow below steps:
    ```tsx
    // ./pages/api/frontegg/[...frontegg-middleware].ts
 
-   export { fronteggMiddleware as default } from '@frontegg/nextjs';
+   export { fronteggMiddleware as default } from '@frontegg/nextjs/middleware';
    ```
 
 4. Create placeholder pages for frontegg router under `./pages/[...frontegg-router].tsx`:
@@ -73,7 +73,7 @@ To Add Frontegg to your existing Next.JS project, follow below steps:
    export {
      FronteggRouter as default,
      FronteggRouterProps as getServerSideProps,
-   } from '@frontegg/nextjs';
+   } from '@frontegg/nextjs/pages';
    ```
 
 ### Using Vercel platform with custom domain
@@ -138,7 +138,7 @@ Frontegg library.
 ```tsx
 // ./pages/_app.tsx
 
-import { withFronteggApp } from '@frontegg/nextjs';
+import { withFronteggApp } from '@frontegg/nextjs/pages';
 
 function CustomApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
@@ -158,7 +158,7 @@ For any pages that required AccessToken in Server Side, you can use:
 
 ```tsx
 import { GetServerSideProps } from 'next';
-import { getSession } from '@frontegg/nextjs';
+import { getSession } from '@frontegg/nextjs/pages';
 
 export default function MyPage({ products }) {
   return (
@@ -190,7 +190,7 @@ withSSRSession HOC can be used to automatic redirect users to login screen if no
 
 ```tsx
 import { GetServerSideProps } from 'next';
-import { withSSRSession } from '@frontegg/nextjs';
+import { withSSRSession } from '@frontegg/nextjs/pages';
 
 export default function MyPage({ products }) {
   return (
@@ -217,7 +217,7 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 ### wrapping your application
 ```tsx
 // ./app/layout.tsx
-import { FronteggAppProvider } from '@frontegg/nextjs/server';
+import { FronteggAppProvider } from '@frontegg/nextjs/app';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -234,14 +234,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ### routing
 ```tsx
 // ./app/[...frontegg-router]/page.tsx
-export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
+export { FronteggAppRouter as default } from '@frontegg/nextjs/app';
 ```
 
 ### server component
 notice that this session is not part of the state and therefore won't trigger ui changes when it changes
 ```tsx
 // ./app/ServerComponent.tsx
-import { getSession } from "@frontegg/nextjs/server";
+import { getSession } from "@frontegg/nextjs/app";
 
 export const ServerComponent = async () => {
   const session = await getSession();
@@ -256,14 +256,15 @@ export const ServerComponent = async () => {
 // ./app/ClientComponent.tsx
 "use client";
 import { useAuth, useLoginWithRedirect } from "@frontegg/nextjs";
+import { useRouter } from 'next/navigation'
 
 export const ClientComponent = ({ baseUrl }: { baseUrl?: string }) => {
   const { user, isAuthenticated } = useAuth();
-
+  const router = useRouter();
   const loginWithRedirect = useLoginWithRedirect();
 
   const logout = () => {
-    window.location.href = `${baseUrl}/account/logout`;
+    router.replace('/account/logout')
   };
 
   return (
@@ -302,13 +303,11 @@ import { ClientComponent } from "./client";
 import { ServerComponent } from "./server";
 
 export default function MainPage() {
-  const baseUrl = process.env["FRONTEGG_APP_URL"];
   return (
     <div>
       <h3>Next JS application with frontegg</h3>
       {/* @ts-ignore ignore server components error with typescript*/}
       <ServerComponent />
-      <ClientComponent baseUrl={baseUrl} />
     </div>
   );
 }
@@ -324,23 +323,25 @@ To prevent access unauthenticated user to all routes, use [Next.js middlewares](
 
 ```ts
 // /middleware.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getSession } from '@frontegg/nextjs/edge';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getSessionOnEdge, shouldByPassMiddleware, redirectToLogin } from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
-  const session = await getSession(request);
-  const isAuthRoute = request.url.endsWith(YOUR_AUTH_ROUTES)
+  const pathname = request.nextUrl.pathname;
 
-  if(!session && isAuthRoute){
-    // redirect unauthenticated user to /account/login page
-    return NextResponse.redirect(new URL('/account/login', request))
+  if (shouldByPassMiddleware(pathname)) {
+    return NextResponse.next();
   }
-  
+
+  const session = await getSessionOnEdge(request);
+  if (!session) {
+    return redirectToLogin(pathname);
+  }
   return NextResponse.next();
 };
 
 export const config = {
-  matcher: "/(.*)",
+  matcher: '/(.*)',
 };
 ```
