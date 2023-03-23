@@ -1,5 +1,275 @@
 # Change Log
 
+## [7.0.0](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.20...v7.0.0) (2023-3-16)
+
+### Summary
+
+In this release, we've introduced several breaking changes that might impact your existing code.
+Please review the changes outlined below and update your code accordingly to ensure compatibility with the new version.
+
+### Changes
+- **Folder Hierarchy:** Separate files per runtime environment ( pages / edge / appDirectory)
+    - `@frontegg/nextjs/pages` for **pages** architecture.
+    - `@frontegg/nextjs/app` for **appDirectory** architecture.
+    - `@frontegg/nextjs/edge` for **edge** runtime.
+    - `@frontegg/nextjs/middleware` for **api middleware**.
+- **Tree-Shaking:** Build package using babel.js with fully tree-shakable dist folder
+- **Logger:** Add ability for print info logs for debugging. 
+- **Improved Error handling:** Improve api middleware error handing. 
+- **Node.js 18 Support:** Support the new Undici network handler.
+- **Next.js 13.2 Support:** Next.js route handlers.
+- **Tests:** Add e2e tests for the `FronteggApiMiddleware`. 
+
+
+## Migrate from v6 to v7
+
+- [Migrate api middleware (tree-shakable, externalResolver, responseLimit)](#frontegg-api-middleware-migration).
+- [Edge middleware Migration (tree-shakable, stability)](#edge-middleware-migration)
+- [Pages architecture (tree-shakable, share logic code between architectures)](#pages-architecture-migration)
+- [AppDir architecture (tree-shakable, stability, support 13.2 routing)](#app-directory-architecture-migration)
+
+
+### Frontegg API middleware migration
+If you are using FronteggProviderNoSSR you can skip this migration:   
+1. Rename imports to `@frontegg/nextjs/middleware`
+2. export Next.JS config to mark as externalResolver and disable response limit.  
+
+**API Middleware (before):**
+```tsx 
+export { fronteggMiddleware as default } from '@frontegg/nextjs';
+```
+**API Middleware (after):**
+```tsx 
+import { FronteggApiMiddleware } from '@frontegg/nextjs/middleware';
+
+export default FronteggApiMiddleware;
+export const config = {
+  api: {
+    externalResolver: true,
+    // https://nextjs.org/docs/messages/api-routes-response-size-limit
+    responseLimit: false,
+  },
+};
+```
+### Edge middleware migration
+
+If you are using nextjs **edge** middleware, (Ex: `middleware.ts`):
+1. Rename the imports to `@frontegg/nextjs/edge`.
+2. Rename `getSession` to `getSessionOnEdge`.
+3. Use `redirectToLogin` method instead of building login url.
+   
+    **API Middleware (before):**
+    ```tsx 
+    import { NextResponse } from 'next/server';
+    import type { NextRequest } from 'next/server';
+    import { getSession, shouldByPassMiddleware } from '@frontegg/nextjs/edge';
+    
+    export const middleware = async (request: NextRequest) => {
+      const pathname = request.nextUrl.pathname;
+    
+      if (shouldByPassMiddleware(pathname /*, options: optional bypass configuration */)) {
+        return NextResponse.next();
+      }
+    
+      const session = await getSession(request);
+      if (!session) {
+        //  redirect unauthenticated user to /account/login page
+        const loginUrl = `/account/login?redirectUrl=${encodeURIComponent(pathname)}`;
+        return NextResponse.redirect(new URL(loginUrl, process.env['FRONTEGG_APP_URL']));
+      }
+    return NextResponse.next();
+    };
+    
+    export const config = {
+      matcher: '/(.*)',
+    };
+    ```
+    **API Middleware (after):**
+    ```tsx
+    import { NextResponse } from 'next/server';
+    import type { NextRequest } from 'next/server';
+    import { getSessionOnEdge, shouldByPassMiddleware, redirectToLogin } from '@frontegg/nextjs/edge';
+    
+    export const middleware = async (request: NextRequest) => {
+      const pathname = request.nextUrl.pathname;
+    
+      if (shouldByPassMiddleware(pathname)) {
+        return NextResponse.next();
+      }
+    
+      const session = await getSessionOnEdge(request);
+      if (!session) {
+        return redirectToLogin(pathname);
+      }
+      return NextResponse.next();
+    };
+    
+    export const config = {
+      matcher: '/(.*)',
+    };
+    ```
+
+### Pages architecture migration
+1. Rename imports from `@frontegg/nextjs` to `@frontegg/nextjs/pages`.
+
+    **Example (before):**
+    ```tsx
+    import { withFronteggApp } from '@frontegg/nextjs';
+    ```
+  
+    **Example (after):**
+    ```tsx
+    import { withFronteggApp } from '@frontegg/nextjs/pages';
+    ```
+2. Import and then export `FronteggRouter` in your `pages/[...frontegg-router].tsx` file:
+
+   **FronteggRouter (before):**
+    ```tsx 
+    export {
+      FronteggRouter as default,
+      FronteggRouterProps as getServerSideProps,
+    } from '@frontegg/nextjs';
+    ```
+   **FronteggRouter (after):**
+    ```tsx 
+    import { FronteggRouter, FronteggRouterProps } from '@frontegg/nextjs/pages';
+
+    export const getServerSideProps = FronteggRouterProps;
+    export default FronteggRouter;
+    ```
+
+3. import getServerSideProps helpers from `@frontegg/nextjs/pages`:
+    
+   **Example Page (before):**
+    ```tsx 
+    import { GetServerSideProps } from 'next';
+    import { getSession, withSSRSession } from '@frontegg/nextjs';
+    
+    export default function ExamplePage({ ssrSession }) {
+      return  <div> My Example Page </div>;
+    }
+    
+    export const getServerSideProps: GetServerSideProps = async (context) => {
+      const session = await getSession(context.req);
+      if (session) {
+        // logged user
+        return { props: { } };
+      }
+      // unauthorized user
+      return { props: { } };
+    };
+    ```
+    **Example Page (before):**
+    ```tsx 
+    import { GetServerSideProps } from 'next';
+    import { getSession, withSSRSession } from '@frontegg/nextjs/pages';
+    
+    export default function ExamplePage({ ssrSession }) {
+      return  <div> My Example Page </div>;
+    }
+    
+    export const getServerSideProps: GetServerSideProps = async (context) => {
+      const session = await getSession(context.req);
+      
+      // ...
+    };
+    ```
+### App Directory architecture migration
+
+1. Rename imports from `@frontegg/nextjs/server` to `@frontegg/nextjs/app`.
+2. Move `FronteggAppProvider` to inside RootLayout's `<body>`:
+
+    **RootLayout file (before):**
+    ```tsx
+    import { FronteggAppProvider } from '@frontegg/nextjs/server';
+
+    export default function RootLayout({ children }: { children: React.ReactNode }) {
+        const authOptions = {
+          // keepSessionAlive: true // Uncomment this in order to maintain the session alive
+        }
+        return (
+          <FronteggAppProvider authOptions={authOptions} hostedLoginBox={true}>
+            <html>
+              <head></head>
+              <body>
+                {children}
+              </body>
+            </html>
+          </FronteggAppProvider>
+        );
+    }
+    ```
+   **RootLayout file (after):**
+    ```tsx
+    import { FronteggAppProvider } from '@frontegg/nextjs/app';
+
+    export default function RootLayout({ children }: { children: React.ReactNode }) {
+        const authOptions = {
+          // keepSessionAlive: true // Uncomment this in order to maintain the session alive
+        }
+        return (
+          <html>
+            <head></head>
+            <body>
+                {/* @ts-expect-error Server Component for more details visit: https://github.com/vercel/next.js/issues/42292 */}
+                <FronteggAppProvider authOptions={authOptions} hostedLoginBox={true}>
+                    {children}
+                </FronteggAppProvider>
+            </body>
+          </html>
+        );
+    }
+    ```
+3. Export FronteggAppRouter from `@frontegg/nextjs/app`, `app/[...frontegg-router]/page.tsx` file:
+
+   **FronteggAppRouter (before):**
+    ```tsx 
+    export { FronteggAppRouter as default } from '@frontegg/nextjs/client';
+    ```
+   **FronteggAppRouter (after):**
+    ```tsx 
+    import { FronteggAppRouter } from '@frontegg/nextjs/app';
+
+    export default FronteggAppRouter;
+    ```
+
+4. Rename `getSession` and `getUserTokens` to `getAppUserSession` and `getAppUserTokens`:
+
+   **ServerComponent Example (before):**
+    ```tsx
+    import { getSession, getUserTokens } from '@frontegg/nextjs/app';
+
+    export const ServerSession = async () => {
+      const userSession = await getSession();
+      const tokens = await getUserTokens();
+      return (
+        <div>
+          <div>user session server side: {JSON.stringify(userSession)}</div>;
+          <div>user tokens server side: {JSON.stringify(tokens)}</div>
+        </div>
+      );
+    };
+    ```
+    
+    **ServerComponent Example (after):**
+    ```tsx
+    import { getAppUserSession, getAppUserTokens } from '@frontegg/nextjs/app';
+
+    export const ServerSession = async () => {
+      const userSession = await getAppUserSession();
+      const tokens = await getAppUserTokens();
+      return (
+        <div>
+          <div>user session server side: {JSON.stringify(userSession)}</div>;
+          <div>user tokens server side: {JSON.stringify(tokens)}</div>
+        </div>
+      );
+    };
+    ```
+
+## Further Information
+If you encounter any issues or have questions, please report them on our [Issues](https://github.com/frontegg/frontegg-nextjs/issues) page.
+
 ## [6.7.20](https://github.com/frontegg/frontegg-nextjs/compare/v6.7.19...v6.7.20) (2023-3-16)
 
 - Fixed use permission regex issue to accept a wild card

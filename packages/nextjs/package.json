@@ -1,9 +1,19 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "6.7.20",
+  "version": "7.0.0",
   "author": "Frontegg LTD",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frontegg/frontegg-nextjs.git",
+    "directory": "packages/nextjs"
+  },
+  "homepage": "https://github.com/frontegg/frontegg-nextjs#readme",
+  "bugs": {
+    "url": "https://github.com/frontegg/frontegg-nextjs/issues",
+    "email": "support@frontegg.com"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -17,18 +27,16 @@
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
-    "@frontegg/js": "6.80.0",
-    "@frontegg/react-hooks": "6.80.0",
+    "@frontegg/js": "6.81.0",
+    "@frontegg/react-hooks": "6.81.0",
     "http-proxy": "^1.18.1",
     "iron-session": "^6.3.1",
     "jose": "^4.12.2"
   },
   "devDependencies": {
-    "@types/http-proxy": "^1.17.9",
-    "next": ">10.0.0"
+    "@types/http-proxy": "^1.17.9"
   },
   "peerDependencies": {
-    "next": ">10.0.0",
     "react": ">16.9.0",
     "react-dom": ">16.9.0"
   }
