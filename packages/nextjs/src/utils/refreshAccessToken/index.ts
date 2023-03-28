@@ -6,6 +6,7 @@ import CookieManager from '../cookies';
 import {
   isOauthCallback,
   isRuntimeNextRequest,
+  isSamlCallback,
   refreshAccessTokenEmbedded,
   refreshAccessTokenHostedLogin,
 } from './helpers';
@@ -47,7 +48,7 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
       }
     }
 
-    if (isOauthCallback(url)) {
+    if (isOauthCallback(url) || isSamlCallback(url)) {
       /* Prevent refresh token due to oauth login callback */
       logger.debug(`abandon refreshToken for url='/oauth/callback'`);
       return null;
@@ -76,6 +77,7 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
     // @ts-ignore
     const cookieHeader = response.headers?.raw?.()['set-cookie'];
     const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
+
     const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
 
     if (!session) {

@@ -6,6 +6,7 @@ import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';
 import { isFronteggLogoutUrl } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
+import { isSSOPostRequest } from '../utils/refreshAccessToken/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**
@@ -75,9 +76,9 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
            * - Does not have accessToken / access_token
            * - Not json response
            */
-          if (statusCode === 302 && url === '/frontegg/auth/saml/callback') {
+          if (statusCode === 302 && isSSOPostRequest(url)) {
             /**
-             * Ignore saml postLogin response with redirect
+             * Ignore saml/oidc postLogin response with redirect
              */
           } else {
             logger.error('failed to create session', e, {
