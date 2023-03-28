@@ -26,5 +26,5 @@ export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] },
     return null;
   }
 
-  return <FronteggRouterBase pathArr={pathArr} queryParams={searchParams} />;
+  return <FronteggRouterBase pathArr={pathArr} queryParams={searchParams} isAppDirEnabled />;
 }

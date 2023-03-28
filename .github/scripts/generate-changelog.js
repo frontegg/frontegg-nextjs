@@ -1,4 +1,3 @@
-import path from "path";
 
 export default async ({context, github}) => {
   const {default: fs} = await import('fs');

@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/example-pages",
-  "version": "6.7.20",
+  "version": "7.0.1",
   "private": true,
   "scripts": {
     "clean": "rm -rf  ./node_modules && rm -rf ./.next",
@@ -8,9 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:dev-1": "export FRONTEGG_APP_URL='http://localhost:3001' && export FRONTEGG_BASE_URL='http://localhost:4001' && next dev -p 3001",
-    "test:dev-2": "export FRONTEGG_APP_URL='http://localhost:3002' && export FRONTEGG_BASE_URL='http://localhost:4002' && next dev -p 3002",
-    "test:dev-3": "export FRONTEGG_APP_URL='http://localhost:3003' && export FRONTEGG_BASE_URL='http://localhost:4003' && next dev -p 3003",
+    "test:dev-1": "export FRONTEGG_APP_URL='http://localhost:3001' && export FRONTEGG_BASE_URL='http://localhost:4001' && export FRONTEGG_TEST_URL='http://localhost:4001' && next dev -p 3001",
+    "test:dev-2": "export FRONTEGG_APP_URL='http://localhost:3002' && export FRONTEGG_BASE_URL='http://localhost:4002' && export FRONTEGG_TEST_URL='http://localhost:4001'&& next dev -p 3002",
+    "test:dev-3": "export FRONTEGG_APP_URL='http://localhost:3003' && export FRONTEGG_BASE_URL='http://localhost:4003' && export FRONTEGG_TEST_URL='http://localhost:4001'&& next dev -p 3003",
     "test:dev": "concurrently \"yarn test:dev-1\" \"yarn test:dev-2\" \"yarn test:dev-3\""
   },
   "dependencies": {

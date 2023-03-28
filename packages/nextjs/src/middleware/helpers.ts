@@ -1,5 +1,3 @@
-import { fronteggAuthApiRoutes } from '@frontegg/rest-api';
-
 /**
  * If pattern information matching the input url information is found in the `pathRewrite` array,
  * the url value is partially replaced with the `pathRewrite.replaceStr` value.
@@ -31,7 +29,8 @@ export const rewritePath = (
 };
 
 export const isFronteggLogoutUrl = (url: string) => {
-  return (
-    fronteggAuthApiRoutes.filter((path) => path.endsWith('/logout')).findIndex((route) => url.endsWith(route)) >= 0
-  );
+  return url.endsWith('/logout');
+  // return (
+  //   fronteggAuthApiRoutesRegex.filter((path) => path.endsWith('/logout')).findIndex((route) => url.endsWith(route)) >= 0
+  // );
 };
