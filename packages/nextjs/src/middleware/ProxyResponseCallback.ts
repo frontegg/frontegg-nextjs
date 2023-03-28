@@ -75,9 +75,12 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
            * - Does not have accessToken / access_token
            * - Not json response
            */
-          if (statusCode === 302 && url === '/frontegg/auth/saml/callback') {
+          if (
+            (statusCode === 302 && url === '/frontegg/auth/saml/callback') ||
+            (statusCode === 302 && url === '/frontegg/auth/oidc/callback')
+          ) {
             /**
-             * Ignore saml postLogin response with redirect
+             * Ignore saml/oidc postLogin response with redirect
              */
           } else {
             logger.error('failed to create session', e, {
