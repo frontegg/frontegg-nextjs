@@ -77,3 +77,11 @@ export function isOauthCallback(url: string): boolean {
 export function isSamlCallback(url: string): boolean {
   return url.startsWith('/account/saml/callback') || url.startsWith('/account/oidc/callback');
 }
+
+/**
+ * If the url equals to '/frontegg/auth/{provider}/callback', it means that the SSO provider
+ * is posting an http request to the nextjs backend middleware after successfully logged in the user
+ */
+export function isSSOPostRequest(url: string): boolean {
+  return url === '/frontegg/auth/saml/callback' || url === '/frontegg/auth/oidc/callback';
+}
