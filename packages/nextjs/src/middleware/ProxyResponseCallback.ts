@@ -41,15 +41,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
           res,
           req,
         });
-        if (isSuccess) {
-          res.redirect(
-            `${process.env['FRONTEGG_BASE_URL']}/oauth/logout?post_logout_redirect_uri=${encodeURIComponent(
-              process.env['FRONTEGG_APP_URL'] ?? ''
-            )}`
-          );
-        } else {
-          res.status(statusCode).end(bodyStr);
-        }
+        res.status(statusCode).end(bodyStr);
         return;
       }
 
