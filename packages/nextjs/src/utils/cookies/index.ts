@@ -176,6 +176,9 @@ class CookieManager {
       }
       let cookieNumber = 1;
       const cookieToRemove = [];
+      if (cookies[this.getCookieName()]) {
+        cookieToRemove.push(cookies[this.getCookieName()]);
+      }
       while (cookies[this.getCookieName(cookieNumber)]) {
         cookieToRemove.push(this.getCookieName(cookieNumber));
         cookieNumber++;
