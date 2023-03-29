@@ -105,6 +105,8 @@ class CookieManager {
           sessionCookies += sessionCookieChunk;
         }
       } while (sessionCookieChunk);
+    } else {
+      sessionCookies = sessionCookieChunk;
     }
 
     if (sessionCookies.length === 0) {
