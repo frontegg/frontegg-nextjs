@@ -64,8 +64,24 @@ export function isRuntimeNextRequest(url: string): boolean {
 
 /**
  * If url starts with '/oauth/callback' means that the user navigated back
- * from frontegg hosted login, in this scenario no need to refresh token
+ * from frontegg hosted login, in this scenario no need to SSR refresh token
  */
 export function isOauthCallback(url: string): boolean {
   return url.startsWith('/oauth/callback');
+}
+
+/**
+ * If url starts with '/account/saml/callback' means that the user navigated back
+ * from sso login, in this scenario no need to SSR refresh token
+ */
+export function isSamlCallback(url: string): boolean {
+  return url.startsWith('/account/saml/callback') || url.startsWith('/account/oidc/callback');
+}
+
+/**
+ * If the url equals to '/frontegg/auth/{provider}/callback', it means that the SSO provider
+ * is posting an http request to the nextjs backend middleware after successfully logged in the user
+ */
+export function isSSOPostRequest(url: string): boolean {
+  return url === '/frontegg/auth/saml/callback' || url === '/frontegg/auth/oidc/callback';
 }

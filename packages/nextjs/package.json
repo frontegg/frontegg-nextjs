@@ -1,7 +1,7 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "7.0.0",
+  "version": "7.0.2",
   "author": "Frontegg LTD",
   "license": "MIT",
   "repository": {
@@ -23,7 +23,7 @@
     "build:stable": "node ../../scripts/build node",
     "build:types": "tsc -b tsconfig.build.json",
     "build:copy-files": "node ../../scripts/copy-files.js",
-    "test": "cp .env.test .env && CI=true npx playwright test",
+    "test": "node ../../scripts/prepare-env-test-file.js && CI=true npx playwright test",
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
