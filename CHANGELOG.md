@@ -1,5 +1,17 @@
 # Change Log
 
+## [7.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.2...v7.0.3) (2023-4-3)
+
+- Added support for SCIM groups
+- Updated texts across login box - grammar and terminology
+- Added impersonation indicator to show impersonator that they're in an impersonation session
+- Added passkeys feature
+- NextJS Wrapper 7.0.3:
+
+### NextJS Wrapper 7.0.3:
+- FR-11268 - Fix nextjs edge session check
+- FR-11268 - build .env.test file in runtime with random values
+
 ## [7.0.2](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.1...v7.0.2) (2023-3-29)
 
 - FR-11247 - fix version branch 6.82
