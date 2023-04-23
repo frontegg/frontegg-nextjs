@@ -1,5 +1,30 @@
 # Change Log
 
+## [7.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.3...v7.0.4) (2023-4-23)
+
+- FR-11419 - Lock reduxjs/toolkit version to be compatible in vite types plugin
+- FR-11447 - Fix password placeholder in the login
+- FR-11437 - Login Box - Fix social buttons order
+- FR-11389 - Fix Vite js-sha256 warning
+- FR-11420 - fix company name error in split mode sign up
+- FR-11338 - fix phone number dropdown theming
+- FR-11375 - a11y add aria labels
+- FR-11393 - Extract customization options from App.tsx for better usage
+- FR-11063 - add tests for passkeys
+- FR-11351 - preserve query params for login per tenant
+
+- FR-11389 - Fix activate account button disable/loading state
+- FR-11389 - Add js-sha256 library to test suites
+- FR-11389 - Add support for generate code challenge in non-secure domains [HostedLogin Mode]
+- FR-9359 - cannot update sso group name
+- FR-11076 - Add live SSO integration guide
+
+- FR-11248 - add the option to separate first and last name in sign up form
+- FR-11354 - allaccounts components
+
+### NextJS Wrapper 7.0.4:
+- FR-11351 - preserve-query-params-for-login-per-tenant
+
 ## [7.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.2...v7.0.3) (2023-4-3)
 
 - Added support for SCIM groups
