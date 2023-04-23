@@ -21,7 +21,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
   const { router, appName, hostedLoginBox, customLoginBox, ...props } = _props;
   const baseName = props.basename ?? router.basePath;
 
-  const onRedirectTo = useOnRedirectTo(baseName, router);
+  const onRedirectTo = useOnRedirectTo(baseName, router, props.authOptions?.routes);
 
   const app = useMemo(() => {
     let createdApp;

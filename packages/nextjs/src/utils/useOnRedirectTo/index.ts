@@ -1,16 +1,27 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { RedirectOptions } from '@frontegg/rest-api';
 import type { NextRouter } from 'next/router';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+import { isAuthRoute, AuthPageRoutes } from '@frontegg/redux-store';
 
-const useOnRedirectTo = (baseName: string, router: AppRouterInstance | NextRouter) => {
+const useOnRedirectTo = (
+  baseName: string,
+  router: AppRouterInstance | NextRouter,
+  routes?: Partial<AuthPageRoutes>
+) => {
+  const isAuthRouteRef = useRef<(path: string) => boolean>(() => false);
+
+  useMemo(() => {
+    isAuthRouteRef.current = (path) => isAuthRoute(path, routes);
+  }, [routes]);
+
   return useCallback((_path: string, opts?: RedirectOptions) => {
     const isSSR = typeof window == undefined;
     let path = _path;
     if (path.startsWith(baseName)) {
       path = path.substring(baseName.length);
     }
-    if (opts?.preserveQueryParams) {
+    if (opts?.preserveQueryParams || isAuthRouteRef.current(path)) {
       path = `${path}${window.location.search}`;
     }
     if (opts?.refresh && !isSSR) {

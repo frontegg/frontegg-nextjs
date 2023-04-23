@@ -16,7 +16,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   const ssrStoreHolder = useRef({});
   const storeHolder = isSSR ? ssrStoreHolder.current : undefined;
 
-  const onRedirectTo = useOnRedirectTo(baseName, router);
+  const onRedirectTo = useOnRedirectTo(baseName, router, props.authOptions?.routes);
 
   const app = useMemo(
     () =>
