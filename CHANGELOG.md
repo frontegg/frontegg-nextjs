@@ -1,5 +1,26 @@
 # Change Log
 
+## [7.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.4...v7.0.5) (2023-4-27)
+
+- FR-11551 - fix hover input eye icon button
+- FR-11547 - fix a11y second part
+
+- FR-11479 - Passkeys button style should be the same configuration as "social login button" style
+- FR-11375 - fix a11y login-box second part
+- FR-11419 - Lock reduxjs/toolkit version to be compatible in vite types plugin
+- FR-11447 - Fix password placeholder in the login
+- FR-11437 - Login Box - Fix social buttons order
+- FR-11389 - Fix Vite js-sha256 warning
+- FR-11420 - fix company name error in split mode sign up
+- FR-11338 - fix phone number dropdown theming
+- FR-11375 - a11y add aria labels
+- FR-11393 - Extract customization options from App.tsx for better usage
+- FR-11063 - add tests for passkeys
+- FR-11351 - preserve query params for login per tenant
+
+- FR-11389 - Fix activate account button disable/loading state
+
+
 ## [7.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.3...v7.0.4) (2023-4-23)
 - Lock reduxjs/toolkit version to be compatible in Vite types plugin
 - Fixed password input placeholder text in the login box
