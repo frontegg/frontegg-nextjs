@@ -78,10 +78,19 @@ export interface FronteggProviderProps extends FronteggProviderOptions {
   appName?: string;
 }
 
-type CustomLoginProps = {
-  paramKey?: string;
-  subDomainIndex?: number;
-};
+type CustomLoginProps =
+  | {
+      /**
+       *@param paramKey The param key from your tenant login url, for 'https://frontegg.com?organization=[tenant]' would be 'organization';
+       */
+      paramKey: string;
+    }
+  | {
+      /**
+       *@param subDomainIndex The index of sub domain from your tenant login url, for 'https://[tenant].frontegg.com' would be 0;
+       */
+      subDomainIndex: number;
+    };
 
 type PagesDirectoryProviderProps = {
   customLogin?: CustomLoginProps;
