@@ -78,6 +78,17 @@ export interface FronteggProviderProps extends FronteggProviderOptions {
   appName?: string;
 }
 
+type CustomLoginProps = {
+  paramKey?: string;
+  subDomainIndex?: number;
+};
+
+type PagesDirectoryProviderProps = {
+  customLogin?: CustomLoginProps;
+};
+
+export type ClientFronteggProviderProps = Omit<FronteggProviderProps, 'router'> & PagesDirectoryProviderProps;
+
 declare module 'iron-session' {
   interface IronSessionData {
     accessToken: FronteggNextJSSession['accessToken'];
