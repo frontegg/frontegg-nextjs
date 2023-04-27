@@ -8,7 +8,7 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  const pathname = request.nextUrl.pathname;
+  const { pathname, searchParams } = request.nextUrl;
 
   if (shouldByPassMiddleware(pathname /*, options: optional bypass configuration */)) {
     return NextResponse.next();
@@ -16,7 +16,7 @@ export const middleware = async (request: NextRequest) => {
 
   const session = await getSessionOnEdge(request);
   if (!session) {
-    return redirectToLogin(pathname);
+    return redirectToLogin(pathname, searchParams);
   }
   return NextResponse.next();
 };
