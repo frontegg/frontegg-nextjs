@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/example-pages",
-  "version": "7.0.3",
+  "version": "7.0.4",
   "private": true,
   "scripts": {
     "clean": "rm -rf  ./node_modules && rm -rf ./.next",
