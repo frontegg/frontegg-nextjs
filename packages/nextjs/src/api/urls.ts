@@ -24,8 +24,10 @@ interface BuildRouteResult {
  *
  *  @throws {TypeError} If redirectUrl is not a string.
  */
-export function buildLoginRoute(redirectUrl: string): BuildRouteResult {
-  const asPath = `${config.appUrl}/account/login?redirectUrl=${encodeURIComponent(redirectUrl)}`;
+export function buildLoginRoute(redirectUrl: string, searchParams?: URLSearchParams): BuildRouteResult {
+  const asPath = `${config.appUrl}/account/login?redirectUrl=${encodeURIComponent(redirectUrl)}${
+    searchParams ? `&${searchParams.toString()}` : ''
+  }`;
   const asUrl = new URL(asPath);
   return {
     asPath,
