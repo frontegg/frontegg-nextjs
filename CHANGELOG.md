@@ -1,5 +1,23 @@
 # Change Log
 
+## [7.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.4...v7.0.5) (2023-4-27)
+
+- Fixed input hover issue on suffix icon
+- A11y improvements 
+- Fixed Passkeys button style
+
+## [7.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.3...v7.0.4) (2023-4-23)
+- Lock reduxjs/toolkit version to be compatible in Vite types plugin
+- Fixed password input placeholder text in the login box
+- Fixed social login buttons order
+- Fix Vite js-sha256 warning
+- Fixed company name error in split mode sign up
+- Fixed phone number dropdown theming
+- Added aria labels to buttons
+
+### NextJS Wrapper 7.0.4:
+- FR-11351 - preserve-query-params-for-login-per-tenant
+
 ## [7.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.2...v7.0.3) (2023-4-3)
 
 - Added support for SCIM groups
