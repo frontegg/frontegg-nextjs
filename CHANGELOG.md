@@ -3,12 +3,6 @@
 ## [7.0.7](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.6...v7.0.7) (2023-4-28)
 
 - FR-11564 - Social login button shouldn't inherit from secondary color
-- FR-11561 - move passkeys button out of form
-- FR-11538 - support-next-js-serach-param-for-login-per-tenant 
-- FR-11337 - Passkeys is missing in the full Preview mode in the Builder
-- FR-10976 - allow to load frontegg helper by a query param to the URL
-- [Snyk] Security upgrade webpack from 5.74.0 to 5.76.0
-
 
 ## [7.0.6](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.5...v7.0.6) (2023-4-27)
 
