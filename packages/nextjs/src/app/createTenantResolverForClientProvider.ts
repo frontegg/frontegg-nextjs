@@ -8,6 +8,7 @@ const isCustomLoginStrategySubDomain = (
   customLoginOptions: CustomLoginOptionsType
 ): customLoginOptions is CustomLoginSubDomainType => customLoginOptions.strategy === 'subDomain';
 
+const emptyTenantResponse = { tenant: null };
 export const createTenantResolverForClientProvider = (customLoginOptions?: CustomLoginOptionsType) => {
   if (!customLoginOptions) {
     return undefined;
@@ -23,9 +24,9 @@ export const createTenantResolverForClientProvider = (customLoginOptions?: Custo
         const tenant = params.get(paramKey);
         return { tenant };
       }
-      return {};
+      return emptyTenantResponse;
     } catch {
-      return {};
+      return emptyTenantResponse;
     }
   };
 };
