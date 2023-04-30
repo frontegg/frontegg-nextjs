@@ -17,9 +17,9 @@ export const createTenantResolverForClientProvider = (customLoginOptions?: Custo
         const tenant = params.get(paramKey) || undefined;
         return { tenant };
       }
-      return { tenant: undefined };
+      return {};
     } catch {
-      return { tenant: undefined };
+      return {};
     }
   };
 };

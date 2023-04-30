@@ -1,5 +1,6 @@
 'use client';
 
+import type { ContextOptions } from '@frontegg/rest-api';
 import type { ClientFronteggProviderProps } from '../types';
 import { FronteggBaseProvider } from '../common';
 import { useRouter } from 'next/navigation';
@@ -16,7 +17,10 @@ export const ClientFronteggProvider: FC<ClientFronteggProviderProps> = ({
   const router = useRouter();
   const basePath = process.env.__NEXT_ROUTER_BASEPATH || '';
 
-  const tenantResolver = useMemo(() => createTenantResolverForClientProvider(customLoginOptions), [customLoginOptions]);
+  const tenantResolver = useMemo(
+    () => createTenantResolverForClientProvider(customLoginOptions),
+    [customLoginOptions]
+  ) as ContextOptions['tenantResolver'];
 
   return (
     <FronteggBaseProvider
