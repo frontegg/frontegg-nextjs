@@ -16,10 +16,7 @@ export const ClientFronteggProvider: FC<ClientFronteggProviderProps> = ({
   const router = useRouter();
   const basePath = process.env.__NEXT_ROUTER_BASEPATH || '';
 
-  const tenantResolver = useMemo(
-    () => (customLoginOptions ? createTenantResolverForClientProvider(customLoginOptions) : undefined),
-    [customLoginOptions]
-  );
+  const tenantResolver = useMemo(() => createTenantResolverForClientProvider(customLoginOptions), [customLoginOptions]);
 
   return (
     <FronteggBaseProvider

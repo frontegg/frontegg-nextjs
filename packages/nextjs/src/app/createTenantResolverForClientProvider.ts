@@ -1,13 +1,23 @@
-import { CustomLoginOptionsType } from '../types';
+import { CustomLoginOptionsType, CustomLoginParamKeyType, CustomLoginSubDomainType } from '../types';
 
-export const createTenantResolverForClientProvider = ({ subDomainIndex, paramKey }: CustomLoginOptionsType) => {
-  if (subDomainIndex && paramKey) {
-    throw new Error('subDomainIndex and paramKey cannot be used together only one strategy is allowed');
+const isCustomLoginStrategyParamKey = (
+  customLoginOptions: CustomLoginOptionsType
+): customLoginOptions is CustomLoginParamKeyType => customLoginOptions.strategy === 'paramKey';
+
+const isCustomLoginStrategySubDomain = (
+  customLoginOptions: CustomLoginOptionsType
+): customLoginOptions is CustomLoginSubDomainType => customLoginOptions.strategy === 'subDomain';
+
+export const createTenantResolverForClientProvider = (customLoginOptions?: CustomLoginOptionsType) => {
+  if (!customLoginOptions) {
+    return undefined;
   }
   return () => {
-    if (subDomainIndex) {
+    if (isCustomLoginStrategySubDomain(customLoginOptions)) {
+      const { subDomainIndex } = customLoginOptions;
       return { tenant: window.location.hostname.split('.')[subDomainIndex] };
-    } else if (paramKey) {
+    } else if (isCustomLoginStrategyParamKey(customLoginOptions)) {
+      const { paramKey } = customLoginOptions;
       const params = new URLSearchParams(window.location.search);
       const tenant = params.get(paramKey);
       return { tenant };
