@@ -1,3 +1,4 @@
+import { ResolvedTenantResult } from '@frontegg/rest-api';
 import { CustomLoginOptionsType, CustomLoginParamKeyType, CustomLoginSubDomainType } from '../types';
 
 const isCustomLoginStrategyParamKey = (
@@ -8,7 +9,8 @@ const isCustomLoginStrategySubDomain = (
   customLoginOptions: CustomLoginOptionsType
 ): customLoginOptions is CustomLoginSubDomainType => customLoginOptions.strategy === 'subDomain';
 
-const emptyTenantResponse = { tenant: null };
+const emptyTenantResponse = {} as ResolvedTenantResult;
+
 export const createTenantResolverForClientProvider = (customLoginOptions?: CustomLoginOptionsType) => {
   if (!customLoginOptions) {
     return undefined;
