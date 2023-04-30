@@ -88,7 +88,7 @@ type CustomLoginOptionsWithParamKeyType = {
 
 type CustomLoginOptionsWithSubDomainType = {
   /**
-   *The param key from your tenant login url, for 'frontegg.com?organization=[tenant]' would be 'organization'
+   *The index of sub domain from your tenant login url, for 'https://[tenant].frontegg.com' would be 0
    */
   subDomainIndex: number;
   paramKey?: never;
