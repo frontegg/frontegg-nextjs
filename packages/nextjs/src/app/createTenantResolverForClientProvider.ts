@@ -13,15 +13,19 @@ export const createTenantResolverForClientProvider = (customLoginOptions?: Custo
     return undefined;
   }
   return () => {
-    if (isCustomLoginStrategySubDomain(customLoginOptions)) {
-      const { subDomainIndex } = customLoginOptions;
-      return { tenant: window.location.hostname.split('.')[subDomainIndex] };
-    } else if (isCustomLoginStrategyParamKey(customLoginOptions)) {
-      const { paramKey } = customLoginOptions;
-      const params = new URLSearchParams(window.location.search);
-      const tenant = params.get(paramKey);
-      return { tenant };
+    try {
+      if (isCustomLoginStrategySubDomain(customLoginOptions)) {
+        const { subDomainIndex } = customLoginOptions;
+        return { tenant: window.location.hostname.split('.')[subDomainIndex] };
+      } else if (isCustomLoginStrategyParamKey(customLoginOptions)) {
+        const { paramKey } = customLoginOptions;
+        const params = new URLSearchParams(window.location.search);
+        const tenant = params.get(paramKey);
+        return { tenant };
+      }
+      return {};
+    } catch {
+      return {};
     }
-    return { tenant: null };
   };
 };
