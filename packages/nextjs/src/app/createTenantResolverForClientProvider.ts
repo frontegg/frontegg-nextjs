@@ -19,7 +19,7 @@ export const createTenantResolverForClientProvider = (customLoginOptions?: Custo
     try {
       if (isCustomLoginStrategySubDomain(customLoginOptions)) {
         const { subDomainIndex } = customLoginOptions;
-        return { tenant: window.location.hostname.split('.')[subDomainIndex] };
+        return { tenant: window.location.hostname.split('.').slice(0, -2)[subDomainIndex] };
       } else if (isCustomLoginStrategyParamKey(customLoginOptions)) {
         const { paramKey } = customLoginOptions;
         const params = new URLSearchParams(window.location.search);
