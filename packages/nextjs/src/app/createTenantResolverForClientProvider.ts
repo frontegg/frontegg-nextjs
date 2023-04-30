@@ -1,34 +1,25 @@
-import { ResolvedTenantResult } from '@frontegg/rest-api';
-import { CustomLoginOptionsType, CustomLoginParamKeyType, CustomLoginSubDomainType } from '../types';
-
-const isCustomLoginStrategyParamKey = (
-  customLoginOptions: CustomLoginOptionsType
-): customLoginOptions is CustomLoginParamKeyType => customLoginOptions.strategy === 'paramKey';
-
-const isCustomLoginStrategySubDomain = (
-  customLoginOptions: CustomLoginOptionsType
-): customLoginOptions is CustomLoginSubDomainType => customLoginOptions.strategy === 'subDomain';
-
-const emptyTenantResponse = {} as ResolvedTenantResult;
+import { CustomLoginOptionsType } from '../types';
 
 export const createTenantResolverForClientProvider = (customLoginOptions?: CustomLoginOptionsType) => {
   if (!customLoginOptions) {
     return undefined;
   }
+
   return () => {
     try {
-      if (isCustomLoginStrategySubDomain(customLoginOptions)) {
-        const { subDomainIndex } = customLoginOptions;
-        return { tenant: window.location.hostname.split('.').slice(0, -2)[subDomainIndex] };
-      } else if (isCustomLoginStrategyParamKey(customLoginOptions)) {
-        const { paramKey } = customLoginOptions;
-        const params = new URLSearchParams(window.location.search);
-        const tenant = params.get(paramKey);
+      const { subDomainIndex, paramKey } = customLoginOptions;
+      if (subDomainIndex) {
+        const tenant = window.location.hostname.split('.').slice(0, -2)[subDomainIndex];
         return { tenant };
       }
-      return emptyTenantResponse;
+      if (paramKey) {
+        const params = new URLSearchParams(window.location.search);
+        const tenant = params.get(paramKey) || undefined;
+        return { tenant };
+      }
+      return { tenant: undefined };
     } catch {
-      return emptyTenantResponse;
+      return { tenant: undefined };
     }
   };
 };
