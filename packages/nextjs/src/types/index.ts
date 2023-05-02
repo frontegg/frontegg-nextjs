@@ -78,6 +78,30 @@ export interface FronteggProviderProps extends FronteggProviderOptions {
   appName?: string;
 }
 
+type CustomLoginOptionsWithParamKeyType = {
+  /**
+   *The param key from your tenant login url, for 'frontegg.com?organization=[tenant]' would be 'organization'
+   */
+  paramKey: string;
+  subDomainIndex?: never;
+};
+
+type CustomLoginOptionsWithSubDomainType = {
+  /**
+   *The index of sub domain from your tenant login url, for 'https://[tenant].frontegg.com' would be 0
+   */
+  subDomainIndex: number;
+  paramKey?: never;
+};
+
+export type CustomLoginOptionsType = CustomLoginOptionsWithParamKeyType | CustomLoginOptionsWithSubDomainType;
+
+type PagesDirectoryProviderProps = {
+  customLoginOptions?: CustomLoginOptionsType;
+};
+
+export type ClientFronteggProviderProps = Omit<FronteggProviderProps, 'router'> & PagesDirectoryProviderProps;
+
 declare module 'iron-session' {
   interface IronSessionData {
     accessToken: FronteggNextJSSession['accessToken'];

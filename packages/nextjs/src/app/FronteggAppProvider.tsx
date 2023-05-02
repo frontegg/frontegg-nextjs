@@ -1,11 +1,11 @@
 import React, { PropsWithChildren } from 'react';
 import { ClientFronteggProvider } from './ClientFronteggProvider';
-import { FronteggAppOptions } from '@frontegg/types';
 import { getAppHeaders, getAppSession } from './helpers';
 import config from '../config';
 import fetchUserData from '../utils/fetchUserData';
+import { ClientFronteggProviderProps } from '../types';
 
-export type FronteggAppProviderProps = PropsWithChildren<Omit<FronteggAppOptions, 'contextOptions'>>;
+export type FronteggAppProviderProps = PropsWithChildren<Omit<ClientFronteggProviderProps, 'contextOptions'>>;
 
 export const FronteggAppProvider = async (options: FronteggAppProviderProps) => {
   const appEnvConfig = config.appEnvConfig;
