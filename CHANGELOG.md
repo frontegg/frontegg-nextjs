@@ -5,9 +5,6 @@
 - FR-11581 - fix a11y login-box onEnter event for links
 - FR-11353 - add new tree graph component
 
-### NextJS Wrapper 7.0.8:
-- FR-11632 - update CODEOWNERS
-
 ## [7.0.7](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.6...v7.0.7) (2023-4-28)
 
 - FR-11564 - Social login button shouldn't inherit from secondary color
