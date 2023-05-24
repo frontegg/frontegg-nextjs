@@ -1,3 +1,5 @@
+'use client';
+
 import React, { FC, isValidElement, ReactElement, useCallback, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FronteggAppInstance } from '@frontegg/types';
