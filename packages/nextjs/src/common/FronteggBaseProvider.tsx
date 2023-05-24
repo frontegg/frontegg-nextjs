@@ -8,6 +8,7 @@ import AppContext from './AppContext';
 import initializeFronteggApp from '../utils/initializeFronteggApp';
 import useRequestAuthorizeSSR from './useRequestAuthorizeSSR';
 import useOnRedirectTo from '../utils/useOnRedirectTo';
+import { CustomComponentRegister } from './CustomComponentHolder';
 
 const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...props }) => {
   const isSSR = typeof window === 'undefined';
@@ -38,6 +39,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   useRequestAuthorizeSSR({ app, user, tenants, session });
   return (
     <AppContext.Provider value={app}>
+      <CustomComponentRegister app={app} themeOptions={props.themeOptions} />
       <FronteggStoreProvider {...({ ...props, app } as any)}>{props.children}</FronteggStoreProvider>
     </AppContext.Provider>
   );
