@@ -2,31 +2,15 @@
 
 ## [7.0.10](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.9...v7.0.10) (2023-5-28)
 
-- FR-11887 - Revert Entitlements SDK - Load entitlements list & make the data accessible for the wrappers"
+- Fixed hosted login with hash router
+- Support login per tenant self service
+- Added Cyprus phone area code 2 fa screen
+- Added option to upload metadata file instead of metadata url
 
-- FR-11722 - fix hosted login with hash [PLEASE DON'T MERGE YET]
-- FR-11611 - login per tenant self service small fixes
-
-- FR-11881 - restore search params after closing the admin portal
-- FR-11878 - QA fixes for login per tenant self service
-- FR-11887 - Entitlements SDK - Load entitlements list & make the data accessible for the wrappers
-- FR-11152 - cyprus phone area code 2 fa screen
-- FR-11658 - merge 6.99.x
-- FR-11652 - Add option to upload metadata file instead of metadata url
-- FR-11529 - fix bug white borders dark mode
-- FR-11769 - add meta data to context
-- FR-11769 - change source to enum
-- FR-11769 - add source header to request
-- FR-11658 - create mock login preview for login per tenant self service mock
-- FR-11652 - SSO Guides enhancements
-- [Snyk] Security upgrade babel-plugin-module-resolver from 4.1.0 to 5.0.0
-- FR-11735 - login per tenant self service dependence fix
-- FR-11442 - remove admin provisioning feature flag
-- FR-11723 - bump rest api version
-- FR-11735 - login per tenant self service input logo upload and fixes
 
 ### NextJS Wrapper 7.0.10:
-- FR-11848 - allow using react hooks in custom components
+- Support react hooks inside custom components
+
 # Change Log
 
 ## [7.0.9](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.8...v7.0.9) (2023-5-12)
