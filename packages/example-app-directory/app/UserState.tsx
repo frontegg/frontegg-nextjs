@@ -1,9 +1,12 @@
 'use client';
-import { useAuthUserOrNull, useLoginWithRedirect, AdminPortal } from '@frontegg/nextjs';
+import { useAuthUserOrNull, useLoginWithRedirect, AdminPortal, useLogoutHostedLogin } from '@frontegg/nextjs';
+import Link from 'next/link';
 
 export const UserState = () => {
   const user = useAuthUserOrNull();
   const loginWithRedirect = useLoginWithRedirect();
+  const logoutHosted = useLogoutHostedLogin();
+
   /*
    * Replace the elements below with your own.
    *
@@ -28,8 +31,19 @@ export const UserState = () => {
           loginWithRedirect();
         }}
       >
-        Hosted login
+        Open hosted login
       </button>
+      <br />
+      <button
+        onClick={() => {
+          logoutHosted();
+        }}
+      >
+        logout hosted login
+      </button>
+      <br />
+      <br />
+      <Link href='/account/logout'>logout embedded</Link>
     </div>
   );
 };
