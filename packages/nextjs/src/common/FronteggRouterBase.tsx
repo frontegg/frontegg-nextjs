@@ -21,7 +21,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
   const app = useContext(AppContext);
   const loginWithRedirect = useLoginWithRedirect();
   const { requestAuthorize } = useLoginActions();
-  const logoutHosted = useLogoutHostedLogin({ goBackToOrigin: true });
+  const logoutHosted = useLogoutHostedLogin();
 
   useEffect(() => {
     if (!app) {
@@ -40,7 +40,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
-        logoutHosted();
+        logoutHosted(window.location.origin);
       }
     } else {
       if (pathname.startsWith(routesObj.hostedLoginRedirectUrl ?? '/oauth/callback')) {

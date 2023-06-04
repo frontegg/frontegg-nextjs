@@ -3,28 +3,21 @@ import { ContextHolder } from '@frontegg/rest-api';
 import { buildLogoutRoute } from '../api/urls';
 
 type UseLogoutHostedOptions = {
-  goBackToOrigin?: boolean;
+  redirectUrl?: string;
 };
 
 /**
  * Hook to logout client side for hosted login
- * @param options
  */
-export const useLogoutHostedLogin = (options?: UseLogoutHostedOptions) => {
-  const goBackToOrigin = options?.goBackToOrigin ?? false;
+
+export const useLogoutHostedLogin = () => {
   const { logout } = useLoginActions();
-  const isSSR = typeof window === 'undefined';
 
-  if (isSSR) {
-    return () => {};
-  }
-
-  const contextBaseUrl = ContextHolder.getContext()?.baseUrl;
-  const baseUrl = typeof contextBaseUrl === 'function' ? contextBaseUrl('') : contextBaseUrl;
-  const redirectUrl = goBackToOrigin ? window.location.origin : window.location.href;
-  const logoutRoute = buildLogoutRoute(redirectUrl, baseUrl).asPath;
-
-  return () => {
+  return (redirectUrl?: string) => {
+    const contextBaseUrl = ContextHolder.getContext()?.baseUrl;
+    const baseUrl = typeof contextBaseUrl === 'function' ? contextBaseUrl('') : contextBaseUrl;
+    const finalRedirectUrl = redirectUrl ?? window.location.href;
+    const logoutRoute = buildLogoutRoute(finalRedirectUrl, baseUrl).asPath;
     logout(() => {
       window.location.href = logoutRoute;
     });
