@@ -1,5 +1,18 @@
 # Change Log
 
+## [7.0.10](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.9...v7.0.10) (2023-5-28)
+
+- Fixed hosted login with hash router
+- Support login per tenant self service
+- Added Cyprus phone area code 2 fa screen
+- Added option to upload metadata file instead of metadata url
+
+
+### NextJS Wrapper 7.0.10:
+- Support react hooks inside custom components
+
+# Change Log
+
 ## [7.0.9](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.8...v7.0.9) (2023-5-12)
 
 - FR-11442 - Removed admin portal provisioning feature flag
