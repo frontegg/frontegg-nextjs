@@ -2,30 +2,14 @@
 
 ## [7.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.10...v7.0.11) (2023-6-6)
 
-- FR-11887 - bump rest api
-- FR-11887 - entitlements load and hook
-- FR-11600 - better error handling for login fixes
-- FR-10891 - add required to fields in invite user modal
-- FR-11985 - SSO Guides fixes
-- FR-11600 - better error handling for login
-- FR-11651 - msp all accounts state
-- FR-11887 - Revert Entitlements SDK - Load entitlements list & make the data accessible for the wrappers"
-
-- FR-11722 - fix hosted login with hash [PLEASE DON'T MERGE YET]
-- FR-11611 - login per tenant self service small fixes
-
-- FR-11881 - restore search params after closing the admin portal
-- FR-11878 - QA fixes for login per tenant self service
-- FR-11887 - Entitlements SDK - Load entitlements list & make the data accessible for the wrappers
-- FR-11152 - cyprus phone area code 2 fa screen
-- FR-11658 - merge 6.99.x
-- FR-11652 - Add option to upload metadata file instead of metadata url
-- FR-11529 - fix bug white borders dark mode
-- FR-11769 - add meta data to context
+- Change iframe login preview for login per tenant self service
+- add required to fields in invite user modal
+- Improve error handling for login 
+- Added MSP - all accounts main page and state
 
 ### NextJS Wrapper 7.0.11:
-- FR-11482 - support null for custom component again
-- FR-11848 - allow using react hooks in custom components
+- Added support for null in custom component
+
 # Change Log
 
 ## [7.0.10](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.9...v7.0.10) (2023-5-28)
