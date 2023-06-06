@@ -2,8 +2,8 @@
 
 ## [7.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.10...v7.0.11) (2023-6-6)
 
-- Change iframe login preview for login per tenant self service
-- add required to fields in invite user modal
+- Improve login preview for login per tenant self service to rendered inside iframe
+- Added required to fields in invite user modal
 - Improve error handling for login 
 - Added MSP - all accounts main page and state
 
