@@ -1,14 +1,13 @@
 'use client';
 
 import React, { FC, useMemo, useRef } from 'react';
-import { FronteggStoreProvider } from '@frontegg/react-hooks';
+import { FronteggStoreProvider, CustomComponentRegister } from '@frontegg/react-hooks';
 import { ContextHolder } from '@frontegg/rest-api';
 import type { FronteggProviderProps } from '../types';
 import AppContext from './AppContext';
 import initializeFronteggApp from '../utils/initializeFronteggApp';
 import useRequestAuthorizeSSR from './useRequestAuthorizeSSR';
 import useOnRedirectTo from '../utils/useOnRedirectTo';
-import { CustomComponentRegister } from './CustomComponentHolder';
 
 const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...props }) => {
   const isSSR = typeof window === 'undefined';
