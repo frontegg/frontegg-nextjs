@@ -68,7 +68,7 @@ export const CustomComponentRegister: FC<{ app: FronteggAppInstance; themeOption
           }
         } catch (e) {}
       }
-      if (isValidElement(obj) || isElement(obj)) {
+      if (isValidElement(obj) || isElement(obj) || obj === null) {
         const generatedKey = `${keyPath}.${key}`;
         CustomComponentHolder.set(generatedKey, obj);
         return [generatedKey];
