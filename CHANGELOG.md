@@ -1,5 +1,17 @@
 # Change Log
 
+## [7.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.10...v7.0.11) (2023-6-6)
+
+- Improve login preview for login per tenant self service to rendered inside iframe
+- Added required to fields in invite user modal
+- Improve error handling for login 
+- Added MSP - all accounts main page and state
+
+### NextJS Wrapper 7.0.11:
+- Added support for null in custom component
+
+# Change Log
+
 ## [7.0.10](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.9...v7.0.10) (2023-5-28)
 
 - Fixed hosted login with hash router
