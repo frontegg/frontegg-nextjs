@@ -47,16 +47,18 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
 /**
  * Build fetch request headers, remove invalid http headers
  * @param headers - Incoming request headers
- * @param additionalHeaders - Specify additional headers
  */
-export function buildRequestHeaders(
-  headers: Record<string, any>,
-  additionalHeaders: Record<string, string> = {}
-): Record<string, string> {
+export function buildRequestHeaders(headers: Record<string, any>): Record<string, string> {
   let cookie = headers['cookie'];
   if (cookie != null && typeof cookie === 'string') {
     cookie = cookie.replace(/fe_session-[^=]*=[^;]*$/, '').replace(/fe_session-[^=]*=[^;]*;/, '');
   }
+  if (cookie != null && typeof cookie === 'object') {
+    cookie = Object.entries(cookie)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('; ');
+  }
+
   const preparedHeaders: Record<string, string> = {
     authorization: headers['authorization'],
     'accept-encoding': headers['accept-encoding'],
@@ -71,10 +73,7 @@ export function buildRequestHeaders(
     'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
   };
 
-  return removeInvalidHeaders({
-    ...preparedHeaders,
-    ...additionalHeaders,
-  });
+  return removeInvalidHeaders({ ...preparedHeaders });
 }
 
 /**

@@ -38,7 +38,7 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
       grant_type: 'refresh_token',
       refresh_token,
     }),
-    headers: buildRequestHeaders(headers, { cookie: headers['cookie'] }),
+    headers: buildRequestHeaders(headers),
   });
 };
 
