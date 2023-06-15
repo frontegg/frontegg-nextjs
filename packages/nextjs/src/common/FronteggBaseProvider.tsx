@@ -38,8 +38,12 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   useRequestAuthorizeSSR({ app, user, tenants, session });
   return (
     <AppContext.Provider value={app}>
-      {!isSSR && <CustomComponentRegister app={app} themeOptions={props.themeOptions} />}
-      <FronteggStoreProvider {...({ ...props, app } as any)}>{props.children}</FronteggStoreProvider>
+      <FronteggStoreProvider
+        {...({ ...props, app } as any)}
+        alwaysVisibleChildren={!isSSR && <CustomComponentRegister app={app} themeOptions={props.themeOptions} />}
+      >
+        {props.children}
+      </FronteggStoreProvider>
     </AppContext.Provider>
   );
 };
