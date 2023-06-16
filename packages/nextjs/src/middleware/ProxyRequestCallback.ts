@@ -30,9 +30,24 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       proxyReq.setHeader(cookieName, allCookies[cookieName]);
     });
 
-    proxyReq.setHeader('x-frontegg-middleware', 'true');
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
+    proxyReq.setHeader('x-frontegg-middleware', 'true');
+    proxyReq.setHeader('accept-encoding', 'gzip, deflate, br');
+
+    [
+      'x-invoke-path',
+      'x-invoke-query',
+      'x-middleware-invoke',
+      'x-middleware-next',
+      'x-forwarded-for',
+      'x-forwarded-host',
+      'x-forwarded-port',
+      'x-forwarded-proto',
+      'transfer-encoding',
+      'cache-control',
+    ].map((header) => proxyReq.removeHeader(header));
+
     logger.debug(`${req.url} | check if request has body`);
     if (req.body) {
       logger.debug(`${req.url} | writing request body to proxyReq`);

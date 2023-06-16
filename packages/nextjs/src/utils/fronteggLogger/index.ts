@@ -50,7 +50,7 @@ class FronteggLogger {
 
   debug(...args: any[]) {
     if (LEVEL_NAMES[this.level] <= LEVEL_NAMES.debug) {
-      console.debug.apply(console, this.prepare('debug', args));
+      console.log.apply(console, this.prepare('debug', args));
     }
   }
 
