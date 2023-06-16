@@ -100,7 +100,7 @@ export function isMiddlewarePath(path: string): boolean {
       if (typeof pathRegex === 'string') {
         return pathRegex === path;
       } else {
-        return pathRegex.test(path);
+        return new RegExp(pathRegex).test(path);
       }
     }) != null;
 
