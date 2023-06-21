@@ -20,7 +20,7 @@ const initializeFronteggApp = ({
   appName,
   storeHolder,
 }: CreateOrGetFronteggAppParams): FronteggApp => {
-  const { session, user, tenants } = options;
+  const { session, user, tenants, activeTenant } = options;
   const { accessToken, refreshToken } = session ?? {};
 
   const contextOptions: FronteggAppOptions['contextOptions'] = {
@@ -61,6 +61,7 @@ const initializeFronteggApp = ({
   const tenantsState = {
     ...defaultTenantsState,
     tenants: tenants || [],
+    activeTenant,
     ...options.authOptions?.tenantsState,
   };
   const userData = user
