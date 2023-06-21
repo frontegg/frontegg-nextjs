@@ -1,5 +1,20 @@
 # Change Log
 
+## [7.0.12](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.11...v7.0.12) (2023-6-19)
+
+- Added support to load cdn component with the new vite version
+- Fix for new sso guide dark theme
+- Fix for login per tenant embedded with sub domain logout route
+- Create MSP all accounts main page
+
+
+### NextJS Wrapper 7.0.12:
+- Added a support to frontegg hooks inside custom components
+- Fix frontegg middleware in NextJS 13.4 versions
+- Fix headers for NodeJS +v18.1
+  
+# Change Log
+
 ## [7.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.10...v7.0.11) (2023-6-6)
 
 - Improve login preview for login per tenant self service to rendered inside iframe
