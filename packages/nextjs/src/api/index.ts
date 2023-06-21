@@ -1,7 +1,12 @@
 import config from '../config';
 import { ApiUrls } from './urls';
 import { buildRequestHeaders, Get, parseHttpResponse, Post } from './utils';
-import { fronteggTenantsV3Url, fronteggUsersUrl, ILoginResponse, GetCurrentUserTenantsResponse } from '@frontegg/rest-api';
+import {
+  fronteggTenantsV3Url,
+  fronteggUsersUrl,
+  ILoginResponse,
+  GetCurrentUserTenantsResponse,
+} from '@frontegg/rest-api';
 
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
@@ -59,7 +64,9 @@ export const getUsers = async (headers: Record<string, string>): Promise<ILoginR
  *
  * @param headers
  */
-export const getTenants = async (headers: Record<string, string>): Promise<GetCurrentUserTenantsResponse | undefined> => {
+export const getTenants = async (
+  headers: Record<string, string>
+): Promise<GetCurrentUserTenantsResponse | undefined> => {
   const res = await Get({
     url: `${config.baseUrl}/frontegg${fronteggTenantsV3Url}`,
     headers: buildRequestHeaders(headers),
