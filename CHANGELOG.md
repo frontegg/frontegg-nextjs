@@ -2,37 +2,17 @@
 
 ## [7.0.12](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.11...v7.0.12) (2023-6-19)
 
-- 
-- FR-12257 - msp give access permission fix
-- FR-12257 - MSP bugfix, improvements
-- FR-12236 - fix new sso guide dark theme
+- Added support to load cdn component with the new vite version
+- Fix for new sso guide dark theme
+- Fix for login per tenant embedded with sub domain logout route
+- Create MSP all accounts main page
 
-- FR-12159 - msp bug fix
-- FR-12221 - support both null and props for custom components
-
-- FR-12159 - msp all accounts bugfix
-- FR-12115 - sso guides crash unless acs url is specified
-- FR-12225 - fix appearance saml and OIDC according to vendor configuration
-- FR-12221 - support props and frontegg hooks in custom components
-- FR-12146 - bugfix msp all accounts
-- FR-12201 - dont send redirect uri on OIDC callback
-- FR-12187 - FR-12188 - fix login per tenant embedded with sub domain logout route
-- FR-11842 - navigation metadata msp
-- FR-11887 - load ff before entitlements and prevent load for logged out users
-- FR-11842 - msp single account view
-- FR-11971 - implement breached password ui
-
-- FR-11482 - add CustomComponentRegister to admin box to prevent duplicated code in react and next js
-- FR-10891 - fix space in input component
-- FR-11734 - MSP - all accounts main page
-- FR-11941 - Tests for login per tenant self service
-- FR-11658 - create iframe login preview for login per tenant self service
 
 ### NextJS Wrapper 7.0.12:
-- FR-12250 - add support to frontegg hooks inside custom components
-- FR-12254 - Fix frontegg middleware in NextJS 13.4 versions
-- FR-12112 - Fix headers for NodeJS +v18.1
-- FR-11482 - support null for custom component again
+- Added a support to frontegg hooks inside custom components
+- Fix frontegg middleware in NextJS 13.4 versions
+- Fix headers for NodeJS +v18.1
+  
 # Change Log
 
 ## [7.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.10...v7.0.11) (2023-6-6)
