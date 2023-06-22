@@ -40,6 +40,7 @@ export interface FronteggUserTokens {
 export interface AllUserData {
   user?: ILoginResponse | null;
   tenants?: ITenantsResponse[] | null;
+  activeTenant?: ITenantsResponse;
   session?: FronteggNextJSSession | null;
 }
 export interface FronteggUserSession {
