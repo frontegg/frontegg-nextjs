@@ -11,7 +11,7 @@ import useOnRedirectTo from '../utils/useOnRedirectTo';
 
 const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...props }) => {
   const isSSR = typeof window === 'undefined';
-  const { user, session, tenants } = props;
+  const { user, session, tenants, activeTenant } = props;
   const baseName = props.basename ?? '';
   const ssrStoreHolder = useRef({});
   const storeHolder = isSSR ? ssrStoreHolder.current : undefined;
@@ -35,7 +35,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   //     app.store.dispatch({ type: 'auth/requestAuthorize', payload: true });
   //   }
   // }, [app]);
-  useRequestAuthorizeSSR({ app, user, tenants, session });
+  useRequestAuthorizeSSR({ app, user, tenants, activeTenant, session });
   return (
     <AppContext.Provider value={app}>
       <FronteggStoreProvider
