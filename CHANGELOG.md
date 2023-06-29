@@ -1,5 +1,16 @@
 # Change Log
 
+## [7.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.12...v7.0.13) (2023-6-28)
+
+- FR-12277 - Extended tenants state with the active tenant to support MSP sub-accounts
+- FR-12405 - MSP bug fixes
+- FR-12381 - Migrated users table to load users by users V2 API
+
+### NextJS Wrapper 7.0.13:
+- FR-12313 - Support tenants V3 and active tenant
+- 
+# Change Log
+
 ## [7.0.12](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.11...v7.0.12) (2023-6-19)
 
 - Added support to load cdn component with the new vite version
