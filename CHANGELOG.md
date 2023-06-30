@@ -1,5 +1,24 @@
 # Change Log
 
+## [7.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.13...v7.0.14) (2023-6-30)
+
+- FR-12426 - msp visibility bypermissions
+- FR-12413 - fix msp accounts update
+- FR-12213 - add security login flows - mfa and breached password
+- FR-12277 - active tenant gap fix
+- FR-12405 - msp bugfix, improvements
+- FR-12381 - users table v2 msp bugfix
+- FR-12313 - remove useWorkspace from lerna.json
+- FR-12313 - fix cdn
+- FR-12313 - add logs to wait-for-cdn script
+- FR-12287 - msp bugfix 
+- FR-12313 - update load tenants to new version
+- FR-12161 - msp bugfix, improvements
+
+### NextJS Wrapper 7.0.14:
+- FR-12313 - Support tenants V3 and active tenant
+# Change Log
+
 ## [7.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.12...v7.0.13) (2023-6-28)
 
 - FR-12277 - Extended tenants state with the active tenant to support MSP sub-accounts
