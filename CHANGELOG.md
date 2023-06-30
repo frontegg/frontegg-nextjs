@@ -1,5 +1,10 @@
 # Change Log
 
+## [7.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.13...v7.0.14) (2023-6-30)
+
+- MSP update visibility, bugfix
+- Add security login flows
+
 ## [7.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.12...v7.0.13) (2023-6-28)
 
 - FR-12277 - Extended tenants state with the active tenant to support MSP sub-accounts
