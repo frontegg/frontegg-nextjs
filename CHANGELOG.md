@@ -1,5 +1,48 @@
 # Change Log
 
+## [7.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.13...v7.0.14) (2023-6-30)
+
+- MSP update visibility, bugfix
+- Add security login flows
+
+## [7.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.12...v7.0.13) (2023-6-28)
+
+- FR-12277 - Extended tenants state with the active tenant to support MSP sub-accounts
+- FR-12405 - MSP bug fixes
+- FR-12381 - Migrated users table to load users by users V2 API
+
+### NextJS Wrapper 7.0.13:
+- FR-12313 - Support tenants V3 and active tenant
+- 
+# Change Log
+
+## [7.0.12](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.11...v7.0.12) (2023-6-19)
+
+- Added support to load cdn component with the new vite version
+- Fix for new sso guide dark theme
+- Fix for login per tenant embedded with sub domain logout route
+- Create MSP all accounts main page
+
+
+### NextJS Wrapper 7.0.12:
+- Added a support to frontegg hooks inside custom components
+- Fix frontegg middleware in NextJS 13.4 versions
+- Fix headers for NodeJS +v18.1
+  
+# Change Log
+
+## [7.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.10...v7.0.11) (2023-6-6)
+
+- Improve login preview for login per tenant self service to rendered inside iframe
+- Added required to fields in invite user modal
+- Improve error handling for login 
+- Added MSP - all accounts main page and state
+
+### NextJS Wrapper 7.0.11:
+- Added support for null in custom component
+
+# Change Log
+
 ## [7.0.10](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.9...v7.0.10) (2023-5-28)
 
 - Fixed hosted login with hash router

@@ -34,9 +34,9 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
     );
 
     const baseUser = baseUserResult.status === 'fulfilled' ? baseUserResult.value : null;
-    const tenants = tenantsResult.status === 'fulfilled' ? tenantsResult.value : null;
+    const tenantsResponse = tenantsResult.status === 'fulfilled' ? tenantsResult.value : null;
 
-    if (!baseUser || !tenants) {
+    if (!baseUser || !tenantsResponse) {
       logger.info('No base user or tenants found');
       return {};
     }
@@ -49,7 +49,8 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     logger.info('Retrieved all user data successfully');
 
-    return { user, session, tenants };
+    const { tenants, activeTenant } = tenantsResponse;
+    return { user, session, tenants, activeTenant };
   } catch (e: any) {
     // logger.error(e.message, e);
     return {};
