@@ -40,7 +40,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
-        logoutHosted(window.location.origin);
+        logoutHosted(window.location.origin + window.location.search);
       }
     } else {
       if (pathname.startsWith(routesObj.hostedLoginRedirectUrl ?? '/oauth/callback')) {

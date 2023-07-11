@@ -9,5 +9,5 @@ export type FronteggCustomAppClass = ((props: AppPropsType<any>) => JSX.Element)
 };
 
 export type WithFronteggAppOptions = Omit<FronteggAppOptions, 'contextOptions'> & {
-  contextOptions?: FronteggAppOptions['contextOptions'];
+  contextOptions?: Partial<FronteggAppOptions['contextOptions']>;
 };
