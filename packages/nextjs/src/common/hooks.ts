@@ -2,12 +2,10 @@ import { useLoginActions } from '@frontegg/react-hooks';
 import { ContextHolder } from '@frontegg/rest-api';
 import { buildLogoutRoute } from '../api/urls';
 
-type UseLogoutHostedOptions = {
-  redirectUrl?: string;
-};
-
 /**
  * Hook to logout client side for hosted login
+ * @returns {Function} logout function to be used in the client side for hosted login
+ * @param redirectUrl - The URL to redirect to after successful logout will be window.location.href by default.
  */
 
 export const useLogoutHostedLogin = () => {
