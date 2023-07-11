@@ -255,14 +255,17 @@ export const ServerComponent = async () => {
 ```tsx
 // ./app/ClientComponent.tsx
 "use client";
-import { useAuth, useLoginWithRedirect, useLogoutHostedLogin } from "@frontegg/nextjs";
+import { useAuth, useLoginWithRedirect } from "@frontegg/nextjs";
 import { useRouter } from 'next/navigation'
 
 export const ClientComponent = ({ baseUrl }: { baseUrl?: string }) => {
   const { user, isAuthenticated } = useAuth();
   const router = useRouter();
   const loginWithRedirect = useLoginWithRedirect();
-  const logout = useLogoutHostedLogin();
+
+  const logout = () => {
+    router.replace('/account/logout')
+  };
 
   return (
     <div className="App">
