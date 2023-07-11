@@ -1,11 +1,13 @@
 import Link from 'next/link';
-import { useAuth, useLoginWithRedirect, AdminPortal } from '@frontegg/nextjs';
+import { useAuth, useLoginWithRedirect, AdminPortal, useAuthActions, useLogoutHostedLogin } from '@frontegg/nextjs';
 import { useState } from 'react';
 
 export function Index() {
   const { user, isAuthenticated } = useAuth();
   const loginWithRedirect = useLoginWithRedirect();
   const [state, setState] = useState({ userAgent: '', id: -1 });
+  const logoutHosted = useLogoutHostedLogin();
+
   /*
    * Replace the elements below with your own.
    *
@@ -18,13 +20,18 @@ export function Index() {
       <br />
       <div>{isAuthenticated ? user?.email : 'not logged in'}</div>
       <br />
+      <br />
       <button
         onClick={() => {
           loginWithRedirect();
         }}
       >
-        Hosted login
+        Open Hosted login
       </button>
+      <br />
+      <br />
+      <button onClick={() => logoutHosted()}>logout hosted</button>
+      <br />
       <br />
       <button
         onClick={() => {
@@ -55,6 +62,9 @@ export function Index() {
       <br />
       <br />
       <Link href='/force-session'>check force session</Link>
+      <br />
+      <br />
+      <Link href='/account/logout'>logout embedded</Link>
     </div>
   );
 }
