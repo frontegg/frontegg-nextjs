@@ -31,10 +31,15 @@ export function withSSRSession<
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`;
       }
+
+      const fullUrl = new URL(config.appUrl + context.resolvedUrl);
+      const urlSearchParams = fullUrl.searchParams;
+      urlSearchParams.set('redirectUrl', context.resolvedUrl ?? context.req.url);
+
       return {
         redirect: {
           permanent: false,
-          destination: `${loginUrl}?redirectUrl=${encodeURIComponent(context.resolvedUrl ?? context.req.url)}`,
+          destination: `${loginUrl}?${urlSearchParams.toString()}`,
         },
         props: {},
       } as GetServerSidePropsResult<P>;
