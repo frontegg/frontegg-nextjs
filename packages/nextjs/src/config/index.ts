@@ -1,5 +1,5 @@
 import { AuthPageRoutes } from '@frontegg/redux-store';
-import { FronteggAppOptions } from '@frontegg/types';
+import { WithFronteggAppOptions } from '../pages';
 import { AppEnvConfig, PasswordsMap } from './types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
 import { EnvVariables } from './constants';
@@ -19,7 +19,7 @@ const setupEnvVariables = {
 
 class Config {
   public authRoutes: Partial<AuthPageRoutes> = {};
-  public fronteggAppOptions: Partial<FronteggAppOptions> = {};
+  public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
   constructor() {
     if (typeof window === 'undefined') {
       this.validatePassword();
