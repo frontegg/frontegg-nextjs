@@ -20,6 +20,8 @@ interface BuildRouteResult {
  * Builds a login route with a redirect URL encoded as a query parameter.
  *
  *  @param {string} redirectUrl - The URL to redirect to after successful login.
+ *  @param {URLSearchParams} searchParams - optional The URL search Params to preserve to login
+ *  @param {string} baseUrl - optional The login base URL the user will be redirected to (default .env.local FRONTEGG_APP_URL)
  *  @returns {BuildRouteResult} An object containing the generated login route and URL.
  *
  *  @throws {TypeError} If redirectUrl is not a string.
