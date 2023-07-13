@@ -1,5 +1,32 @@
 # Change Log
 
+## [7.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.14...v7.0.15) (2023-7-13)
+
+- FR-12114 - Shouldn't show inactive custom social login provider
+- FR-12098 - FR-12020 - admin portal user status update if email verification is off + blinking workspace title in admin portal vivid theme
+- FR-12660 - implement sagas for security center admin portal
+- FR-12664 - Rename redux-saga file to prevent loop imports by webpack
+- FR-12652 - init new security page. wrap with ff
+- FR-12628 - fix custom login with hosted oauth in URL 
+- FR-12536 - check up card component
+- FR-12535 - security severity badge component
+- FR-12543 - msp fix bulk users invitation
+- FR-12575 - change remember my device default value
+- FR-12550 - Align all auth methods to get login response of me and tenants from auth APIs
+- FR-12313 - fix cdn nextjs alpha version
+
+FR-12586 - Fix pipeline
+[FR-12581 - add support for custom inline html and script]
+[FR-12343 - admin box implement sso per tenant]
+[FR-12488 - users page load users support v1 and v2]
+[FR-12164 - MSP bulk user invitation]
+[FR-12479 - msp fix warning dialog issue]
+[FR-12408 - entitlements redesign]
+
+### NextJS Wrapper 7.0.15:
+- FR-12629 - preserve search params for withSSRSession
+# Change Log
+
 ## [7.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.13...v7.0.14) (2023-6-30)
 
 - MSP update visibility, bugfix
