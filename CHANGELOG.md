@@ -17,7 +17,7 @@
 • FR-12408 - Redesigned Entitlements structure
 
 ### NextJS Wrapper 7.0.15:
-- FR-12629 - preserve search params for withSSRSession
+- FR-12629 - Support custom login with search params
 # Change Log
 
 ## [7.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.13...v7.0.14) (2023-6-30)
