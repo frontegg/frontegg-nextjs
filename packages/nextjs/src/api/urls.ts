@@ -20,12 +20,18 @@ interface BuildRouteResult {
  * Builds a login route with a redirect URL encoded as a query parameter.
  *
  *  @param {string} redirectUrl - The URL to redirect to after successful login.
+ *  @param {URLSearchParams} searchParams - optional The URL search Params to preserve to login
+ *  @param {string} baseUrl - optional The login base URL the user will be redirected to (default .env.local FRONTEGG_APP_URL)
  *  @returns {BuildRouteResult} An object containing the generated login route and URL.
  *
  *  @throws {TypeError} If redirectUrl is not a string.
  */
-export function buildLoginRoute(redirectUrl: string, searchParams?: URLSearchParams): BuildRouteResult {
-  const asPath = `${config.appUrl}/account/login?redirectUrl=${encodeURIComponent(redirectUrl)}${
+export function buildLoginRoute(
+  redirectUrl: string,
+  searchParams?: URLSearchParams,
+  baseUrl: string = config.appUrl
+): BuildRouteResult {
+  const asPath = `${baseUrl}/account/login?redirectUrl=${encodeURIComponent(redirectUrl)}${
     searchParams ? `&${searchParams.toString()}` : ''
   }`;
   const asUrl = new URL(asPath);

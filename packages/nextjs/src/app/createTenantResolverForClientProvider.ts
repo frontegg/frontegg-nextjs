@@ -8,7 +8,7 @@ export const createTenantResolverForClientProvider = (customLoginOptions?: Custo
   return () => {
     try {
       const { subDomainIndex, paramKey } = customLoginOptions;
-      if (subDomainIndex) {
+      if (subDomainIndex !== undefined) {
         const tenant = window.location.hostname.split('.').slice(0, -2)[subDomainIndex];
         return { tenant };
       }
