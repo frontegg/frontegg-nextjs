@@ -27,8 +27,7 @@
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
-    "@frontegg/js": "6.123.0",
-    "@frontegg/react-hooks": "6.123.0",
+    "@frontegg/react": "5.0.46",
     "http-proxy": "^1.18.1",
     "iron-session": "^6.3.1",
     "jose": "^4.12.2"
