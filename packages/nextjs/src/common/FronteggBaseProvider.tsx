@@ -1,7 +1,8 @@
 'use client';
 
 import React, { FC, useMemo, useRef } from 'react';
-import { FronteggStoreProvider, CustomComponentRegister } from '@frontegg/react-hooks';
+import { FronteggStoreProvider } from '@frontegg/react-hooks';
+import { CustomComponentRegister } from '@frontegg/react';
 import { ContextHolder } from '@frontegg/rest-api';
 import type { FronteggProviderProps } from '../types';
 import AppContext from './AppContext';
