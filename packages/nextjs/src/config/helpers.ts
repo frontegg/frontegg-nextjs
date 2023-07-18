@@ -35,7 +35,7 @@ export const getEnvOrDefault = <T>(name: string, defaultValue: T): string | T =>
 export const generateCookieDomain = (appUrl: string): string => {
   try {
     const url = new URL(appUrl);
-    return `.${url.hostname.replace(/:(\d)+$/, '')}`;
+    return url.hostname.replace(/:(\d)+$/, '');
   } catch (e) {
     throw new InvalidFronteggEnv(EnvVariables.FRONTEGG_APP_URL, 'Valid URL');
   }
