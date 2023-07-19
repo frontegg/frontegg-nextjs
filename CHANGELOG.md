@@ -2,28 +2,16 @@
 
 ## [7.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.15...v7.0.16) (2023-7-19)
 
-- FR-12701 - revert change settings list
-- FR-12696 - Entitlements load on demand fix
-- FR-12701 - implememt sessions inner page
-
-- FR-12696 - Entitlements redesign
-- FR-12537 - recomendations component
-- FR-12675 - add security center context holder and mappers for recommendations&#x2F;insights
-
-
-- FR-12703 - Make sure to update correctly the change log in wrappers
 - FR-12688 - Make Admin box compatible with the updated type of IUserProfile
-- FR-12649 - Added a skeleton for the new security center page
-
 - FR-12114 - Shouldn't show inactive custom social login provider
-- FR-12098 - FR-12020 - admin portal user status update if email verification is off + blinking workspace title in admin portal vivid theme
-- FR-12660 - implement sagas for security center admin portal
+- FR-12098 -  admin portal user status update if email verification is off 
+- FR-12020 - blinking workspace title in admin portal vivid theme
 - FR-12664 - Rename redux-saga file to prevent loop imports by webpack
-- FR-12652 - init new security page. wrap with ff
 
 ### NextJS Wrapper 7.0.16:
 - FR-12634 - next-js-package-support-sub-domain-for-custom-login-boxes 
 - FR-12629 - preserve search params for withSSRSession
+  
 # Change Log
 
 ## [7.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.14...v7.0.15) (2023-7-13)
