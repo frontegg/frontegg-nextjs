@@ -1,5 +1,19 @@
 # Change Log
 
+## [7.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.15...v7.0.16) (2023-7-19)
+
+- FR-12688 - Make Admin box compatible with the updated type of IUserProfile
+- FR-12114 - Fix show inactive custom social login provider
+- FR-12098 - Fix admin portal user status update if email verification is off 
+- FR-12020 - Fix blinking workspace title in admin portal vivid theme
+- FR-12664 - Fix custom webpack bug by renaming redux-saga file
+
+### NextJS Wrapper 7.0.16:
+- FR-12634 - Support custom login with sub-domain index 0 for app dir 
+- FR-12629 - Support custom login with search params and withSSRSession
+  
+# Change Log
+
 ## [7.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.14...v7.0.15) (2023-7-13)
 
 • FR-12550 - Align all auth methods to get the right login response type
