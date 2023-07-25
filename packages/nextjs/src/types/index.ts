@@ -4,6 +4,7 @@ import type { IncomingMessage } from 'http';
 import type { ReactNode } from 'react';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import type { NextRouter } from 'next/router';
+import { Config } from '../config';
 
 export interface EncryptionUtils {
   unsealTokens(data: string): Promise<FronteggUserTokens | undefined>;
@@ -111,6 +112,7 @@ declare module 'iron-session' {
 }
 
 declare global {
+  var config: Config;
   interface ProcessEnv {
     FRONTEGG_BASE_URL: string;
     PORT?: string;

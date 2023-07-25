@@ -1,4 +1,3 @@
-import config from '../config';
 import { initialState as authInitialState } from '@frontegg/redux-store/auth/initialState';
 
 const staticFilesRegex = new RegExp('^/(_next/static).*');

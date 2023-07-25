@@ -6,6 +6,7 @@ import {
   fronteggUsersUrl,
   ILoginResponse,
   GetCurrentUserTenantsResponse,
+  IPublicSettingsResponse,
 } from '@frontegg/rest-api';
 
 /**
@@ -74,10 +75,22 @@ export const getTenants = async (
   return parseHttpResponse(res);
 };
 
+export const getPublicSettings = async (
+  headers: Record<string, string>,
+  alias?: string
+): Promise<IPublicSettingsResponse | undefined> => {
+  const res = await Get({
+    url: `${config.baseUrl}/frontegg/tenants/resources/account-settings/v1/public`,
+    headers: { ...buildRequestHeaders(headers), 'frontegg-login-alias': alias ?? '' },
+  });
+  return parseHttpResponse(res);
+};
+
 export default {
   loadPublicKey,
   refreshTokenEmbedded,
   refreshTokenHostedLogin,
   getUsers,
   getTenants,
+  getPublicSettings,
 };
