@@ -15,7 +15,7 @@ export const FronteggAppProvider = async (options: FronteggAppProviderProps) => 
     const subDomainAppUrl = await getAppUrlForCustomLoginWithSubdomain(options.customLoginOptions.subDomainIndex);
     if (subDomainAppUrl) {
       envAppUrl = subDomainAppUrl;
-      global.config.setAppUrl(subDomainAppUrl);
+      config.setAppUrl(subDomainAppUrl);
     }
   }
 
