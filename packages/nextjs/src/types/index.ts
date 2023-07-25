@@ -112,7 +112,7 @@ declare module 'iron-session' {
 }
 
 declare global {
-  var config: Config;
+  var config: Config | undefined;
   interface ProcessEnv {
     FRONTEGG_BASE_URL: string;
     PORT?: string;

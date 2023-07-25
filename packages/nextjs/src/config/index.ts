@@ -106,7 +106,7 @@ export class Config {
 export { EnvVariables } from './constants';
 
 const config = new Config();
-if (!global.config) {
+if (global.config) {
   global.config = config;
 }
 
