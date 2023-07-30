@@ -5,6 +5,7 @@ import config from '../config';
 import fetchUserData from '../utils/fetchUserData';
 import { ClientFronteggProviderProps } from '../types';
 import { getAppUrlForCustomLoginWithSubdomain } from './getAppUrlForCustomLoginWithSubdomain';
+import { setEnvAppUrl } from '../config/helpers';
 
 export type FronteggAppProviderProps = PropsWithChildren<Omit<ClientFronteggProviderProps, 'contextOptions'>>;
 
@@ -15,7 +16,7 @@ export const FronteggAppProvider = async (options: FronteggAppProviderProps) => 
     const subDomainAppUrl = await getAppUrlForCustomLoginWithSubdomain(options.customLoginOptions.subDomainIndex);
     if (subDomainAppUrl) {
       envAppUrl = subDomainAppUrl;
-      config.setAppUrl(subDomainAppUrl);
+      setEnvAppUrl(subDomainAppUrl);
     }
   }
 

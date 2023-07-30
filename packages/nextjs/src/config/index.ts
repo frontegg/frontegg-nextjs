@@ -17,10 +17,9 @@ const setupEnvVariables = {
   VERCEL_URL: process.env.VERCEL_URL,
 };
 
-export class Config {
+class Config {
   public authRoutes: Partial<AuthPageRoutes> = {};
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
-  private internalAppUrl?: string;
   constructor() {
     if (typeof window === 'undefined') {
       this.validatePassword();
@@ -28,11 +27,7 @@ export class Config {
   }
 
   get appUrl(): string {
-    return this.internalAppUrl ?? generateAppUrl();
-  }
-
-  setAppUrl(appUrl: string) {
-    this.internalAppUrl = appUrl;
+    return generateAppUrl();
   }
 
   get testUrl(): string | undefined {
@@ -104,10 +99,4 @@ export class Config {
 }
 
 export { EnvVariables } from './constants';
-
-const config = new Config();
-if (global.config) {
-  global.config = config;
-}
-
-export default global.config ?? config;
+export default new Config();
