@@ -76,12 +76,12 @@ export const getTenants = async (
 };
 
 export const getPublicSettings = async (
-  headers: Record<string, string>,
-  alias?: string
+  headers: Record<string, string>
 ): Promise<IPublicSettingsResponse | undefined> => {
   const res = await Get({
+    //TODO: export the route url from rest-api and import from there
     url: `${config.baseUrl}/frontegg/tenants/resources/account-settings/v1/public`,
-    headers: { ...buildRequestHeaders(headers), 'frontegg-login-alias': alias ?? '' },
+    headers: buildRequestHeaders(headers),
   });
   return parseHttpResponse(res);
 };

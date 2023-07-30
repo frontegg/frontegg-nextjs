@@ -1,4 +1,5 @@
 import { getPublicSettings } from '../api';
+import { CUSTOM_LOGIN_HEADER } from '../api/utils';
 import { getAppHeaders } from './helpers';
 
 /**
@@ -7,14 +8,14 @@ import { getAppHeaders } from './helpers';
  * @param subDomainIndex - the subdomain index to specify the tenant sub-domain
  * @returns the alias for custom login with subdomain or undefined if not exist
  */
-const getTenantAliasFromHeaders = (headers: Record<string, string>, subDomainIndex: number) => {
+export const getTenantAliasFromHeaders = (headers: Record<string, string>, subDomainIndex: number) => {
   return headers?.host?.split('.')?.slice(0, -2)?.[subDomainIndex];
 };
 
 /**
  * set the global.customLoginAppUrl to undefined in order to allow switching from tenant to vendor app
  */
-const resetGlobalCustomLoginAppUrl = () => {
+export const resetGlobalCustomLoginAppUrl = () => {
   global.customLoginAppUrl = undefined;
 };
 
@@ -35,7 +36,8 @@ export const getAppUrlForCustomLoginWithSubdomain = async (subDomainIndex?: numb
     resetGlobalCustomLoginAppUrl();
     return undefined;
   }
-  const res = await getPublicSettings(headers, alias).catch(() => undefined);
+  const requestHeaders = { ...headers, [CUSTOM_LOGIN_HEADER]: alias };
+  const res = await getPublicSettings(requestHeaders).catch(() => undefined);
   const subDomainAppUrl = res?.applicationUrl;
   if (!subDomainAppUrl) {
     resetGlobalCustomLoginAppUrl();
