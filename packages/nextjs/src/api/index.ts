@@ -6,6 +6,7 @@ import {
   fronteggUsersUrl,
   ILoginResponse,
   GetCurrentUserTenantsResponse,
+  IPublicSettingsResponse,
 } from '@frontegg/rest-api';
 
 /**
@@ -74,10 +75,22 @@ export const getTenants = async (
   return parseHttpResponse(res);
 };
 
+export const getPublicSettings = async (
+  headers: Record<string, string>
+): Promise<IPublicSettingsResponse | undefined> => {
+  const res = await Get({
+    //TODO: export the route url from rest-api and import from there
+    url: `${config.baseUrl}/frontegg/tenants/resources/account-settings/v1/public`,
+    headers: buildRequestHeaders(headers),
+  });
+  return parseHttpResponse(res);
+};
+
 export default {
   loadPublicKey,
   refreshTokenEmbedded,
   refreshTokenHostedLogin,
   getUsers,
   getTenants,
+  getPublicSettings,
 };

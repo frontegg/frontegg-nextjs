@@ -45,6 +45,10 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
 }
 
 /**
+ * These header is used to identify the tenant for login per tenant feature
+ */
+export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
+/**
  * Build fetch request headers, remove invalid http headers
  * @param headers - Incoming request headers
  */
@@ -73,6 +77,9 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
   };
 
+  if (headers[CUSTOM_LOGIN_HEADER]) {
+    preparedHeaders[CUSTOM_LOGIN_HEADER] = headers[CUSTOM_LOGIN_HEADER];
+  }
   return removeInvalidHeaders({ ...preparedHeaders });
 }
 

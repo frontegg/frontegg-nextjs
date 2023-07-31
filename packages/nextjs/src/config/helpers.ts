@@ -73,6 +73,10 @@ export function generateAppUrl() {
     }
   }
 
+  if (global.customLoginAppUrl) {
+    appUrl = global.customLoginAppUrl;
+  }
+
   /**
    * In some cases the {@link EnvVariables.VERCEL_URL} value does not
    * include the URL protocol, bellow code to verify that the appUrl

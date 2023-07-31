@@ -1,6 +1,6 @@
 import { ProxyResCallback } from 'http-proxy';
 import { IncomingMessage } from 'http';
-import { NextApiResponse, NextApiRequest } from 'next';
+import { NextApiResponse } from 'next';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';

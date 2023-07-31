@@ -14,10 +14,14 @@ export const getAppSession = () => {
   return createSession(cookies, encryption);
 };
 
-export const getAppHeaders = async (): Promise<Record<string, string>> => {
+export const getAppHeaders = (): Record<string, string> => {
   const reqHeaders: Record<string, string> = {};
   headers().forEach((value, key) => (reqHeaders[key] = value));
   return reqHeaders;
+};
+
+export const getAppHeadersPromise = async (): Promise<Record<string, string>> => {
+  return getAppHeaders();
 };
 
 export async function getAppUserSession(): Promise<FronteggUserSession | undefined> {

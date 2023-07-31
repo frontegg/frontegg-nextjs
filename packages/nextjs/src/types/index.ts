@@ -111,6 +111,7 @@ declare module 'iron-session' {
 }
 
 declare global {
+  var customLoginAppUrl: string | undefined;
   interface ProcessEnv {
     FRONTEGG_BASE_URL: string;
     PORT?: string;
