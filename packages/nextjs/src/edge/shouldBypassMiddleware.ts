@@ -1,4 +1,4 @@
-import { initialState as authInitialState } from '@frontegg/redux-store/auth/initialState';
+import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
 
 const staticFilesRegex = new RegExp('^/(_next/static).*');
 const imageOptimizationRegex = new RegExp('^/(_next/image).*');
@@ -41,7 +41,7 @@ export const shouldByPassMiddleware = (pathname: string, options?: ByPassOptions
   const isHeaderRequests = headerRequestsRegex.test(pathname);
   const isFronteggMiddleware = fronteggMiddlewareRegex.test(pathname);
 
-  const { authenticatedUrl, ...authRoutes } = authInitialState.routes;
+  const { authenticatedUrl, ...authRoutes } = defaultFronteggRoutes;
   const isFronteggRoutes = Object.values(authRoutes).find((path) => pathname.startsWith(path)) != null;
 
   if (isStaticFiles) return _options.bypassStaticFiles;
