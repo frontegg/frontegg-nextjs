@@ -45,7 +45,7 @@ class CookieManager {
       serializeOptions.sameSite = 'none';
     }
 
-    const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
+    const serializedCookie = cookieSerializer.serialize(this.getCookieName(1), cookieValue, serializeOptions);
 
     if (serializedCookie.length <= COOKIE_MAX_LENGTH) {
       logger.info(`Successfully create a cookie header, '${cookieName}'`);
