@@ -21,13 +21,29 @@ class CookieManager {
   }
 
   /**
+   * This function creates list of empty cookies that already exists in the request.
+   * This is used for removing existing cookies before creating new ones.
+   * @param {CreateCookieOptions} options - Create cookie options
+   */
+  getEmptyCookiesBeforeCreatingNew({ req, value, secure, domain }: CreateCookieOptions): string[] {
+    if (!req || !value) {
+      return [];
+    }
+    const cookiesToRemove = this.getCookiesToRemove(req);
+    if (cookiesToRemove.length === 0) {
+      return [];
+    }
+    return this.createEmptyCookies(secure, domain ?? config.cookieDomain, cookiesToRemove, false);
+  }
+
+  /**
    * Validate and create new cookie headers.
    * The default value of `cookieName` is {@link config.cookieName}
    * @param {CreateCookieOptions} options - Create cookie options
    */
   create(options: CreateCookieOptions): string[] {
     const logger = fronteggLogger.child({ tag: 'CookieManager.create', level: options.silent ? 'error' : undefined });
-    const cookieName = options.cookieName ?? config.cookieName;
+    const cookieName = options.cookieName ?? this.getCookieName();
     const cookieValue = options.value;
     logger.info(`Creating new cookie for '${cookieName}'`);
 
@@ -45,17 +61,19 @@ class CookieManager {
       serializeOptions.sameSite = 'none';
     }
 
-    const serializedCookie = cookieSerializer.serialize(this.getCookieName(1), cookieValue, serializeOptions);
+    const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
+
+    const removedCookiesValue = this.getEmptyCookiesBeforeCreatingNew(options);
 
     if (serializedCookie.length <= COOKIE_MAX_LENGTH) {
       logger.info(`Successfully create a cookie header, '${cookieName}'`);
-      return [serializedCookie];
+      return [...removedCookiesValue, serializedCookie];
     } else {
       logger.debug('Going to split cookie into chunks');
       /** Create chunked cookie headers and store value as array of headers */
       const cookies = splitValueToChunks(cookieName, cookieValue, serializeOptions);
       logger.info(`Successfully create chunked cookie headers, '${cookieName}' (count: ${cookies.length})`);
-      return cookies;
+      return [...removedCookiesValue, ...cookies];
     }
   }
 
@@ -149,11 +167,16 @@ class CookieManager {
     });
   };
 
-  createEmptyCookies = (isSecured: boolean, cookieDomain: string, _cookiesToRemove: string[]): string[] => {
+  createEmptyCookies = (
+    isSecured: boolean,
+    cookieDomain: string,
+    _cookiesToRemove: string[],
+    removeRefresh = true
+  ): string[] => {
     const allEmptyCookies: string[] = [];
 
     const refreshTokenVariants = getRefreshTokenCookieNameVariants();
-    const cookiesToRemove = [..._cookiesToRemove, ...refreshTokenVariants];
+    const cookiesToRemove = [..._cookiesToRemove, ...(removeRefresh ? refreshTokenVariants : [])];
 
     cookiesToRemove.forEach((name: string) => {
       allEmptyCookies.push(...this.createEmptySingleCookie(name, isSecured, cookieDomain));
