@@ -87,6 +87,7 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
       value: session,
       expires: new Date(decodedJwt.exp * 1000),
       secure: isSecured,
+      req: nextJsRequest,
     });
     newSetCookie.push(...cookieValue);
     ctx.res?.setHeader('set-cookie', newSetCookie);

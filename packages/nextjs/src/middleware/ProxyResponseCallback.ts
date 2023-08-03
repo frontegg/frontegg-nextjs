@@ -58,6 +58,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
                   value: session,
                   expires: new Date(decodedJwt.exp * 1000),
                   secure: isSecured,
+                  req,
                 });
                 cookies.push(...sessionCookie);
               }
