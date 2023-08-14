@@ -1,5 +1,32 @@
 # Change Log
 
+## [7.0.17](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.16...v7.0.17) (2023-8-14)
+
+- 
+
+- FR-11857 - Added new support for hosted login to load user on load
+
+- 
+
+- FR-12855 - add sso recommendation
+- FR-12942 - Fix next-js build with middleware file
+- FR-12291 - msp change text
+
+- FR-12818 - Handle permissions in the security center inner pages and modified the security center main page
+- FR-12859 - Pipeline - fixed lerna version for the set alpha version step in the pipeline
+
+- FR-12701 - revert change settings list
+- FR-12696 - Entitlements load on demand fix
+- FR-12701 - implememt sessions inner page
+
+
+### NextJS Wrapper 7.0.17:
+- FR-12942 - fix-next-js-build-with-middleware-file
+- FR-12947 - switching-tenant-cause-duplicated-session-cookie
+- FR-12634 - support-custom-login-sub-domain-out-of-the-box 
+- Update Frontegg AdminPortal to 6.126.0
+# Change Log
+
 ## [7.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.15...v7.0.16) (2023-7-19)
 
 - FR-12688 - Make Admin box compatible with the updated type of IUserProfile
