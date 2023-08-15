@@ -7,7 +7,6 @@
 - FR-12828 - Updated entitlements API response
 - FR-12224 - Supported custom login for authenticated users without a tenant alias
 - FR-12780 - Improved Entitlements Vanilla JS SDK
-- FR-12224 - Updated admin portal public endpoints
 
 ### NextJS Wrapper 7.0.17:
 - FR-12947 - Fixed duplicated cookie issue with switching tenant
