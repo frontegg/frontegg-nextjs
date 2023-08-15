@@ -11,6 +11,8 @@
 ### NextJS Wrapper 7.0.17:
 - FR-12947 - Fixed duplicated cookie issue with switching tenant
 - FR-12634 - Added support for custom login box with sub domain
+- FR-12942 - Fixed build issue with middleware
+
 # Change Log
 
 ## [7.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.15...v7.0.16) (2023-7-19)
