@@ -1,5 +1,15 @@
 # Change Log
 
+## [7.0.18](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.17...v7.0.18) (2023-8-28)
+
+- FR-13142 - Support setRootAccountData action for all account feature 
+- FR-12321 - Added max validations to session management fields 
+- FR-12974 - Fixed the issue with permissions and roles granted from user groups on User context
+- FR-12322 - Change redirect to SSO text
+- FR-12979 - Fixed MFA options save button to be disabled if the user has no security write permission
+
+# Change Log
+
 ## [7.0.17](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.16...v7.0.17) (2023-8-14)
 
 # v7.0.17
