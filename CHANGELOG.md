@@ -1,5 +1,20 @@
 # Change Log
 
+## [7.0.17](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.16...v7.0.17) (2023-8-14)
+
+# v7.0.17
+- FR-11857 - Added new support for hosted login to load user on load
+- FR-12828 - Updated entitlements API response
+- FR-12224 - Supported custom login for authenticated users without a tenant alias
+- FR-12780 - Improved Entitlements Vanilla JS SDK
+
+### NextJS Wrapper 7.0.17:
+- FR-12947 - Fixed duplicated cookie issue with switching tenant
+- FR-12634 - Added support for custom login box with sub domain
+- FR-12942 - Fixed build issue with middleware
+
+# Change Log
+
 ## [7.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.15...v7.0.16) (2023-7-19)
 
 - FR-12688 - Make Admin box compatible with the updated type of IUserProfile
