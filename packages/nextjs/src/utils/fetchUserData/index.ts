@@ -1,5 +1,5 @@
 import { AllUserData, FronteggNextJSSession } from '../../types';
-import { getTenants, getUsers } from '../../api';
+import { getTenants, getMe, getMeAuthorization } from '../../api';
 import { calculateExpiresInFromExp } from '../common';
 import fronteggLogger from '../fronteggLogger';
 
@@ -24,7 +24,11 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
     const headers = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     logger.debug('Retrieving user data...');
-    const [baseUserResult, tenantsResult] = await Promise.allSettled([getUsers(headers), getTenants(headers)]);
+    const [baseUserResult, tenantsResult, meAuthorizationResult] = await Promise.allSettled([
+      getMe(headers),
+      getTenants(headers),
+      getMeAuthorization(headers),
+    ]);
     logger.debug(
       'Retrieved user data:',
       'baseUserResult: ',
@@ -35,6 +39,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const baseUser = baseUserResult.status === 'fulfilled' ? baseUserResult.value : null;
     const tenantsResponse = tenantsResult.status === 'fulfilled' ? tenantsResult.value : null;
+    const meAuthorizationResponse = meAuthorizationResult.status === 'fulfilled' ? meAuthorizationResult.value : null;
 
     if (!baseUser || !tenantsResponse) {
       logger.info('No base user or tenants found');
@@ -44,6 +49,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
     const user = {
       ...session.user,
       ...baseUser!,
+      ...meAuthorizationResponse,
       expiresIn: calculateExpiresInFromExp(session.user.exp),
     };
 

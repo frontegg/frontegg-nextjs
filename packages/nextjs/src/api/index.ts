@@ -7,6 +7,7 @@ import {
   ILoginResponse,
   GetCurrentUserTenantsResponse,
   IPublicSettingsResponse,
+  IGetUserAuthorizationResponse,
 } from '@frontegg/rest-api';
 
 /**
@@ -52,7 +53,7 @@ const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_
  *
  * @param headers
  */
-export const getUsers = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
+export const getMe = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
   const headersToSend = buildRequestHeaders(headers);
   const res = await Get({
     url: `${config.baseUrl}/frontegg${fronteggUsersUrl}`,
@@ -75,6 +76,21 @@ export const getTenants = async (
   return parseHttpResponse(res);
 };
 
+/**
+ *
+ * @param headers
+ */
+export const getMeAuthorization = async (
+  headers: Record<string, string>
+): Promise<IGetUserAuthorizationResponse | undefined> => {
+  const res = await Get({
+    //TODO: replace this with rest/api route
+    url: `${config.baseUrl}/frontegg/identity/resources/users/v1/me/authorization`,
+    headers: buildRequestHeaders(headers),
+  });
+  return parseHttpResponse(res);
+};
+
 export const getPublicSettings = async (
   headers: Record<string, string>
 ): Promise<IPublicSettingsResponse | undefined> => {
@@ -90,7 +106,7 @@ export default {
   loadPublicKey,
   refreshTokenEmbedded,
   refreshTokenHostedLogin,
-  getUsers,
+  getMe,
   getTenants,
   getPublicSettings,
 };
