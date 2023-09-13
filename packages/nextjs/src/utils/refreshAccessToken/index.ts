@@ -74,8 +74,8 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
 
     const data = await response.json();
 
-    // @ts-ignore
-    const cookieHeader = response.headers?.raw?.()['set-cookie'];
+    // @ts-ignore the first argument "raw" will only work before nextjs 13.4 and the second argument "getSetCookie" will only work after
+    const cookieHeader: string[] = response.headers?.raw?.()['set-cookie'] ?? response.headers?.getSetCookie?.() ?? [];
     const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
 
     const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
