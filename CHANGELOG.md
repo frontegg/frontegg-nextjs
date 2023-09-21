@@ -1,5 +1,14 @@
 # Change Log
 
+## [7.0.19](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.18...v7.0.19) (2023-9-5)
+
+- Releasing the new Security Center Page, which will replace the current Security Page. Currently exposed on Early Access with limited availability by a feature flag.
+
+
+### NextJS Wrapper 7.0.19:
+- FR-13346 - Support me authorization
+# Change Log
+
 ## [7.0.18](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.17...v7.0.18) (2023-8-28)
 
 - FR-13142 - Support setRootAccountData action for all account feature 

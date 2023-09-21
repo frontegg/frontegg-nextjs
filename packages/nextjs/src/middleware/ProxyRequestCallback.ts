@@ -40,10 +40,6 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       'x-invoke-query',
       'x-middleware-invoke',
       'x-middleware-next',
-      'x-forwarded-for',
-      'x-forwarded-host',
-      'x-forwarded-port',
-      'x-forwarded-proto',
       'transfer-encoding',
       'cache-control',
     ].map((header) => proxyReq.removeHeader(header));
