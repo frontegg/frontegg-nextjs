@@ -1,5 +1,17 @@
 # Change Log
 
+## [8.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.19...v8.0.1) (2023-9-27)
+
+- FR-13509 - Added GTM integration
+
+- Releasing the new Security Center Page, which will replace the current Security Page. Currently exposed on Early Access with limited availability by a feature flag.
+
+
+### NextJS Wrapper 8.0.1:
+- FR-13647 - release major
+- FR-13233 - Device location points out Vercel's IP instead of actual device IP
+- FR-13274 - Fixed removed cookies in pages directory for next-js version 13.4
+
 ## [7.0.19](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.18...v7.0.19) (2023-9-5)
 
 - Releasing the new Security Center Page, which will replace the current Security Page. Currently exposed on Early Access with limited availability by a feature flag.
