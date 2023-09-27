@@ -8,7 +8,7 @@
 NextJS Wrapper 8.0.1:
 - FR-13274 - Fixed removed cookies in the pages directory for next-js version 13.4
 
-#### Note: no migration is needed to upgrade between version 5 to 6.
+#### Note: no migration is needed to upgrade between versions 7 to 8.
 
 
 ## [7.0.19](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.18...v7.0.19) (2023-9-5)
