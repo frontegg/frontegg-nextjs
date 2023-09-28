@@ -4,7 +4,6 @@
 
 ### NextJS Wrapper 8.0.2:
 - Revamped the security page in the Admin Portal
-- FR-13233 - Device location points out Vercel's IP instead of actual device IP
 
 #### Note: no migration is needed to upgrade between versions 7 to 8.
 
