@@ -1,5 +1,16 @@
 # Change Log
 
+## [8.0.2](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.1...v8.0.2) (2023-9-28)
+
+null
+- FR-13509 - Added GTM integration
+
+
+### NextJS Wrapper 8.0.2:
+- FR-13647 - release major
+- FR-13233 - Device location points out Vercel's IP instead of actual device IP
+# Change Log
+
 ## [8.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.19...v8.0.1) (2023-9-27)
 
 - Introduction of our new security page in the admin portal replacing the current security page.
