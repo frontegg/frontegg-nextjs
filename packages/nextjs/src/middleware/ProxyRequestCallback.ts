@@ -18,6 +18,7 @@ const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCa
 const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (proxyReq, req) => {
   try {
     logger.info(`${req.url} | Going to proxy request`);
+    logger.info('The original req headers are', {headers: req.headers});
     logger.debug(`${req.url} | parsing request cookies`);
     const allCookies = CookieManager.parseCookieHeader(req);
     logger.debug(`${req.url} | found ${allCookies} cookies`);
@@ -33,7 +34,20 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
     proxyReq.setHeader('x-frontegg-middleware', 'true');
-    proxyReq.setHeader('accept-encoding', 'gzip, deflate, br');
+
+    const xForwardedFor = req.headers['x-forwarded-for'];
+    const xOriginalForwardedFor = req.headers['x-original-forwarded-for'];
+    const cfConnectionIp = req.headers['cf-connecting-ip'];
+
+    if (xForwardedFor) {
+      proxyReq.setHeader('x-forwarded-for', xForwardedFor);
+    }
+    if (xOriginalForwardedFor) {
+      proxyReq.setHeader('x-original-forwarded-for', xOriginalForwardedFor);
+    }
+    if (cfConnectionIp) {
+      proxyReq.setHeader('cf-connecting-ip', cfConnectionIp);
+    }
 
     [
       'x-invoke-path',
