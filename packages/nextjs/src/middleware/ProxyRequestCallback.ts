@@ -18,7 +18,7 @@ const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCa
 const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (proxyReq, req) => {
   try {
     logger.info(`${req.url} | Going to proxy request`);
-    logger.info(`The original req headers are ${req.headers}`);
+    logger.info('The original req headers are', {headers: req.headers});
     logger.debug(`${req.url} | parsing request cookies`);
     const allCookies = CookieManager.parseCookieHeader(req);
     logger.debug(`${req.url} | found ${allCookies} cookies`);
