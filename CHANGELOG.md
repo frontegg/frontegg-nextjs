@@ -1,5 +1,14 @@
 # Change Log
 
+## [8.0.2](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.1...v8.0.2) (2023-9-28)
+
+### NextJS Wrapper 8.0.2:
+- Revamped the security page in the Admin Portal
+
+#### Note: no migration is needed to upgrade between versions 7 to 8.
+
+# Change Log
+
 ## [8.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.19...v8.0.1) (2023-9-27)
 
 - Introduction of our new security page in the admin portal replacing the current security page.
@@ -7,9 +16,6 @@
 
 NextJS Wrapper 8.0.1:
 - FR-13274 - Fixed removed cookies in the pages directory for next-js version 13.4
-
-#### Note: no migration is needed to upgrade between versions 7 to 8.
-
 
 ## [7.0.19](https://github.com/frontegg/frontegg-nextjs/compare/v7.0.18...v7.0.19) (2023-9-5)
 
