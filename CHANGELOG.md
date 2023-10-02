@@ -1,5 +1,15 @@
 # Change Log
 
+## [8.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.2...v8.0.3) (2023-10-2)
+
+- FR-13455 - Fixed impersonation with custom login on embedded initial blank screen
+- FR-13649 - Fixed testimonial quote layout for split signup mode
+
+
+### NextJS Wrapper 8.0.3:
+- FR-13233 - Device location points out Vercel's IP instead of actual device IP
+# Change Log
+
 ## [8.0.2](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.1...v8.0.2) (2023-9-28)
 
 ### NextJS Wrapper 8.0.2:
