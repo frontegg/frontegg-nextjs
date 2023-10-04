@@ -1,5 +1,17 @@
 # Change Log
 
+## [8.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.3...v8.0.4) (2023-10-4)
+
+- FR-13364 - Improved validations text for sign in form
+- FR-13737 - Changed breached password page to be shown just for block breached password policy
+- FR-13665 - Enhance hasPermission with inEntitled in admin portal in case entitlements is enabled
+- FR-13665 - Enhance hasPermission with inEntitled in admin portal in case entitlements is enabled
+
+- FR-13455 - Fixed impersonation with custom login on embedded initial blank screen
+- FR-13649 - Fixed testimonial quote layout for split signup mode
+
+
+
 ## [8.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.2...v8.0.3) (2023-10-2)
 
 - FR-13455 - Fixed impersonation with custom login on embedded initial blank screen
