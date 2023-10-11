@@ -3,10 +3,7 @@
 ## [8.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.4...v8.0.5) (2023-10-11)
 
 - FR-13798 - Added support for login with SMS
-
-- FR-13364 - Improved validations text for sign in form
-- FR-13737 - Changed breached password page to be shown just for block breached password policy
-- FR-13665 - Enhance hasPermission with inEntitled in admin portal in case entitlements is enabled
+- FR-13364 - Improved validations text for sign-in form
 
 # Change Log
 
