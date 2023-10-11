@@ -1,5 +1,12 @@
 # Change Log
 
+## [8.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.4...v8.0.5) (2023-10-11)
+
+- FR-13798 - Added support for login with SMS
+- FR-13364 - Improved validations text for sign-in form
+
+# Change Log
+
 ## [8.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.3...v8.0.4) (2023-10-4)
 
 - FR-13364 - Improved validations text for sign in form
