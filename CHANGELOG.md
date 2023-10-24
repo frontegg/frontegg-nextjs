@@ -2,7 +2,6 @@
 
 ## [8.0.6](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.5...v8.0.6) (2023-10-24)
 
-- FR-13508 - Mobile native module bridge
 - FR-13772 - Fixed issue on edit user roles modal - at least 1 role is required
 - FR-13808 - Support Login with SMS
 - FR-13786 - Support tab per tenant
