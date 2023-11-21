@@ -1,5 +1,15 @@
 # Change Log
 
+## [8.0.7](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.6...v8.0.7) (2023-11-20)
+
+FR-14201 - Fixed login with SMS resend code action
+FR-13913 - Let tenants and users set an expiry on client credentials API tokens
+FR-14099 - Fix load custom login routes only when necessary
+FR-13605 - Support adding a phone number field to the signup page and control his required state
+FR-13123 - Added support to provide scopes for social logins
+
+# Change Log
+
 ## [8.0.6](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.5...v8.0.6) (2023-10-24)
 
 - FR-13772 - Fixed issue on edit user roles modal - at least 1 role is required
