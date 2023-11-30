@@ -2,8 +2,7 @@
 
 ## [8.0.8](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.7...v8.0.8) (2023-11-29)
 
-- FR-13527 - Added a11y support for admin portal pages: sso, security, profile, personal tokens, users, groups, provisioning, audit logs, api tokens, webhooks, account details.
-
+- FR-13527 - Added a11y support for admin portal pages: SSO, security, profile, personal tokens, users, groups, provisioning, audit logs, API tokens, webhooks, and account details.
 
 # Change Log
 
