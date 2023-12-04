@@ -18,7 +18,7 @@ const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCa
 const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (proxyReq, req) => {
   try {
     logger.info(`${req.url} | Going to proxy request`);
-    logger.info('The original req headers are', {headers: req.headers});
+    logger.info('The original req headers are', { headers: req.headers });
     logger.debug(`${req.url} | parsing request cookies`);
     const allCookies = CookieManager.parseCookieHeader(req);
     logger.debug(`${req.url} | found ${allCookies} cookies`);
@@ -59,7 +59,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     ].map((header) => proxyReq.removeHeader(header));
 
     logger.debug(`${req.url} | check if request has body`);
-    if (req.body) {
+    if (req.method !== 'GET' && req.body) {
       logger.debug(`${req.url} | writing request body to proxyReq`);
       const bodyData = JSON.stringify(req.body);
       // in case if content-type is application/x-www-form-urlencoded -> we need to change to application/json
