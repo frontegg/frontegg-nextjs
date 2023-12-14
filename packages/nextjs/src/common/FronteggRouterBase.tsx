@@ -38,7 +38,11 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         if (queryParams.redirectUrl) {
           localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, `${window.location.origin}${queryParams.redirectUrl}`);
         }
-        loginWithRedirect();
+        const payload: Record<string, string> = {};
+        if (typeof queryParams.invitationToken === 'string') {
+          payload['invitationToken'] = queryParams.invitationToken;
+        }
+        loginWithRedirect(payload);
       } else if (pathname === routesObj.logoutUrl) {
         logoutHosted(window.location.origin + window.location.search);
       }
