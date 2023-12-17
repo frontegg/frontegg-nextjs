@@ -1,5 +1,21 @@
 # Change Log
 
+## [8.0.9](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.8...v8.0.9) (2023-12-17)
+
+- FR-10692 - Remove the ability to select a full category on webhooks page
+
+- FR-14324 - Fix android native module and add option for direct social login
+
+- FR-14287 - Fix grammar of 1 day expiry of api tokens
+
+
+- FR-14308 - Fixed alignment issue with icon in custom social login button
+
+
+### NextJS Wrapper 8.0.9:
+- FR-14438 - disable sending body if request method is 'GET'
+# Change Log
+
 ## [8.0.8](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.7...v8.0.8) (2023-11-29)
 
 - FR-13527 - Added a11y support for admin portal pages: SSO, security, profile, personal tokens, users, groups, provisioning, audit logs, API tokens, webhooks, and account details.
