@@ -9,6 +9,7 @@ export const FronteggProxy = createProxyServer({
   target: process.env['FRONTEGG_BASE_URL'],
   changeOrigin: true,
   selfHandleResponse: true,
+  xfwd: true,
 });
 
 /**
