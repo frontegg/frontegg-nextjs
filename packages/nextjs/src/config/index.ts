@@ -18,7 +18,6 @@ const setupEnvVariables = {
 };
 
 class Config {
-  public authRoutes: Partial<AuthPageRoutes> = {};
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
   constructor() {
     if (typeof window === 'undefined') {
@@ -64,6 +63,10 @@ class Config {
 
   get cookieDomain(): string {
     return generateCookieDomain(this.appUrl);
+  }
+
+  get authRoutes(): Partial<AuthPageRoutes> {
+    return this.fronteggAppOptions?.authOptions?.routes ?? {};
   }
 
   private validatePassword() {

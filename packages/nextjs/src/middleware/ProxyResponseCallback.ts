@@ -4,9 +4,11 @@ import { NextApiResponse } from 'next';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';
-import { isFronteggLogoutUrl } from './helpers';
+import { isFronteggLogoutUrl, isFronteggOauthLogoutUrl } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessToken/helpers';
+import { buildLogoutRoute } from '../api/urls';
+import { authInitialState } from '@frontegg/redux-store';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**
@@ -41,6 +43,15 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
           res,
           req,
         });
+        if (isFronteggOauthLogoutUrl(url) || config.isHostedLogin) {
+          const referer = req.headers['referer'];
+          const logoutPath = config.authRoutes?.logoutUrl ?? authInitialState.routes.logoutUrl;
+          const shouldUseReferer = !!(referer && !referer.endsWith(logoutPath));
+          const redirectUrl = shouldUseReferer ? referer : config.appUrl;
+          const { asPath: hostedLogoutUrl } = buildLogoutRoute(redirectUrl, config.baseUrl);
+          res.status(302).end(hostedLogoutUrl);
+          return;
+        }
         res.status(statusCode).end(bodyStr);
         return;
       }

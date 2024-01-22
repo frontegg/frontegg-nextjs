@@ -28,9 +28,14 @@ export const rewritePath = (
   return url;
 };
 
-export const isFronteggLogoutUrl = (url: string) => {
-  return url.endsWith('/logout');
-  // return (
-  //   fronteggAuthApiRoutesRegex.filter((path) => path.endsWith('/logout')).findIndex((route) => url.endsWith(route)) >= 0
-  // );
-};
+/**
+ * Checks If route is a logout route
+ * @param url
+ */
+export const isFronteggLogoutUrl = (url: string) => url.endsWith('/logout');
+
+/**
+ * Checks If route is a hosted logout route
+ * @param url
+ */
+export const isFronteggOauthLogoutUrl = (url: string) => url.endsWith('/oauth/logout');

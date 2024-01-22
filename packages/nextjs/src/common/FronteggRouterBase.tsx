@@ -8,7 +8,6 @@ import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../utils/common/constants';
 import AppContext from './AppContext';
 import React from 'react';
 import { ParsedUrlQuery } from 'querystring';
-import { useLogoutHostedLogin } from './hooks';
 
 interface FronteggRouterBaseProps {
   queryParams?: ParsedUrlQuery;
@@ -20,8 +19,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
   const { queryParams = {}, pathArr, isAppDirEnabled } = props;
   const app = useContext(AppContext);
   const loginWithRedirect = useLoginWithRedirect();
-  const { requestAuthorize } = useLoginActions();
-  const logoutHosted = useLogoutHostedLogin();
+  const { requestAuthorize, logout } = useLoginActions();
 
   useEffect(() => {
     if (!app) {
@@ -40,7 +38,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
-        logoutHosted(window.location.origin + window.location.search);
+        logout();
       }
     } else {
       if (pathname.startsWith(routesObj.hostedLoginRedirectUrl ?? '/oauth/callback')) {
@@ -54,6 +52,6 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         }
       }
     }
-  }, [app, queryParams, pathArr, loginWithRedirect, logoutHosted]);
+  }, [app, queryParams, pathArr, loginWithRedirect, logout]);
   return <></>;
 }

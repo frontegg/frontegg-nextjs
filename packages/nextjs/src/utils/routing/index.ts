@@ -16,7 +16,7 @@ export function getAuthRoutes(): { routesArr: string[]; routesObj: Record<string
 export function isAuthRoute(pathname: string): boolean {
   const { routesArr, routesObj } = getAuthRoutes();
 
-  if (config.fronteggAppOptions.hostedLoginBox) {
+  if (config.isHostedLogin) {
     return (
       routesObj.loginUrl === pathname ||
       routesObj.logoutUrl === pathname ||
