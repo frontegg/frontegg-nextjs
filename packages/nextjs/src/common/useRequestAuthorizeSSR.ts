@@ -5,12 +5,19 @@ import { FronteggApp } from '@frontegg/js';
 import { AllUserData } from '../types';
 
 export default function useRequestAuthorizeSSR({ app, user, tenants, session }: { app: FronteggApp } & AllUserData) {
+  const userWithTokensOrNull = user
+    ? {
+        ...user,
+        refreshToken: session?.refreshToken,
+        accessToken: user.accessToken ?? session?.accessToken,
+      }
+    : null;
   useEffect(() => {
     app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
       payload: {
         accessToken: session?.accessToken,
-        user: user ? { ...user, refreshToken: session?.refreshToken } : null,
+        user: userWithTokensOrNull,
         tenants,
       },
     });

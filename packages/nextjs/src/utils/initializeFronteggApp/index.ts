@@ -77,7 +77,7 @@ const initializeFronteggApp = ({
     ...options.authOptions,
     onRedirectTo,
     isLoading: false,
-    isAuthenticated: !!options.authOptions?.isAuthenticated,
+    isAuthenticated: !!options.session,
     hostedLoginBox: options.hostedLoginBox ?? false,
     disableSilentRefresh: options.authOptions?.disableSilentRefresh ?? true,
     user: userData,
