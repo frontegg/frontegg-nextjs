@@ -11,7 +11,7 @@ export const ApiUrls = {
   },
 };
 
-interface BuildRouteResult {
+export interface BuildRouteResult {
   asPath: string;
   asUrl: URL;
 }
