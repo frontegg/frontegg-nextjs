@@ -1,5 +1,13 @@
 # Change Log
 
+## [8.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.10...v8.0.11) (2024-1-24)
+
+
+### NextJS Wrapper 8.0.11:
+- FR-13875 - Support idle-session, logout hosted login in middleware
+- FR-14458 - Fixed error on middleware request since NextJs V14.0.2
+- FR-14800 - remove app url end char if is /
+
 ## [8.0.10](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.9...v8.0.10) (2023-12-31)
 
 - FR-14578 - Fixed custom login without tenant alias
