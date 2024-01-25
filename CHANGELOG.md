@@ -4,9 +4,7 @@
 
 
 ### NextJS Wrapper 8.0.11:
-- FR-13875 - support logout hosted login in middleware
-- FR-14458 - fix build
-- FR-14827 - allow alpha creation manually
+- FR-13875 - Support idle-session, logout hosted login in middleware
 - FR-14458 - Fixed error on middleware request since NextJs V14.0.2
 - FR-14800 - remove app url end char if is /
 
