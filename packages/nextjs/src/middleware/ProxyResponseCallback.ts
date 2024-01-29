@@ -50,9 +50,8 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
         return;
       }
 
+      const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
       if (isSuccess) {
-        const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
-
         try {
           if (bodyStr && bodyStr.length > 0) {
             const body = JSON.parse(bodyStr);
@@ -101,6 +100,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
           .forEach((header) => {
             res.setHeader(header, `${proxyRes.headers[header]}`);
           });
+        res.setHeader('set-cookie', cookies);
         res.status(statusCode).end(bodyStr);
       }
     } catch (e: any) {
