@@ -6,7 +6,9 @@ import fetchUserData from '../utils/fetchUserData';
 import { ClientFronteggProviderProps } from '../types';
 import { getAppUrlForCustomLoginWithSubdomain } from './getAppUrlForCustomLoginWithSubdomain';
 
-export type FronteggAppProviderProps = PropsWithChildren<Omit<ClientFronteggProviderProps, 'contextOptions'>>;
+export type FronteggAppProviderProps = PropsWithChildren<
+  Omit<ClientFronteggProviderProps, 'contextOptions' | 'envAppUrl' | 'envBaseUrl' | 'envClientId'>
+>;
 
 export const FronteggAppProvider = async (options: FronteggAppProviderProps) => {
   const { envAppUrl, ...appEnvConfig } = config.appEnvConfig;

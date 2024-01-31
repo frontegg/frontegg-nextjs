@@ -18,7 +18,6 @@ const setupEnvVariables = {
 };
 
 class Config {
-  public authRoutes: Partial<AuthPageRoutes> = {};
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
   constructor() {
     if (typeof window === 'undefined') {
@@ -35,7 +34,11 @@ class Config {
   }
 
   get baseUrl(): string {
-    return getEnv(EnvVariables.FRONTEGG_BASE_URL) ?? setupEnvVariables.FRONTEGG_BASE_URL;
+    const baseUrl = getEnv(EnvVariables.FRONTEGG_BASE_URL) ?? setupEnvVariables.FRONTEGG_BASE_URL;
+    if (baseUrl.endsWith('/')) {
+      return baseUrl.slice(0, -1);
+    }
+    return baseUrl;
   }
 
   get baseUrlHost(): string {
@@ -60,6 +63,10 @@ class Config {
 
   get cookieDomain(): string {
     return generateCookieDomain(this.appUrl);
+  }
+
+  get authRoutes(): Partial<AuthPageRoutes> {
+    return this.fronteggAppOptions?.authOptions?.routes ?? {};
   }
 
   private validatePassword() {

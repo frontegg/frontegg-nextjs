@@ -4,7 +4,7 @@ import { NextApiResponse } from 'next';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';
-import { isFronteggLogoutUrl } from './helpers';
+import { getHostedLogoutUrl, isFronteggLogoutUrl, isFronteggOauthLogoutUrl } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessToken/helpers';
 
@@ -41,13 +41,17 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
           res,
           req,
         });
+        if (isFronteggOauthLogoutUrl(url) || config.isHostedLogin) {
+          const { asPath: hostedLogoutUrl } = getHostedLogoutUrl(req.headers['referer']);
+          res.status(302).end(hostedLogoutUrl);
+          return;
+        }
         res.status(statusCode).end(bodyStr);
         return;
       }
 
+      const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
       if (isSuccess) {
-        const cookies = CookieManager.modifySetCookie(proxyRes.headers['set-cookie'], isSecured) ?? [];
-
         try {
           if (bodyStr && bodyStr.length > 0) {
             const body = JSON.parse(bodyStr);
@@ -96,6 +100,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
           .forEach((header) => {
             res.setHeader(header, `${proxyRes.headers[header]}`);
           });
+        res.setHeader('set-cookie', cookies);
         res.status(statusCode).end(bodyStr);
       }
     } catch (e: any) {

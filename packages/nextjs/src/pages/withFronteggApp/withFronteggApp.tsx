@@ -41,9 +41,6 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
     };
   };
 
-  config.authRoutes = options?.authOptions?.routes ?? {};
-  config.fronteggAppOptions = options ?? {};
-
   function CustomFronteggApp(appProps: AppProps) {
     const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId } = appProps.pageProps;
     return (
