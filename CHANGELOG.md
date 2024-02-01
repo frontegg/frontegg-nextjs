@@ -4,11 +4,10 @@
 
 
 ### NextJS Wrapper 8.0.12:
-- FR-15071 - Rewrite cookies on failure request to support Microsoft SSO activation process
-- FR-13875 - support logout hosted login in middleware
-- FR-14458 - fix build
-- FR-14827 - allow alpha creation manually
+- FR-15071 - Rewrite cookies on failure requests to support Microsoft SSO activation process
+- FR-13875 - Added support for logout hosted login in middleware
 - FR-14458 - Fixed error on middleware request since NextJs V14.0.2
+  
 # Change Log
 
 ## [8.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.10...v8.0.11) (2024-1-24)
