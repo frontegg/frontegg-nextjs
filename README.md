@@ -345,3 +345,5 @@ export const config = {
   matcher: '/(.*)',
 };
 ```
+
+[![Create  Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffrontegg%2Ffrontegg-nextjs%2Ftree%2Fmaster%2Fpackages%2Fexample-app-directory)
