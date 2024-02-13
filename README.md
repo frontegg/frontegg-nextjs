@@ -346,4 +346,8 @@ export const config = {
 };
 ```
 
-[![Create  Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffrontegg%2Ffrontegg-nextjs%2Ftree%2Fmaster%2Fpackages%2Fexample-app-directory)
+## Quick start frontegg with vercel
+
+To easily clone frontegg app sample and deploy with Vercel click [here](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffrontegg%2Ffrontegg-nextjs%2Ftree%2FFR-15157%2Fdemos%2Fquick-starter-demo&env=FRONTEGG_BASE_URL,FRONTEGG_CLIENT_ID,FRONTEGG_ENCRYPTION_PASSWORD&envDescription=Frontegg%20env%20variable%20to%20connect%20to%20your%20frontegg%20account%20and%20encrypt%20the%20frontegg%20session%20cookie&envLink=https%3A%2F%2Fdocs.frontegg.com%2Fdocs%2Fnextjs-12-13-ssr-hosted-login%23step-4-setup-environment&project-name=my-frontegg-app&repository-name=my-frontegg-app&demo-title=Authentication%20and%20user%20management&demo-description=Application%20with%20frontegg%20authentication&demo-url=https%3A%2F%2Fplain-next-vercel.vercel.app%2F)
+
+
