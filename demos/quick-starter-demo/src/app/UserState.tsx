@@ -22,7 +22,7 @@ export const UserState = () => {
     <>
       <img
         src={user.profilePictureUrl ?? ''}
-        alt={user?.name ?? ''}
+        alt={user.name ?? 'user'}
         width='50'
         height='50'
         className={styles.user}
