@@ -48,6 +48,7 @@
   background: rgba(var(--card-rgb), 0);
   border: 1px solid rgba(var(--card-border-rgb), 0);
   transition: background 200ms, border 200ms;
+  cursor: pointer;
 }
 
 .card span {
@@ -75,6 +76,26 @@
   align-items: center;
   position: relative;
   padding: 4rem 0;
+}
+
+.dropdown {
+  position: absolute;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(var(--card-rgb), 0.1);
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.dropdown a {
+  width: fit-content;
+}
+
+.user {
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .center::before {

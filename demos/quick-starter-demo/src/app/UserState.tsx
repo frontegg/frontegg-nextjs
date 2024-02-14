@@ -2,6 +2,7 @@
 import { useAuthUserOrNull } from '@frontegg/nextjs';
 import { useState } from 'react';
 import Link from 'next/link';
+import styles from './page.module.css';
 
 export const UserState = () => {
   const user = useAuthUserOrNull();
@@ -24,18 +25,14 @@ export const UserState = () => {
         alt={user?.name ?? ''}
         width='50'
         height='50'
-        style={{ borderRadius: '50%', cursor: 'pointer' }}
+        className={styles.user}
         onClick={() => toggleUserMenu()}
       />
 
       {open && (
-        <div style={{ position: 'absolute' }}>
-          <br />
+        <div className={styles.dropdown}>
           <div>{user.email}</div>
-          <br />
-          <Link style={{ width: 'fit-content' }} href={'/account/logout'}>
-            Log out
-          </Link>
+          <Link href={'/account/logout'}>Log out</Link>
         </div>
       )}
     </>

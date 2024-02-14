@@ -41,7 +41,7 @@ export default function Home() {
           <p>Easily handle complicated authentication flows</p>
         </a>
 
-        <AdminPortalButton className={styles.card} />
+        <AdminPortalButton />
 
         <a
           href='https://docs.frontegg.com/docs/user-management'
