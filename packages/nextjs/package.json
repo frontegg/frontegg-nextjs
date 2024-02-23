@@ -1,7 +1,7 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "8.0.12",
+  "version": "8.0.13",
   "author": "Frontegg LTD",
   "license": "MIT",
   "repository": {
