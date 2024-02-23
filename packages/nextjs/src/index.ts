@@ -1,6 +1,5 @@
 export * from './common';
 export * from './config';
-export * from './middleware';
 export * from './types';
 
 export { AdminPortal, AppHolder, HostedLogin } from '@frontegg/js';

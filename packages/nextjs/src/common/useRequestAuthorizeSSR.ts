@@ -12,6 +12,8 @@ export default function useRequestAuthorizeSSR({ app, user, tenants, session }: 
         accessToken: user.accessToken ?? session?.accessToken,
       }
     : null;
+
+  // TODO: consider using useMemo instead of useEffect
   useEffect(() => {
     app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
