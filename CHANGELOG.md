@@ -1,5 +1,23 @@
 # Change Log
 
+## [8.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.12...v8.0.13) (2024-2-23)
+
+
+### NextJS Wrapper 8.0.13:
+- FR-15208 - Remove middleware from default export to prevent include backend code in frontend components
+- FR-15157 - Create sample repo with quick deployment flow in readme
+# Change Log
+
+## [8.0.12](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.11...v8.0.12) (2024-2-1)
+
+
+### NextJS Wrapper 8.0.12:
+- FR-15071 - Rewrite cookies on failure requests to support Microsoft SSO activation process
+- FR-13875 - Added support for logout hosted login in middleware
+- FR-14458 - Fixed error on middleware request since NextJs V14.0.2
+  
+# Change Log
+
 ## [8.0.11](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.10...v8.0.11) (2024-1-24)
 
 

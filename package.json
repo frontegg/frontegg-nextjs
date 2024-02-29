@@ -10,6 +10,7 @@
     "dev": "lerna run build:watch --stream --scope '@frontegg/nextjs'",
     "demo": "lerna run dev --stream --scope '@frontegg/example-app-directory'",
     "demo12": "lerna run dev --stream --scope '@frontegg/example-pages'",
+    "quick-starter": "cd demos/quick-starter-demo && yarn dev",
     "build": "cross-env NODE_ENV='production' lerna run build --stream --ignore '@frontegg/example-app-directory' --ignore '@frontegg/example-pages'",
     "test": "lerna run test --stream --scope '@frontegg/nextjs'",
     "start:middleware-test-server": "node tests/middleware-test/middleware-test-server.js",
