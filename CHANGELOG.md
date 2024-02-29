@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.13...v8.0.14) (2024-2-29)
+
+
+### NextJS Wrapper 8.0.14:
+- FR-15208 - Remove middleware from default export to prevent include backend code in frontend components
+
 ## [8.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.12...v8.0.13) (2024-2-23)
 
 
