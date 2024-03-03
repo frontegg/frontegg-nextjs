@@ -1,5 +1,14 @@
 # Change Log
 
+## [8.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.13...v8.0.14) (2024-2-29)
+
+
+### NextJS Wrapper 8.0.14:
+- FR-15305 - Fixed changed fields sent on edit group to support SCIM group update
+- FR-15219 - Fixed missing row actions in users table when using MSP
+- FR-15126 - Fixed MSP invite user dialog
+- FR-15100 - Fixed Apple custom SSO scopes
+
 ## [8.0.13](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.12...v8.0.13) (2024-2-23)
 
 
