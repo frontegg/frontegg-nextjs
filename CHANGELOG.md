@@ -1,5 +1,13 @@
 # Change Log
 
+## [8.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.14...v8.0.15) (2024-3-3)
+
+- FR-15270 - Added new roles page to the Admin Portal
+- FR-15395 - Fixed tab tenant not cleared after logout
+
+
+# Change Log
+
 ## [8.0.14](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.13...v8.0.14) (2024-2-29)
 
 
