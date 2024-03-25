@@ -1,7 +1,9 @@
 import { AllUserData, FronteggNextJSSession } from '../../types';
-import { getTenants, getMe, getMeAuthorization } from '../../api';
+import { getTenants, getMe, getMeAuthorization, getEntitlements } from '../../api';
 import { calculateExpiresInFromExp } from '../common';
 import fronteggLogger from '../fronteggLogger';
+
+const FULFILLED_STATUS = 'fulfilled';
 
 type FetchUserDataOptions = {
   getSession: () => Promise<FronteggNextJSSession | undefined | null>;
@@ -24,22 +26,28 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
     const headers = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     logger.debug('Retrieving user data...');
-    const [baseUserResult, tenantsResult, meAuthorizationResult] = await Promise.allSettled([
+    const [baseUserResult, tenantsResult, entitlementsResult, meAuthorizationResult] = await Promise.allSettled([
       getMe(headers),
       getTenants(headers),
+      getEntitlements(headers),
       getMeAuthorization(headers),
     ]);
+
     logger.debug(
       'Retrieved user data:',
       'baseUserResult: ',
       baseUserResult.status,
       'tenantsResult:',
-      tenantsResult.status
+      tenantsResult.status,
+      'entitlements:',
+      entitlementsResult.status
     );
 
-    const baseUser = baseUserResult.status === 'fulfilled' ? baseUserResult.value : null;
-    const tenantsResponse = tenantsResult.status === 'fulfilled' ? tenantsResult.value : null;
-    const meAuthorizationResponse = meAuthorizationResult.status === 'fulfilled' ? meAuthorizationResult.value : null;
+    const baseUser = baseUserResult.status === FULFILLED_STATUS ? baseUserResult.value : null;
+    const tenantsResponse = tenantsResult.status === FULFILLED_STATUS ? tenantsResult.value : null;
+    const meAuthorizationResponse =
+      meAuthorizationResult.status === FULFILLED_STATUS ? meAuthorizationResult.value : null;
+    const entitlementsResponse = entitlementsResult.status === FULFILLED_STATUS ? entitlementsResult.value : undefined;
 
     if (!baseUser || !tenantsResponse) {
       logger.info('No base user or tenants found');
@@ -50,6 +58,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
       ...session.user,
       ...baseUser!,
       ...meAuthorizationResponse,
+      entitlements: entitlementsResponse,
       expiresIn: calculateExpiresInFromExp(session.user.exp),
     };
 
