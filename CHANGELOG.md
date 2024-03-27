@@ -2,7 +2,7 @@
 
 ## [8.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.15...v8.0.16) (2024-3-27)
 
-- FR-15233 - Fix autocomplete popper
+- FR-15233 - Fixed autocomplete popper
 - FR-15315 - Added sort for role selections in Admin Portal 
 
 
