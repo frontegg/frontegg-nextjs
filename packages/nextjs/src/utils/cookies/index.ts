@@ -25,14 +25,20 @@ class CookieManager {
    * This is used for removing existing cookies before creating new ones.
    * @param {CreateCookieOptions} options - Create cookie options
    */
-  getEmptyCookiesBeforeCreatingNew({ req, value, secure, domain }: CreateCookieOptions): string[] {
+  getEmptyCookiesBeforeCreatingNew(
+    { req, value, secure, domain }: CreateCookieOptions,
+    newCookies: string[]
+  ): string[] {
     if (!req || !value) {
       return [];
     }
-    const cookiesToRemove = this.getCookiesToRemove(req);
+    const newCookieNames = newCookies.map((c) => c.split('=')[0]);
+    const cookiesToRemove = this.getCookiesToRemove(req).filter((cookie) => newCookieNames.indexOf(cookie) === -1);
     if (cookiesToRemove.length === 0) {
       return [];
     }
+
+    console.log('cookiesToRemove', cookiesToRemove);
     return this.createEmptyCookies(secure, domain ?? config.cookieDomain, cookiesToRemove, false);
   }
 
@@ -63,18 +69,20 @@ class CookieManager {
 
     const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
 
-    const removedCookiesValue = this.getEmptyCookiesBeforeCreatingNew(options);
-
+    let newCookies: string[] = [];
     if (serializedCookie.length <= COOKIE_MAX_LENGTH) {
       logger.info(`Successfully create a cookie header, '${cookieName}'`);
-      return [...removedCookiesValue, serializedCookie];
+      newCookies = [serializedCookie];
     } else {
       logger.debug('Going to split cookie into chunks');
       /** Create chunked cookie headers and store value as array of headers */
       const cookies = splitValueToChunks(cookieName, cookieValue, serializeOptions);
       logger.info(`Successfully create chunked cookie headers, '${cookieName}' (count: ${cookies.length})`);
-      return [...removedCookiesValue, ...cookies];
+      newCookies = cookies;
     }
+
+    const removedCookiesValue = this.getEmptyCookiesBeforeCreatingNew(options, newCookies);
+    return [...removedCookiesValue, ...newCookies];
   }
 
   /**
