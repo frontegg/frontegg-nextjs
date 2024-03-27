@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.15...v8.0.16) (2024-3-27)
+
+- FR-15233 - Fixed autocomplete popper
+- FR-15315 - Added sort for role selections in Admin Portal 
+
+
 ## [8.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.14...v8.0.15) (2024-3-3)
 
 - FR-15270 - Added new roles page to the Admin Portal
