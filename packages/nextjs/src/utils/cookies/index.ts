@@ -38,7 +38,6 @@ class CookieManager {
       return [];
     }
 
-    console.log('cookiesToRemove', cookiesToRemove);
     return this.createEmptyCookies(secure, domain ?? config.cookieDomain, cookiesToRemove, false);
   }
 
