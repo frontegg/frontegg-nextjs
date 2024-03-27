@@ -1,5 +1,16 @@
 # Change Log
 
+## [8.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.15...v8.0.16) (2024-3-27)
+
+- FR-15715 - Entitlements api v1 usage removal (FF)
+- FR-15233 - Fix autocomplete popper
+
+
+- FR-13828 - Add option to specify prompt consent from loginDirectAction
+- FR-15315 - Added sort for role selections in Admin Portal 
+
+
+
 ## [8.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.14...v8.0.15) (2024-3-3)
 
 - FR-15270 - Added new roles page to the Admin Portal
