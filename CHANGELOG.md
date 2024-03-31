@@ -2,16 +2,13 @@
 
 ## [8.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.15...v8.0.16) (2024-3-31)
 
-- FR-15715 - Entitlements api v1 usage removal (FF)
-- FR-15233 - Fix autocomplete popper
-
-
-- FR-13828 - Add option to specify prompt consent from loginDirectAction
+- FR-15233 - Fixed autocomplete popper
+- FR-13828 - Added option to specify prompt consent from loginDirectAction
 - FR-15315 - Added sort for role selections in Admin Portal 
 
 
 ### NextJS Wrapper 8.0.16:
-- FR-15792 - Filter empty cookies array from the new cookies
+- FR-15792 - Filtered empty cookies array from the new cookies
 - FR-14384 - Added entitlements for NextJS
 
 ## [8.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.14...v8.0.15) (2024-3-3)
