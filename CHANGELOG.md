@@ -8,7 +8,7 @@
 
 
 ### NextJS Wrapper 8.0.16:
-- FR-15792 - Filtered empty cookies array from the new cookies
+- FR-15792 - Fixed duplicated set-cookie header
 - FR-14384 - Added entitlements feature
 
 ## [8.0.15](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.14...v8.0.15) (2024-3-3)
