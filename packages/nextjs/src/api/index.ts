@@ -8,7 +8,10 @@ import {
   GetCurrentUserTenantsResponse,
   IPublicSettingsResponse,
   IGetUserAuthorizationResponse,
+  fronteggEntitlementsV2Url,
 } from '@frontegg/rest-api';
+
+import { UserEntitlementsResponseV2 } from '@frontegg/types';
 
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
@@ -66,6 +69,21 @@ export const getMe = async (headers: Record<string, string>): Promise<ILoginResp
  *
  * @param headers
  */
+export const getEntitlements = async (
+  headers: Record<string, string>
+): Promise<UserEntitlementsResponseV2 | undefined> => {
+  const headersToSend = buildRequestHeaders(headers);
+  const res = await Get({
+    url: `${config.baseUrl}${fronteggEntitlementsV2Url}`,
+    headers: headersToSend,
+  });
+  return parseHttpResponse(res);
+};
+
+/**
+ *
+ * @param headers
+ */
 export const getTenants = async (
   headers: Record<string, string>
 ): Promise<GetCurrentUserTenantsResponse | undefined> => {
@@ -109,4 +127,5 @@ export default {
   getMe,
   getTenants,
   getPublicSettings,
+  getEntitlements,
 };
