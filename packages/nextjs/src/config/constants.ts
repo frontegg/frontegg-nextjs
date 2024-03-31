@@ -51,6 +51,11 @@ export enum EnvVariables {
   FRONTEGG_COOKIE_NAME = 'FRONTEGG_COOKIE_NAME',
 
   /**
+   * When `true`, the initial props will not refresh access token if it's valid.
+   */
+  DISABLE_INITIAL_PROPS_REFRESH_TOKEN = 'DISABLE_INITIAL_PROPS_REFRESH_TOKEN',
+
+  /**
    * This Env variable assign automatically when deploying you Next.js application
    * to Vercel deployments service, and will be used to detect to dynamically configure
    * the {@link EnvVariables.FRONTEGG_APP_URL}
