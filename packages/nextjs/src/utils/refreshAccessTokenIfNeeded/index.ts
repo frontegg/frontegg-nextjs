@@ -33,9 +33,7 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
   }
 
   try {
-    logger.info(
-      `Check if should request made from first application load, disableInitialPropsRefreshToken: ${config.disableInitialPropsRefreshToken}`
-    );
+    logger.info(`Check if should request made from first application load`);
 
     if (isRuntimeNextRequest(url) || config.disableInitialPropsRefreshToken) {
       logger.debug(`Detect runtime next.js request, resolving existing session from cookies if exists`);
