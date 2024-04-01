@@ -98,8 +98,10 @@ class Config {
   }
 
   get disableInitialPropsRefreshToken(): boolean {
-    const disableInitialPropsRefreshToken =
-      getEnv(EnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN) ?? setupEnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN;
+    const disableInitialPropsRefreshToken = getEnvOrDefault(
+      EnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
+      setupEnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN
+    );
     return disableInitialPropsRefreshToken === 'true';
   }
 

@@ -20,8 +20,7 @@ export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
 export async function refreshAccessTokenEmbedded(request: IncomingMessage): Promise<Response | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenEmbedded' });
 
-  const headers = request.headers as Record<string, string | undefined>;
-  headers['x-forwarded-for'] = request.socket.remoteAddress;
+  const headers = request.headers as Record<string, string>;
   const cookies = (request as NextApiRequest).cookies;
 
   logger.info('check if has refresh token headers');
@@ -34,7 +33,7 @@ export async function refreshAccessTokenEmbedded(request: IncomingMessage): Prom
 
 export async function refreshAccessTokenHostedLogin(request: IncomingMessage): Promise<Response | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenHostedLogin' });
-  const headers = request.headers as Record<string, string | undefined>;
+  const headers = request.headers as Record<string, string>;
 
   logger.info('trying to get token from cookies');
 
@@ -47,7 +46,6 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
     }
 
     logger.info('going to refresh token (hosted-login mode)');
-    headers['x-forwarded-for'] = request.socket.remoteAddress;
     return await api.refreshTokenHostedLogin(headers, tokens.refreshToken);
   } catch (e) {
     logger.error(e);
