@@ -34,6 +34,7 @@ export async function refreshAccessTokenEmbedded(request: IncomingMessage): Prom
 export async function refreshAccessTokenHostedLogin(request: IncomingMessage): Promise<Response | null> {
   const logger = fronteggLogger.child({ tag: 'refreshToken.refreshAccessTokenHostedLogin' });
   const headers = request.headers as Record<string, string>;
+
   logger.info('trying to get token from cookies');
 
   const sealFromCookies = CookieManager.getSessionCookieFromRequest(request);

@@ -2,7 +2,7 @@ import React from 'react';
 import type { AppContext, AppInitialProps, AppProps } from 'next/app';
 import type { FronteggCustomAppClass, FronteggCustomApp, WithFronteggAppOptions } from './types';
 import FronteggProvider from '../FronteggPagesProvider';
-import refreshAccessToken from '../../utils/refreshAccessToken';
+import refreshAccessTokenIfNeeded, { isRuntimeNextRequest } from '../../utils/refreshAccessTokenIfNeeded';
 import fetchUserData from '../../utils/fetchUserData';
 import config from '../../config';
 import { AllUserData } from '../../types';
@@ -22,11 +22,18 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
 
     if (ctx.req) {
       appEnvConfig = config.appEnvConfig;
-      const userData = await fetchUserData({
-        getSession: async () => await refreshAccessToken(ctx),
-        getHeaders: async () => ctx.req?.headers ?? {},
-      });
-      Object.assign(appContextSessionData, userData);
+      const url = ctx.req?.url;
+
+      if (url && isRuntimeNextRequest(url)) {
+        const session = await refreshAccessTokenIfNeeded(ctx);
+        Object.assign(appContextSessionData, { session });
+      } else {
+        const userData = await fetchUserData({
+          getSession: async () => await refreshAccessTokenIfNeeded(ctx),
+          getHeaders: async () => ctx.req?.headers ?? {},
+        });
+        Object.assign(appContextSessionData, userData);
+      }
     }
 
     Object.assign(appContext, appContextSessionData);
