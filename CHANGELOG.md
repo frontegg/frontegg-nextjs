@@ -7,8 +7,6 @@
 - FR-15111 - Fixed impersonation embedded redirection
 
 
-- FR-15715 - Entitlements api v1 usage removal (FF)
-
 ### NextJS Wrapper 8.0.17:
 - FR-15792 - Add support for disable refresh token on every initial props
 - FR-15792 - Filter empty cookies array from the new cookies
