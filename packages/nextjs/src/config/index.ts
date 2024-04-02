@@ -13,6 +13,7 @@ const setupEnvVariables = {
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
+  DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
 };
@@ -94,6 +95,14 @@ class Config {
 
   get isHostedLogin(): boolean {
     return this.fronteggAppOptions.hostedLoginBox ?? false;
+  }
+
+  get disableInitialPropsRefreshToken(): boolean {
+    const disableInitialPropsRefreshToken = getEnvOrDefault(
+      EnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
+      setupEnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN
+    );
+    return disableInitialPropsRefreshToken === 'true';
   }
 
   get appEnvConfig(): AppEnvConfig {

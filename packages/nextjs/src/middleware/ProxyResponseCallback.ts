@@ -6,7 +6,7 @@ import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';
 import { getHostedLogoutUrl, isFronteggLogoutUrl, isFronteggOauthLogoutUrl } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
-import { isSSOPostRequest } from '../utils/refreshAccessToken/helpers';
+import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**

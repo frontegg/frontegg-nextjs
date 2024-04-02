@@ -14,14 +14,15 @@ import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
 import createSession from '../createSession';
 
+export { isRuntimeNextRequest };
 /**
  * Refreshes the access token for the current session.
  *
  * @param {NextPageContext} ctx - The Next.js Page Context object.
  * @returns {Promise<FronteggNextJSSession | null>} A Promise that resolves to the updated session object, or `null` if the refresh failed.
  */
-export default async function refreshAccessToken(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
-  const logger = fronteggLogger.child({ tag: 'refreshAccessToken' });
+export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
+  const logger = fronteggLogger.child({ tag: 'refreshAccessTokenIfNeeded' });
   logger.info(`Refreshing token by for PageContext ${ctx.pathname}`);
   const nextJsRequest = ctx.req;
   const nextJsResponse = ctx.res;
@@ -34,7 +35,7 @@ export default async function refreshAccessToken(ctx: NextPageContext): Promise<
   try {
     logger.info(`Check if should request made from first application load`);
 
-    if (isRuntimeNextRequest(url)) {
+    if (isRuntimeNextRequest(url) || config.disableInitialPropsRefreshToken) {
       logger.debug(`Detect runtime next.js request, resolving existing session from cookies if exists`);
 
       const cookies = CookieManager.getSessionCookieFromRequest(nextJsRequest);
