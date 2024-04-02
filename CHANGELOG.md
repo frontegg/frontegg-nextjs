@@ -1,5 +1,20 @@
 # Change Log
 
+## [8.0.17](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.16...v8.0.17) (2024-4-2)
+
+- FR-15863 - Changed chip list design in admin portal
+- FR-15367 - Fixed user logo upload for SCIM users
+- FR-15111 - Fixed impersonation embedded redirection
+
+
+- FR-15715 - Entitlements api v1 usage removal (FF)
+
+### NextJS Wrapper 8.0.17:
+- FR-15792 - Add support for disable refresh token on every initial props
+- FR-15792 - Filter empty cookies array from the new cookies
+- FR-14384 - Added entitlements for NextJS
+# Change Log
+
 ## [8.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.15...v8.0.16) (2024-3-31)
 
 - FR-15233 - Fixed autocomplete popper
