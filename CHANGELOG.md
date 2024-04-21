@@ -1,5 +1,17 @@
 # Change Log
 
+## [8.0.18](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.17...v8.0.18) (2024-4-21)
+
+- FR-15737 - Added an option for accounts to open sub-account management for their sub-accounts
+- FR-15603 - Added support for embedded SCIM guides
+- FR-15863 - Changed chip list design in admin portal
+- FR-15367 - Fixed user logo upload for SCIM users
+- FR-15111 - Fixed impersonation embedded redirection
+
+
+
+# Change Log
+
 ## [8.0.17](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.16...v8.0.17) (2024-4-2)
 
 - FR-15863 - Changed chip list design in admin portal
