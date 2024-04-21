@@ -4,11 +4,6 @@
 
 - FR-15737 - Added an option for accounts to open sub-account management for their sub-accounts
 - FR-15603 - Added support for embedded SCIM guides
-- FR-15863 - Changed chip list design in admin portal
-- FR-15367 - Fixed user logo upload for SCIM users
-- FR-15111 - Fixed impersonation embedded redirection
-
-
 
 # Change Log
 
