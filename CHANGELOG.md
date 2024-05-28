@@ -1,5 +1,32 @@
 # Change Log
 
+## [8.0.19](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.18...v8.0.19) (2024-5-27)
+
+- FR-16463 - Removed domain restrictions validation when invite user from All Accounts page
+- FR-16421 - Fixed error handling in edit phone number dialog
+
+# Change Log
+
+## [8.0.18](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.17...v8.0.18) (2024-4-21)
+
+- FR-15737 - Added an option for accounts to open sub-account management for their sub-accounts
+- FR-15603 - Added support for embedded SCIM guides
+
+# Change Log
+
+## [8.0.17](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.16...v8.0.17) (2024-4-2)
+
+- FR-15863 - Changed chip list design in admin portal
+- FR-15367 - Fixed user logo upload for SCIM users
+- FR-15111 - Fixed impersonation embedded redirection
+
+
+### NextJS Wrapper 8.0.17:
+- FR-15792 - Add support for disable refresh token on every initial props
+- FR-15792 - Filter empty cookies array from the new cookies
+- FR-14384 - Added entitlements for NextJS
+# Change Log
+
 ## [8.0.16](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.15...v8.0.16) (2024-3-31)
 
 - FR-15233 - Fixed autocomplete popper
