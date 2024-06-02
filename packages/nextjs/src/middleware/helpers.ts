@@ -1,6 +1,6 @@
 import { BuildRouteResult, buildLogoutRoute } from '../api/urls';
 import config from '../config';
-import { authInitialState } from '@frontegg/redux-store';
+import { defaultFronteggRoutes } from '@frontegg/redux-store';
 
 /**
  * If pattern information matching the input url information is found in the `pathRewrite` array,
@@ -49,7 +49,7 @@ export const isFronteggOauthLogoutUrl = (url: string) => url.endsWith('/oauth/lo
  * @param referer the route to redirect to after logout
  */
 export const getHostedLogoutUrl = (referer = config.appUrl): BuildRouteResult => {
-  const logoutPath = config.authRoutes?.logoutUrl ?? authInitialState.routes.logoutUrl;
+  const logoutPath = config.authRoutes?.logoutUrl ?? defaultFronteggRoutes.logoutUrl;
   const refererUrl = new URL(referer);
   const isLogoutRoute = refererUrl.toString().includes(logoutPath);
 

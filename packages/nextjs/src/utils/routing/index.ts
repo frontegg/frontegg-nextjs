@@ -1,9 +1,9 @@
-import { authInitialState } from '@frontegg/redux-store';
+import { defaultFronteggRoutes } from '@frontegg/redux-store';
 import config from '../../config';
 
 export function getAuthRoutes(): { routesArr: string[]; routesObj: Record<string, string> } {
   const routesObj = {
-    ...authInitialState.routes,
+    ...defaultFronteggRoutes,
     ...config.authRoutes,
   };
   const routesArr: string[] = Object.keys(routesObj).reduce(
