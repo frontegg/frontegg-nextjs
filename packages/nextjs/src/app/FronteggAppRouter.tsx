@@ -9,7 +9,12 @@ interface FronteggRouterProps {
   searchParams?: ParsedUrlQuery;
 }
 
-export function FronteggAppRouter({ params: { 'frontegg-router': pathArr = [] }, searchParams }: FronteggRouterProps) {
+export function FronteggAppRouter(props: FronteggRouterProps) {
+  const {
+    params: { 'frontegg-router': pathArr = [] },
+    searchParams,
+  } = props;
+
   let pathname = `/${pathArr.join('/')}`;
   if (!pathname || pathname.startsWith('/_next/data')) {
     if (searchParams) {

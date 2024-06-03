@@ -5,8 +5,8 @@ import { isAuthRoute } from '../../utils/routing';
 import { FronteggRouterBase } from '../../common/FronteggRouterBase';
 
 export function FronteggRouter() {
-  const { query } = useRouter();
-  const { 'frontegg-router': pathArr, ...queryParams } = query as any;
+  const { query, ...other } = useRouter();
+  const { 'frontegg-router': pathArr = [], ...queryParams } = query as any;
 
   return <FronteggRouterBase pathArr={pathArr} queryParams={queryParams} />;
 }

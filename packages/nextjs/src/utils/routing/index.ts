@@ -1,4 +1,4 @@
-import { defaultFronteggRoutes } from '@frontegg/redux-store';
+import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
 import config from '../../config';
 
 export function getAuthRoutes(): { routesArr: string[]; routesObj: Record<string, string> } {

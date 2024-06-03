@@ -1,4 +1,4 @@
-import { defaultFronteggRoutes } from '@frontegg/redux-store';
+import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import type { ParsedUrlQuery } from 'querystring';
 import type { FronteggNextJSSession, RequestType } from '../types';

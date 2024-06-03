@@ -1,7 +1,7 @@
 'use client';
 
 import config from '../config';
-import { defaultFronteggRoutes } from '@frontegg/redux-store';
+import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
 import { useContext, useEffect } from 'react';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../utils/common/constants';
@@ -26,7 +26,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
       return;
     }
 
-    let pathname = pathArr != null ? `/${pathArr.join('/')}` : '/';
+    const pathname = `/${pathArr.join('/')}`;
     const routesObj = {
       ...defaultFronteggRoutes,
       ...config.authRoutes,

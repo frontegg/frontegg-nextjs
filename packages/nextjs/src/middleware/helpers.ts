@@ -1,6 +1,6 @@
 import { BuildRouteResult, buildLogoutRoute } from '../api/urls';
 import config from '../config';
-import { defaultFronteggRoutes } from '@frontegg/redux-store';
+import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
 
 /**
  * If pattern information matching the input url information is found in the `pathRewrite` array,

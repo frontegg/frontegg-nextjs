@@ -94,6 +94,7 @@ const initializeFronteggApp = ({
       auth: authOptions,
     },
   });
+  storeHolder.store = sharedStore;
 
   let createdApp;
   try {
@@ -116,5 +117,4 @@ const initializeFronteggApp = ({
   }
   return createdApp;
 };
-
 export default initializeFronteggApp;
