@@ -94,7 +94,6 @@ const initializeFronteggApp = ({
       auth: authOptions,
     },
   });
-  storeHolder.store = sharedStore;
 
   let createdApp;
   try {

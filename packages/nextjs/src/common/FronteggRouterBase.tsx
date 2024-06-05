@@ -1,7 +1,7 @@
 'use client';
 
 import config from '../config';
-import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
+import { defaultFronteggRoutes } from '../utils/routing';
 import { useContext, useEffect } from 'react';
 import { useLoginActions, useLoginWithRedirect } from '@frontegg/react-hooks';
 import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../utils/common/constants';
