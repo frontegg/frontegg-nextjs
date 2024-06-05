@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.0.20](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.19...v8.0.20) (2024-5-28)
+
+- FR-16341 - Support hiding columns in admin portal users table
+
+
+
 ## [8.0.19](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.18...v8.0.19) (2024-5-27)
 
 - FR-16463 - Removed domain restrictions validation when invite user from All Accounts page
