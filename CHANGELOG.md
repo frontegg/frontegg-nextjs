@@ -1,5 +1,15 @@
 # Change Log
 
+## [8.0.21](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.20...v8.0.21) (2024-6-5)
+
+- FR-16466 - Support next-js impersonation
+
+- FR-16513 - Show client id on all tokens in API tokens table 
+
+
+### NextJS Wrapper 8.0.21:
+- FR-101010 - Update CODEOWNERS
+
 ## [8.0.20](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.19...v8.0.20) (2024-5-28)
 
 - FR-16341 - Support hiding columns in admin portal users table
