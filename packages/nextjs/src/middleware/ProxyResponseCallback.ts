@@ -55,6 +55,9 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
         try {
           if (bodyStr && bodyStr.length > 0) {
             const body = JSON.parse(bodyStr);
+            if (body.authResponse) {
+              Object.assign(body, body.authResponse);
+            }
             if (body.accessToken || body.access_token) {
               const [session, decodedJwt] = await createSessionFromAccessToken(body);
               if (session) {
