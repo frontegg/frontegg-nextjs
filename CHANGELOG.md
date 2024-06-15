@@ -1,5 +1,9 @@
 # Change Log
 
+## [8.0.22](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.21...v8.0.22) (2024-6-13)
+
+
+
 ## [8.0.21](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.20...v8.0.21) (2024-6-5)
 
 - FR-16466 - Support next-js impersonation
