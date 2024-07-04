@@ -1,5 +1,13 @@
 # Change Log
 
+## [8.0.24](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.23...v8.0.24) (2024-7-4)
+
+- FR-16881 - Fixed hosted login redirect url when using basename
+- FR-16812 - Fixed dark theme disabled input palette
+- FR-16704 - Fixed password meter unsuspended async component
+
+
+
 ## [8.0.23](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.22...v8.0.23) (2024-6-30)
 
 FR-15484 - Fix update tenant state after account settings change
