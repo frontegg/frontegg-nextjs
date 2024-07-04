@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.0.23](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.22...v8.0.23) (2024-6-30)
+
+FR-15484 - Fix update tenant state after account settings change
+FR-16613 - Add automatic sub-account access in MSP
+
+
 ## [8.0.22](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.21...v8.0.22) (2024-6-13)
 
 
