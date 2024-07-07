@@ -25,6 +25,7 @@ export const FronteggAppProvider = async (options: FronteggAppProviderProps) => 
     ...userData,
     ...options,
     envAppUrl: subDomainAppUrl ?? envAppUrl,
+    secureJwtEnabled: options.secureJwtEnabled ?? false,
   };
 
   return <ClientFronteggProvider {...providerProps} />;
