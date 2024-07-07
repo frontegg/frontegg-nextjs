@@ -6,6 +6,7 @@ import refreshAccessTokenIfNeeded, { isRuntimeNextRequest } from '../../utils/re
 import fetchUserData from '../../utils/fetchUserData';
 import config from '../../config';
 import { AllUserData } from '../../types';
+import { removeJwtSignatureFrom } from '../../middleware/helpers';
 
 export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFronteggAppOptions): FronteggCustomApp => {
   const originalGetInitialProps = app.getInitialProps;
@@ -25,13 +26,20 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
       const url = ctx.req?.url;
 
       if (url && isRuntimeNextRequest(url)) {
-        const session = await refreshAccessTokenIfNeeded(ctx);
+        let session = await refreshAccessTokenIfNeeded(ctx);
+        if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
+          session = removeJwtSignatureFrom(session);
+        }
         Object.assign(appContextSessionData, { session });
       } else {
-        const userData = await fetchUserData({
+        let userData = await fetchUserData({
           getSession: async () => await refreshAccessTokenIfNeeded(ctx),
           getHeaders: async () => ctx.req?.headers ?? {},
         });
+        if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
+          userData = removeJwtSignatureFrom(userData);
+          userData.session = removeJwtSignatureFrom(userData?.session);
+        }
         Object.assign(appContextSessionData, userData);
       }
     }

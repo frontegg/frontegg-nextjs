@@ -13,6 +13,7 @@ const setupEnvVariables = {
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
+  FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
@@ -20,6 +21,7 @@ const setupEnvVariables = {
 
 class Config {
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
+
   constructor() {
     if (typeof window === 'undefined') {
       this.validatePassword();
@@ -54,6 +56,14 @@ class Config {
     return getEnv(EnvVariables.FRONTEGG_JWT_PUBLIC_KEY);
   }
 
+  get secureJwtEnabled(): string | undefined {
+    try {
+      return getEnv(EnvVariables.FRONTEGG_SECURE_JWT_ENABLED) ?? setupEnvVariables.FRONTEGG_SECURE_JWT_ENABLED;
+    } catch (e) {
+      return setupEnvVariables.FRONTEGG_SECURE_JWT_ENABLED;
+    }
+  }
+
   get cookieName(): string {
     const cookieNameEnv = getEnvOrDefault(
       EnvVariables.FRONTEGG_COOKIE_NAME,
@@ -82,6 +92,7 @@ class Config {
       }
     }
   }
+
   get password(): PasswordsMap {
     const encryptionPasswordEnv =
       getEnv(EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD) ?? setupEnvVariables.FRONTEGG_ENCRYPTION_PASSWORD;
@@ -110,6 +121,7 @@ class Config {
       envAppUrl: this.appUrl,
       envBaseUrl: this.baseUrl,
       envClientId: this.clientId,
+      secureJwtEnabled: this.secureJwtEnabled,
     };
   }
 }

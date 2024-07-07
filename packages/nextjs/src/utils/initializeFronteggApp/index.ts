@@ -49,7 +49,7 @@ const initializeFronteggApp = ({
       return additionalHeaders;
     },
     baseUrl: (path: string) => {
-      if (isMiddlewarePath(path)) {
+      if (isMiddlewarePath(path) || options.secureJwtEnabled) {
         return `${options.envAppUrl}/api`;
       } else {
         return options.envBaseUrl;

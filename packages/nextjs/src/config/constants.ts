@@ -56,6 +56,10 @@ export enum EnvVariables {
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN = 'DISABLE_INITIAL_PROPS_REFRESH_TOKEN',
 
   /**
+   * Enable secure JWT by removing the signature from the JWT token.
+   */
+  FRONTEGG_SECURE_JWT_ENABLED = 'FRONTEGG_SECURE_JWT_ENABLED',
+  /**
    * This Env variable assign automatically when deploying you Next.js application
    * to Vercel deployments service, and will be used to detect to dynamically configure
    * the {@link EnvVariables.FRONTEGG_APP_URL}
