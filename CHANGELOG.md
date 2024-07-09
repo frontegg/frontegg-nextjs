@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.0.25](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.24...v8.0.25) (2024-7-9)
+
+- FR-16737 - Allow terms and conditions checkbox on sign up form being optional
+
+
+
 ## [8.0.24](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.23...v8.0.24) (2024-7-4)
 
 - FR-16881 - Fixed hosted login redirect url when using basename
