@@ -89,10 +89,13 @@ export const removeJwtSignatureFrom = <T extends any>(body: any): T => {
   if (!body) {
     return body;
   }
+
   if (body.authResponse) {
     jwtKeys.forEach((key) => {
       if (body.authResponse[key]) {
-        body.authResponse[key] = body.authResponse[key].split('.')[0] + '.' + body.authResponse[key].split('.')[1];
+        // body.authResponse[key] = "REDACTED_FOR_SECURITY";
+        // body.authResponse[key] = body.authResponse[key].split('.')[0] + '.' + body.authResponse[key].split('.')[1];
+        body.authResponse[key] = `REDACTED_FOR_SECURITY.${body.authResponse[key].split('.')[1]}.REDACTED_FOR_SECURITY`;
       }
     });
     refreshTokenKeys.forEach((key) => {
@@ -104,7 +107,9 @@ export const removeJwtSignatureFrom = <T extends any>(body: any): T => {
 
   jwtKeys.forEach((key) => {
     if (body[key]) {
-      body[key] = body[key].split('.')[0] + '.' + body[key].split('.')[1];
+      // body[key] = "REDACTED_FOR_SECURITY";
+      // body[key] = body[key].split('.')[0] + '.' + body[key].split('.')[1];
+      body[key] = `REDACTED_FOR_SECURITY.${body[key].split('.')[1]}.REDACTED_FOR_SECURITY`;
     }
   });
   refreshTokenKeys.forEach((key) => {

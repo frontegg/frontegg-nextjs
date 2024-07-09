@@ -10,6 +10,7 @@ const setupEnvVariables = {
   FRONTEGG_BASE_URL: process.env.FRONTEGG_BASE_URL,
   FRONTEGG_TEST_URL: process.env.FRONTEGG_TEST_URL,
   FRONTEGG_CLIENT_ID: process.env.FRONTEGG_CLIENT_ID,
+  FRONTEGG_CLIENT_SECRET: process.env.FRONTEGG_CLIENT_SECRET,
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
@@ -50,6 +51,23 @@ class Config {
 
   get clientId(): string {
     return getEnv(EnvVariables.FRONTEGG_CLIENT_ID) ?? setupEnvVariables.FRONTEGG_CLIENT_ID;
+  }
+
+  get clientSecret(): string | undefined {
+    let clientSecret = undefined;
+    try {
+      clientSecret = getEnv(EnvVariables.FRONTEGG_CLIENT_SECRET) ?? setupEnvVariables.FRONTEGG_CLIENT_SECRET;
+    } catch (e) {
+      clientSecret = setupEnvVariables.FRONTEGG_CLIENT_SECRET;
+    }
+
+    if (this.secureJwtEnabled === 'true' && !clientSecret) {
+      throw new InvalidFronteggEnv(
+        EnvVariables.FRONTEGG_CLIENT_SECRET,
+        'Client secret is required when secure JWT is enabled'
+      );
+    }
+    return clientSecret;
   }
 
   get jwtPublicKeyJson(): string | undefined {
@@ -105,7 +123,9 @@ class Config {
   }
 
   get isHostedLogin(): boolean {
-    return this.fronteggAppOptions.hostedLoginBox ?? false;
+    return (
+      this.fronteggAppOptions.hostedLoginBox ?? getEnvOrDefault(EnvVariables.FRONTEGG_HOSTED_LOGIN, 'false') === 'true'
+    );
   }
 
   get disableInitialPropsRefreshToken(): boolean {
@@ -117,12 +137,14 @@ class Config {
   }
 
   get appEnvConfig(): AppEnvConfig {
-    return {
+    const config = {
       envAppUrl: this.appUrl,
       envBaseUrl: this.baseUrl,
       envClientId: this.clientId,
       secureJwtEnabled: this.secureJwtEnabled,
     };
+    console.log('this.appEnvConfig', config);
+    return config;
   }
 }
 

@@ -57,9 +57,22 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
   };
 
   function CustomFronteggApp(appProps: AppProps) {
-    const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId } = appProps.pageProps;
+    const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId, secureJwtEnabled } =
+      appProps.pageProps;
     return (
-      <FronteggProvider {...options} {...{ user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId }}>
+      <FronteggProvider
+        {...options}
+        {...{
+          user,
+          tenants,
+          activeTenant,
+          session,
+          envAppUrl,
+          envBaseUrl,
+          secureJwtEnabled,
+          envClientId,
+        }}
+      >
         {app(appProps) as any}
       </FronteggProvider>
     );

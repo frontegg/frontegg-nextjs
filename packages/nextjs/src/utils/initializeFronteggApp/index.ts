@@ -48,7 +48,9 @@ const initializeFronteggApp = ({
       });
       return additionalHeaders;
     },
+    tokenResolver: options.secureJwtEnabled ? () => '' : undefined,
     baseUrl: (path: string) => {
+      console.log('isMiddleware', options, options.secureJwtEnabled);
       if (isMiddlewarePath(path) || options.secureJwtEnabled) {
         return `${options.envAppUrl}/api`;
       } else {

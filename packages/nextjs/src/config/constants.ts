@@ -24,6 +24,13 @@ export enum EnvVariables {
   FRONTEGG_CLIENT_ID = 'FRONTEGG_CLIENT_ID',
 
   /**
+   * Your Frontegg application's Client Secret, get it by visit:
+   * - For Dev environment [visit](https://portal.frontegg.com/development/settings/general)
+   * - For Prod environment [visit](https://portal.frontegg.com/production/settings/general)
+   */
+  FRONTEGG_CLIENT_SECRET = 'FRONTEGG_CLIENT_SECRET',
+
+  /**
    * The stateless session encryption password, used to encrypt
    * JWT before sending it to the client side.
    *
@@ -57,8 +64,15 @@ export enum EnvVariables {
 
   /**
    * Enable secure JWT by removing the signature from the JWT token.
+   * In order to enable this feature, you need to provide {@link EnvVariables.FRONTEGG_CLIENT_SECRET}
    */
   FRONTEGG_SECURE_JWT_ENABLED = 'FRONTEGG_SECURE_JWT_ENABLED',
+
+  /**
+   * The Frontegg Hosted Login URL, used to redirect the user to the Frontegg login page
+   * set to 'true' to enable the hosted login feature
+   */
+  FRONTEGG_HOSTED_LOGIN = 'FRONTEGG_HOSTED_LOGIN',
   /**
    * This Env variable assign automatically when deploying you Next.js application
    * to Vercel deployments service, and will be used to detect to dynamically configure
