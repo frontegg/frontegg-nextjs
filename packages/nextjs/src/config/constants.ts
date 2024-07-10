@@ -73,6 +73,13 @@ export enum EnvVariables {
    * set to 'true' to enable the hosted login feature
    */
   FRONTEGG_HOSTED_LOGIN = 'FRONTEGG_HOSTED_LOGIN',
+
+  /**
+   * Forward client IP address to Frontegg gateway, used to detect the client's IP address
+   * when the Next.js application using frontegg middleware proxy service
+   * In order to enable this feature, you need to provide {@link EnvVariables.FRONTEGG_CLIENT_SECRET}
+   */
+  FRONTEGG_FORWARD_IP = 'FRONTEGG_FORWARD_IP',
   /**
    * This Env variable assign automatically when deploying you Next.js application
    * to Vercel deployments service, and will be used to detect to dynamically configure

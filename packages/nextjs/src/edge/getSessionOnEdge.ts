@@ -45,9 +45,7 @@ export const handleHostedLoginCallback = async (
     config.clientSecret!
   );
 
-  const headers = response.headers;
   const data = await response.json();
-  console.log('session', headers, data);
 
   const [session, decodedJwt, refreshToken] = await createSessionFromAccessTokenEdge(data);
 
