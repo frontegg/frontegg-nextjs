@@ -57,3 +57,65 @@ export const getHostedLogoutUrl = (referer = config.appUrl): BuildRouteResult =>
 
   return buildLogoutRoute(redirectUrl, config.baseUrl);
 };
+
+export type Tokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+/**
+ * Extracts the access token from the response body
+ * @param bodyStr
+ */
+export const extractAccessToken = (bodyStr: string): Tokens => {
+  const body = JSON.parse(bodyStr);
+
+  if (body.authResponse) {
+    Object.assign(body, body.authResponse);
+  }
+  return {
+    accessToken: body.accessToken || body.access_token,
+    refreshToken: body.refreshToken || body.refresh_token,
+  };
+};
+
+const jwtKeys = ['accessToken', 'access_token', 'idToken', 'id_token'];
+const refreshTokenKeys = ['refreshToken', 'refresh_token'];
+/**
+ * Removes the signature from the JWT token
+ * @param body
+ */
+export const removeJwtSignatureFrom = <T extends any>(body: any): T => {
+  if (!body) {
+    return body;
+  }
+
+  if (body.authResponse) {
+    jwtKeys.forEach((key) => {
+      if (body.authResponse[key]) {
+        // body.authResponse[key] = "REDACTED_FOR_SECURITY";
+        // body.authResponse[key] = body.authResponse[key].split('.')[0] + '.' + body.authResponse[key].split('.')[1];
+        body.authResponse[key] = `REDACTED_FOR_SECURITY.${body.authResponse[key].split('.')[1]}.REDACTED_FOR_SECURITY`;
+      }
+    });
+    refreshTokenKeys.forEach((key) => {
+      if (body.authResponse[key]) {
+        delete body.authResponse[key];
+      }
+    });
+  }
+
+  jwtKeys.forEach((key) => {
+    if (body[key]) {
+      // body[key] = "REDACTED_FOR_SECURITY";
+      // body[key] = body[key].split('.')[0] + '.' + body[key].split('.')[1];
+      body[key] = `REDACTED_FOR_SECURITY.${body[key].split('.')[1]}.REDACTED_FOR_SECURITY`;
+    }
+  });
+  refreshTokenKeys.forEach((key) => {
+    if (body[key]) {
+      delete body[key];
+    }
+  });
+  return body;
+};

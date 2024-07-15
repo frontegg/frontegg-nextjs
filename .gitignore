@@ -86,3 +86,4 @@ cypress/screenshots
 tsconfig.build.tsbuildinfo
 playwright-report/
 lint-report.json
+reqs.md
