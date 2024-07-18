@@ -103,7 +103,7 @@ export const parseHttpResponse = async <T>(res: Response): Promise<T | undefined
  */
 export function isMiddlewarePath(path: string): boolean {
   let isAuthPath =
-    fronteggAuthApiRoutesRegex.find((pathRegex) => {
+    [...fronteggAuthApiRoutesRegex, /^\/identity\/resources\/impersonation\/v[0-9]$/g].find((pathRegex) => {
       if (typeof pathRegex === 'string') {
         return pathRegex === path;
       } else {
