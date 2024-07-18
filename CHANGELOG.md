@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.0.27](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.26...v8.0.27) (2024-7-18)
+
+
+
+# Change Log
+
 ## [8.0.26](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.25...v8.0.26) (2024-7-18)
 
 - FR-17009 - Add the option to disable/enable users from users table
