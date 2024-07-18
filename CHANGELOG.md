@@ -4,9 +4,6 @@
 
 - FR-17009 - Add the option to disable&#x2F;enable users from users table
 
-### NextJS Wrapper 8.0.26:
-- FR-17008 - fix pipeline release version
-
 ## [8.0.25](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.24...v8.0.25) (2024-7-9)
 
 - FR-16737 - Allow terms and conditions checkbox on sign up form being optional
