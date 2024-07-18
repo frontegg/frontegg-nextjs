@@ -3,9 +3,7 @@
 ## [8.0.27](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.26...v8.0.27) (2024-7-18)
 
 
-### NextJS Wrapper 8.0.27:
-- FR-17012 - Support e2e sanity run
-- FR-17008 - fix pipeline release version
+
 # Change Log
 
 ## [8.0.26](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.25...v8.0.26) (2024-7-18)
