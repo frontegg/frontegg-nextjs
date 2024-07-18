@@ -2,7 +2,7 @@
 
 ## [8.0.26](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.25...v8.0.26) (2024-7-18)
 
-- FR-17009 - Add the option to disable&#x2F;enable users from users table
+- FR-17009 - Add the option to disable/enable users from users table
 
 ## [8.0.25](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.24...v8.0.25) (2024-7-9)
 
