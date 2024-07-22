@@ -14,8 +14,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   const isSSR = typeof window === 'undefined';
   const { user, session, tenants, activeTenant } = props;
   const baseName = props.basename ?? '';
-  const ssrStoreHolder = useRef({});
-  const storeHolder = isSSR ? ssrStoreHolder.current : undefined;
+  const storeHolder = useRef({});
 
   const onRedirectTo = useOnRedirectTo(baseName, router, props.authOptions?.routes);
 
@@ -25,7 +24,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
         options: { ...props, basename: baseName },
         onRedirectTo,
         appName,
-        storeHolder,
+        storeHolder: storeHolder.current,
       }),
     [props]
   );

@@ -1,4 +1,4 @@
-import { defaultFronteggRoutes } from '@frontegg/redux-store/auth/LoginState/consts';
+import { defaultFronteggRoutes } from '../utils/routing';
 
 const staticFilesRegex = new RegExp('^/(_next/static).*');
 const imageOptimizationRegex = new RegExp('^/(_next/image).*');

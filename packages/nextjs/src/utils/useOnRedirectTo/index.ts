@@ -10,12 +10,13 @@ const useOnRedirectTo = (
   routes?: Partial<AuthPageRoutes>
 ) => {
   const isAuthRouteRef = useRef<(path: string) => boolean>(() => false);
+  const onRedirectTo = useRef((_path: string, opts?: RedirectOptions) => {});
 
   useMemo(() => {
     isAuthRouteRef.current = (path) => isAuthRoute(path, routes);
   }, [routes]);
 
-  return useCallback((_path: string, opts?: RedirectOptions) => {
+  onRedirectTo.current = (_path: string, opts?: RedirectOptions) => {
     const isSSR = typeof window == undefined;
     let path = _path;
     if (path.startsWith(baseName)) {
@@ -30,7 +31,9 @@ const useOnRedirectTo = (
     } else {
       opts?.replace ? router.replace(path) : router.push(path);
     }
-  }, []);
+  };
+
+  return onRedirectTo.current;
 };
 
 export default useOnRedirectTo;

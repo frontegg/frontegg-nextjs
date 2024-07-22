@@ -1,5 +1,5 @@
 import { AppHolder, FronteggApp, initialize } from '@frontegg/js';
-import { createFronteggStore, AuthState, tenantsState as defaultTenantsState } from '@frontegg/redux-store';
+import { createStore, AuthState } from '@frontegg/redux-store';
 import { KeyValuePair } from '@frontegg/rest-api';
 import { FronteggAppOptions } from '@frontegg/types';
 import sdkVersion from '../../sdkVersion';
@@ -60,7 +60,6 @@ const initializeFronteggApp = ({
   };
 
   const tenantsState = {
-    ...defaultTenantsState,
     tenants: tenants || [],
     activeTenant,
     ...options.authOptions?.tenantsState,
@@ -82,21 +81,20 @@ const initializeFronteggApp = ({
     hostedLoginBox: options.hostedLoginBox ?? false,
     disableSilentRefresh: options.authOptions?.disableSilentRefresh ?? true,
     user: userData,
-    tenantsState,
+    tenantsState: tenantsState as AuthState['tenantsState'],
   };
 
-  const sharedStore = createFronteggStore(
-    { context: contextOptions, appName: appName ?? 'default' },
+  const sharedStore = createStore({
+    context: contextOptions,
     storeHolder,
-    options.previewMode,
-    authOptions,
-    {
-      auth: authOptions ?? {},
-      audits: options.auditsOptions ?? {},
+    previewMode: options.previewMode,
+    name: appName ?? 'default',
+    urlStrategy: options.urlStrategy,
+    builderMode: false,
+    initialState: {
+      auth: authOptions,
     },
-    false,
-    options.urlStrategy
-  );
+  });
 
   let createdApp;
   try {
@@ -119,5 +117,4 @@ const initializeFronteggApp = ({
   }
   return createdApp;
 };
-
 export default initializeFronteggApp;
