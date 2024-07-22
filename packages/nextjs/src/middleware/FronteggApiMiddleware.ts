@@ -2,9 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { FronteggProxy } from './FronteggProxy';
 import { fronteggSSOPathRewrite, fronteggPathRewrite } from './constants';
 import { rewritePath } from './helpers';
+import { getSession } from '../pages';
 
 const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
-  new Promise<void>((resolve) => {
+  new Promise<void>(async (resolve) => {
     const fronteggUrlPath = rewritePath(req.url ?? '/', fronteggPathRewrite);
     const rewriteUrl = rewritePath(fronteggUrlPath ?? '/', fronteggSSOPathRewrite);
     req.url = rewriteUrl;
@@ -16,7 +17,17 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
       options.target = process.env['FRONTEGG_TEST_URL'];
     }
 
-    FronteggProxy.web(req, res, options);
+    const headers: Record<string, string> = {};
+    if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
+      const session = await getSession(req);
+      if (session?.accessToken) {
+        headers['authorization'] = 'Bearer ' + session.accessToken;
+      }
+    }
+    FronteggProxy.web(req, res, {
+      ...options,
+      headers,
+    });
   });
 
 /**

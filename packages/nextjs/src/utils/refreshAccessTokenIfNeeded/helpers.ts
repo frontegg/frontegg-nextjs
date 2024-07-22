@@ -4,6 +4,7 @@ import { NextApiRequest } from 'next/dist/shared/lib/utils';
 import api from '../../api';
 import { getTokensFromCookie } from '../../common';
 import { IncomingMessage } from 'http';
+import config from '../../config';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
@@ -45,8 +46,16 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
       return null;
     }
 
-    logger.info('going to refresh token (hosted-login mode)');
-    return await api.refreshTokenHostedLogin(headers, tokens.refreshToken);
+    if (config.secureJwtEnabled) {
+      const clientId = config.clientId;
+      const clientSecret = config.clientSecret;
+
+      logger.info('going to refresh token (hosted-login mode) (secure-jwt mode)');
+      return await api.refreshTokenHostedLogin(headers, tokens.refreshToken, clientId, clientSecret);
+    } else {
+      logger.info('going to refresh token (hosted-login mode) ', tokens.refreshToken);
+      return await api.refreshTokenHostedLogin(headers, tokens.refreshToken);
+    }
   } catch (e) {
     logger.error(e);
     return null;

@@ -14,4 +14,7 @@ export interface AppEnvConfig {
   envBaseUrl: string;
   /** {@link EnvVariables.FRONTEGG_CLIENT_ID} */
   envClientId: string;
+
+  /** {@link EnvVariables.FRONTEGG_SECURE_JWT_ENABLED} */
+  secureJwtEnabled?: string;
 }

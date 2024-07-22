@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getSessionOnEdge, shouldByPassMiddleware, redirectToLogin } from '@frontegg/nextjs/edge';
+import {
+  isHostedLoginCallback,
+  handleHostedLoginCallback,
+  getSessionOnEdge,
+  shouldByPassMiddleware,
+  redirectToLogin,
+} from '@frontegg/nextjs/edge';
 
 export const middleware = async (request: NextRequest) => {
   // this if for frontegg middleware tests
@@ -9,6 +15,10 @@ export const middleware = async (request: NextRequest) => {
   }
 
   const { pathname, searchParams } = request.nextUrl;
+
+  if (isHostedLoginCallback(pathname, searchParams)) {
+    return handleHostedLoginCallback(request, pathname, searchParams);
+  }
 
   if (shouldByPassMiddleware(pathname /*, options: optional bypass configuration */)) {
     return NextResponse.next();

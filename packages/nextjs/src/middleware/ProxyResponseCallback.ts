@@ -4,7 +4,13 @@ import { NextApiResponse } from 'next';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import { createSessionFromAccessToken } from '../common';
-import { getHostedLogoutUrl, isFronteggLogoutUrl, isFronteggOauthLogoutUrl } from './helpers';
+import {
+  extractAccessToken,
+  getHostedLogoutUrl,
+  isFronteggLogoutUrl,
+  isFronteggOauthLogoutUrl,
+  removeJwtSignatureFrom,
+} from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
@@ -31,7 +37,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
       const url = req.url!;
       const statusCode = proxyRes.statusCode ?? 500;
       const isSuccess = statusCode >= 200 && statusCode < 400;
-      const bodyStr = buffer.toString('utf-8');
+      let bodyStr = buffer.toString('utf-8');
       const isLogout = isFronteggLogoutUrl(url);
 
       if (isLogout) {
@@ -54,9 +60,14 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
       if (isSuccess) {
         try {
           if (bodyStr && bodyStr.length > 0) {
-            const body = JSON.parse(bodyStr);
-            if (body.accessToken || body.access_token) {
-              const [session, decodedJwt] = await createSessionFromAccessToken(body);
+            const tokens = extractAccessToken(bodyStr);
+
+            if (tokens.accessToken) {
+              if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
+                bodyStr = JSON.stringify(removeJwtSignatureFrom(JSON.parse(bodyStr)));
+              }
+
+              const [session, decodedJwt] = await createSessionFromAccessToken(tokens);
               if (session) {
                 const sessionCookie = CookieManager.create({
                   value: session,
@@ -90,6 +101,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
             res.setHeader(header, `${proxyRes.headers[header]}`);
           });
         res.setHeader('set-cookie', cookies);
+        res.setHeader('content-length', bodyStr.length);
         res.status(statusCode).end(bodyStr);
       } else {
         if (statusCode >= 400 && statusCode !== 404) {

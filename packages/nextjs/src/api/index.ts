@@ -41,12 +41,42 @@ const refreshTokenEmbedded = async (headers: Record<string, string>) => {
  * Send HTTP post request for Frontegg services to refresh `hosted login` token
  * by providing client's fe_ as body with grant_type.
  */
-const refreshTokenHostedLogin = async (headers: Record<string, string>, refresh_token: string) => {
+const refreshTokenHostedLogin = async (
+  headers: Record<string, string>,
+  refresh_token: string,
+  cliendId?: string,
+  clientSecret?: string
+) => {
   return Post({
     url: `${config.baseUrl}${ApiUrls.refreshToken.hosted}`,
     body: JSON.stringify({
       grant_type: 'refresh_token',
       refresh_token,
+      client_id: cliendId,
+      client_secret: clientSecret,
+    }),
+    headers: buildRequestHeaders(headers),
+  });
+};
+
+/**
+ * Send HTTP post request for Frontegg services to exchange `hosted login` callback code
+ */
+export const exchangeHostedLoginToken = async (
+  headers: Record<string, string>,
+  code: string,
+  cliendId: string,
+  clientSecret: string
+) => {
+  return Post({
+    url: `${config.baseUrl}${ApiUrls.refreshToken.hosted}`,
+    body: JSON.stringify({
+      redirect_uri: `${config.appUrl}/oauth/callback`,
+      grant_type: 'authorization_code',
+      code,
+      client_id: cliendId,
+      client_secret: clientSecret,
+      // code_verifier
     }),
     headers: buildRequestHeaders(headers),
   });
@@ -128,4 +158,5 @@ export default {
   getTenants,
   getPublicSettings,
   getEntitlements,
+  exchangeHostedLoginToken,
 };

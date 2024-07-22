@@ -7,7 +7,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
 }
 
 const options = {
-  hostedLoginBox: false,
+  hostedLoginBox: true,
   customLoader: true,
   authOptions: {
     keepSessionAlive: true,

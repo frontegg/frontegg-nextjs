@@ -1,5 +1,43 @@
 # Change Log
 
+## [8.0.26](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.25...v8.0.26) (2024-7-18)
+
+- FR-17009 - Add the option to disable/enable users from users table
+
+## [8.0.25](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.24...v8.0.25) (2024-7-9)
+
+- FR-16737 - Allow terms and conditions checkbox on sign up form being optional
+
+
+
+## [8.0.24](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.23...v8.0.24) (2024-7-4)
+
+- FR-16881 - Fixed hosted login redirect url when using basename
+- FR-16812 - Fixed dark theme disabled input palette
+- FR-16704 - Fixed password meter unsuspended async component
+
+
+
+## [8.0.23](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.22...v8.0.23) (2024-6-30)
+
+FR-15484 - Fix update tenant state after account settings change
+FR-16613 - Add automatic sub-account access in MSP
+
+
+## [8.0.22](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.21...v8.0.22) (2024-6-13)
+
+
+
+## [8.0.21](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.20...v8.0.21) (2024-6-5)
+
+- FR-16466 - Support next-js impersonation
+
+- FR-16513 - Show client id on all tokens in API tokens table 
+
+
+### NextJS Wrapper 8.0.21:
+- FR-101010 - Update CODEOWNERS
+
 ## [8.0.20](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.19...v8.0.20) (2024-5-28)
 
 - FR-16341 - Support hiding columns in admin portal users table
