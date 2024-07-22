@@ -33,11 +33,6 @@ const useOnRedirectTo = (
     }
   };
 
-  if (typeof window !== 'undefined') {
-    (window as any).testOnRedirectTo = onRedirectTo.current;
-    (window as any).testRouter = router;
-  }
-
   return onRedirectTo.current;
 };
 
