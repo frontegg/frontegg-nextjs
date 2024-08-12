@@ -2,7 +2,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "8.0.26",
+  "version": "9.0.0",
   "npmClient": "yarn",
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
