@@ -1298,29 +1298,16 @@
     "@babel/runtime" "^7.18.6"
     "@frontegg/types" "7.1.0"
 
-"@frontegg/react-hooks@7.0.0-alpha.9":
-  version "7.0.0-alpha.9"
-  resolved "https://registry.yarnpkg.com/@frontegg/react-hooks/-/react-hooks-7.0.0-alpha.9.tgz#9d41e4ae55e6b33ce6db27dc71586b37dc0836de"
-  integrity sha512-EQ9KczRFj2DGLfSMxYxBaVQSQdBuWI9mn8zOw5m0Ev5mZn/hUTWfAAneFL9ziA2pY4XtvgUpcTlaqT0TccvS3Q==
+"@frontegg/react-hooks@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@frontegg/react-hooks/-/react-hooks-7.1.0.tgz#663771a4fcd34ddc10c62dc422673fe7455855e8"
+  integrity sha512-EXtDQ4YbjTCEfdxekV7A8x7+q/+sBr+mbOp9TF2+Y1PNSwYjGJu4tnoEDWomreBIKxYMAL4l+sqbIOX3ADw7sg==
   dependencies:
     "@babel/runtime" "^7.18.6"
-    "@frontegg/redux-store" "7.0.0-alpha.9"
-    "@frontegg/types" "7.0.0-alpha.9"
+    "@frontegg/redux-store" "7.1.0"
+    "@frontegg/types" "7.1.0"
     "@types/react" "*"
     get-value "^3.0.1"
-
-"@frontegg/redux-store@7.0.0-alpha.9":
-  version "7.0.0-alpha.9"
-  resolved "https://registry.yarnpkg.com/@frontegg/redux-store/-/redux-store-7.0.0-alpha.9.tgz#ae25592ac8c17a91b3f2225b3653f5587fa2306d"
-  integrity sha512-dKaF/LYJHjqJ4I/qEBLDD4st1MYbZjZmm5AQsLPQe5EUcEn4YXI4qUxeBKHIU8cO8yFjM3EgPb2vARULjL+3pg==
-  dependencies:
-    "@babel/runtime" "^7.18.6"
-    "@frontegg/entitlements-javascript-commons" "1.1.2"
-    "@frontegg/rest-api" "3.1.79-alpha.10029056154"
-    fast-deep-equal "3.1.3"
-    set-value "^4.1.0"
-    uuid "^8.3.2"
-    valtio "^1.13.0"
 
 "@frontegg/redux-store@7.1.0":
   version "7.1.0"
@@ -1335,14 +1322,6 @@
     uuid "^8.3.2"
     valtio "^1.13.0"
 
-"@frontegg/rest-api@3.1.79-alpha.10029056154":
-  version "3.1.79-alpha.10029056154"
-  resolved "https://registry.yarnpkg.com/@frontegg/rest-api/-/rest-api-3.1.79-alpha.10029056154.tgz#18fd970c270d405caeae1283e290fa8bb524574f"
-  integrity sha512-BuaWboxVOj4bNjPLhtvZJ6+SrY3sX748Qa7AEvvvz56X6iBL58xngYFu7sK0CMy7K6ou1NkrHhPqI/tehMPw9A==
-  dependencies:
-    "@babel/runtime" "^7.17.2"
-    "@frontegg/entitlements-javascript-commons" "1.1.2"
-
 "@frontegg/rest-api@3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@frontegg/rest-api/-/rest-api-3.2.0.tgz#d15938d38dc54dc783a3cac353662ec5b30ac6b8"
@@ -1350,16 +1329,6 @@
   dependencies:
     "@babel/runtime" "^7.17.2"
     "@frontegg/entitlements-javascript-commons" "1.1.2"
-
-"@frontegg/types@7.0.0-alpha.9":
-  version "7.0.0-alpha.9"
-  resolved "https://registry.yarnpkg.com/@frontegg/types/-/types-7.0.0-alpha.9.tgz#8e4ba1bc0f87f79e4ae5812047bf40dac787b5d9"
-  integrity sha512-eFqy0ycJkJCYWISeF0uvQD3LhAOOrINxoFT4Nf8mK2R3d62AlbeQpmM3vOucnFzQkbtzn2GooLFE/nCdvWRsvQ==
-  dependencies:
-    "@babel/runtime" "^7.18.6"
-    "@frontegg/redux-store" "7.0.0-alpha.9"
-    csstype "^3.0.9"
-    deepmerge "^4.2.2"
 
 "@frontegg/types@7.1.0":
   version "7.1.0"
