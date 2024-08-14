@@ -1,7 +1,7 @@
 {
   "name": "@frontegg/nextjs",
   "libName": "FronteggNextJs",
-  "version": "9.0.2",
+  "version": "9.0.0",
   "author": "Frontegg LTD",
   "license": "MIT",
   "repository": {
@@ -27,8 +27,8 @@
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
-    "@frontegg/js": "7.2.0-alpha.3",
-    "@frontegg/react-hooks": "7.2.0-alpha.3",
+    "@frontegg/js": "7.2.0",
+    "@frontegg/react-hooks": "7.2.0",
     "http-proxy": "^1.18.1",
     "iron-session": "^6.3.1",
     "jose": "^4.12.2"
