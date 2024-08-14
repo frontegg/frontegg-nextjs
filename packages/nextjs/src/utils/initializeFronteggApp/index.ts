@@ -84,17 +84,21 @@ const initializeFronteggApp = ({
     tenantsState: tenantsState as AuthState['tenantsState'],
   };
 
-  const sharedStore = createStore({
-    context: contextOptions,
-    storeHolder,
-    previewMode: options.previewMode,
-    name: appName ?? 'default',
-    urlStrategy: options.urlStrategy,
-    builderMode: false,
-    initialState: {
-      auth: authOptions,
-    },
-  });
+  let sharedStore = storeHolder.store;
+  if (!sharedStore) {
+    sharedStore = createStore({
+      context: contextOptions,
+      storeHolder,
+      previewMode: options.previewMode,
+      name: appName ?? 'default',
+      urlStrategy: options.urlStrategy,
+      builderMode: false,
+      initialState: {
+        auth: authOptions,
+      },
+    });
+    storeHolder.store = sharedStore;
+  }
 
   let createdApp;
   try {
