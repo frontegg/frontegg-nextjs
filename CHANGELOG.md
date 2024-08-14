@@ -1,5 +1,14 @@
 # Change Log
 
+## [9.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.26...v9.0.1) (2024-8-12)
+
+
+### NextJS Wrapper 9.0.1:
+- FR-15099 - Migrate to valtio
+- FR-17012 - Support e2e sanity run
+- FR-17008 - fix pipeline release version
+# Change Log
+
 ## [8.0.26](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.25...v8.0.26) (2024-7-18)
 
 - FR-17009 - Add the option to disable/enable users from users table
