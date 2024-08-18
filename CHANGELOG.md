@@ -2,11 +2,9 @@
 
 ## [9.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.0...v9.0.1) (2024-8-18)
 
-null
+- FR-17169 - Added support in send unlock account email
 
-### NextJS Wrapper 9.0.1:
-- FR-17441 - Fix store holder ref
-- FR-15099 - Migrate to valtio
+  
 # Change Log
 
 
