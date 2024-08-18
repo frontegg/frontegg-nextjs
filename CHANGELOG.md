@@ -1,5 +1,14 @@
 # Change Log
 
+## [9.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.0...v9.0.1) (2024-8-18)
+
+null
+
+### NextJS Wrapper 9.0.1:
+- FR-17441 - Fix store holder ref
+- FR-15099 - Migrate to valtio
+# Change Log
+
 
 ## [9.0.0](https://github.com/frontegg/frontegg-nextjs/compare/v8.0.26...v9.0.0) (2024-8-14)
 
