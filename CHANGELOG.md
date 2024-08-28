@@ -5,7 +5,6 @@
 - FR-17626 - Fix clientId on request authorize for multi-apps
 - FR-17182 - Fix copy invite user link in hosted admin portal
 
-null
 
 # Change Log
 
