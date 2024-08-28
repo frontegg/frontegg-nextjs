@@ -1,5 +1,14 @@
 # Change Log
 
+## [9.0.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.1...v9.0.2) (2024-8-28)
+
+- FR-17626 - Fix clientId on request authorize for multi-apps
+- FR-17182 - Fix copy invite user link in hosted admin portal
+
+null
+
+# Change Log
+
 ## [9.0.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.0...v9.0.1) (2024-8-18)
 
 - FR-17169 - Added support in send unlock account email
