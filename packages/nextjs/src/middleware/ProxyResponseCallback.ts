@@ -12,7 +12,7 @@ import {
   removeJwtSignatureFrom,
 } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
-import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
+import { extractSameSiteFromRefreshTokenCookie, isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**
@@ -74,6 +74,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
                   expires: new Date(decodedJwt.exp * 1000),
                   secure: isSecured,
                   req,
+                  sameSite: extractSameSiteFromRefreshTokenCookie(cookies),
                 });
                 cookies.push(...sessionCookie);
               }

@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 export type RequestType = IncomingMessage | Request;
 export type ResponseType = ServerResponse;
 
-export interface CreateCookieOptions extends Pick<CookieSerializeOptions, 'domain' | 'httpOnly' | 'path'> {
+export interface CreateCookieOptions extends Pick<CookieSerializeOptions, 'domain' | 'httpOnly' | 'path' | 'sameSite'> {
   cookieName?: string;
   value: string;
   secure: boolean;

@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
 import encryptionUtils from '../utils/encryption-edge';
-import Cookies from '../utils/cookies';
+import { extractSameSiteFromRefreshTokenCookie } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -57,7 +57,9 @@ export const handleHostedLoginCallback = async (
     value: session,
     expires: new Date(decodedJwt.exp * 1000),
     secure: isSecured,
+    sameSite: extractSameSiteFromRefreshTokenCookie(response.headers.get('set-cookie')?.split(',') ?? []),
   });
+  
   const refreshCookie = CookieManager.create({
     cookieName: `fe_refresh_${config.clientId.replace('-', '')}`,
     value: refreshToken ?? '',
