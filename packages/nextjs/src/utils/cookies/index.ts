@@ -66,6 +66,10 @@ class CookieManager {
       serializeOptions.sameSite = 'none';
     }
 
+    if (options.sameSite) {
+      serializeOptions.sameSite = options.sameSite;
+    }
+
     const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
 
     let newCookies: string[] = [];

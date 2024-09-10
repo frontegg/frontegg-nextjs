@@ -5,6 +5,7 @@ import api from '../../api';
 import { getTokensFromCookie } from '../../common';
 import { IncomingMessage } from 'http';
 import config from '../../config';
+import { CookieSerializeOptions } from '../cookies/types';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
@@ -94,4 +95,18 @@ export function isSamlCallback(url: string): boolean {
  */
 export function isSSOPostRequest(url: string): boolean {
   return url === '/frontegg/auth/saml/callback' || url === '/frontegg/auth/oidc/callback';
+}
+
+export function extractSameSiteFromRefreshTokenCookie(cookies: string[]): CookieSerializeOptions['sameSite'] | undefined {
+  const refreshTokenKey = CookieManager.refreshTokenKey;
+  const refreshTokenCookie = cookies.find((cookie) => {
+    return cookie.replace(/-/g, '') === refreshTokenKey;
+  });
+
+  if (!refreshTokenCookie) {
+    return undefined;
+  }
+
+  const sameSite = refreshTokenCookie.split(';').find((c: string) => c.trim().toLowerCase().startsWith('samesite'));
+  return sameSite?.split('=')[1]?.trim() as CookieSerializeOptions['sameSite'];
 }

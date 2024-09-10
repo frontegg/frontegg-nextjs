@@ -4,6 +4,7 @@ import { createSessionFromAccessToken } from '../../common';
 import config from '../../config';
 import CookieManager from '../cookies';
 import {
+  extractSameSiteFromRefreshTokenCookie,
   isOauthCallback,
   isRuntimeNextRequest,
   isSamlCallback,
@@ -89,6 +90,7 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       expires: new Date(decodedJwt.exp * 1000),
       secure: isSecured,
       req: nextJsRequest,
+      sameSite: extractSameSiteFromRefreshTokenCookie(newSetCookie),
     });
     newSetCookie.push(...cookieValue);
     ctx.res?.setHeader('set-cookie', newSetCookie);
