@@ -6,6 +6,7 @@ import sdkVersion from '../sdkVersion';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
+import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
 /**
@@ -48,6 +49,11 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       proxyReq.setHeader('cf-connecting-ip', cfConnectionIp);
     }
 
+    if (isRefreshTokenRequest(req.url!)) {
+      logger.debug(`${req.url} | removing Authorization header`);
+      proxyReq.removeHeader('authorization');
+    }
+
     [
       'x-invoke-path',
       'x-invoke-query',
@@ -56,6 +62,8 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       'transfer-encoding',
       'cache-control',
     ].map((header) => proxyReq.removeHeader(header));
+
+    logger.debug(`${req.url} | headers to be sent:`, proxyReq.getHeaders());
 
     logger.debug(`${req.url} | check if request has body`);
     if (req.method !== 'GET' && req.body) {

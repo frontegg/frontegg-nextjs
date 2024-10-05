@@ -7,6 +7,13 @@ export function Index() {
   const loginWithRedirect = useLoginWithRedirect();
   const [state, setState] = useState({ userAgent: '', id: -1 });
   const logoutHosted = useLogoutHostedLogin();
+  const { switchTenant } = useAuthActions();
+  const handleTenantSwitch = () => {
+    switchTenant({
+      tenantId: user?.tenantId === 'sso_per_tenant_1' ? 'a4700c12-4119-4add-a7f0-00d31ea279da' : 'sso_per_tenant_1',
+    });
+  };
+  console.log('user', user);
 
   /*
    * Replace the elements below with your own.
@@ -19,6 +26,16 @@ export function Index() {
       <br />
       <br />
       <div>{isAuthenticated ? user?.email : 'not logged in'}</div>
+      <br />
+      <br />
+      <button
+        onClick={() => {
+          handleTenantSwitch();
+        }}
+      >
+        Switch tenant to{' '}
+        {user?.tenantId === 'sso_per_tenant_1' ? 'a4700c12-4119-4add-a7f0-00d31ea279da' : 'sso_per_tenant_1'}
+      </button>
       <br />
       <br />
       <button
