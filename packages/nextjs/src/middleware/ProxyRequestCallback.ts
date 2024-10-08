@@ -63,8 +63,6 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       'cache-control',
     ].map((header) => proxyReq.removeHeader(header));
 
-    logger.debug(`${req.url} | headers to be sent:`, proxyReq.getHeaders());
-
     logger.debug(`${req.url} | check if request has body`);
     if (req.method !== 'GET' && req.body) {
       logger.debug(`${req.url} | writing request body to proxyReq`);
