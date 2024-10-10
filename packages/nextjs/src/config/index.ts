@@ -13,6 +13,7 @@ const setupEnvVariables = {
   FRONTEGG_CLIENT_SECRET: process.env.FRONTEGG_CLIENT_SECRET,
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
+  FRONTEGG_COOKIE_DOMAIN: process.env.FRONTEGG_COOKIE_DOMAIN,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
   FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
@@ -91,7 +92,10 @@ class Config {
   }
 
   get cookieDomain(): string {
-    return generateCookieDomain(this.appUrl);
+    return getEnvOrDefault(
+      EnvVariables.FRONTEGG_COOKIE_DOMAIN,
+      setupEnvVariables.FRONTEGG_COOKIE_DOMAIN ?? generateCookieDomain(this.appUrl)
+    );
   }
 
   get authRoutes(): Partial<AuthPageRoutes> {
