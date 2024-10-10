@@ -11,8 +11,8 @@ FR-17517 - Fixed login direct action race condition
 FR-17649 - Fixed autofill sms code iOS SDK
 FR-17650 - Fixed auto capitalize email input in login page
 FR-17443 - Fixed infinite loader when using direct login action
-- FR-17626 - Fix clientId on request authorize for multi-apps
-- FR-17182 - Fix copy invite user link in hosted admin portal
+FR-17626 - Fixed clientId on request authorize for multi-apps
+FR-17182 - Fixed copy invite user link in hosted admin portal
 
 
 # Change Log
