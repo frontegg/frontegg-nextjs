@@ -1,5 +1,22 @@
 # Change Log
 
+## [9.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.2...v9.0.3) (2024-10-10)
+
+FR-18217 - Fixed impersonation on embedded
+FR-18167 - Fixed back to login on magic link
+FR-8030 - Fixed website dialog cancel button typeography
+FR-17760 - Fixed empty lastSeen column on expanded user info
+FR-17762 - Fixed tree component using mui/x-tree-view
+FR-17517 - Fixed login direct action race condition
+FR-17649 - Fixed autofill sms code iOS SDK
+FR-17650 - Fixed auto capitalize email input in login page
+FR-17443 - Fixed infinite loader when using direct login action
+FR-17626 - Fixed clientId on request authorize for multi-apps
+FR-17182 - Fixed copy invite user link in hosted admin portal
+
+
+# Change Log
+
 ## [9.0.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.1...v9.0.2) (2024-8-28)
 
 - FR-17626 - Fix clientId on request authorize for multi-apps
