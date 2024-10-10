@@ -6,6 +6,7 @@ import sdkVersion from '../sdkVersion';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
+import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
 /**
@@ -46,6 +47,11 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     }
     if (cfConnectionIp) {
       proxyReq.setHeader('cf-connecting-ip', cfConnectionIp);
+    }
+
+    if (isRefreshTokenRequest(req.url!)) {
+      logger.debug(`${req.url} | removing Authorization header`);
+      proxyReq.removeHeader('authorization');
     }
 
     [
