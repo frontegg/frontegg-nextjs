@@ -58,6 +58,12 @@ export enum EnvVariables {
   FRONTEGG_COOKIE_NAME = 'FRONTEGG_COOKIE_NAME',
 
   /**
+   * The stateless cookie domain for storing the encrypted JWT
+   * value as session cookies for supporting getServerSideProps and ServerComponents
+   */
+  FRONTEGG_COOKIE_DOMAIN = 'FRONTEGG_COOKIE_DOMAIN',
+
+  /**
    * When `true`, the initial props will not refresh access token if it's valid.
    */
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN = 'DISABLE_INITIAL_PROPS_REFRESH_TOKEN',
