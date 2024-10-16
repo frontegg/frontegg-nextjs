@@ -24,6 +24,19 @@ export enum EnvVariables {
   FRONTEGG_CLIENT_ID = 'FRONTEGG_CLIENT_ID',
 
   /**
+   * Your Frontegg application ID, get it by visit:
+   * - For Dev environment [visit](https://portal.frontegg.com/development/applications)
+   * - For Prod environment [visit](https://portal.frontegg.com/production/applications)
+   */
+  FRONTEGG_APP_ID = 'FRONTEGG_APP_ID',
+
+  /**
+   * Rewrite the cookie name by the Frontegg application ID
+   * to support multiple Frontegg applications with same domain
+   */
+  FRONTEGG_REWRITE_COOKIE_BY_APP_ID = 'FRONTEGG_REWRITE_COOKIE_BY_APP_ID',
+
+  /**
    * Your Frontegg application's Client Secret, get it by visit:
    * - For Dev environment [visit](https://portal.frontegg.com/development/settings/general)
    * - For Prod environment [visit](https://portal.frontegg.com/production/settings/general)

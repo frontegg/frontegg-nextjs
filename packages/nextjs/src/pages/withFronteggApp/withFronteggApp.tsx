@@ -57,7 +57,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
   };
 
   function CustomFronteggApp(appProps: AppProps) {
-    const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId, secureJwtEnabled } =
+    const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId, secureJwtEnabled, envAppId } =
       appProps.pageProps;
     return (
       <FronteggProvider
@@ -71,6 +71,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           envBaseUrl,
           secureJwtEnabled,
           envClientId,
+          envAppId,
         }}
       >
         {app(appProps) as any}

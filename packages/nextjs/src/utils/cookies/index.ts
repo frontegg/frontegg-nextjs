@@ -17,7 +17,11 @@ class CookieManager {
     cookieNumber ? getIndexedCookieName(cookieNumber, cookieName) : cookieName;
 
   get refreshTokenKey(): string {
-    return `fe_refresh_${config.clientId}`.replace(/-/g, '');
+    if (config.rewriteCookieByAppId && config.appId) {
+      return `fe_refresh_${config.appId.replace(/-/g, '')}`;
+    } else {
+      return `fe_refresh_${config.clientId.replace(/-/g, '')}`;
+    }
   }
 
   /**
@@ -266,10 +270,20 @@ class CookieManager {
       return (
         cookie
           .map((property) => {
-            if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
+            if (property.startsWith(`fe_refresh_${config.clientId.replace('-', '')}`)) {
+              if (config.rewriteCookieByAppId && config.appId) {
+                return property.replace(
+                  `fe_refresh_${config.clientId.replace('-', '')}`,
+                  `fe_refresh_${config.appId.replace('-', '')}`
+                );
+              } else {
+                return property;
+              }
+            } else if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
               return `Domain=${config.cookieDomain}`;
+            } else {
+              return property;
             }
-            return property;
           })
           .join(';') + ';'
       );

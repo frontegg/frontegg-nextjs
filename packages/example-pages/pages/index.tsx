@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 export function Index() {
   const { user, isAuthenticated } = useAuth();
+  const { switchTenant } = useAuthActions();
   const loginWithRedirect = useLoginWithRedirect();
   const [state, setState] = useState({ userAgent: '', id: -1 });
   const logoutHosted = useLogoutHostedLogin();
@@ -65,6 +66,33 @@ export function Index() {
       <br />
       <br />
       <Link href='/account/logout'>logout embedded</Link>
+      <br />
+      <br />
+      <br />
+      <div>
+        <h2>Tenants:</h2>
+        {(user?.tenants ?? []).map((tenant) => {
+          return (
+            <div key={tenant.tenantId}>
+              <b>Tenant Id:</b>
+              {tenant['tenantId']}
+              <span style={{ display: 'inline-block', width: '20px' }} />
+              {tenant.tenantId === user?.tenantId ? (
+                <b>Current Tenant</b>
+              ) : (
+                <button
+                  onClick={() => {
+                    switchTenant({ tenantId: tenant.tenantId });
+                  }}
+                >
+                  Switch to tenant
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <br />
     </div>
   );
 }

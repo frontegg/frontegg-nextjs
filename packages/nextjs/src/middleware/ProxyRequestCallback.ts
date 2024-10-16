@@ -26,8 +26,17 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     });
 
     logger.debug(`${req.url} | proxy FronteggCookies (${fronteggCookiesNames.join(', ')})`);
-    fronteggCookiesNames.forEach((cookieName: string) => {
-      proxyReq.setHeader(cookieName, allCookies[cookieName]);
+    fronteggCookiesNames.forEach((requestCookieName: string) => {
+      let cookieName = requestCookieName;
+      if (config.rewriteCookieByAppId && config.appId) {
+        cookieName = requestCookieName
+          .replace(config.appId, config.clientId)
+          .replace(config.appId.replace(/-/g, ''), config.clientId.replace(/-/g, ''))
+          .replace(config.appId.replace('-', ''), config.clientId.replace('-', ''));
+
+        logger.debug(`cookieName ${requestCookieName} replaced with appId ${cookieName}`);
+      }
+      proxyReq.setHeader(cookieName, allCookies[requestCookieName]);
     });
 
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
