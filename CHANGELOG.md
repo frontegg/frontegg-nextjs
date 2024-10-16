@@ -1,5 +1,10 @@
 # Change Log
 
+## [9.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.3...v9.0.4) (2024-10-16)
+
+
+# Change Log
+
 ## [9.0.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.2...v9.0.3) (2024-10-10)
 
 FR-18217 - Fixed impersonation on embedded
