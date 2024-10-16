@@ -58,8 +58,13 @@ export const handleHostedLoginCallback = async (
     expires: new Date(decodedJwt.exp * 1000),
     secure: isSecured,
   });
+
+  let cookieName = `fe_refresh_${config.clientId.replace('-', '')}`;
+  if (config.rewriteCookieByAppId && config.appId) {
+    cookieName = `fe_refresh_${config.appId.replace('-', '')}`;
+  }
   const refreshCookie = CookieManager.create({
-    cookieName: `fe_refresh_${config.clientId.replace('-', '')}`,
+    cookieName,
     value: refreshToken ?? '',
     expires: new Date(decodedJwt.exp * 1000),
     secure: isSecured,
