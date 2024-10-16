@@ -59,6 +59,10 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     cookie = cookie.replace(/fe_session-[^=]*=[^;]*$/, '').replace(/fe_session-[^=]*=[^;]*;/, '');
 
     if (config.rewriteCookieByAppId && config.appId) {
+      cookie = cookie
+        .split(';')
+        .filter((cookieStr: string) => !cookieStr.trim().startsWith(`fe_refresh_${config.clientId.replace('-', '')}`))
+        .join(';');
       cookie = cookie.replace(
         `fe_refresh_${config.appId.replace('-', '')}`,
         `fe_refresh_${config.clientId.replace('-', '')}`
@@ -67,6 +71,12 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   }
   if (cookie != null && typeof cookie === 'object') {
     cookie = Object.entries(cookie)
+      .filter(([key]) => {
+        if (config.rewriteCookieByAppId && config.appId) {
+          return key !== `fe_refresh_${config.clientId.replace('-', '')}`;
+        }
+        return true;
+      })
       .map(([key, value]) => {
         if (config.rewriteCookieByAppId && config.appId && key === `fe_refresh_${config.appId.replace('-', '')}`) {
           return `fe_refresh_${config.clientId.replace('-', '')}=${value}`;

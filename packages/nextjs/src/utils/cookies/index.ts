@@ -258,6 +258,24 @@ class CookieManager {
       logger.info(`No headers to modify`);
       return setCookieValue;
     }
+
+    // noinspection SuspiciousTypeOfGuard
+    if (typeof setCookieValue === 'string') {
+      const cookieRegexSplitter = /(.*?;.*?(?:Expires=[^;]+;.*?)?(?=,\s*\S+=|$))/g;
+      const cookies = [];
+      const cookieHeader = `${setCookieValue}`;
+      let match;
+      while ((match = cookieRegexSplitter.exec(cookieHeader)) !== null) {
+        let cookieString = match[1].trim();
+        if (cookieString.startsWith(',')) {
+          cookies.push(cookieString.substring(1).trim());
+        } else {
+          cookies.push(cookieString);
+        }
+      }
+      setCookieValue = cookies;
+    }
+
     logger.info(`modifying cookie headers (count: ${setCookieValue.length})`);
     return setCookieValue.map((c) => {
       let cookie = c.split('; ');
@@ -270,7 +288,7 @@ class CookieManager {
       return (
         cookie
           .map((property) => {
-            if (property.startsWith(`fe_refresh_${config.clientId.replace('-', '')}`)) {
+            if (property.trim().startsWith(`fe_refresh_${config.clientId.replace('-', '')}`)) {
               if (config.rewriteCookieByAppId && config.appId) {
                 return property.replace(
                   `fe_refresh_${config.clientId.replace('-', '')}`,
