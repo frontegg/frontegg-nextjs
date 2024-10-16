@@ -5,6 +5,7 @@ import api from '../../api';
 import { getTokensFromCookie } from '../../common';
 import { IncomingMessage } from 'http';
 import config from '../../config';
+import { ApiUrls } from '../../api/urls';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
@@ -99,4 +100,14 @@ export function isSamlCallback(url: string): boolean {
  */
 export function isSSOPostRequest(url: string): boolean {
   return url === '/frontegg/auth/saml/callback' || url === '/frontegg/auth/oidc/callback';
+}
+
+/**
+ * Checks if the request URL is a refresh token request.
+ * This is used to determine if the current request is targeting
+ * one of the predefined refresh token URLs (embedded or hosted modes).
+ */
+export function isRefreshTokenRequest(url: string): boolean {
+  const refreshTokenUrls = [ApiUrls.refreshToken.embedded, ApiUrls.refreshToken.hosted];
+  return refreshTokenUrls.includes(url);
 }
