@@ -77,6 +77,12 @@ export enum EnvVariables {
   FRONTEGG_COOKIE_DOMAIN = 'FRONTEGG_COOKIE_DOMAIN',
 
   /**
+   * The stateless cookie same site value for storing the encrypted JWT
+   * default is none, you can set it to 'lax' or 'strict' for more security
+   */
+  FRONTEGG_COOKIE_SAME_SITE = 'FRONTEGG_COOKIE_SAME_SITE',
+
+  /**
    * When `true`, the initial props will not refresh access token if it's valid.
    */
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN = 'DISABLE_INITIAL_PROPS_REFRESH_TOKEN',

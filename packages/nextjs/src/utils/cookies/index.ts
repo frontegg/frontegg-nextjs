@@ -67,7 +67,7 @@ class CookieManager {
     if (options.secure) {
       logger.debug(`Set cookie '${cookieName}' as secure`);
       serializeOptions.secure = options.secure;
-      serializeOptions.sameSite = 'none';
+      serializeOptions.sameSite = config.cookieSameSite;
     }
 
     const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
