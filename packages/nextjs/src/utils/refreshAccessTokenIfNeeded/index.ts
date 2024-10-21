@@ -55,6 +55,11 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       return null;
     }
 
+    nextJsRequest.headers['x-original-forwarded-for'] =
+      nextJsRequest.headers['cf-connecting-ip'] ||
+      nextJsRequest.headers['x-forwarded-for'] ||
+      nextJsRequest.socket.remoteAddress;
+
     let response: Response | null;
     if (config.isHostedLogin) {
       response = await refreshAccessTokenHostedLogin(nextJsRequest);

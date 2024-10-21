@@ -104,6 +104,12 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   if (headers['frontegg-requested-application-id']) {
     preparedHeaders['frontegg-requested-application-id'] = headers['frontegg-requested-application-id'];
   }
+
+  const clientIp = headers['cf-connecting-ip'] || headers['x-original-forwarded-for'] || headers['x-forwarded-for'];
+  if (clientIp) {
+    preparedHeaders['x-original-forwarded-for'] = clientIp;
+  }
+
   if (headers[CUSTOM_LOGIN_HEADER]) {
     preparedHeaders[CUSTOM_LOGIN_HEADER] = headers[CUSTOM_LOGIN_HEADER];
   }

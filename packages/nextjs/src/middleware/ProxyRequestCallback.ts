@@ -49,18 +49,11 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
     proxyReq.setHeader('x-frontegg-middleware', 'true');
 
-    const xForwardedFor = req.headers['x-forwarded-for'];
-    const xOriginalForwardedFor = req.headers['x-original-forwarded-for'];
-    const cfConnectionIp = req.headers['cf-connecting-ip'];
+    const clientIp =
+      req.headers['cf-connecting-ip'] || req.headers['x-original-forwarded-for'] || req.headers['x-forwarded-for'];
 
-    if (xForwardedFor) {
-      proxyReq.setHeader('x-forwarded-for', xForwardedFor);
-    }
-    if (xOriginalForwardedFor) {
-      proxyReq.setHeader('x-original-forwarded-for', xOriginalForwardedFor);
-    }
-    if (cfConnectionIp) {
-      proxyReq.setHeader('cf-connecting-ip', cfConnectionIp);
+    if (clientIp) {
+      proxyReq.setHeader('x-original-forwarded-for', clientIp);
     }
 
     if (isRefreshTokenRequest(req.url!)) {
