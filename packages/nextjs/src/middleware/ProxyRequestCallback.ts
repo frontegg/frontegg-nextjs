@@ -27,6 +27,8 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     });
 
     logger.debug(`${req.url} | proxy FronteggCookies (${fronteggCookiesNames.join(', ')})`);
+    let modifiedCookies = ``;
+
     fronteggCookiesNames.forEach((requestCookieName: string) => {
       let cookieName = requestCookieName;
       if (config.rewriteCookieByAppId && config.appId) {
@@ -37,8 +39,11 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
         logger.debug(`cookieName ${requestCookieName} replaced with appId ${cookieName}`);
       }
-      proxyReq.setHeader(cookieName, allCookies[requestCookieName]);
+
+      logger.debug(`PROXY_ADDING_COOKIE ${cookieName}, ${allCookies[requestCookieName]}`);
+      modifiedCookies += `${cookieName}=${allCookies[requestCookieName]}; `;
     });
+    proxyReq.setHeader('cookie', modifiedCookies);
 
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
