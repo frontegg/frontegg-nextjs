@@ -48,7 +48,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
     }
     return createdApp;
   }, [appName, props, hostedLoginBox, baseName, onRedirectTo]);
-  ContextHolder.setOnRedirectTo(onRedirectTo);
+  ContextHolder.for(appName ?? 'default').setOnRedirectTo(onRedirectTo);
 
   useEffect(() => {
     app.store.dispatch({ type: 'auth/requestAuthorize', payload: true });
