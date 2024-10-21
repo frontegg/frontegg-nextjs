@@ -30,7 +30,7 @@ export const getAppUrlForCustomLoginWithSubdomain = async (subDomainIndex?: numb
     return undefined;
   }
 
-  const headers = getAppHeaders();
+  const headers = await getAppHeaders();
   const alias = getTenantAliasFromHeaders(headers, subDomainIndex);
   if (!alias) {
     resetGlobalCustomLoginAppUrl();
