@@ -17,7 +17,11 @@ class CookieManager {
     cookieNumber ? getIndexedCookieName(cookieNumber, cookieName) : cookieName;
 
   get refreshTokenKey(): string {
-    return `fe_refresh_${config.clientId}`.replace(/-/g, '');
+    if (config.rewriteCookieByAppId && config.appId) {
+      return `fe_refresh_${config.appId.replace(/-/g, '')}`;
+    } else {
+      return `fe_refresh_${config.clientId.replace(/-/g, '')}`;
+    }
   }
 
   /**
@@ -63,7 +67,7 @@ class CookieManager {
     if (options.secure) {
       logger.debug(`Set cookie '${cookieName}' as secure`);
       serializeOptions.secure = options.secure;
-      serializeOptions.sameSite = 'none';
+      serializeOptions.sameSite = config.cookieSameSite;
     }
 
     const serializedCookie = cookieSerializer.serialize(cookieName, cookieValue, serializeOptions);
@@ -254,6 +258,24 @@ class CookieManager {
       logger.info(`No headers to modify`);
       return setCookieValue;
     }
+
+    // noinspection SuspiciousTypeOfGuard
+    if (typeof setCookieValue === 'string') {
+      const cookieRegexSplitter = /(.*?;.*?(?:Expires=[^;]+;.*?)?(?=,\s*\S+=|$))/g;
+      const cookies = [];
+      const cookieHeader = `${setCookieValue}`;
+      let match;
+      while ((match = cookieRegexSplitter.exec(cookieHeader)) !== null) {
+        let cookieString = match[1].trim();
+        if (cookieString.startsWith(',')) {
+          cookies.push(cookieString.substring(1).trim());
+        } else {
+          cookies.push(cookieString);
+        }
+      }
+      setCookieValue = cookies;
+    }
+
     logger.info(`modifying cookie headers (count: ${setCookieValue.length})`);
     return setCookieValue.map((c) => {
       let cookie = c.split('; ');
@@ -266,10 +288,20 @@ class CookieManager {
       return (
         cookie
           .map((property) => {
-            if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
+            if (property.trim().startsWith(`fe_refresh_${config.clientId.replace('-', '')}`)) {
+              if (config.rewriteCookieByAppId && config.appId) {
+                return property.replace(
+                  `fe_refresh_${config.clientId.replace('-', '')}`,
+                  `fe_refresh_${config.appId.replace('-', '')}`
+                );
+              } else {
+                return property;
+              }
+            } else if (property.toLowerCase() === `domain=${config.baseUrlHost}`) {
               return `Domain=${config.cookieDomain}`;
+            } else {
+              return property;
             }
-            return property;
           })
           .join(';') + ';'
       );

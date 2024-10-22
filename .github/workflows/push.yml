@@ -28,7 +28,9 @@ jobs:
       - run: yarn clean
       - run: yarn install
       - run: yarn build
-      - run: sudo apt-get update
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: Run Playwright tests

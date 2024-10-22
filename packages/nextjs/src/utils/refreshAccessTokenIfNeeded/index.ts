@@ -55,6 +55,11 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       return null;
     }
 
+    nextJsRequest.headers['x-original-forwarded-for'] =
+      nextJsRequest.headers['cf-connecting-ip'] ||
+      nextJsRequest.headers['x-forwarded-for'] ||
+      nextJsRequest.socket.remoteAddress;
+
     let response: Response | null;
     if (config.isHostedLogin) {
       response = await refreshAccessTokenHostedLogin(nextJsRequest);
@@ -75,10 +80,15 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
 
     const data = await response.json();
 
-    // @ts-ignore the first argument "raw" will only work before nextjs 13.4 and the second argument "getSetCookie" will only work after
-    const cookieHeader: string[] = response.headers?.raw?.()['set-cookie'] ?? response.headers?.getSetCookie?.() ?? [];
-    const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
+    const cookieHeader: string[] =
+      // @ts-ignore the first argument "raw" will only work before nextjs 13.4 and the second argument "getSetCookie" will only work after
+      response.headers?.raw?.()['set-cookie'] ??
+      // @ts-ignore the first argument "raw" will only work before nextjs 13.4 and the second argument "getSetCookie" will only work after
+      response.headers?.getSetCookie?.() ??
+      response.headers?.get?.('set-cookie') ??
+      [];
 
+    const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
     const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken(data);
 
     if (!session) {

@@ -2,6 +2,7 @@ import { AllUserData, FronteggNextJSSession } from '../../types';
 import { getTenants, getMe, getMeAuthorization, getEntitlements } from '../../api';
 import { calculateExpiresInFromExp } from '../common';
 import fronteggLogger from '../fronteggLogger';
+import config from '../../config';
 
 const FULFILLED_STATUS = 'fulfilled';
 
@@ -23,7 +24,11 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const { accessToken } = session;
     const reqHeaders = await getHeaders();
-    const headers = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
+    const headers: Record<string, string> = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
+
+    if (config.appId) {
+      headers['frontegg-requested-application-id'] = config.appId;
+    }
 
     logger.debug('Retrieving user data...');
     const [baseUserResult, tenantsResult, entitlementsResult, meAuthorizationResult] = await Promise.allSettled([

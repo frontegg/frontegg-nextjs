@@ -9,6 +9,7 @@ import config from '../config';
 import JwtManager from '../utils/jwt';
 import encryptionUtils from '../utils/encryption-edge';
 import Cookies from '../utils/cookies';
+import { buildRequestHeaders } from '../api/utils';
 
 async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -36,10 +37,30 @@ export const handleHostedLoginCallback = async (
   }
 
   const code = searchParams.get('code') ?? '';
+
+  let headers: Record<string, string> = {};
+  let clientIp: string | undefined = undefined;
+  if (typeof req.headers?.get === 'function') {
+    clientIp =
+      req.headers.get('cf-connecting-ip') ||
+      req.headers.get('x-original-forwarded-for') ||
+      req.headers.get('x-forwarded-for') ||
+      (req as any).socket?.remoteAddress;
+  } else if (typeof req.headers === 'object') {
+    let requestHeaders: any = { ...req.headers };
+    clientIp =
+      requestHeaders['cf-connecting-ip'] ||
+      requestHeaders['x-original-forwarded-for'] ||
+      requestHeaders['x-forwarded-for'] ||
+      (req as any).socket?.remoteAddress;
+  }
+
+  if (clientIp) {
+    headers['x-original-forwarded-for'] = clientIp;
+  }
+
   const response = await api.exchangeHostedLoginToken(
-    {
-      'Content-Type': 'application/json',
-    },
+    buildRequestHeaders(headers),
     code,
     config.clientId,
     config.clientSecret!
@@ -58,8 +79,13 @@ export const handleHostedLoginCallback = async (
     expires: new Date(decodedJwt.exp * 1000),
     secure: isSecured,
   });
+
+  let cookieName = `fe_refresh_${config.clientId.replace('-', '')}`;
+  if (config.rewriteCookieByAppId && config.appId) {
+    cookieName = `fe_refresh_${config.appId.replace('-', '')}`;
+  }
   const refreshCookie = CookieManager.create({
-    cookieName: `fe_refresh_${config.clientId.replace('-', '')}`,
+    cookieName,
     value: refreshToken ?? '',
     expires: new Date(decodedJwt.exp * 1000),
     secure: isSecured,

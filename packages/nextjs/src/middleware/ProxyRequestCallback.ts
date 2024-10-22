@@ -27,26 +27,33 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     });
 
     logger.debug(`${req.url} | proxy FronteggCookies (${fronteggCookiesNames.join(', ')})`);
-    fronteggCookiesNames.forEach((cookieName: string) => {
-      proxyReq.setHeader(cookieName, allCookies[cookieName]);
+    let modifiedCookies = ``;
+
+    fronteggCookiesNames.forEach((requestCookieName: string) => {
+      let cookieName = requestCookieName;
+      if (config.rewriteCookieByAppId && config.appId) {
+        cookieName = requestCookieName
+          .replace(config.appId, config.clientId)
+          .replace(config.appId.replace(/-/g, ''), config.clientId.replace(/-/g, ''))
+          .replace(config.appId.replace('-', ''), config.clientId.replace('-', ''));
+
+        logger.debug(`cookieName ${requestCookieName} replaced with appId ${cookieName}`);
+      }
+
+      logger.debug(`PROXY_ADDING_COOKIE ${cookieName}, ${allCookies[requestCookieName]}`);
+      modifiedCookies += `${cookieName}=${allCookies[requestCookieName]}; `;
     });
+    proxyReq.setHeader('cookie', modifiedCookies);
 
     proxyReq.setHeader('x-frontegg-framework', req.headers['x-frontegg-framework'] ?? `next@${NextJsPkg.version}`);
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
     proxyReq.setHeader('x-frontegg-middleware', 'true');
 
-    const xForwardedFor = req.headers['x-forwarded-for'];
-    const xOriginalForwardedFor = req.headers['x-original-forwarded-for'];
-    const cfConnectionIp = req.headers['cf-connecting-ip'];
+    const clientIp =
+      req.headers['cf-connecting-ip'] || req.headers['x-original-forwarded-for'] || req.headers['x-forwarded-for'];
 
-    if (xForwardedFor) {
-      proxyReq.setHeader('x-forwarded-for', xForwardedFor);
-    }
-    if (xOriginalForwardedFor) {
-      proxyReq.setHeader('x-original-forwarded-for', xOriginalForwardedFor);
-    }
-    if (cfConnectionIp) {
-      proxyReq.setHeader('cf-connecting-ip', cfConnectionIp);
+    if (clientIp) {
+      proxyReq.setHeader('x-original-forwarded-for', clientIp);
     }
 
     if (isRefreshTokenRequest(req.url!)) {

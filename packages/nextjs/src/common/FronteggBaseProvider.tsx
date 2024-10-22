@@ -2,7 +2,7 @@
 
 import React, { FC, useMemo, useRef } from 'react';
 import { FronteggStoreProvider, CustomComponentRegister } from '@frontegg/react-hooks';
-import { ContextHolder } from '@frontegg/rest-api';
+import { ContextHolder, IUserProfile } from '@frontegg/rest-api';
 import type { FronteggProviderProps } from '../types';
 import AppContext from './AppContext';
 import initializeFronteggApp from '../utils/initializeFronteggApp';
@@ -28,8 +28,10 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
       }),
     [props]
   );
-  ContextHolder.setOnRedirectTo(onRedirectTo);
+  ContextHolder.for(appName).setOnRedirectTo(onRedirectTo);
 
+  ContextHolder.for(appName).setAccessToken(session?.accessToken ?? null);
+  ContextHolder.for(appName).setUser(session?.['user'] as any);
   useRequestAuthorizeSSR({ app, user, tenants, activeTenant, session });
   return (
     <AppContext.Provider value={app}>

@@ -48,6 +48,7 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
  * These header is used to identify the tenant for login per tenant feature
  */
 export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
+
 /**
  * Build fetch request headers, remove invalid http headers
  * @param headers - Incoming request headers
@@ -56,10 +57,33 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   let cookie = headers['cookie'];
   if (cookie != null && typeof cookie === 'string') {
     cookie = cookie.replace(/fe_session-[^=]*=[^;]*$/, '').replace(/fe_session-[^=]*=[^;]*;/, '');
+
+    if (config.rewriteCookieByAppId && config.appId) {
+      cookie = cookie
+        .split(';')
+        .filter((cookieStr: string) => !cookieStr.trim().startsWith(`fe_refresh_${config.clientId.replace('-', '')}`))
+        .join(';');
+      cookie = cookie.replace(
+        `fe_refresh_${config.appId.replace('-', '')}`,
+        `fe_refresh_${config.clientId.replace('-', '')}`
+      );
+    }
   }
   if (cookie != null && typeof cookie === 'object') {
     cookie = Object.entries(cookie)
-      .map(([key, value]) => `${key}=${value}`)
+      .filter(([key]) => {
+        if (config.rewriteCookieByAppId && config.appId) {
+          return key !== `fe_refresh_${config.clientId.replace('-', '')}`;
+        }
+        return true;
+      })
+      .map(([key, value]) => {
+        if (config.rewriteCookieByAppId && config.appId && key === `fe_refresh_${config.appId.replace('-', '')}`) {
+          return `fe_refresh_${config.clientId.replace('-', '')}=${value}`;
+        } else {
+          return `${key}=${value}`;
+        }
+      })
       .join('; ');
   }
 
@@ -76,6 +100,15 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     'x-frontegg-framework': `next@${nextjsPkg.version}`,
     'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
   };
+
+  if (headers['frontegg-requested-application-id']) {
+    preparedHeaders['frontegg-requested-application-id'] = headers['frontegg-requested-application-id'];
+  }
+
+  const clientIp = headers['cf-connecting-ip'] || headers['x-original-forwarded-for'] || headers['x-forwarded-for'];
+  if (clientIp) {
+    preparedHeaders['x-original-forwarded-for'] = clientIp;
+  }
 
   if (headers[CUSTOM_LOGIN_HEADER]) {
     preparedHeaders[CUSTOM_LOGIN_HEADER] = headers[CUSTOM_LOGIN_HEADER];

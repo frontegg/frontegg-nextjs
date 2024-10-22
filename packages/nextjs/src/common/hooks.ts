@@ -1,4 +1,4 @@
-import { useLoginActions } from '@frontegg/react-hooks';
+import { useLoginActions, useRootState } from '@frontegg/react-hooks';
 import { ContextHolder } from '@frontegg/rest-api';
 import { buildLogoutRoute } from '../api/urls';
 
@@ -10,10 +10,11 @@ import { buildLogoutRoute } from '../api/urls';
  */
 
 export const useLogoutHostedLogin = () => {
+  const { appName } = useRootState();
   const { logout } = useLoginActions();
 
   return (redirectUrl?: string) => {
-    const contextBaseUrl = ContextHolder.getContext()?.baseUrl;
+    const contextBaseUrl = ContextHolder.for(appName).getContext()?.baseUrl;
     const baseUrl = typeof contextBaseUrl === 'function' ? contextBaseUrl('') : contextBaseUrl;
     const finalRedirectUrl = redirectUrl ?? window.location.href;
     const logoutRoute = buildLogoutRoute(finalRedirectUrl, baseUrl).asPath;

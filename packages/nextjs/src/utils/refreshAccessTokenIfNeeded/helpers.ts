@@ -28,6 +28,9 @@ export async function refreshAccessTokenEmbedded(request: IncomingMessage): Prom
   logger.info('check if has refresh token headers');
   if (hasRefreshTokenCookie(cookies)) {
     logger.info('going to refresh token (embedded mode)');
+    if (config.appId) {
+      headers['frontegg-requested-application-id'] = config.appId;
+    }
     return await api.refreshTokenEmbedded(headers);
   }
   return null;
@@ -46,7 +49,9 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
       logger.info('refresh token not found');
       return null;
     }
-
+    if (config.appId) {
+      headers['frontegg-requested-application-id'] = config.appId;
+    }
     if (config.secureJwtEnabled) {
       const clientId = config.clientId;
       const clientSecret = config.clientSecret;

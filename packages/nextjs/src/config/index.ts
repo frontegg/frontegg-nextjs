@@ -10,9 +10,13 @@ const setupEnvVariables = {
   FRONTEGG_BASE_URL: process.env.FRONTEGG_BASE_URL,
   FRONTEGG_TEST_URL: process.env.FRONTEGG_TEST_URL,
   FRONTEGG_CLIENT_ID: process.env.FRONTEGG_CLIENT_ID,
+  FRONTEGG_APP_ID: process.env.FRONTEGG_APP_ID,
+  FRONTEGG_REWRITE_COOKIE_BY_APP_ID: process.env.FRONTEGG_REWRITE_COOKIE_BY_APP_ID,
   FRONTEGG_CLIENT_SECRET: process.env.FRONTEGG_CLIENT_SECRET,
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
+  FRONTEGG_COOKIE_DOMAIN: process.env.FRONTEGG_COOKIE_DOMAIN,
+  FRONTEGG_COOKIE_SAME_SITE: process.env.FRONTEGG_COOKIE_SAME_SITE,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
   FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
@@ -53,6 +57,18 @@ class Config {
     return getEnv(EnvVariables.FRONTEGG_CLIENT_ID) ?? setupEnvVariables.FRONTEGG_CLIENT_ID;
   }
 
+  get appId(): string | undefined {
+    return getEnvOrDefault(EnvVariables.FRONTEGG_APP_ID, setupEnvVariables.FRONTEGG_APP_ID);
+  }
+  get rewriteCookieByAppId(): boolean {
+    return (
+      getEnvOrDefault(
+        EnvVariables.FRONTEGG_REWRITE_COOKIE_BY_APP_ID,
+        setupEnvVariables.FRONTEGG_REWRITE_COOKIE_BY_APP_ID ?? 'false'
+      ) === 'true'
+    );
+  }
+
   get clientSecret(): string | undefined {
     let clientSecret = undefined;
     try {
@@ -87,11 +103,38 @@ class Config {
       EnvVariables.FRONTEGG_COOKIE_NAME,
       setupEnvVariables.FRONTEGG_COOKIE_NAME ?? 'fe_session'
     );
-    return `${cookieNameEnv}-${this.clientId.replace(/-/g, '')}`;
+
+    if (this.rewriteCookieByAppId && this.appId) {
+      return `${cookieNameEnv}-${this.appId.replace(/-/g, '')}`;
+    } else {
+      return `${cookieNameEnv}-${this.clientId.replace(/-/g, '')}`;
+    }
   }
 
   get cookieDomain(): string {
-    return generateCookieDomain(this.appUrl);
+    return getEnvOrDefault(
+      EnvVariables.FRONTEGG_COOKIE_DOMAIN,
+      setupEnvVariables.FRONTEGG_COOKIE_DOMAIN ?? generateCookieDomain(this.appUrl)
+    );
+  }
+
+  get cookieSameSite(): 'lax' | 'strict' | 'none' {
+    let sameSite = getEnvOrDefault(
+      EnvVariables.FRONTEGG_COOKIE_SAME_SITE,
+      setupEnvVariables.FRONTEGG_COOKIE_SAME_SITE ?? 'none'
+    );
+    switch (sameSite) {
+      case 'true':
+        return 'strict';
+      case 'false':
+        return 'none';
+      case 'lax':
+      case 'strict':
+      case 'none':
+        return sameSite;
+      default:
+        return 'none';
+    }
   }
 
   get authRoutes(): Partial<AuthPageRoutes> {
@@ -148,9 +191,9 @@ class Config {
       envAppUrl: this.appUrl,
       envBaseUrl: this.baseUrl,
       envClientId: this.clientId,
+      envAppId: this.appId,
       secureJwtEnabled: this.secureJwtEnabled,
     };
-    console.log('this.appEnvConfig', config);
     return config;
   }
 }

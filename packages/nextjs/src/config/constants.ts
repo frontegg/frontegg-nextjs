@@ -24,6 +24,19 @@ export enum EnvVariables {
   FRONTEGG_CLIENT_ID = 'FRONTEGG_CLIENT_ID',
 
   /**
+   * Your Frontegg application ID, get it by visit:
+   * - For Dev environment [visit](https://portal.frontegg.com/development/applications)
+   * - For Prod environment [visit](https://portal.frontegg.com/production/applications)
+   */
+  FRONTEGG_APP_ID = 'FRONTEGG_APP_ID',
+
+  /**
+   * Rewrite the cookie name by the Frontegg application ID
+   * to support multiple Frontegg applications with same domain
+   */
+  FRONTEGG_REWRITE_COOKIE_BY_APP_ID = 'FRONTEGG_REWRITE_COOKIE_BY_APP_ID',
+
+  /**
    * Your Frontegg application's Client Secret, get it by visit:
    * - For Dev environment [visit](https://portal.frontegg.com/development/settings/general)
    * - For Prod environment [visit](https://portal.frontegg.com/production/settings/general)
@@ -56,6 +69,18 @@ export enum EnvVariables {
    * value as session cookies for supporting getServerSideProps and ServerComponents
    */
   FRONTEGG_COOKIE_NAME = 'FRONTEGG_COOKIE_NAME',
+
+  /**
+   * The stateless cookie domain for storing the encrypted JWT
+   * value as session cookies for supporting getServerSideProps and ServerComponents
+   */
+  FRONTEGG_COOKIE_DOMAIN = 'FRONTEGG_COOKIE_DOMAIN',
+
+  /**
+   * The stateless cookie same site value for storing the encrypted JWT
+   * default is none, you can set it to 'lax' or 'strict' for more security
+   */
+  FRONTEGG_COOKIE_SAME_SITE = 'FRONTEGG_COOKIE_SAME_SITE',
 
   /**
    * When `true`, the initial props will not refresh access token if it's valid.

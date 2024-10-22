@@ -55,8 +55,18 @@ export const getCookieHeader = (request: RequestType): string => {
   return cookieHeader;
 };
 
-export const getRefreshTokenCookieNameVariants = () => [
-  `fe_refresh_${config.clientId}`,
-  `fe_refresh_${config.clientId.replace('-', '')}`,
-  `fe_refresh_${config.clientId.replace(/-/g, '')}`,
-];
+export const getRefreshTokenCookieNameVariants = () => {
+  if (config.rewriteCookieByAppId && config.appId) {
+    return [
+      `fe_refresh_${config.appId}`,
+      `fe_refresh_${config.appId.replace('-', '')}`,
+      `fe_refresh_${config.appId.replace(/-/g, '')}`,
+    ];
+  } else {
+    return [
+      `fe_refresh_${config.clientId}`,
+      `fe_refresh_${config.clientId.replace('-', '')}`,
+      `fe_refresh_${config.clientId.replace(/-/g, '')}`,
+    ];
+  }
+};

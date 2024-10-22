@@ -57,6 +57,7 @@ const initializeFronteggApp = ({
       }
     },
     clientId: options.envClientId,
+    appId: options.envAppId,
   };
 
   const tenantsState = {
