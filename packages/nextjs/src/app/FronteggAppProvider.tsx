@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { ClientFronteggProvider } from './ClientFronteggProvider';
-import { getAppHeadersPromise, getAppSession } from './helpers';
+import { getAppHeaders, getAppSession } from './helpers';
 import config from '../config';
 import fetchUserData from '../utils/fetchUserData';
 import { ClientFronteggProviderProps } from '../types';
@@ -13,7 +13,7 @@ export type FronteggAppProviderProps = PropsWithChildren<
 
 export const FronteggAppProvider = async (options: FronteggAppProviderProps) => {
   const { envAppUrl, ...appEnvConfig } = config.appEnvConfig;
-  let userData = await fetchUserData({ getSession: getAppSession, getHeaders: getAppHeadersPromise });
+  let userData = await fetchUserData({ getSession: getAppSession, getHeaders: getAppHeaders });
   const subDomainAppUrl = await getAppUrlForCustomLoginWithSubdomain(options.customLoginOptions?.subDomainIndex);
 
   if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
