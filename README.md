@@ -29,7 +29,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 
 To Add Frontegg to your existing Next.JS project, follow below steps:
 
-1. Use package manager to install Frontegg Next.JS library.
+Use package manager to install Frontegg Next.JS library.
 
    ```bash
      npm install --save @frontegg/nextjs
@@ -41,7 +41,10 @@ To Add Frontegg to your existing Next.JS project, follow below steps:
      yarn add --save @frontegg/nextjs
    ```
 
-2. Wrap the default export with `withFronteggApp` in `./pages/_app.tsx`:
+
+**If you're using the App Directory architecture, you can skip the following Pages architecture steps and refer to the [AppDir guide](#nextjs-appdir-architecture) instead.**
+
+1. Wrap the default export with `withFronteggApp` in `./pages/_app.tsx`:
 
    ```tsx
    // ./pages/_app.tsx
@@ -58,7 +61,7 @@ To Add Frontegg to your existing Next.JS project, follow below steps:
     });
    ```
 
-3. Create files for frontegg middleware under `./pages/api/frontegg/[...frontegg-middleware].ts`:
+2. Create files for frontegg middleware under `./pages/api/frontegg/[...frontegg-middleware].ts`:
 
    ```tsx
    // ./pages/api/frontegg/[...frontegg-middleware].ts
@@ -66,7 +69,7 @@ To Add Frontegg to your existing Next.JS project, follow below steps:
    export { fronteggMiddleware as default } from '@frontegg/nextjs/middleware';
    ```
 
-4. Create placeholder pages for frontegg router under `./pages/[...frontegg-router].tsx`:
+3. Create placeholder pages for frontegg router under `./pages/[...frontegg-router].tsx`:
 
    ```tsx
    // ./pages/[...frontegg-router].tsx
@@ -244,7 +247,7 @@ export const getServerSideProps: GetServerSideProps = withSSRSession(
 );
 ```
 
-## Next.js 13
+## Next.js (AppDir architecture)
 ### wrapping your application
 ```tsx
 // ./app/layout.tsx
@@ -262,9 +265,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-### routing
+### Routing
+
+
 ```tsx
 // ./app/[...frontegg-router]/page.tsx
+
+/** 
+ * For Next.js 15+ use the following FronteggAppRouterAsync as default export 
+ */
+export { FronteggAppRouterAsync as default } from '@frontegg/nextjs/app';
+
+
+/** 
+ * For Next.js 14 and below use the following FronteggAppRouter as default export 
+ */
 export { FronteggAppRouter as default } from '@frontegg/nextjs/app';
 ```
 
