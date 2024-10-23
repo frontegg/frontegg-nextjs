@@ -1,5 +1,14 @@
 # Change Log
 
+## [9.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.4...v9.0.5) (2024-10-23)
+
+- FR-18356 - Fixed validations localization override type
+
+
+### NextJS Wrapper 9.0.5:
+- Export FronteggAppRouterAsync to be imported by '@frontegg/nextjs/app'
+- Add Support for NextJS 15
+
 ## [9.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.3...v9.0.4) (2024-10-22)
 
 - FR-18356 - Fixed validations localization override type
