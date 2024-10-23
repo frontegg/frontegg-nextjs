@@ -87,3 +87,4 @@ tsconfig.build.tsbuildinfo
 playwright-report/
 lint-report.json
 reqs.md
+packages/nextjs/test-results
