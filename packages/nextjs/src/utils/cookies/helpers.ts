@@ -3,6 +3,7 @@ import { COOKIE_MAX_LENGTH } from './constants';
 import { chunkString } from '../common';
 import config from '../../config';
 import { CookieSerializeOptions, RequestType } from './types';
+import { ServerResponse } from 'http';
 
 /**
  * Return a cookieName with index, used for divided cookies.
@@ -53,6 +54,23 @@ export const getCookieHeader = (request: RequestType): string => {
   }
 
   return cookieHeader;
+};
+
+/**
+ * Receive http response, and extract the set-cookie header.
+ * @return cookie as string if exists, else empty string
+ *
+ * @param {ResponseType} response - HTTP Response
+ */
+export const getSetCookieHeader = (response: ServerResponse): string => {
+  let cookieHeader = response.getHeader('set-cookie');
+  const cookies: string[] = [];
+  if (!Array.isArray(cookieHeader)) {
+    cookies.push(`${cookieHeader}`);
+  } else {
+    cookies.push(...cookieHeader);
+  }
+  return cookies.map((cookie) => cookie.split(';')[0]).join(';');
 };
 
 export const getRefreshTokenCookieNameVariants = () => {

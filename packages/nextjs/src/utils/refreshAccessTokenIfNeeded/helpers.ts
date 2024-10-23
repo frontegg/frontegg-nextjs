@@ -3,9 +3,11 @@ import CookieManager from '../cookies';
 import { NextApiRequest } from 'next/dist/shared/lib/utils';
 import api from '../../api';
 import { getTokensFromCookie } from '../../common';
-import { IncomingMessage } from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 import config from '../../config';
 import { ApiUrls } from '../../api/urls';
+import { FRONTEGG_FORWARDED_SESSION_KEY } from '../common/constants';
+import { FronteggNextJSSession } from '../../types';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
@@ -110,4 +112,42 @@ export function isSSOPostRequest(url: string): boolean {
 export function isRefreshTokenRequest(url: string): boolean {
   const refreshTokenUrls = [ApiUrls.refreshToken.embedded, ApiUrls.refreshToken.hosted];
   return refreshTokenUrls.includes(url);
+}
+
+/**
+ * This function verifies if the headers includes a 'set-cookie' header
+ * from a prior refresh token request. If it's the case, we can infer that the
+ * session cookie has been initialized, thus we can disable the double refresh token
+ * for server-side redirects such as '/_error' or any other server-side redirects.
+ */
+export function hasSetSessionCookie(cookieHeader: number | string | string[] | undefined): boolean {
+  if (!cookieHeader || typeof cookieHeader === 'number') {
+    return false;
+  }
+  const cookieName = config.cookieName;
+  if (typeof cookieHeader === 'string') {
+    return cookieHeader.indexOf(cookieName) !== -1;
+  }
+  if (Array.isArray(cookieHeader)) {
+    return cookieHeader.some((header) => header.startsWith(cookieName));
+  }
+  return false;
+}
+
+/**
+ * This function stores the Frontegg session instance for use
+ * within the Next.js application during the token refresh process
+ * in the redirect request page.
+ */
+export function saveForwardedSession(holder: any, session: FronteggNextJSSession | undefined) {
+  holder[FRONTEGG_FORWARDED_SESSION_KEY] = session;
+}
+
+/**
+ * This function retrieves the stored session from the previous redirected page request.
+ * This helps in preventing the token from being refreshed twice during a single client page request.
+ */
+
+export function getForwardedSession(holder: any): FronteggNextJSSession | null {
+  return holder[FRONTEGG_FORWARDED_SESSION_KEY];
 }

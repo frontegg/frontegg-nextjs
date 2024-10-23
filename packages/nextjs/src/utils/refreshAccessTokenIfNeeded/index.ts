@@ -5,10 +5,13 @@ import config from '../../config';
 import CookieManager from '../cookies';
 import {
   isOauthCallback,
+  hasSetSessionCookie,
   isRuntimeNextRequest,
   isSamlCallback,
   refreshAccessTokenEmbedded,
   refreshAccessTokenHostedLogin,
+  saveForwardedSession,
+  getForwardedSession,
 } from './helpers';
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
@@ -23,6 +26,7 @@ export { isRuntimeNextRequest };
  */
 export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): Promise<FronteggNextJSSession | null> {
   const logger = fronteggLogger.child({ tag: 'refreshAccessTokenIfNeeded' });
+
   logger.info(`Refreshing token by for PageContext ${ctx.pathname}`);
   const nextJsRequest = ctx.req;
   const nextJsResponse = ctx.res;
@@ -30,6 +34,13 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
   if (!nextJsResponse || !nextJsRequest || !url) {
     logger.debug(`abandon refreshToken due to PageContext.req = null`);
     return null;
+  }
+
+  if (hasSetSessionCookie(nextJsResponse.getHeader('set-cookie'))) {
+    const cookies = CookieManager.getSessionCookieFromRedirectedResponse(nextJsResponse);
+    const session = await createSession(cookies, encryption);
+    logger.debug('Abandon refreshToken due to a previous redirect to /_error or other server-side redirect.');
+    return session ?? getForwardedSession(nextJsResponse);
   }
 
   try {
@@ -101,13 +112,16 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       req: nextJsRequest,
     });
     newSetCookie.push(...cookieValue);
-    ctx.res?.setHeader('set-cookie', newSetCookie);
+    nextJsResponse.setHeader('set-cookie', newSetCookie);
 
-    return {
+    const fronteggSession = {
       accessToken: data.accessToken ?? data.access_token,
       user: decodedJwt,
       refreshToken,
     };
+
+    saveForwardedSession(nextJsResponse, fronteggSession);
+    return fronteggSession;
   } catch (e) {
     logger.error('[refreshToken] Failed to create session e', e);
     return null;
