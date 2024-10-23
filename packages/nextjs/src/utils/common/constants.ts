@@ -11,3 +11,5 @@ export const FRONTEGG_AFTER_AUTH_REDIRECT_URL = 'FRONTEGG_AFTER_AUTH_REDIRECT_UR
  */
 export const headerCharRegex = /[^\t\x20-\x7e\x80-\xff]/;
 export const cookieContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
+
+export const FRONTEGG_FORWARDED_SESSION_KEY = '__frontegg_forwarded_session__';
