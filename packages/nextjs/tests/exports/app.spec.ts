@@ -4,8 +4,8 @@ import * as Exports from '../../src/app';
 test('@frontegg/nextjs/app exports test', () => {
   const requiredExports: Set<string> = new Set<string>([
     'FronteggAppProvider',
-    'FronteggAppProviderAsync',
     'FronteggAppRouter',
+    'FronteggAppRouterAsync',
     'getAppSession',
     'getAppUserSession',
     'getAppUserTokens',
