@@ -1,13 +1,14 @@
 import cookieSerializer from './serializer';
 import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
 import config from '../../config';
-import { CookieSerializeOptions, CreateCookieOptions, RemoveCookiesOptions, RequestType } from './types';
+import { CookieSerializeOptions, CreateCookieOptions, RemoveCookiesOptions, RequestType, ResponseType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';
 
 import {
   getCookieHeader,
   getIndexedCookieName,
   getRefreshTokenCookieNameVariants,
+  getSetCookieHeader,
   splitValueToChunks,
 } from './helpers';
 import fronteggLogger from '../fronteggLogger';
@@ -144,6 +145,50 @@ class CookieManager {
     }
 
     logger.info(`Session cookie found, (count: ${sessionCookies.length})`);
+    return sessionCookies;
+  }
+
+  /**
+   * Loop over cookie headers, extract, parse cookies and merged divided cookies from redirected http response,
+   * @return full session cookie headers if exists, else return undefined
+   * @param {ResponseType} response - Outgoing HTTP response
+   */
+  getSessionCookieFromRedirectedResponse(response?: ResponseType): string | undefined {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.getSessionCookieFromRedirectedResponse' });
+    logger.info('Going to extract session from set-cookie header from response');
+
+    if (!response) {
+      logger.info(`'response' argument is null, Cookie header not found`);
+      return undefined;
+    }
+
+    logger.debug('Getting set-cookie header');
+    const cookieStr = getSetCookieHeader(response);
+
+    logger.debug('Parsing set-cookie header string');
+    const cookies = cookieSerializer.parse(cookieStr);
+
+    logger.debug('Loop over session set-cookie header');
+    let i = 1;
+    let sessionCookies = '';
+    let sessionCookieChunk: string | undefined = cookies[this.getCookieName()];
+    if (sessionCookieChunk === undefined) {
+      do {
+        sessionCookieChunk = cookies[getIndexedCookieName(i++)];
+        if (sessionCookieChunk) {
+          sessionCookies += sessionCookieChunk;
+        }
+      } while (sessionCookieChunk);
+    } else {
+      sessionCookies = sessionCookieChunk;
+    }
+
+    if (sessionCookies.length === 0) {
+      logger.info('Session set-cookie NOT found');
+      return undefined;
+    }
+
+    logger.info(`Session set-cookie found, (count: ${sessionCookies.length})`);
     return sessionCookies;
   }
 

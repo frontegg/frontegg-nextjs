@@ -36,11 +36,5 @@
     "types": [
       "jest"
     ]
-  },
-  "include": [
-    "dangerfile.ts"
-  ],
-  "exclude": [
-    "dangerfile.ts"
-  ]
+  }
 }
