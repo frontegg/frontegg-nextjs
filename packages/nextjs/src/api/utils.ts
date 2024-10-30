@@ -108,7 +108,7 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     preparedHeaders[FRONTEGG_APPLICATION_ID_HEADER] = headers[FRONTEGG_APPLICATION_ID_HEADER];
   }
 
-  const clientIp = headers['cf-connecting-ip'] || headers['x-forwarded-for'];
+  const clientIp = headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for'];
   if (clientIp && config.shouldForwardIp) {
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     preparedHeaders[FRONTEGG_CLIENT_SECRET_HEADER] = config.clientSecret ?? '';

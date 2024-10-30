@@ -3,6 +3,7 @@ import { getTenants, getMe, getMeAuthorization, getEntitlements } from '../../ap
 import { calculateExpiresInFromExp } from '../common';
 import fronteggLogger from '../fronteggLogger';
 import config from '../../config';
+import { FRONTEGG_APPLICATION_ID_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../../api/utils';
 
 const FULFILLED_STATUS = 'fulfilled';
 
@@ -27,7 +28,20 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
     const headers: Record<string, string> = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     if (config.appId) {
-      headers['frontegg-requested-application-id'] = config.appId;
+      headers[FRONTEGG_APPLICATION_ID_HEADER] = config.appId;
+    }
+
+    if (config.shouldForwardIp) {
+      logger.debug('Retrieving forwarded IP...');
+      let clientIp =
+        reqHeaders['cf-connecting-ip'] ||
+        reqHeaders['x-vercel-proxied-for'] ||
+        reqHeaders['x-real-ip'] ||
+        reqHeaders['x-forwarded-for'];
+      clientIp = Array.isArray(clientIp) ? clientIp[0] : clientIp;
+      if (clientIp) {
+        headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+      }
     }
 
     logger.debug('Retrieving user data...');

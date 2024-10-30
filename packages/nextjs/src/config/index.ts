@@ -178,13 +178,6 @@ class Config {
     );
   }
 
-  get isForwardIpEnabled(): boolean {
-    if (this.clientSecret) {
-      return getEnvOrDefault(EnvVariables.FRONTEGG_HOSTED_LOGIN, 'false') === 'true';
-    }
-    return false;
-  }
-
   get disableInitialPropsRefreshToken(): boolean {
     const disableInitialPropsRefreshToken = getEnvOrDefault(
       EnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
