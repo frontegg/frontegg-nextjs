@@ -19,6 +19,7 @@ const setupEnvVariables = {
   FRONTEGG_COOKIE_SAME_SITE: process.env.FRONTEGG_COOKIE_SAME_SITE,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
   FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
+  FRONTEGG_FORWARD_IP: process.env.FRONTEGG_FORWARD_IP,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
@@ -86,8 +87,14 @@ class Config {
     return clientSecret;
   }
 
+  get shouldForwardIp(): boolean {
+    return (
+      getEnvOrDefault(EnvVariables.FRONTEGG_FORWARD_IP, setupEnvVariables.FRONTEGG_FORWARD_IP ?? 'false') === 'true'
+    );
+  }
+
   get jwtPublicKeyJson(): string | undefined {
-    return getEnv(EnvVariables.FRONTEGG_JWT_PUBLIC_KEY);
+    return getEnv(EnvVariables.FRONTEGG_JWT_PUBLIC_KEY) ?? setupEnvVariables.FRONTEGG_JWT_PUBLIC_KEY;
   }
 
   get secureJwtEnabled(): string | undefined {
@@ -169,13 +176,6 @@ class Config {
     return (
       this.fronteggAppOptions.hostedLoginBox ?? getEnvOrDefault(EnvVariables.FRONTEGG_HOSTED_LOGIN, 'false') === 'true'
     );
-  }
-
-  get isForwardIpEnabled(): boolean {
-    if (this.clientSecret) {
-      return getEnvOrDefault(EnvVariables.FRONTEGG_HOSTED_LOGIN, 'false') === 'true';
-    }
-    return false;
   }
 
   get disableInitialPropsRefreshToken(): boolean {

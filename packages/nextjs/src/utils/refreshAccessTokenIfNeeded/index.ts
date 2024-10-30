@@ -16,6 +16,7 @@ import {
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
 import createSession from '../createSession';
+import { FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../../api/utils';
 
 export { isRuntimeNextRequest };
 /**
@@ -66,10 +67,15 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       return null;
     }
 
-    nextJsRequest.headers['x-original-forwarded-for'] =
+    const clientIp =
       nextJsRequest.headers['cf-connecting-ip'] ||
       nextJsRequest.headers['x-forwarded-for'] ||
       nextJsRequest.socket.remoteAddress;
+
+    if (clientIp && config.shouldForwardIp) {
+      nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+      nextJsRequest.headers[FRONTEGG_CLIENT_SECRET_HEADER] = config.clientSecret ?? '';
+    }
 
     let response: Response | null;
     if (config.isHostedLogin) {
