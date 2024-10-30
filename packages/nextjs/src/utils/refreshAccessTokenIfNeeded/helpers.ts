@@ -10,6 +10,9 @@ import { FRONTEGG_FORWARDED_SESSION_KEY } from '../common/constants';
 import { FronteggNextJSSession } from '../../types';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
+  if (cookies == null) {
+    return false;
+  }
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
   const refreshTokenKey = CookieManager.refreshTokenKey;
   logger.debug(`Checking if '${refreshTokenKey}' exists in cookies`);

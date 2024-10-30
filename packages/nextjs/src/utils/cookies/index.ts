@@ -282,10 +282,13 @@ class CookieManager {
     const cookiesToRemove = this.getCookiesToRemove(req);
     const cookieValue = this.createEmptyCookies(isSecured, cookieDomain, cookieNames ?? cookiesToRemove);
     let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
+
+    if (existingSetCookie != null && typeof existingSetCookie === 'object' && !Array.isArray(existingSetCookie)) {
+      existingSetCookie = Object.values(existingSetCookie);
+    }
     if (typeof existingSetCookie === 'string') {
       existingSetCookie = [existingSetCookie];
     }
-
     const setCookieHeaders = [...existingSetCookie, ...cookieValue];
     logger.debug(`removing headers (count: ${setCookieHeaders.length})`);
     res.setHeader('set-cookie', setCookieHeaders);

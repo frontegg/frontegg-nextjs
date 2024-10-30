@@ -9,12 +9,11 @@ export default function useRequestAuthorizeSSR({ app, user, tenants, session }: 
     ? {
         ...user,
         refreshToken: session?.refreshToken,
-        accessToken: user.accessToken ?? session?.accessToken,
+        accessToken: user?.accessToken ?? session?.accessToken,
       }
     : null;
 
-  // TODO: consider using useMemo instead of useEffect
-  useEffect(() => {
+  if (typeof window !== 'undefined') {
     app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
       payload: {
@@ -23,5 +22,5 @@ export default function useRequestAuthorizeSSR({ app, user, tenants, session }: 
         tenants,
       },
     });
-  }, [app]);
+  }
 }

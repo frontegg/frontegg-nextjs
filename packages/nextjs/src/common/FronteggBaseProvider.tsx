@@ -1,14 +1,40 @@
 'use client';
 
-import React, { FC, useMemo, useRef } from 'react';
-import { FronteggStoreProvider, CustomComponentRegister } from '@frontegg/react-hooks';
-import { ContextHolder, IUserProfile } from '@frontegg/rest-api';
+import React, { FC, useEffect, useMemo, useRef } from 'react';
+import { FronteggStoreProvider, CustomComponentRegister, useAuthActions, useStore } from '@frontegg/react-hooks';
+import { ContextHolder } from '@frontegg/rest-api';
 import type { FronteggProviderProps } from '../types';
 import AppContext from './AppContext';
 import initializeFronteggApp from '../utils/initializeFronteggApp';
 import useRequestAuthorizeSSR from './useRequestAuthorizeSSR';
 import useOnRedirectTo from '../utils/useOnRedirectTo';
 import config from '../config';
+
+const SSGRequestAuthorize: FC<{ isSSG?: boolean; shouldRequestAuthorize?: boolean }> = ({
+  isSSG,
+  shouldRequestAuthorize,
+}) => {
+  const { store } = useStore();
+  const { requestAuthorize, setAuthState } = useAuthActions();
+
+  useEffect(
+    () => {
+      if (isSSG && shouldRequestAuthorize && !(store.auth as any).silentRefreshing) {
+        setAuthState({ silentRefreshing: true } as any);
+        requestAuthorize().finally(() => {
+          setAuthState({ silentRefreshing: false } as any);
+        });
+      } else {
+        setAuthState({ silentRefreshing: false } as any);
+      }
+    },
+    [
+      /* DON'T add any dependency to make sure this useEffect called once on app mount */
+    ]
+  );
+
+  return <></>;
+};
 
 const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...props }) => {
   const isSSR = typeof window === 'undefined';
@@ -30,15 +56,27 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   );
   ContextHolder.for(appName).setOnRedirectTo(onRedirectTo);
 
-  ContextHolder.for(appName).setAccessToken(session?.accessToken ?? null);
-  ContextHolder.for(appName).setUser(session?.['user'] as any);
-  useRequestAuthorizeSSR({ app, user, tenants, activeTenant, session });
+  useEffect(() => {
+    if (props.shouldRequestAuthorize && !props.isSSG) {
+      if (session?.accessToken) {
+        ContextHolder.for(appName).setAccessToken(session?.accessToken ?? null);
+      }
+      if (user) {
+        ContextHolder.for(appName).setUser(user);
+      }
+      useRequestAuthorizeSSR({ app, user, tenants, activeTenant, session });
+    }
+  }, []);
+
+  const alwaysVisibleChildren = isSSR ? undefined : (
+    <>
+      <SSGRequestAuthorize isSSG={props.isSSG} shouldRequestAuthorize={props.shouldRequestAuthorize} />
+      <CustomComponentRegister app={app} themeOptions={props.themeOptions} />
+    </>
+  );
   return (
     <AppContext.Provider value={app}>
-      <FronteggStoreProvider
-        {...({ ...props, app } as any)}
-        alwaysVisibleChildren={!isSSR && <CustomComponentRegister app={app} themeOptions={props.themeOptions} />}
-      >
+      <FronteggStoreProvider {...({ ...props, app } as any)} alwaysVisibleChildren={alwaysVisibleChildren}>
         {props.children}
       </FronteggStoreProvider>
     </AppContext.Provider>
