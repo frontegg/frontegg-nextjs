@@ -1428,6 +1428,7 @@
     react-is "^17.0.2"
     use-sync-external-store "^1.2.2"
 
+
 "@frontegg/redux-store@7.19.0":
   version "7.19.0"
   resolved "https://registry.yarnpkg.com/@frontegg/redux-store/-/redux-store-7.19.0.tgz#9b08bec70c54271147ba49f432e226c46ffa0c68"
