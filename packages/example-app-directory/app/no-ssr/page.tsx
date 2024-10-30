@@ -1,18 +1,20 @@
+'use client';
+
+import { useAuth } from '@frontegg/nextjs';
 import Link from 'next/link';
-import { UserState } from './UserState';
 
 export default function MainPage() {
+  const { user } = useAuth();
   return (
     <div>
       <h3>Next JS application with frontegg</h3>
+
       <br />
       <br />
-      <UserState />
+      <div>{user?.email ?? 'not logged in'}</div>
       <br />
       <br />
       <Link href='/session'>check session</Link>
-
-      <Link href='/no-ssr'>Go to SSG page</Link>
     </div>
   );
 }
