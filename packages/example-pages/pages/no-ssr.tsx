@@ -5,12 +5,11 @@ import Link from 'next/link';
 export default function NoSsr() {
   const { user, silentRefreshing = true } = useAuth() as any;
 
-  const isSSR = typeof window === 'undefined';
   return (
     <div>
       <h1>NO SSR Session</h1>
 
-      {!isSSR && silentRefreshing && <h2>Loading..</h2>}
+      {silentRefreshing && <h2>Loading..</h2>}
       <code>{/*<pre>{JSON.stringify({user}, null, 2)}</pre>*/}</code>
       {user ? <div>Logged in as: {user.email}</div> : <div>SSG not authorized</div>}
       <br />

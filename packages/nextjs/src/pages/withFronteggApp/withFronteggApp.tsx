@@ -12,7 +12,9 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
   const originalGetInitialProps = app.getInitialProps;
 
   app.getInitialProps = async (appContext: AppContext & AllUserData): Promise<AppInitialProps> => {
-    const { ctx, Component } = appContext;
+    const { ctx, router, Component } = appContext;
+
+    const isSSG = router.isReady == false && router.isPreview == false;
 
     let appEnvConfig = {};
     let appContextSessionData: AllUserData = {
@@ -24,27 +26,30 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
 
     if (ctx.req) {
       appEnvConfig = config.appEnvConfig;
-      const url = ctx.req?.url;
 
-      console.log('withFronteggApp', url);
-
-      if (url && isRuntimeNextRequest(url)) {
-        let session = await refreshAccessTokenIfNeeded(ctx);
-        if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
-          session = removeJwtSignatureFrom(session);
-        }
-        Object.assign(appContextSessionData, { session });
-      } else {
-        let userData = await fetchUserData({
-          getSession: async () => await refreshAccessTokenIfNeeded(ctx),
-          getHeaders: async () => ctx.req?.headers ?? {},
-        });
-        if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
-          userData = removeJwtSignatureFrom(userData);
-          userData.session = removeJwtSignatureFrom(userData?.session);
-        }
+      if (isSSG) {
         shouldRequestAuthorize = true;
-        Object.assign(appContextSessionData, userData);
+      } else {
+        const url = ctx.req?.url;
+
+        if (url && isRuntimeNextRequest(url)) {
+          let session = await refreshAccessTokenIfNeeded(ctx);
+          if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
+            session = removeJwtSignatureFrom(session);
+          }
+          Object.assign(appContextSessionData, { session });
+        } else {
+          let userData = await fetchUserData({
+            getSession: async () => await refreshAccessTokenIfNeeded(ctx),
+            getHeaders: async () => ctx.req?.headers ?? {},
+          });
+          if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
+            userData = removeJwtSignatureFrom(userData);
+            userData.session = removeJwtSignatureFrom(userData?.session);
+          }
+          shouldRequestAuthorize = true;
+          Object.assign(appContextSessionData, userData);
+        }
       }
     }
 

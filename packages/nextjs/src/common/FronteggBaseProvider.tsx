@@ -1,7 +1,7 @@
 'use client';
 
 import React, { FC, useEffect, useMemo, useRef } from 'react';
-import { FronteggStoreProvider, CustomComponentRegister, useAuthActions } from '@frontegg/react-hooks';
+import { FronteggStoreProvider, CustomComponentRegister, useAuthActions, useStore } from '@frontegg/react-hooks';
 import { ContextHolder } from '@frontegg/rest-api';
 import type { FronteggProviderProps } from '../types';
 import AppContext from './AppContext';
@@ -14,16 +14,18 @@ const SSGRequestAuthorize: FC<{ isSSG?: boolean; shouldRequestAuthorize?: boolea
   isSSG,
   shouldRequestAuthorize,
 }) => {
+  const { store } = useStore();
   const { requestAuthorize, setAuthState } = useAuthActions();
 
   useEffect(
     () => {
-      if (isSSG && shouldRequestAuthorize && process.env.NODE_ENV === 'production') {
-        console.warn('Landing on SSG page, should request authorize to update store');
+      if (isSSG && shouldRequestAuthorize && !(store.auth as any).silentRefreshing) {
         setAuthState({ silentRefreshing: true } as any);
-        requestAuthorize().then(() => {
+        requestAuthorize().finally(() => {
           setAuthState({ silentRefreshing: false } as any);
         });
+      } else {
+        setAuthState({ silentRefreshing: false } as any);
       }
     },
     [
@@ -54,15 +56,17 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   );
   ContextHolder.for(appName).setOnRedirectTo(onRedirectTo);
 
-  if (props.shouldRequestAuthorize && !props.isSSG) {
-    if (session?.accessToken) {
-      ContextHolder.for(appName).setAccessToken(session?.accessToken ?? null);
+  useEffect(() => {
+    if (props.shouldRequestAuthorize && !props.isSSG) {
+      if (session?.accessToken) {
+        ContextHolder.for(appName).setAccessToken(session?.accessToken ?? null);
+      }
+      if (user) {
+        ContextHolder.for(appName).setUser(user);
+      }
+      useRequestAuthorizeSSR({ app, user, tenants, activeTenant, session });
     }
-    if (user) {
-      ContextHolder.for(appName).setUser(user);
-    }
-    useRequestAuthorizeSSR({ app, user, tenants, activeTenant, session });
-  }
+  }, []);
 
   const alwaysVisibleChildren = isSSR ? undefined : (
     <>

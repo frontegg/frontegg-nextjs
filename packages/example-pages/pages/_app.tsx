@@ -12,7 +12,6 @@ const options = {
   authOptions: {
     keepSessionAlive: true,
   },
-  cdnUrl: 'http://localhost:3001',
 };
 export default withFronteggApp(
   CustomApp,

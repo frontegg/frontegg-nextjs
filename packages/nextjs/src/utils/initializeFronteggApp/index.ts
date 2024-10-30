@@ -6,6 +6,7 @@ import sdkVersion from '../../sdkVersion';
 import type { FronteggProviderOptions } from '../../types';
 import nextjsPkg from 'next/package.json';
 import { isMiddlewarePath } from '../../api/utils';
+import { ApiUrls } from '../../api/urls';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -55,6 +56,21 @@ const initializeFronteggApp = ({
       } else {
         return options.envBaseUrl;
       }
+    },
+    beforeRequestInterceptor: (options, url) => {
+      try {
+        const path = new URL(url).pathname;
+        if (
+          (path.endsWith(ApiUrls.refreshToken.embedded) || path.endsWith(ApiUrls.refreshToken.hosted)) &&
+          options.headers
+        ) {
+          delete options.headers['authorization'];
+          delete options.headers['Authorization'];
+        }
+      } catch (e) {
+        /** ignore */
+      }
+      return { ...options, url };
     },
     clientId: options.envClientId,
     appId: options.envAppId,
