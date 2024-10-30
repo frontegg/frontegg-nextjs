@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { RedirectOptions } from '@frontegg/rest-api';
 import type { NextRouter } from 'next/router';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';

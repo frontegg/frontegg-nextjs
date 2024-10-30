@@ -45,9 +45,12 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
 }
 
 /**
- * These header is used to identify the tenant for login per tenant feature
+ * These headers are used to identify the tenant for login per tenant feature
  */
 export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
+export const FRONTEGG_FORWARD_IP_HEADER = 'x-frontegg-forwarded-for';
+export const FRONTEGG_CLIENT_SECRET_HEADER = 'x-frontegg-client-secret';
+export const FRONTEGG_APPLICATION_ID_HEADER = 'frontegg-requested-application-id';
 
 /**
  * Build fetch request headers, remove invalid http headers
@@ -101,13 +104,14 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     'x-frontegg-sdk': `@frontegg/nextjs@${sdkVersion.version}`,
   };
 
-  if (headers['frontegg-requested-application-id']) {
-    preparedHeaders['frontegg-requested-application-id'] = headers['frontegg-requested-application-id'];
+  if (headers[FRONTEGG_APPLICATION_ID_HEADER]) {
+    preparedHeaders[FRONTEGG_APPLICATION_ID_HEADER] = headers[FRONTEGG_APPLICATION_ID_HEADER];
   }
 
-  const clientIp = headers['cf-connecting-ip'] || headers['x-original-forwarded-for'] || headers['x-forwarded-for'];
-  if (clientIp) {
-    preparedHeaders['x-original-forwarded-for'] = clientIp;
+  const clientIp = headers['cf-connecting-ip'] || headers['x-forwarded-for'];
+  if (clientIp && config.shouldForwardIp) {
+    preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+    preparedHeaders[FRONTEGG_CLIENT_SECRET_HEADER] = config.clientSecret ?? '';
   }
 
   if (headers[CUSTOM_LOGIN_HEADER]) {

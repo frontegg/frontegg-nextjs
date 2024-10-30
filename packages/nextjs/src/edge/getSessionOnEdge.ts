@@ -8,8 +8,7 @@ import { NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
 import encryptionUtils from '../utils/encryption-edge';
-import Cookies from '../utils/cookies';
-import { buildRequestHeaders } from '../api/utils';
+import { buildRequestHeaders, FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
 
 async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -42,21 +41,16 @@ export const handleHostedLoginCallback = async (
   let clientIp: string | undefined = undefined;
   if (typeof req.headers?.get === 'function') {
     clientIp =
-      req.headers.get('cf-connecting-ip') ||
-      req.headers.get('x-original-forwarded-for') ||
-      req.headers.get('x-forwarded-for') ||
-      (req as any).socket?.remoteAddress;
+      req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || (req as any).socket?.remoteAddress;
   } else if (typeof req.headers === 'object') {
     let requestHeaders: any = { ...req.headers };
     clientIp =
-      requestHeaders['cf-connecting-ip'] ||
-      requestHeaders['x-original-forwarded-for'] ||
-      requestHeaders['x-forwarded-for'] ||
-      (req as any).socket?.remoteAddress;
+      requestHeaders['cf-connecting-ip'] || requestHeaders['x-forwarded-for'] || (req as any).socket?.remoteAddress;
   }
 
-  if (clientIp) {
-    headers['x-original-forwarded-for'] = clientIp;
+  if (clientIp && config.shouldForwardIp) {
+    headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+    headers[FRONTEGG_CLIENT_SECRET_HEADER] = config.clientSecret ?? '';
   }
 
   const response = await api.exchangeHostedLoginToken(
