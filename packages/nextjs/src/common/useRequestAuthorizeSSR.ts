@@ -5,16 +5,16 @@ import { FronteggApp } from '@frontegg/js';
 import { AllUserData } from '../types';
 
 export default function useRequestAuthorizeSSR({ app, user, tenants, session }: { app: FronteggApp } & AllUserData) {
-  const userWithTokensOrNull = user
-    ? {
-        ...user,
-        refreshToken: session?.refreshToken,
-        accessToken: user.accessToken ?? session?.accessToken,
-      }
-    : null;
+  const userWithTokensOrNull =
+    user || session?.user
+      ? {
+          ...(user ?? session?.user),
+          refreshToken: session?.refreshToken,
+          accessToken: user?.accessToken ?? session?.accessToken,
+        }
+      : null;
 
-  // TODO: consider using useMemo instead of useEffect
-  useEffect(() => {
+  if (typeof window !== 'undefined') {
     app?.store.dispatch({
       type: 'auth/requestAuthorizeSSR',
       payload: {
@@ -23,5 +23,5 @@ export default function useRequestAuthorizeSSR({ app, user, tenants, session }: 
         tenants,
       },
     });
-  }, [app]);
+  }
 }

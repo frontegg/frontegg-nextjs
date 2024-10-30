@@ -52,13 +52,25 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
         ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
         ...(appContextSessionData.session == null ? {} : appContextSessionData),
         ...appEnvConfig,
+        ssrProps: ctx.req != null,
       },
     };
   };
 
   function CustomFronteggApp(appProps: AppProps) {
-    const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId, secureJwtEnabled, envAppId } =
-      appProps.pageProps;
+    const {
+      user,
+      tenants,
+      activeTenant,
+      session,
+      envAppUrl,
+      envBaseUrl,
+      envClientId,
+      secureJwtEnabled,
+      envAppId,
+      ssrProps,
+    } = appProps.pageProps;
+
     return (
       <FronteggProvider
         {...options}
@@ -70,6 +82,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           envAppUrl,
           envBaseUrl,
           secureJwtEnabled,
+          ssrProps,
           envClientId,
           envAppId,
         }}

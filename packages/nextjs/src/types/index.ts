@@ -70,6 +70,7 @@ export interface FronteggProviderOptions extends Omit<FronteggAppOptions, 'conte
   envAppUrl: string;
   envBaseUrl: string;
   envClientId: string;
+  ssrProps?: boolean;
   envAppId?: string;
   secureJwtEnabled?: boolean;
   contextOptions?: Omit<FronteggAppOptions['contextOptions'], 'baseUrl'>;
