@@ -20,10 +20,13 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
       user: null,
       tenants: null,
     };
+    let shouldRequestAuthorize = false;
 
     if (ctx.req) {
       appEnvConfig = config.appEnvConfig;
       const url = ctx.req?.url;
+
+      console.log('withFronteggApp', url);
 
       if (url && isRuntimeNextRequest(url)) {
         let session = await refreshAccessTokenIfNeeded(ctx);
@@ -40,6 +43,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           userData = removeJwtSignatureFrom(userData);
           userData.session = removeJwtSignatureFrom(userData?.session);
         }
+        shouldRequestAuthorize = true;
         Object.assign(appContextSessionData, userData);
       }
     }
@@ -52,7 +56,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
         ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
         ...(appContextSessionData.session == null ? {} : appContextSessionData),
         ...appEnvConfig,
-        ssrProps: ctx.req != null,
+        shouldRequestAuthorize,
       },
     };
   };
@@ -68,7 +72,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
       envClientId,
       secureJwtEnabled,
       envAppId,
-      ssrProps,
+      shouldRequestAuthorize,
     } = appProps.pageProps;
 
     return (
@@ -82,7 +86,8 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           envAppUrl,
           envBaseUrl,
           secureJwtEnabled,
-          ssrProps,
+          shouldRequestAuthorize,
+          isSSG: appProps.__N_SSG,
           envClientId,
           envAppId,
         }}
