@@ -1,18 +1,4 @@
-import { fronteggRefreshTokenUrl } from '@frontegg/rest-api';
 import config from '../config';
-
-export const ApiUrls = {
-  WellKnown: {
-    jwks: `/.well-known/jwks.json`,
-  },
-  refreshToken: {
-    embedded: `/frontegg${fronteggRefreshTokenUrl}`,
-    hosted: `/frontegg/oauth/token`,
-  },
-  activateAccount: {
-    activate: '/frontegg/identity/resources/users/v1/activate',
-  },
-};
 
 export interface BuildRouteResult {
   asPath: string;
@@ -23,7 +9,7 @@ export interface BuildRouteResult {
  * Builds a login route with a redirect URL encoded as a query parameter.
  *
  *  @param {string} redirectUrl - The URL to redirect to after successful login.
- *  @param {URLSearchParams} searchParams - optional The URL search Params to preserve to login
+ *  @param {URLSearchParams} searchParams - optional The URL search Params to preserve to log in
  *  @param {string} baseUrl - optional The login base URL the user will be redirected to (default .env.local FRONTEGG_APP_URL)
  *  @returns {BuildRouteResult} An object containing the generated login route and URL.
  *

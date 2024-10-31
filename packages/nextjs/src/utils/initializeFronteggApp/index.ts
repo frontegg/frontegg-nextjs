@@ -6,7 +6,7 @@ import sdkVersion from '../../sdkVersion';
 import type { FronteggProviderOptions } from '../../types';
 import nextjsPkg from 'next/package.json';
 import { isMiddlewarePath } from '../../api/utils';
-import { ApiUrls } from '../../api/urls';
+import { CommonUrls } from '../common/urls';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -69,9 +69,12 @@ const initializeFronteggApp = ({
             return { ...options, url };
           }
           if (
-            [ApiUrls.refreshToken.embedded, ApiUrls.refreshToken.hosted, ApiUrls.activateAccount.activate].find(
-              (path) => pathname.endsWith(path)
-            ) != undefined
+            [
+              CommonUrls.refreshToken.embedded,
+              CommonUrls.refreshToken.hosted,
+              CommonUrls.activateAccount.activate,
+              CommonUrls.logout,
+            ].find((path) => pathname.endsWith(path)) != undefined
           ) {
             delete options.headers['authorization'];
             delete options.headers['Authorization'];

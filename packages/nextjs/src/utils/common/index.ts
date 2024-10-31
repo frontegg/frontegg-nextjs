@@ -1,5 +1,3 @@
-import { ApiUrls } from '../../api/urls';
-
 /**
  * Splits a string into chunks of a specified size.
  * @param {string} str - The string to be chunked.
