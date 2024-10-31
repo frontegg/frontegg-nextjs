@@ -7,6 +7,7 @@ import type { FronteggProviderOptions } from '../../types';
 import nextjsPkg from 'next/package.json';
 import { isMiddlewarePath } from '../../api/utils';
 import { ApiUrls } from '../../api/urls';
+import { isFronteggLogoutUrl } from '../../middleware/helpers';
 
 type CreateOrGetFronteggAppParams = {
   options: FronteggProviderOptions;
@@ -60,10 +61,13 @@ const initializeFronteggApp = ({
     beforeRequestInterceptor: (options, url) => {
       try {
         const path = new URL(url).pathname;
-        if (
-          (path.endsWith(ApiUrls.refreshToken.embedded) || path.endsWith(ApiUrls.refreshToken.hosted)) &&
-          options.headers
-        ) {
+
+        const shouldRemoveAuthorizationToken =
+          path.endsWith(ApiUrls.refreshToken.embedded) ||
+          path.endsWith(ApiUrls.refreshToken.hosted) ||
+          isFronteggLogoutUrl(path);
+
+        if (shouldRemoveAuthorizationToken && options.headers) {
           delete options.headers['authorization'];
           delete options.headers['Authorization'];
         }
