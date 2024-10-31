@@ -61,10 +61,23 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       }
     }
 
-    if (isOauthCallback(url) || isSamlCallback(url)) {
-      /* Prevent refresh token due to oauth login callback */
-      logger.debug(`abandon refreshToken for url='/oauth/callback'`);
-      return null;
+    if (config.isHostedLogin) {
+      // hosted login bypassed urls
+      if (isOauthCallback(url)) {
+        logger.debug(`abandon refreshToken for HostedLogin Callback ${url}`);
+        CookieManager.removeCookies({
+          isSecured: config.isSSL,
+          cookieDomain: config.cookieDomain,
+          res: nextJsResponse,
+          req: nextJsRequest,
+        });
+      }
+    } else {
+      // embedded login bypassed urls
+      if (isSamlCallback(url)) {
+        logger.debug(`abandon refreshToken for Saml Callback ${url}`);
+        return null;
+      }
     }
 
     const clientIp =

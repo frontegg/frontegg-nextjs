@@ -265,23 +265,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-### Routing
-
-
+### routing
 ```tsx
 // ./app/[...frontegg-router]/page.tsx
 
-/** 
- * For Next.js 15+ use the following FronteggAppRouterAsync as default export 
- */
-export { FronteggAppRouterAsync as default } from '@frontegg/nextjs/app';
-
-
-/** 
- * For Next.js 14 and below use the following FronteggAppRouter as default export 
- */
 export { FronteggAppRouter as default } from '@frontegg/nextjs/app';
 ```
+
 
 ### server component
 notice that this session is not part of the state and therefore won't trigger ui changes when it changes

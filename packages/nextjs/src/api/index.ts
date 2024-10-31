@@ -1,5 +1,4 @@
 import config from '../config';
-import { ApiUrls } from './urls';
 import { buildRequestHeaders, Get, parseHttpResponse, Post } from './utils';
 import {
   fronteggTenantsV3Url,
@@ -12,12 +11,13 @@ import {
 } from '@frontegg/rest-api';
 
 import { UserEntitlementsResponseV2 } from '@frontegg/types';
+import { CommonUrls } from '../utils/common/urls';
 
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
  */
 const loadPublicKey = async () => {
-  const response = await fetch(`${config.baseUrl}${ApiUrls.WellKnown.jwks}`, {
+  const response = await fetch(`${config.baseUrl}${CommonUrls.WellKnown.jwks}`, {
     cache: 'force-cache',
   });
   const data = await response.json();
@@ -25,12 +25,12 @@ const loadPublicKey = async () => {
 };
 
 /**
- * Send HTTP post request for Frontegg services to refresh token
+ * Send HTTP post-request for Frontegg services to refresh token
  * by providing client's fe_ cookies
  */
 const refreshTokenEmbedded = async (headers: Record<string, string>) => {
   return Post({
-    url: `${config.baseUrl}${ApiUrls.refreshToken.embedded}`,
+    url: `${config.baseUrl}${CommonUrls.refreshToken.embedded}`,
     body: '{}',
     credentials: 'include',
     headers: buildRequestHeaders(headers),
@@ -48,7 +48,7 @@ const refreshTokenHostedLogin = async (
   clientSecret?: string
 ) => {
   return Post({
-    url: `${config.baseUrl}${ApiUrls.refreshToken.hosted}`,
+    url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
     body: JSON.stringify({
       grant_type: 'refresh_token',
       refresh_token,
@@ -69,7 +69,7 @@ export const exchangeHostedLoginToken = async (
   clientSecret: string
 ) => {
   return Post({
-    url: `${config.baseUrl}${ApiUrls.refreshToken.hosted}`,
+    url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
     body: JSON.stringify({
       redirect_uri: `${config.appUrl}/oauth/callback`,
       grant_type: 'authorization_code',

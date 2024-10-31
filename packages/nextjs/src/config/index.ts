@@ -61,6 +61,7 @@ class Config {
   get appId(): string | undefined {
     return getEnvOrDefault(EnvVariables.FRONTEGG_APP_ID, setupEnvVariables.FRONTEGG_APP_ID);
   }
+
   get rewriteCookieByAppId(): boolean {
     return (
       getEnvOrDefault(
@@ -78,7 +79,7 @@ class Config {
       clientSecret = setupEnvVariables.FRONTEGG_CLIENT_SECRET;
     }
 
-    if (this.secureJwtEnabled === 'true' && !clientSecret) {
+    if (this.secureJwtEnabled && !clientSecret) {
       throw new InvalidFronteggEnv(
         EnvVariables.FRONTEGG_CLIENT_SECRET,
         'Client secret is required when secure JWT is enabled'
@@ -97,12 +98,13 @@ class Config {
     return getEnv(EnvVariables.FRONTEGG_JWT_PUBLIC_KEY) ?? setupEnvVariables.FRONTEGG_JWT_PUBLIC_KEY;
   }
 
-  get secureJwtEnabled(): string | undefined {
-    try {
-      return getEnv(EnvVariables.FRONTEGG_SECURE_JWT_ENABLED) ?? setupEnvVariables.FRONTEGG_SECURE_JWT_ENABLED;
-    } catch (e) {
-      return setupEnvVariables.FRONTEGG_SECURE_JWT_ENABLED;
-    }
+  get secureJwtEnabled(): boolean {
+    return (
+      getEnvOrDefault(
+        EnvVariables.FRONTEGG_SECURE_JWT_ENABLED,
+        setupEnvVariables.FRONTEGG_SECURE_JWT_ENABLED ?? 'false'
+      ) == 'true'
+    );
   }
 
   get cookieName(): string {
@@ -193,8 +195,23 @@ class Config {
       envClientId: this.clientId,
       envAppId: this.appId,
       secureJwtEnabled: this.secureJwtEnabled,
+      envHostedLoginBox: this.isHostedLogin,
     };
     return config;
+  }
+
+  checkHostedLoginConfig(options: WithFronteggAppOptions | undefined) {
+    // noinspection JSDeprecatedSymbols
+    if (options?.hostedLoginBox === undefined) {
+      return;
+    }
+    // noinspection JSDeprecatedSymbols
+    if (options.hostedLoginBox != this.isHostedLogin) {
+      throw new Error(
+        'There is mismatch between FRONTEGG_HOSTED_LOGIN environment variable and withFronteggOptions, ' +
+          'please remove the hostedLoginBox from withFronteggOptions and use the FRONTEGG_HOSTED_LOGIN environment variable instead.'
+      );
+    }
   }
 }
 
