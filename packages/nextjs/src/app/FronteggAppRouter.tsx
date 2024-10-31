@@ -9,56 +9,46 @@ interface FronteggRouterProps {
   searchParams?: ParsedUrlQuery;
 }
 
-export function FronteggAppRouter(props: FronteggRouterProps) {
-  const {
-    params: { 'frontegg-router': pathArr = [] },
-    searchParams,
-  } = props;
-
-  let pathname = `/${pathArr.join('/')}`;
-  if (!pathname || pathname.startsWith('/_next/data')) {
-    if (searchParams) {
-      const query = searchParams[Object.keys(searchParams)[0]];
-      pathname = `/${Array.isArray(query) ? query.join('/') : query}`;
-    } else {
-      notFound();
-      return null;
-    }
-  }
-
-  if (!isAuthRoute(pathname)) {
-    notFound();
-    return null;
-  }
-
-  return <FronteggRouterBase pathArr={pathArr} queryParams={searchParams} isAppDirEnabled />;
-}
-
 interface FronteggRouterAsyncProps {
   params: Promise<ParsedUrlQuery & { 'frontegg-router'?: string[] }>;
-  searchParams?: Promise<ParsedUrlQuery>;
+  searchParams: Promise<ParsedUrlQuery>;
 }
-export async function FronteggAppRouterAsync(props: FronteggRouterAsyncProps) {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
 
-  const pathArr = params['frontegg-router'] || [];
+export function FronteggAppRouter(props: FronteggRouterProps) {
+  const renderAppRouter = (searchParams: ParsedUrlQuery | undefined, pathArr: string[]) => {
+    let pathname = `/${pathArr.join('/')}`;
+    if (!pathname || pathname.startsWith('/_next/data')) {
+      if (searchParams) {
+        const query = searchParams[Object.keys(searchParams)[0]];
+        pathname = `/${Array.isArray(query) ? query.join('/') : query}`;
+      } else {
+        notFound();
+        return null;
+      }
+    }
 
-  let pathname = `/${pathArr.join('/')}`;
-  if (!pathname || pathname.startsWith('/_next/data')) {
-    if (searchParams) {
-      const query = searchParams[Object.keys(searchParams)[0]];
-      pathname = `/${Array.isArray(query) ? query.join('/') : query}`;
-    } else {
+    if (!isAuthRoute(pathname)) {
       notFound();
       return null;
     }
+
+    return <FronteggRouterBase pathArr={pathArr} queryParams={searchParams} isAppDirEnabled />;
+  };
+
+  /**
+   * used to avoid type error by supporting both NextJS 15+ and NextJS < 14 versions
+   * for promise and non-promise props
+   * for more info: https://nextjs.org/docs/messages/sync-dynamic-apis
+   */
+  // noinspection SuspiciousTypeOfGuard
+  if (props.params instanceof Promise || props.searchParams instanceof Promise) {
+    const asyncProps: FronteggRouterAsyncProps = props as any;
+    return asyncProps.params.then((params) => {
+      return asyncProps.searchParams.then((searchParams) => {
+        return renderAppRouter(searchParams, params['frontegg-router'] || []);
+      });
+    });
   }
 
-  if (!isAuthRoute(pathname)) {
-    notFound();
-    return null;
-  }
-
-  return <FronteggRouterBase pathArr={pathArr} queryParams={searchParams} isAppDirEnabled />;
+  return renderAppRouter(props.searchParams, props.params['frontegg-router'] || []);
 }
