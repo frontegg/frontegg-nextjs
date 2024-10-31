@@ -8,6 +8,11 @@ export type FronteggCustomAppClass = ((props: AppPropsType<any>) => JSX.Element)
   getInitialProps?: FronteggCustomApp['getInitialProps'];
 };
 
-export type WithFronteggAppOptions = Omit<FronteggAppOptions, 'contextOptions'> & {
+export type WithFronteggAppOptions = Omit<FronteggAppOptions, 'contextOptions' | 'hostedLoginBox'> & {
   contextOptions?: Partial<FronteggAppOptions['contextOptions']>;
+
+  /**
+   * @deprecated use FRONTEGG_HOSTED_LOGIN environment variable instead
+   */
+  hostedLoginBox?: FronteggAppOptions['hostedLoginBox'];
 };

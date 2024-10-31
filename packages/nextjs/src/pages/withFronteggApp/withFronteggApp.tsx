@@ -16,6 +16,8 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
 
     const isSSG = router.isReady == false && router.isPreview == false;
 
+    config.checkHostedLoginConfig(options);
+
     let appEnvConfig = {};
     let appContextSessionData: AllUserData = {
       session: null,
@@ -77,12 +79,14 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
       envClientId,
       secureJwtEnabled,
       envAppId,
+      envHostedLoginBox,
       shouldRequestAuthorize,
     } = appProps.pageProps;
 
     return (
       <FronteggProvider
         {...options}
+        hostedLoginBox={envHostedLoginBox}
         {...{
           user,
           tenants,
@@ -90,6 +94,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           session,
           envAppUrl,
           envBaseUrl,
+          envHostedLoginBox,
           secureJwtEnabled,
           shouldRequestAuthorize,
           isSSG: appProps.__N_SSG,
