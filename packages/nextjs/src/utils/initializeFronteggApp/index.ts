@@ -58,14 +58,24 @@ const initializeFronteggApp = ({
       }
     },
     beforeRequestInterceptor: (options, url) => {
+      /**
+       * Determines whether the authorization header should be removed from a request.
+       * @param {String} urlStr - The URL of the request.
+       */
       try {
-        const path = new URL(url).pathname;
-        if (
-          (path.endsWith(ApiUrls.refreshToken.embedded) || path.endsWith(ApiUrls.refreshToken.hosted)) &&
-          options.headers
-        ) {
-          delete options.headers['authorization'];
-          delete options.headers['Authorization'];
+        if (url && options.headers) {
+          const { pathname, origin } = new URL(url);
+          if (typeof window !== 'undefined' && origin != window.location.origin) {
+            return { ...options, url };
+          }
+          if (
+            [ApiUrls.refreshToken.embedded, ApiUrls.refreshToken.hosted, ApiUrls.activateAccount.activate].find(
+              (path) => pathname.endsWith(path)
+            ) != undefined
+          ) {
+            delete options.headers['authorization'];
+            delete options.headers['Authorization'];
+          }
         }
       } catch (e) {
         /** ignore */

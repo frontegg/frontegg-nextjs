@@ -9,6 +9,9 @@ export const ApiUrls = {
     embedded: `/frontegg${fronteggRefreshTokenUrl}`,
     hosted: `/frontegg/oauth/token`,
   },
+  activateAccount: {
+    activate: '/frontegg/identity/resources/users/v1/activate',
+  },
 };
 
 export interface BuildRouteResult {
