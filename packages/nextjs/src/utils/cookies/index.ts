@@ -12,6 +12,7 @@ import {
   splitValueToChunks,
 } from './helpers';
 import fronteggLogger from '../fronteggLogger';
+import { NextApiRequest } from 'next/dist/shared/lib/utils';
 
 class CookieManager {
   getCookieName = (cookieNumber?: number, cookieName = config.cookieName) =>
@@ -120,14 +121,17 @@ class CookieManager {
 
     logger.debug('Getting cookie header');
     const cookieStr = getCookieHeader(request);
+    logger.debug('cookieStr', cookieStr);
 
     logger.debug('Parsing cookie header string');
     const cookies = cookieSerializer.parse(cookieStr);
+    logger.debug('cookieSerializer.parse(cookieStr)', cookies);
 
     logger.debug('Loop over session cookie headers');
     let i = 1;
     let sessionCookies = '';
     let sessionCookieChunk: string | undefined = cookies[this.getCookieName()];
+    logger.debug('sessionCookieChunk', sessionCookieChunk);
     if (sessionCookieChunk === undefined) {
       do {
         sessionCookieChunk = cookies[getIndexedCookieName(i++)];
@@ -146,6 +150,36 @@ class CookieManager {
 
     logger.info(`Session cookie found, (count: ${sessionCookies.length})`);
     return sessionCookies;
+  }
+
+  getRefreshCookieFromRequest(request?: RequestType): any {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.getRefreshCookieFromRequest' });
+    logger.info('Going to extract refresh cookie header from request');
+
+    if (!request) {
+      logger.info(`'request' argument is null, Cookie header not found`);
+      return undefined;
+    }
+
+    logger.debug('Getting cookie header');
+    const cookieStr = getCookieHeader(request);
+    logger.debug('cookieStr', cookieStr);
+
+    logger.debug('Parsing cookie header string');
+    const cookies = cookieSerializer.parse(cookieStr);
+
+    const refreshTokenKey = this.refreshTokenKey;
+    const refreshCookie = Object.keys(cookies).find((cookie) => {
+      return cookie.replace(/-/g, '') === refreshTokenKey;
+    });
+
+    if (!refreshCookie) {
+      logger.info('Refresh cookie NOT found');
+      return undefined;
+    }
+
+    logger.info(`Refresh cookie found, (${refreshCookie})`);
+    return refreshCookie;
   }
 
   /**

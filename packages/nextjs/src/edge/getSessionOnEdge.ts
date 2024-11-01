@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
 import { buildRequestHeaders, FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import { NextApiRequest } from 'next/dist/shared/lib/utils';
+import { refreshAccessTokenEmbedded, refreshAccessTokenHostedLogin } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -20,9 +22,41 @@ async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any
   return [session, decodedJwt, refreshToken];
 }
 
-export const getSessionOnEdge = (req: IncomingMessage | Request): Promise<FronteggNextJSSession | undefined> => {
-  const cookies = CookieManager.getSessionCookieFromRequest(req);
-  return createSession(cookies, encryptionEdge);
+export const getSessionOnEdge = async (
+  req: IncomingMessage | Request,
+  response?: NextResponse
+): Promise<FronteggNextJSSession | undefined> => {
+  const sessionCookies = CookieManager.getSessionCookieFromRequest(req);
+
+  if (!sessionCookies) {
+    const refreshCookie = CookieManager.getRefreshCookieFromRequest(req);
+
+    if (refreshCookie) {
+      const headers = req.headers as Record<string, string>;
+      const clientId = config.clientId;
+      const clientSecret = config.clientSecret;
+      console.log('refresh cookie', refreshCookie);
+      let response: Response | null;
+      if (config.isHostedLogin) {
+        try {
+          response = await api.refreshTokenHostedLogin(headers, refreshCookie, clientId, clientSecret);
+          console.log('response api.refreshTokenHostedLogin', await response.json());
+        } catch (e) {
+          console.log('error api.refreshTokenHostedLogin', e);
+        }
+      } else {
+        try {
+          response = await api.refreshTokenEmbedded(headers);
+          console.log('response api.refreshTokenEmbedded', await response.json());
+        } catch (e) {
+          console.log('error headers', headers);
+          console.log('error api.refreshTokenEmbedded', e);
+        }
+      }
+    }
+  }
+
+  return createSession(sessionCookies, encryptionEdge);
 };
 
 export const handleHostedLoginCallback = async (

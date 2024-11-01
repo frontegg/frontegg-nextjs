@@ -25,6 +25,8 @@ export const middleware = async (request: NextRequest) => {
   }
 
   const session = await getSessionOnEdge(request);
+  const response = NextResponse.next();
+
   if (!session) {
     return redirectToLogin(pathname, searchParams);
   }
