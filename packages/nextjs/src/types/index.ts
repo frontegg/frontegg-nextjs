@@ -20,6 +20,11 @@ export interface FronteggNextJSSession extends FronteggUserTokens {
   user: FronteggUserSession;
 }
 
+export interface FronteggEdgeSession {
+  session?: FronteggNextJSSession;
+  headers?: Record<string, string>;
+}
+
 export type RequestType = IncomingMessage | Request;
 
 export interface AccountEnvironment {
@@ -32,17 +37,13 @@ export interface CustomClaims {
   accountEnvironments: AccountEnvironment[];
 }
 
-export interface FronteggUserTokens {
-  accessToken: string;
-  refreshToken?: string;
-}
-
 export interface AllUserData {
   user?: ILoginResponse | null;
   tenants?: ITenantsResponse[] | null;
   activeTenant?: ITenantsResponse;
   session?: FronteggNextJSSession | null;
 }
+
 export interface FronteggUserSession {
   sub: string;
   name: string;
@@ -60,10 +61,6 @@ export interface FronteggUserSession {
   exp: number;
   aud: string;
   iss: string;
-}
-
-export interface FronteggNextJSSession extends FronteggUserTokens {
-  user: FronteggUserSession;
 }
 
 export interface FronteggProviderOptions extends Omit<FronteggAppOptions, 'contextOptions'>, AllUserData {
@@ -116,6 +113,7 @@ declare module 'iron-session' {
 
 declare global {
   var customLoginAppUrl: string | undefined;
+
   interface ProcessEnv {
     FRONTEGG_BASE_URL: string;
     PORT?: string;

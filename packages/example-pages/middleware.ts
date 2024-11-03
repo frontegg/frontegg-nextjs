@@ -24,11 +24,15 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  const session = await getSessionOnEdge(request);
-  const response = NextResponse.next();
+  const edgeSession = await getSessionOnEdge(request);
 
-  if (!session) {
+  if (!edgeSession) {
     return redirectToLogin(pathname, searchParams);
+  }
+  if (edgeSession.headers) {
+    return NextResponse.next({
+      headers: edgeSession.headers,
+    });
   }
   return NextResponse.next();
 };

@@ -152,7 +152,7 @@ class CookieManager {
     return sessionCookies;
   }
 
-  getRefreshCookieFromRequest(request?: RequestType): any {
+  getRefreshCookieFromRequestEdge(request?: RequestType): string | undefined {
     const logger = fronteggLogger.child({ tag: 'CookieManager.getRefreshCookieFromRequest' });
     logger.info('Going to extract refresh cookie header from request');
 
@@ -179,7 +179,7 @@ class CookieManager {
     }
 
     logger.info(`Refresh cookie found, (${refreshCookie})`);
-    return refreshCookie;
+    return cookies[refreshCookie];
   }
 
   /**
@@ -305,18 +305,32 @@ class CookieManager {
   };
 
   /**
-   * Take a list of cookieNames and modify request/response headers
-   * to proxy the cookies from Next.js to Frontegg Services and vice-versa
-   * @param {string[]} setCookieValue - list of cookies to modify
-   * @param {boolean} isSecured - if the running application behind SSL
+   * Take a list of cookieNames and return the headers to remove the cookies from the client side
+   * @param {RemoveCookiesOptions} setCookieValue
    */
-  removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesOptions): void {
-    const logger = fronteggLogger.child({ tag: 'CookieManager.removeCookies' });
+  getRequestCookiesHeaderToRemove({
+    cookieNames,
+    isSecured,
+    cookieDomain,
+    req,
+  }: Omit<RemoveCookiesOptions, 'res'>): string[] {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.getSetCookiesHeaderToRemove' });
     logger.debug('Setting empty cookie headers remove cookies from client side');
     const cookiesToRemove = this.getCookiesToRemove(req);
     const cookieValue = this.createEmptyCookies(isSecured, cookieDomain, cookieNames ?? cookiesToRemove);
-    let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
+    return [...cookieValue];
+  }
 
+  /**
+   * Take a list of cookieNames and modify request/response headers
+   * to proxy the cookies from Next.js to Frontegg Services and vice-versa
+   * @param {RemoveCookiesOptions} setCookieValue
+   */
+  removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesOptions): void {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.removeCookies' });
+    const cookieValue = this.getRequestCookiesHeaderToRemove({ cookieNames, isSecured, cookieDomain, req });
+
+    let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
     if (existingSetCookie != null && typeof existingSetCookie === 'object' && !Array.isArray(existingSetCookie)) {
       existingSetCookie = Object.values(existingSetCookie);
     }
@@ -324,6 +338,7 @@ class CookieManager {
       existingSetCookie = [existingSetCookie];
     }
     const setCookieHeaders = [...existingSetCookie, ...cookieValue];
+
     logger.debug(`removing headers (count: ${setCookieHeaders.length})`);
     res.setHeader('set-cookie', setCookieHeaders);
   }
