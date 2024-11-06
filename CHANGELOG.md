@@ -1,5 +1,31 @@
 # Change Log
 
+## [9.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.4...v9.0.5) (2024-10-31)
+
+- FR-18476 - Added url for beforeRequestInterceptor function
+
+
+- FR-18476 - Added request interceptor
+- FR-18472 - Fixed Google one tap login stuck after unmounting login&#x2F;signup unmounted
+
+- FR-18436 - Fixed activate account with empty redirect bug
+
+
+- FR-17943 - Added code pages
+
+- FR-18427 - Added Support for triggering MFA after native passkeys &#x2F; iOS apple login
+- FR-18211 - Fixed email overlapping roles field
+
+- FR-18356 - Fixed validations localization override type
+
+
+### NextJS Wrapper 9.0.5:
+- FR-18442 - Remove cookies when landing on oauth/callback to support after hosted login activate account succeeded
+- FR-18442 - Fix Nextjs session store injection and support SSG pages
+- Fix session abandoned when accessing not found page
+- Export FronteggAppRouterAsync to be imported by '@frontegg/nextjs/app'
+- Add Support for NextJS 15
+
 ## [9.0.4](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.3...v9.0.4) (2024-10-22)
 
 - FR-18356 - Fixed validations localization override type
