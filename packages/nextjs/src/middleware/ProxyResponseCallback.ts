@@ -101,7 +101,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
             res.setHeader(header, `${proxyRes.headers[header]}`);
           });
         res.setHeader('set-cookie', cookies);
-        res.setHeader('content-length', buffer.length);
+        res.setHeader('content-length', Buffer.byteLength(bodyStr));
         res.status(statusCode).end(bodyStr);
       } else {
         if (statusCode >= 400 && statusCode !== 404) {

@@ -121,17 +121,14 @@ class CookieManager {
 
     logger.debug('Getting cookie header');
     const cookieStr = getCookieHeader(request);
-    logger.debug('cookieStr', cookieStr);
 
     logger.debug('Parsing cookie header string');
     const cookies = cookieSerializer.parse(cookieStr);
-    logger.debug('cookieSerializer.parse(cookieStr)', cookies);
 
     logger.debug('Loop over session cookie headers');
     let i = 1;
     let sessionCookies = '';
     let sessionCookieChunk: string | undefined = cookies[this.getCookieName()];
-    logger.debug('sessionCookieChunk', sessionCookieChunk);
     if (sessionCookieChunk === undefined) {
       do {
         sessionCookieChunk = cookies[getIndexedCookieName(i++)];
@@ -163,7 +160,6 @@ class CookieManager {
 
     logger.debug('Getting cookie header');
     const cookieStr = getCookieHeader(request);
-    logger.debug('cookieStr', cookieStr);
 
     logger.debug('Parsing cookie header string');
     const cookies = cookieSerializer.parse(cookieStr);
@@ -178,7 +174,7 @@ class CookieManager {
       return undefined;
     }
 
-    logger.info(`Refresh cookie found, (${refreshCookie})`);
+    logger.info(`Refresh cookie found for key: ${refreshTokenKey}`);
     return cookies[refreshCookie];
   }
 
