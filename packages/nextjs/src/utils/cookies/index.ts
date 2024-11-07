@@ -12,6 +12,7 @@ import {
   splitValueToChunks,
 } from './helpers';
 import fronteggLogger from '../fronteggLogger';
+import { NextApiRequest } from 'next/dist/shared/lib/utils';
 
 class CookieManager {
   getCookieName = (cookieNumber?: number, cookieName = config.cookieName) =>
@@ -148,6 +149,35 @@ class CookieManager {
     return sessionCookies;
   }
 
+  getRefreshCookieFromRequestEdge(request?: RequestType): string | undefined {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.getRefreshCookieFromRequest' });
+    logger.info('Going to extract refresh cookie header from request');
+
+    if (!request) {
+      logger.info(`'request' argument is null, Cookie header not found`);
+      return undefined;
+    }
+
+    logger.debug('Getting cookie header');
+    const cookieStr = getCookieHeader(request);
+
+    logger.debug('Parsing cookie header string');
+    const cookies = cookieSerializer.parse(cookieStr);
+
+    const refreshTokenKey = this.refreshTokenKey;
+    const refreshCookie = Object.keys(cookies).find((cookie) => {
+      return cookie.replace(/-/g, '') === refreshTokenKey;
+    });
+
+    if (!refreshCookie) {
+      logger.info('Refresh cookie NOT found');
+      return undefined;
+    }
+
+    logger.info(`Refresh cookie found for key: ${refreshTokenKey}`);
+    return cookies[refreshCookie];
+  }
+
   /**
    * Loop over cookie headers, extract, parse cookies and merged divided cookies from redirected http response,
    * @return full session cookie headers if exists, else return undefined
@@ -271,18 +301,32 @@ class CookieManager {
   };
 
   /**
-   * Take a list of cookieNames and modify request/response headers
-   * to proxy the cookies from Next.js to Frontegg Services and vice-versa
-   * @param {string[]} setCookieValue - list of cookies to modify
-   * @param {boolean} isSecured - if the running application behind SSL
+   * Take a list of cookieNames and return the headers to remove the cookies from the client side
+   * @param {RemoveCookiesOptions} setCookieValue
    */
-  removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesOptions): void {
-    const logger = fronteggLogger.child({ tag: 'CookieManager.removeCookies' });
+  getRequestCookiesHeaderToRemove({
+    cookieNames,
+    isSecured,
+    cookieDomain,
+    req,
+  }: Omit<RemoveCookiesOptions, 'res'>): string[] {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.getSetCookiesHeaderToRemove' });
     logger.debug('Setting empty cookie headers remove cookies from client side');
     const cookiesToRemove = this.getCookiesToRemove(req);
     const cookieValue = this.createEmptyCookies(isSecured, cookieDomain, cookieNames ?? cookiesToRemove);
-    let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
+    return [...cookieValue];
+  }
 
+  /**
+   * Take a list of cookieNames and modify request/response headers
+   * to proxy the cookies from Next.js to Frontegg Services and vice-versa
+   * @param {RemoveCookiesOptions} setCookieValue
+   */
+  removeCookies({ cookieNames, isSecured, cookieDomain, res, req }: RemoveCookiesOptions): void {
+    const logger = fronteggLogger.child({ tag: 'CookieManager.removeCookies' });
+    const cookieValue = this.getRequestCookiesHeaderToRemove({ cookieNames, isSecured, cookieDomain, req });
+
+    let existingSetCookie = (res.getHeader('set-cookie') as string[] | string) ?? [];
     if (existingSetCookie != null && typeof existingSetCookie === 'object' && !Array.isArray(existingSetCookie)) {
       existingSetCookie = Object.values(existingSetCookie);
     }
@@ -290,6 +334,7 @@ class CookieManager {
       existingSetCookie = [existingSetCookie];
     }
     const setCookieHeaders = [...existingSetCookie, ...cookieValue];
+
     logger.debug(`removing headers (count: ${setCookieHeaders.length})`);
     res.setHeader('set-cookie', setCookieHeaders);
   }

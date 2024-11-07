@@ -70,6 +70,9 @@ export function Index() {
       <Link href='/no-ssr'>Go to SSG page</Link>
       <br />
       <br />
+      <Link href='/no-ssr-2'>Go to SSG page 2</Link>
+      <br />
+      <br />
       <Link href='/account/logout'>logout embedded</Link>
       <br />
       <br />
