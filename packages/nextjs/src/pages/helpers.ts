@@ -33,7 +33,7 @@ export function withSSRSession<
     if (session) {
       return handler(context, session);
     } else {
-      let loginUrl = config.authRoutes.loginUrl ?? defaultFronteggRoutes.logoutUrl;
+      let loginUrl = config.authRoutes.loginUrl ?? defaultFronteggRoutes.loginUrl;
 
       if (!loginUrl.startsWith('/')) {
         loginUrl = `/${loginUrl}`;
