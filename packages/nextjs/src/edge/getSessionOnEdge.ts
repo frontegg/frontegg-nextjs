@@ -1,19 +1,147 @@
 import type { IncomingMessage } from 'http';
-import { FronteggEdgeSession, FronteggNextJSSession } from '../types';
+import { FronteggEdgeSession } from '../types';
 import CookieManager from '../utils/cookies';
 import createSession from '../utils/createSession';
 import encryptionEdge from '../utils/encryption-edge';
 import api from '../api';
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
 import { buildRequestHeaders, FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
 import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
+import { redirectToLogin } from './redirectToLogin';
+import { shouldByPassMiddleware } from './shouldBypassMiddleware';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.getSessionOnEdge' });
 
+export type HandleSessionOnEdge = {
+  request: IncomingMessage | Request;
+  pathname: string;
+  headers: NextRequest['headers'];
+  searchParams: URLSearchParams;
+};
+
+export const handleSessionOnEdge = async (params: HandleSessionOnEdge): Promise<NextResponse> => {
+  const { request, pathname, searchParams, headers } = params;
+
+  if (isHostedLoginCallback(pathname, searchParams)) {
+    return handleHostedLoginCallback(request, pathname, searchParams);
+  }
+
+  if (shouldByPassMiddleware(pathname, headers /*, options: optional bypass configuration */)) {
+    return NextResponse.next();
+  }
+
+  const edgeSession = await checkSessionOnEdge(request);
+  if (!edgeSession) {
+    return redirectToLogin(pathname, searchParams);
+  }
+  if (edgeSession.headers) {
+    return NextResponse.next({
+      headers: edgeSession.headers,
+    });
+  }
+  return NextResponse.next();
+};
+
+const GET_SESSION_ON_EDGE_DEPRECATED_ERROR = `Deprecation Notice: getSessionOnEdge has been deprecated. Please use handleSessionOnEdge instead. For example:
+
+file: middleware.ts
+\`\`\`ts
+  import { NextRequest } from 'next/server';
+  import { handleSessionOnEdge } from '@frontegg/nextjs/edge';
+    
+  export const middleware = async (request: NextRequest) => {
+    const { pathname, searchParams } = request.nextUrl;
+    const headers = request.headers;
+    
+    // Additional logic if needed
+    
+    return handleSessionOnEdge({ request, pathname, searchParams, headers });
+  };
+  
+  
+  export const config = {
+    matcher: '/(.*)',
+  };
+
+\`\`\`
+
+Alternatively, to manually verify the session, you can use checkSessionOnEdge. Note that this method does not redirect to the login page if the session is invalid.
+`;
+
+/**
+ * getSessionOnEdge is deprecated, please use handleSessionOnEdge instead example:
+ *
+ * ```ts
+ *   import { NextRequest } from 'next/server';
+ *   import { handleSessionOnEdge } from '@frontegg/nextjs/edge';
+ *
+ *   export const middleware = async (request: NextRequest) => {
+ *     const { pathname, searchParams } = request.nextUrl;
+ *     const headers = request.headers;
+ *
+ *     // Additional logic if needed
+ *
+ *     return handleSessionOnEdge({ request, pathname, searchParams, headers });
+ *   };
+ *
+ *   export const config = {
+ *     matcher: '/(.*)',
+ *   };
+ * ```
+ * @deprecated
+ */
 export const getSessionOnEdge = async (req: IncomingMessage | Request): Promise<FronteggEdgeSession | undefined> => {
+  throw new Error(GET_SESSION_ON_EDGE_DEPRECATED_ERROR);
+};
+
+/**
+ * Check session on edge and return session if exists this method does not redirect to login page
+ * Example:
+ *
+ * ```ts
+ *   import { NextRequest } from 'next/server';
+ *   import { handleSessionOnEdge } from '@frontegg/nextjs/edge';
+ *
+ *   export const middleware = async (request: NextRequest) => {
+ *     const { pathname, searchParams } = request.nextUrl;
+ *     const headers = request.headers;
+ *
+ *     // Additional logic if needed
+ *
+ *     // check if it's a hosted login callback
+ *     if (isHostedLoginCallback(pathname, searchParams)) {
+ *       return handleHostedLoginCallback(request, pathname, searchParams);
+ *     }
+ *
+ *     // check if we should bypass the middleware
+ *     if (shouldByPassMiddleware(pathname)) {
+ *       return NextResponse.next();
+ *     }
+ *
+ *     // check session
+ *     const session = await checkSessionOnEdge(request);
+ *
+ *     if (!session) {
+ *       return redirectToLogin(pathname);
+ *     }
+ *
+ *     // if headers are present return them to the next response
+ *     if (session.headers) {
+ *       return NextResponse.next({
+ *         headers: session.headers,
+ *       });
+ *     }
+ *     return NextResponse.next();
+ *   };
+ * ```
+ *
+ *
+ * @param req
+ */
+export const checkSessionOnEdge = async (req: IncomingMessage | Request): Promise<FronteggEdgeSession | undefined> => {
   const sessionCookies = CookieManager.getSessionCookieFromRequest(req);
   let existingSession = await createSession(sessionCookies, encryptionEdge);
   if (existingSession) {
