@@ -74,7 +74,6 @@ export const UserState = () => {
       </button>
       <br />
       <br />
-      <Link href='/account/logout'>logout embedded</Link>
     </div>
   );
 };

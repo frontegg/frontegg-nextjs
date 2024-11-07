@@ -3,13 +3,17 @@ import CookieManager from '../cookies';
 import { NextApiRequest } from 'next/dist/shared/lib/utils';
 import api from '../../api';
 import { getTokensFromCookie } from '../../common';
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage } from 'http';
 import config from '../../config';
-import { ApiUrls } from '../../api/urls';
+
 import { FRONTEGG_FORWARDED_SESSION_KEY } from '../common/constants';
 import { FronteggNextJSSession } from '../../types';
+import { CommonUrls } from '../common/urls';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
+  if (cookies == null) {
+    return false;
+  }
   const logger = fronteggLogger.child({ tag: 'refreshToken.hasRefreshTokenCookie' });
   const refreshTokenKey = CookieManager.refreshTokenKey;
   logger.debug(`Checking if '${refreshTokenKey}' exists in cookies`);
@@ -110,7 +114,7 @@ export function isSSOPostRequest(url: string): boolean {
  * one of the predefined refresh token URLs (embedded or hosted modes).
  */
 export function isRefreshTokenRequest(url: string): boolean {
-  const refreshTokenUrls = [ApiUrls.refreshToken.embedded, ApiUrls.refreshToken.hosted];
+  const refreshTokenUrls = [CommonUrls.refreshToken.embedded, CommonUrls.refreshToken.hosted];
   return refreshTokenUrls.includes(url);
 }
 

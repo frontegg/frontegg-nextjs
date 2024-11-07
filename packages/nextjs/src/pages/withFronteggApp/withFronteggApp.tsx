@@ -12,7 +12,11 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
   const originalGetInitialProps = app.getInitialProps;
 
   app.getInitialProps = async (appContext: AppContext & AllUserData): Promise<AppInitialProps> => {
-    const { ctx, Component } = appContext;
+    const { ctx, router, Component } = appContext;
+
+    const isSSG = router.isReady == false && router.isPreview == false;
+
+    config.checkHostedLoginConfig(options);
 
     let appEnvConfig = {};
     let appContextSessionData: AllUserData = {
@@ -20,27 +24,34 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
       user: null,
       tenants: null,
     };
+    let shouldRequestAuthorize = false;
 
     if (ctx.req) {
       appEnvConfig = config.appEnvConfig;
-      const url = ctx.req?.url;
 
-      if (url && isRuntimeNextRequest(url)) {
-        let session = await refreshAccessTokenIfNeeded(ctx);
-        if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
-          session = removeJwtSignatureFrom(session);
-        }
-        Object.assign(appContextSessionData, { session });
+      if (isSSG) {
+        shouldRequestAuthorize = true;
       } else {
-        let userData = await fetchUserData({
-          getSession: async () => await refreshAccessTokenIfNeeded(ctx),
-          getHeaders: async () => ctx.req?.headers ?? {},
-        });
-        if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
-          userData = removeJwtSignatureFrom(userData);
-          userData.session = removeJwtSignatureFrom(userData?.session);
+        const url = ctx.req?.url;
+
+        if (url && isRuntimeNextRequest(url)) {
+          let session = await refreshAccessTokenIfNeeded(ctx);
+          if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
+            session = removeJwtSignatureFrom(session);
+          }
+          Object.assign(appContextSessionData, { session });
+        } else {
+          let userData = await fetchUserData({
+            getSession: async () => await refreshAccessTokenIfNeeded(ctx),
+            getHeaders: async () => ctx.req?.headers ?? {},
+          });
+          if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
+            userData = removeJwtSignatureFrom(userData);
+            userData.session = removeJwtSignatureFrom(userData?.session);
+          }
+          shouldRequestAuthorize = true;
+          Object.assign(appContextSessionData, userData);
         }
-        Object.assign(appContextSessionData, userData);
       }
     }
 
@@ -52,16 +63,30 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
         ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
         ...(appContextSessionData.session == null ? {} : appContextSessionData),
         ...appEnvConfig,
+        shouldRequestAuthorize,
       },
     };
   };
 
   function CustomFronteggApp(appProps: AppProps) {
-    const { user, tenants, activeTenant, session, envAppUrl, envBaseUrl, envClientId, secureJwtEnabled, envAppId } =
-      appProps.pageProps;
+    const {
+      user,
+      tenants,
+      activeTenant,
+      session,
+      envAppUrl,
+      envBaseUrl,
+      envClientId,
+      secureJwtEnabled,
+      envAppId,
+      envHostedLoginBox,
+      shouldRequestAuthorize,
+    } = appProps.pageProps;
+
     return (
       <FronteggProvider
         {...options}
+        hostedLoginBox={envHostedLoginBox}
         {...{
           user,
           tenants,
@@ -69,7 +94,10 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           session,
           envAppUrl,
           envBaseUrl,
+          envHostedLoginBox,
           secureJwtEnabled,
+          shouldRequestAuthorize,
+          isSSG: appProps.__N_SSG,
           envClientId,
           envAppId,
         }}

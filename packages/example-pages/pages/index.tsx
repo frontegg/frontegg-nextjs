@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useAuth, useLoginWithRedirect, AdminPortal, useAuthActions, useLogoutHostedLogin } from '@frontegg/nextjs';
 import { useState } from 'react';
+import TestComponent from '../components/TestComponent';
 
 export function Index() {
   const { user, isAuthenticated } = useAuth();
@@ -62,7 +63,11 @@ export function Index() {
       <input data-testid='test-middleware-id' readOnly value={state.id} />
       <br />
       <br />
-      <Link href='/force-session'>check force session</Link>
+      <Link href='/force-session'>Go to force session page</Link>
+      <TestComponent />
+      <br />
+      <br />
+      <Link href='/no-ssr'>Go to SSG page</Link>
       <br />
       <br />
       <Link href='/account/logout'>logout embedded</Link>

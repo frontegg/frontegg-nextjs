@@ -7,7 +7,6 @@ import api from '../api';
 import { NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
-import encryptionUtils from '../utils/encryption-edge';
 import { buildRequestHeaders, FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
 
 async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any, string] | []> {
@@ -17,7 +16,7 @@ async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
   const tokens = { accessToken, refreshToken };
-  const session = await encryptionUtils.sealTokens(tokens, decodedJwt.exp);
+  const session = await encryptionEdge.sealTokens(tokens, decodedJwt.exp);
   return [session, decodedJwt, refreshToken];
 }
 
