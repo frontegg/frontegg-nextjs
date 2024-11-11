@@ -4,7 +4,7 @@ import { isAuthRoute } from '../utils/routing';
 import { FronteggRouterBase } from '../common/FronteggRouterBase';
 import React from 'react';
 
-interface FronteggRouterProps {
+interface FronteggRouterSyncProps {
   params: ParsedUrlQuery & { 'frontegg-router'?: string[] };
   searchParams?: ParsedUrlQuery;
 }
@@ -14,7 +14,11 @@ interface FronteggRouterAsyncProps {
   searchParams: Promise<ParsedUrlQuery>;
 }
 
-export function FronteggAppRouter(props: FronteggRouterProps) {
+type FronteggRouterProps = FronteggRouterSyncProps | FronteggRouterAsyncProps;
+
+export function FronteggAppRouter<T>(routerProps: T) {
+  const props = routerProps as FronteggRouterProps;
+
   const renderAppRouter = (searchParams: ParsedUrlQuery | undefined, pathArr: string[]) => {
     let pathname = `/${pathArr.join('/')}`;
     if (!pathname || pathname.startsWith('/_next/data')) {
