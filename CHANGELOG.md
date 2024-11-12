@@ -1,5 +1,45 @@
 # Change Log
 
+## [9.1.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.5...v9.1.1) (2024-11-12)
+
+- FR-18594 - Fixed blinking bug On IP and domain page
+- FR-18499 - Fixed otc page blink
+- FR-18005 - Fixed search api tokens with null descriptions 
+- FR-18499 - Fixed activate with code and password
+- FR-18582 - Fixed loader size and wrong massage
+
+
+- FR-18561 - Fixed get ip metadata when app name is provided
+- FR-17091 - Fixed long name in groups and roles
+
+
+- FR-18529 - Fixed empty roles field bug when appName is provided
+
+
+- FR-18516 - Fixed redundant function
+- FR-18476 - Added url for beforeRequestInterceptor function
+
+
+- FR-18476 - Added request interceptor
+- FR-18472 - Fixed Google one tap login stuck after unmounting login&#x2F;signup unmounted
+
+- FR-18436 - Fixed activate account with empty redirect bug
+
+
+- FR-17943 - Added code pages
+
+- FR-18427 - Added Support for triggering MFA after native passkeys &#x2F; iOS apple login
+- FR-18211 - Fixed email overlapping roles field
+
+
+### NextJS Wrapper 9.1.1:
+- FR-17280 - fix next js 15 build & update example app project middleware
+- FR-18495 - refresh the token when it has expired
+- FR-18442 - Remove cookies when landing on oauth/callback to support after hosted login activate account succeeded
+- FR-18442 - Fix Nextjs session store injection and support SSG pages
+- Fix session abandoned when accessing not found page
+- Export FronteggAppRouterAsync to be imported by '@frontegg/nextjs/app'
+
 ## [9.0.5](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.4...v9.0.5) (2024-10-31)
 
 - FR-18476 - Added url for beforeRequestInterceptor function
