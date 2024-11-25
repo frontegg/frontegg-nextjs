@@ -1,6 +1,6 @@
 # Change Log
 
-## [9.1.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.1.2) (2024-11-25)
+## [9.2.0](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.2.0) (2024-11-25)
 
 - FR-18699 - Removed entitlements automatic 30 seconds refresh mechanism
 - FR-18138 - Added logic to improve login box and admin portal stability and resiliency
@@ -9,7 +9,7 @@
 - FR-16902 - Fixed login box scroll on mobile browsers
 
 
-### NextJS Wrapper 9.1.2:
+### NextJS Wrapper 9.2.0:
 - FR-17280 - Fixed NextJS v15 build issue
 
 ## [9.1.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.5...v9.1.1) (2024-11-12)
