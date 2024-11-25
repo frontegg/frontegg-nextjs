@@ -1,5 +1,17 @@
 # Change Log
 
+## [9.1.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.1.2) (2024-11-25)
+
+- FR-18699 - Removed entitlements automatic 30 seconds refresh mechanism
+- FR-18138 - Added logic to improve login box and admin portal stability and resiliency
+- FR-18646 - Fixed missing permissions with wildcard on custom roles
+- FR-18341 - Fixed Google Chrome Translate feature causes a crash
+- FR-16902 - Fixed login box scroll on mobile browsers
+
+
+### NextJS Wrapper 9.1.2:
+- FR-17280 - fix next js 15 build & update example app project middleware
+
 ## [9.1.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.5...v9.1.1) (2024-11-12)
 
 - FR-18594 - Fixed blinking bug On IP and domain page
