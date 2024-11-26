@@ -1,5 +1,5 @@
 import type { IncomingMessage } from 'http';
-import { FronteggEdgeSession } from '../types';
+import { FronteggEdgeSession, FronteggNextJSSession } from '../types';
 import CookieManager from '../utils/cookies';
 import createSession from '../utils/createSession';
 import encryptionEdge from '../utils/encryption-edge';
@@ -93,8 +93,10 @@ Alternatively, to manually verify the session, you can use checkSessionOnEdge. N
  * ```
  * @deprecated
  */
-export const getSessionOnEdge = async (req: IncomingMessage | Request): Promise<FronteggEdgeSession | undefined> => {
-  throw new Error(GET_SESSION_ON_EDGE_DEPRECATED_ERROR);
+
+export const getSessionOnEdge = (req: IncomingMessage | Request): Promise<FronteggNextJSSession | undefined> => {
+  const cookies = CookieManager.getSessionCookieFromRequest(req);
+  return createSession(cookies, encryptionEdge);
 };
 
 /**
