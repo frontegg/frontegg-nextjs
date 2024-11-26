@@ -119,3 +119,5 @@ export const removeJwtSignatureFrom = <T extends any>(body: any): T => {
   });
   return body;
 };
+
+export const isInternalRequest = (host: string) => config.appUrl.includes(host);
