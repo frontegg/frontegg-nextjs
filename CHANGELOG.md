@@ -2,6 +2,11 @@
 
 ## [9.2.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.0...v9.2.1) (2024-11-26)
 
+
+# Change Log
+
+## [9.2.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.0...v9.2.1) (2024-11-26)
+
 #### **Enhancements**
 1. **Improved Backward Compatibility**: 
    - The deprecated `getSessionOnEdge` function now triggers a warning instead of throwing an error, ensuring smoother upgrades for users.
