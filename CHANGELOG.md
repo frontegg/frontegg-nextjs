@@ -1,5 +1,10 @@
 # Change Log
 
+## [9.2.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.0...v9.2.1) (2024-11-26)
+
+
+# Change Log
+
 ## [9.2.0](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.2.0) (2024-11-25)
 
 - FR-18699 - Removed entitlements automatic 30 seconds refresh mechanism
