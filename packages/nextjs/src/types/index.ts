@@ -23,6 +23,7 @@ export interface FronteggNextJSSession extends FronteggUserTokens {
 export interface FronteggEdgeSession {
   session?: FronteggNextJSSession;
   headers?: Record<string, string>;
+  forwardedHeaders?: Headers;
 }
 
 export type RequestType = IncomingMessage | Request;

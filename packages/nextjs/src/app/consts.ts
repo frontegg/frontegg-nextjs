@@ -1,0 +1,1 @@
+export const FRONTEGG_HOSTED_LOGIN_MIGRATION_WARNING = `\n**Deprecated**: The 'hostedLoginBox' prop is deprecated in frontegg NextJS SKD and will be removed in the next major version. Please use 'FRONTEGG_HOSTED_LOGIN' environment variable instead.`;
