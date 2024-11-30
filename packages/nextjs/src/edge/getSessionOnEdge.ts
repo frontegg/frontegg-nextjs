@@ -1,5 +1,5 @@
 import type { IncomingMessage } from 'http';
-import { FronteggEdgeSession } from '../types';
+import { FronteggEdgeSession, FronteggNextJSSession } from '../types';
 import CookieManager from '../utils/cookies';
 import createSession from '../utils/createSession';
 import encryptionEdge from '../utils/encryption-edge';
@@ -40,12 +40,15 @@ export const handleSessionOnEdge = async (params: HandleSessionOnEdge): Promise<
   if (edgeSession.headers) {
     return NextResponse.next({
       headers: edgeSession.headers,
+      request: {
+        headers: edgeSession.forwardedHeaders,
+      },
     });
   }
   return NextResponse.next();
 };
 
-const GET_SESSION_ON_EDGE_DEPRECATED_ERROR = `Deprecation Notice: getSessionOnEdge has been deprecated. Please use handleSessionOnEdge instead. For example:
+const GET_SESSION_ON_EDGE_DEPRECATED_WARN = `Deprecation Notice: getSessionOnEdge has been deprecated. Please use handleSessionOnEdge instead. For example:
 
 file: middleware.ts
 \`\`\`ts
@@ -93,8 +96,17 @@ Alternatively, to manually verify the session, you can use checkSessionOnEdge. N
  * ```
  * @deprecated
  */
-export const getSessionOnEdge = async (req: IncomingMessage | Request): Promise<FronteggEdgeSession | undefined> => {
-  throw new Error(GET_SESSION_ON_EDGE_DEPRECATED_ERROR);
+
+export const getSessionOnEdge = (
+  req: IncomingMessage | Request,
+  disableWarning = false
+): Promise<FronteggNextJSSession | undefined> => {
+  const logger = fronteggLogger.child({ tag: 'EdgeRuntime.getSessionOnEdge' });
+  const cookies = CookieManager.getSessionCookieFromRequest(req);
+  if (!disableWarning) {
+    logger.info(GET_SESSION_ON_EDGE_DEPRECATED_WARN);
+  }
+  return createSession(cookies, encryptionEdge);
 };
 
 /**
@@ -128,11 +140,14 @@ export const getSessionOnEdge = async (req: IncomingMessage | Request): Promise<
  *       return redirectToLogin(pathname);
  *     }
  *
- *     // if headers are present return them to the next response
+ *     // if headers are present forward them to the next response / request
  *     if (session.headers) {
- *       return NextResponse.next({
- *         headers: session.headers,
- *       });
+ *        return NextResponse.next({
+ *          headers: edgeSession.headers,
+ *          request:{
+ *            headers: edgeSession.forwardedHeaders
+ *          }
+ *        });
  *     }
  *     return NextResponse.next();
  *   };

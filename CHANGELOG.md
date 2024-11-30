@@ -1,5 +1,17 @@
 # Change Log
 
+## [9.2.0](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.2.0) (2024-11-25)
+
+- FR-18699 - Removed entitlements automatic 30 seconds refresh mechanism
+- FR-18138 - Added logic to improve login box and admin portal stability and resiliency
+- FR-18646 - Fixed missing permissions with wildcard on custom roles
+- FR-18341 - Fixed Google Chrome Translate feature causes a crash
+- FR-16902 - Fixed login box scroll on mobile browsers
+
+
+### NextJS Wrapper 9.2.0:
+- FR-17280 - Fixed NextJS v15 build issue
+
 ## [9.1.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.0.5...v9.1.1) (2024-11-12)
 
 - FR-18594 - Fixed blinking bug On IP and domain page
@@ -7,27 +19,15 @@
 - FR-18005 - Fixed search api tokens with null descriptions 
 - FR-18499 - Fixed activate with code and password
 - FR-18582 - Fixed loader size and wrong massage
-
-
 - FR-18561 - Fixed get ip metadata when app name is provided
 - FR-17091 - Fixed long name in groups and roles
-
-
 - FR-18529 - Fixed empty roles field bug when appName is provided
-
-
 - FR-18516 - Fixed redundant function
 - FR-18476 - Added url for beforeRequestInterceptor function
-
-
 - FR-18476 - Added request interceptor
 - FR-18472 - Fixed Google one tap login stuck after unmounting login&#x2F;signup unmounted
-
 - FR-18436 - Fixed activate account with empty redirect bug
-
-
 - FR-17943 - Added code pages
-
 - FR-18427 - Added Support for triggering MFA after native passkeys &#x2F; iOS apple login
 - FR-18211 - Fixed email overlapping roles field
 
