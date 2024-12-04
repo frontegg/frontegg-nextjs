@@ -88,6 +88,12 @@ export async function refreshAccessTokenIfNeededOnEdge(
   });
   newSetCookie.push(...cookieValue);
 
+  const forwardedHeaders = req.headers as Headers;
+  newSetCookie.forEach((cookie) => {
+    // get cookie name and value only
+    const [name, value] = cookie.split(';')[0].split('=');
+    forwardedHeaders.set('cookie', `${name}=${value}`);
+  });
   return {
     session: {
       accessToken: data.accessToken ?? data.access_token,
@@ -97,6 +103,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
     headers: {
       'set-cookie': newSetCookie.join(', '),
     },
+    forwardedHeaders,
   };
 }
 
