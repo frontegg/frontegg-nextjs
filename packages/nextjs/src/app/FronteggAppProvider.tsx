@@ -31,6 +31,7 @@ export const FronteggAppProvider = async (options: FronteggAppProviderProps) => 
     ...appEnvConfig,
     ...userData,
     ...options,
+    shouldRequestAuthorize: true,
     envAppUrl: subDomainAppUrl ?? envAppUrl,
     secureJwtEnabled: options.secureJwtEnabled ?? false,
     hostedLoginBox: appEnvConfig.envHostedLoginBox ?? options.hostedLoginBox ?? false,
