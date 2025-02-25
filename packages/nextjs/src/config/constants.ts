@@ -45,8 +45,8 @@ export enum EnvVariables {
 
   /**
    * Your Frontegg application's Shared Secret, get it by visit:
-   * - For Dev environment [visit](https://portal.frontegg.com/development/settings/general)
-   * - For Prod environment [visit](https://portal.frontegg.com/production/settings/general)
+   * - For Dev environment [visit](https://portal.frontegg.com/development/applications/[YOUR_APP_ID])
+   * - For Prod environment [visit](https://portal.frontegg.com/production/applications/[YOUR_APP_ID])
    */
   FRONTEGG_SHARED_SECRET = 'FRONTEGG_SHARED_SECRET',
 
