@@ -16,7 +16,7 @@ import {
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
 import createSession from '../createSession';
-import { FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../../api/utils';
+import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../../api/utils';
 
 export { isRuntimeNextRequest };
 /**
@@ -87,7 +87,7 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
 
     if (clientIp && config.shouldForwardIp) {
       nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
-      nextJsRequest.headers[FRONTEGG_CLIENT_SECRET_HEADER] = config.clientSecret ?? '';
+      nextJsRequest.headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
     }
 
     let response: Response | null;

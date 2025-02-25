@@ -13,6 +13,7 @@ const setupEnvVariables = {
   FRONTEGG_APP_ID: process.env.FRONTEGG_APP_ID,
   FRONTEGG_REWRITE_COOKIE_BY_APP_ID: process.env.FRONTEGG_REWRITE_COOKIE_BY_APP_ID,
   FRONTEGG_CLIENT_SECRET: process.env.FRONTEGG_CLIENT_SECRET,
+  FRONTEGG_SHARED_SECRET: process.env.FRONTEGG_SHARED_SECRET,
   FRONTEGG_ENCRYPTION_PASSWORD: process.env.FRONTEGG_ENCRYPTION_PASSWORD,
   FRONTEGG_COOKIE_NAME: process.env.FRONTEGG_COOKIE_NAME,
   FRONTEGG_COOKIE_DOMAIN: process.env.FRONTEGG_COOKIE_DOMAIN,
@@ -72,7 +73,7 @@ class Config {
   }
 
   get clientSecret(): string | undefined {
-    let clientSecret = undefined;
+    let clientSecret;
     try {
       clientSecret = getEnv(EnvVariables.FRONTEGG_CLIENT_SECRET) ?? setupEnvVariables.FRONTEGG_CLIENT_SECRET;
     } catch (e) {
@@ -86,6 +87,17 @@ class Config {
       );
     }
     return clientSecret;
+  }
+
+  get sharedSecret(): string | undefined {
+    let sharedSecret;
+    try {
+      sharedSecret = getEnv(EnvVariables.FRONTEGG_SHARED_SECRET) ?? setupEnvVariables.FRONTEGG_SHARED_SECRET;
+    } catch (e) {
+      sharedSecret = setupEnvVariables.FRONTEGG_SHARED_SECRET;
+    }
+
+    return sharedSecret;
   }
 
   get shouldForwardIp(): boolean {
