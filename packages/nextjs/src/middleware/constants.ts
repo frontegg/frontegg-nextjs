@@ -19,3 +19,18 @@ export const defaultFronteggHeaders = [
   'frontegg-source',
   'frontegg-requested-application-id',
 ];
+
+export const headersToRemove = [
+  'x-invoke-path',
+  'x-invoke-query',
+  'x-middleware-invoke',
+  'x-middleware-next',
+  'transfer-encoding',
+  'cache-control',
+  'content-security-policy',
+  'x-content-security-policy',
+  'permissions-policy',
+  'feature-policy',
+  'l5d-client-id',
+  'x-webkit-csp',
+];

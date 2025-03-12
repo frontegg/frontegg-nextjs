@@ -49,7 +49,7 @@ export function removeInvalidHeaders(headers: Record<string, string>) {
  */
 export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
 export const FRONTEGG_FORWARD_IP_HEADER = 'x-frontegg-forwarded-for';
-export const FRONTEGG_CLIENT_SECRET_HEADER = 'x-frontegg-client-secret';
+export const FRONTEGG_HEADERS_VERIFIER_HEADER = 'x-frontegg-headers-verifier';
 export const FRONTEGG_APPLICATION_ID_HEADER = 'frontegg-requested-application-id';
 
 /**
@@ -111,7 +111,7 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   const clientIp = headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for'];
   if (clientIp && config.shouldForwardIp) {
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
-    preparedHeaders[FRONTEGG_CLIENT_SECRET_HEADER] = config.clientSecret ?? '';
+    preparedHeaders[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
   }
 
   if (headers[CUSTOM_LOGIN_HEADER]) {

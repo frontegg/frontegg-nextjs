@@ -44,6 +44,13 @@ export enum EnvVariables {
   FRONTEGG_CLIENT_SECRET = 'FRONTEGG_CLIENT_SECRET',
 
   /**
+   * Your Frontegg application's Shared Secret, get it by visit:
+   * - For Dev environment [visit](https://portal.frontegg.com/development/applications/[YOUR_APP_ID])
+   * - For Prod environment [visit](https://portal.frontegg.com/production/applications/[YOUR_APP_ID])
+   */
+  FRONTEGG_SHARED_SECRET = 'FRONTEGG_SHARED_SECRET',
+
+  /**
    * The stateless session encryption password, used to encrypt
    * JWT before sending it to the client side.
    *
@@ -102,7 +109,7 @@ export enum EnvVariables {
   /**
    * Forward client IP address to Frontegg gateway, used to detect the client's IP address
    * when the Next.js application using frontegg middleware proxy service
-   * In order to enable this feature, you need to provide {@link EnvVariables.FRONTEGG_CLIENT_SECRET}
+   * In order to enable this feature, you need to provide {@link EnvVariables.FRONTEGG_SHARED_SECRET}
    */
   FRONTEGG_FORWARD_IP = 'FRONTEGG_FORWARD_IP',
   /**

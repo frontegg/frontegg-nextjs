@@ -7,7 +7,8 @@ import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
-import { FRONTEGG_CLIENT_SECRET_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import { headersToRemove } from './constants';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
 /**
@@ -54,7 +55,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
     if (clientIp && config.shouldForwardIp) {
       proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, `${clientIp}`);
-      proxyReq.setHeader(FRONTEGG_CLIENT_SECRET_HEADER, config.clientSecret ?? '');
+      proxyReq.setHeader(FRONTEGG_HEADERS_VERIFIER_HEADER, config.sharedSecret ?? '');
     }
 
     if (isRefreshTokenRequest(req.url!)) {
@@ -62,14 +63,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       proxyReq.removeHeader('authorization');
     }
 
-    [
-      'x-invoke-path',
-      'x-invoke-query',
-      'x-middleware-invoke',
-      'x-middleware-next',
-      'transfer-encoding',
-      'cache-control',
-    ].map((header) => proxyReq.removeHeader(header));
+    headersToRemove.map((header) => proxyReq.removeHeader(header));
 
     logger.debug(`${req.url} | check if request has body`);
     if (req.method !== 'GET' && req.body) {
