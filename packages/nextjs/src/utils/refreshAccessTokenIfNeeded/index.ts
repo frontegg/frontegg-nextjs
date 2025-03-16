@@ -86,7 +86,7 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       nextJsRequest.socket?.remoteAddress;
 
     if (clientIp && config.shouldForwardIp) {
-      nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+      nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = '93.171.242.152';
       nextJsRequest.headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
     }
 

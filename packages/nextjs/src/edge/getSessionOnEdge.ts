@@ -204,7 +204,7 @@ export const handleHostedLoginCallback = async (
   }
 
   if (clientIp && config.shouldForwardIp) {
-    headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+    headers[FRONTEGG_FORWARD_IP_HEADER] = '93.171.242.152';
     headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
   }
 

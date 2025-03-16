@@ -54,7 +54,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     const clientIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'];
 
     if (clientIp && config.shouldForwardIp) {
-      proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, `${clientIp}`);
+      proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, '93.171.242.152');
       proxyReq.setHeader(FRONTEGG_HEADERS_VERIFIER_HEADER, config.sharedSecret ?? '');
     }
 

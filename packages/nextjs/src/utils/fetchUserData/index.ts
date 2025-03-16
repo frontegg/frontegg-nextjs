@@ -40,7 +40,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
         reqHeaders['x-forwarded-for'];
       clientIp = Array.isArray(clientIp) ? clientIp[0] : clientIp;
       if (clientIp) {
-        headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+        headers[FRONTEGG_FORWARD_IP_HEADER] = '93.171.242.152';
       }
     }
 
