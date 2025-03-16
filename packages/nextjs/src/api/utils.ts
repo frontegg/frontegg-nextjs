@@ -110,7 +110,10 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
 
   const clientIp = headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for'];
   if (clientIp && config.shouldForwardIp) {
-    preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = '93.171.242.152';
+    preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+    preparedHeaders[
+      'build-request-headers'
+    ] = `headers[FRONTEGG_FORWARD_IP_HEADER] ${headers[FRONTEGG_FORWARD_IP_HEADER]} | headers['cf-connecting-ip'] ${headers['cf-connecting-ip']} | headers['x-forwarded-for'] ${headers['x-forwarded-for']}`;
     preparedHeaders[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
   }
 

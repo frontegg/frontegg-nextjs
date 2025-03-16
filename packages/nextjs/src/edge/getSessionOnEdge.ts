@@ -201,10 +201,13 @@ export const handleHostedLoginCallback = async (
     let requestHeaders: any = { ...req.headers };
     clientIp =
       requestHeaders['cf-connecting-ip'] || requestHeaders['x-forwarded-for'] || (req as any).socket?.remoteAddress;
+    headers[
+      'get-session-on-edge'
+    ] = `requestHeaders['cf-connecting-ip'] ${requestHeaders['cf-connecting-ip']} | requestHeaders['x-forwarded-for'] ${requestHeaders['x-forwarded-for']} | (req as any).socket?.remoteAddress ${requestHeaders['x-forwarded-for']}`;
   }
 
   if (clientIp && config.shouldForwardIp) {
-    headers[FRONTEGG_FORWARD_IP_HEADER] = '93.171.242.152';
+    headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
   }
 
