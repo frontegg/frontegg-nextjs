@@ -73,7 +73,7 @@ const initializeFronteggApp = ({
             CommonUrls.refreshToken.embedded,
             CommonUrls.refreshToken.hosted,
             CommonUrls.activateAccount.activate,
-            ...(!options?.hostedLoginBox ? [CommonUrls.logout] : []),
+            CommonUrls.logout,
           ];
 
           if (excludedPaths.some((path) => pathname.endsWith(path))) {
