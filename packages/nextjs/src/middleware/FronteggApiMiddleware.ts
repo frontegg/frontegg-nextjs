@@ -29,7 +29,7 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
       }
     }
 
-    if (config.isHostedLogin && isFronteggLogoutUrl(req.url || '')) {
+    if (config.isHostedLogin && isFronteggLogoutUrl(req.url || '') && !headers['authorization']) {
       const sessionCookie = CookieManager.getSessionCookieFromRequest(req);
       const tokens = await getTokensFromCookie(sessionCookie);
       if (tokens?.accessToken) {
