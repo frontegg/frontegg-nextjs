@@ -9,6 +9,7 @@ import fronteggLogger from '../utils/fronteggLogger';
 import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
 import { headersToRemove } from './constants';
+import { getClientIp } from '../utils/headers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
 /**
@@ -51,10 +52,10 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
     proxyReq.setHeader('x-frontegg-middleware', 'true');
 
-    const clientIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'];
+    const clientIp = getClientIp(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']);
 
     if (clientIp && config.shouldForwardIp) {
-      proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, '93.171.242.152');
+      proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, clientIp);
       proxyReq.setHeader(
         'proxy-request-callback',
         `req.headers['cf-connecting-ip'] ${req.headers['cf-connecting-ip']} | req.headers['x-forwarded-for'] ${req.headers['x-forwarded-for']}`

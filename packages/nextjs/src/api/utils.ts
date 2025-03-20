@@ -3,6 +3,7 @@ import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
 import { fronteggAuthApiRoutesRegex } from '@frontegg/rest-api';
 import { headerCharRegex } from '../utils/common/constants';
+import { getClientIp } from '../utils/headers';
 
 interface GetRequestOptions {
   url: string;
@@ -108,9 +109,11 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     preparedHeaders[FRONTEGG_APPLICATION_ID_HEADER] = headers[FRONTEGG_APPLICATION_ID_HEADER];
   }
 
-  const clientIp = headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for'];
+  const clientIp = getClientIp(
+    headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for']
+  );
   if (clientIp && config.shouldForwardIp) {
-    preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = '93.171.242.152';
+    preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     preparedHeaders[
       'build-request-headers'
     ] = `headers[FRONTEGG_FORWARD_IP_HEADER] ${headers[FRONTEGG_FORWARD_IP_HEADER]} | headers['cf-connecting-ip'] ${headers['cf-connecting-ip']} | headers['x-forwarded-for'] ${headers['x-forwarded-for']}`;
