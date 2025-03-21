@@ -7,7 +7,13 @@ import api from '../api';
 import { type NextRequest, NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
-import { buildRequestHeaders, FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import {
+  buildRequestHeaders,
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_FORWARD_IP_HEADER,
+  FRONTEGG_APP_ID_HEADER,
+  FRONTEGG_VENDOR_ID_HEADER,
+} from '../api/utils';
 import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
@@ -211,6 +217,8 @@ export const handleHostedLoginCallback = async (
   if (clientIp && config.shouldForwardIp) {
     headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
+    headers[FRONTEGG_APP_ID_HEADER] = config.appId ?? '';
+    headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId ?? '';
   }
 
   const response = await api.exchangeHostedLoginToken(

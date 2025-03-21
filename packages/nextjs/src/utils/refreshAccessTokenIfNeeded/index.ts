@@ -16,7 +16,12 @@ import {
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
 import createSession from '../createSession';
-import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../../api/utils';
+import {
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_FORWARD_IP_HEADER,
+  FRONTEGG_APP_ID_HEADER,
+  FRONTEGG_VENDOR_ID_HEADER,
+} from '../../api/utils';
 import { getClientIp } from '../headers';
 
 export { isRuntimeNextRequest };
@@ -87,6 +92,8 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
 
     if (clientIp && config.shouldForwardIp) {
       nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+      nextJsRequest.headers[FRONTEGG_APP_ID_HEADER] = config.appId ?? '';
+      nextJsRequest.headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId ?? '';
       nextJsRequest.headers[
         'refresh-access-token-if-needed'
       ] = `nextJsRequest.headers['cf-connecting-ip'] ${nextJsRequest.headers['cf-connecting-ip']} | nextJsRequest.headers['x-forwarded-for']${nextJsRequest.headers['x-forwarded-for']} | nextJsRequest.socket?.remoteAddress ${nextJsRequest.socket?.remoteAddress}`;

@@ -52,6 +52,8 @@ export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
 export const FRONTEGG_FORWARD_IP_HEADER = 'x-frontegg-forwarded-for';
 export const FRONTEGG_HEADERS_VERIFIER_HEADER = 'x-frontegg-headers-verifier';
 export const FRONTEGG_APPLICATION_ID_HEADER = 'frontegg-requested-application-id';
+export const FRONTEGG_APP_ID_HEADER = 'frontegg-application-id';
+export const FRONTEGG_VENDOR_ID_HEADER = 'frontegg-vendor-id';
 
 /**
  * Build fetch request headers, remove invalid http headers
@@ -114,6 +116,9 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   );
   if (clientIp && config.shouldForwardIp) {
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
+    preparedHeaders[FRONTEGG_APP_ID_HEADER] = config.appId ?? '';
+    preparedHeaders[FRONTEGG_VENDOR_ID_HEADER] = config.clientId ?? '';
+
     preparedHeaders[
       'build-request-headers'
     ] = `headers[FRONTEGG_FORWARD_IP_HEADER] ${headers[FRONTEGG_FORWARD_IP_HEADER]} | headers['cf-connecting-ip'] ${headers['cf-connecting-ip']} | headers['x-forwarded-for'] ${headers['x-forwarded-for']}`;

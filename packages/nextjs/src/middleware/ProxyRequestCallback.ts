@@ -7,7 +7,12 @@ import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
-import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import {
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_FORWARD_IP_HEADER,
+  FRONTEGG_APP_ID_HEADER,
+  FRONTEGG_VENDOR_ID_HEADER,
+} from '../api/utils';
 import { headersToRemove } from './constants';
 import { getClientIp } from '../utils/headers';
 
@@ -56,6 +61,8 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
     if (clientIp && config.shouldForwardIp) {
       proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, clientIp);
+      proxyReq.setHeader(FRONTEGG_APP_ID_HEADER, config.appId ?? '');
+      proxyReq.setHeader(FRONTEGG_VENDOR_ID_HEADER, config.clientId ?? '');
       proxyReq.setHeader(
         'proxy-request-callback',
         `req.headers['cf-connecting-ip'] ${req.headers['cf-connecting-ip']} | req.headers['x-forwarded-for'] ${req.headers['x-forwarded-for']}`
