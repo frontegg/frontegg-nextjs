@@ -52,7 +52,7 @@ export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
 export const FRONTEGG_FORWARD_IP_HEADER = 'x-frontegg-forwarded-for';
 export const FRONTEGG_HEADERS_VERIFIER_HEADER = 'x-frontegg-headers-verifier';
 export const FRONTEGG_APPLICATION_ID_HEADER = 'frontegg-requested-application-id';
-export const FRONTEGG_APP_ID_HEADER = 'frontegg-application-id';
+export const FRONTEGG_APP_ID_HEADER = 'test123'; //frontegg-application-id;
 export const FRONTEGG_VENDOR_ID_HEADER = 'frontegg-vendor-id';
 
 /**
