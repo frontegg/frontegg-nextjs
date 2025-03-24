@@ -6,7 +6,6 @@ import sdkVersion from '../sdkVersion';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
-import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 import {
   FRONTEGG_HEADERS_VERIFIER_HEADER,
   FRONTEGG_FORWARD_IP_HEADER,
