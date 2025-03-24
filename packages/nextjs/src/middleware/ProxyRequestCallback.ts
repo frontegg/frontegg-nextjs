@@ -6,7 +6,13 @@ import sdkVersion from '../sdkVersion';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
-import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import { isRefreshTokenRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
+import {
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_FORWARD_IP_HEADER,
+  getClientIp,
+  FRONTEGG_VENDOR_ID_HEADER,
+} from '../api/utils';
 import { headersToRemove } from './constants';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
@@ -50,11 +56,12 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
     proxyReq.setHeader('x-frontegg-middleware', 'true');
 
-    const clientIp = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for'];
+    const clientIp = getClientIp(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']);
 
     if (clientIp && config.shouldForwardIp) {
-      proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, `${clientIp}`);
+      proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, clientIp);
       proxyReq.setHeader(FRONTEGG_HEADERS_VERIFIER_HEADER, config.sharedSecret ?? '');
+      proxyReq.setHeader(FRONTEGG_VENDOR_ID_HEADER, config.clientId);
     }
 
     headersToRemove.map((header) => proxyReq.removeHeader(header));
