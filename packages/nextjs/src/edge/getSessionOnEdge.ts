@@ -163,14 +163,14 @@ export const getSessionOnEdge = (
  * @param req
  */
 export const checkSessionOnEdge = async (req: IncomingMessage | Request): Promise<FronteggEdgeSession | undefined> => {
-  const sessionCookies = CookieManager.getSessionCookieFromRequest(req);
-  let existingSession = await createSession(sessionCookies, encryptionEdge);
-  if (existingSession) {
-    logger.debug('session resolved from session cookie');
-    return {
-      session: existingSession,
-    };
-  }
+  // const sessionCookies = CookieManager.getSessionCookieFromRequest(req);
+  // let existingSession = await createSession(sessionCookies, encryptionEdge);
+  // if (existingSession) {
+  //   logger.debug('session resolved from session cookie');
+  //   return {
+  //     session: existingSession,
+  //   };
+  // }
 
   logger.debug('Failed to resolve session from cookie, going to refresh token');
   return refreshAccessTokenIfNeededOnEdge(req);

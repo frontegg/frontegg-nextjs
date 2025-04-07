@@ -12,8 +12,17 @@ const logger = fronteggLogger.child({ tag: 'EdgeRuntime.refreshAccessTokenIfNeed
 export async function refreshAccessTokenIfNeededOnEdge(
   req: IncomingMessage | Request
 ): Promise<FronteggEdgeSession | undefined> {
-  const refreshCookie = CookieManager.getRefreshCookieFromRequestEdge(req);
-  if (!refreshCookie) {
+  const sealFromCookies = CookieManager.getSessionCookieFromRequest(req);
+  console.log('sealFromCookiesOnEdge', sealFromCookies);
+  if (!sealFromCookies) {
+    //Change meee
+    logger.info('no cookies found');
+    return undefined;
+  }
+  const tokens = await encryptionEdge.unsealTokens(sealFromCookies);
+  logger.info('tokens', tokens);
+
+  if (!tokens?.refreshToken) {
     logger.info('No refresh cookie found, No session found');
     return undefined;
   }
@@ -31,7 +40,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
   let response: Response | null;
   try {
     if (config.isHostedLogin) {
-      response = await api.refreshTokenHostedLogin(headers, refreshCookie, clientId, clientSecret);
+      response = await api.refreshTokenHostedLogin(headers, tokens.refreshToken, clientId, clientSecret);
     } else {
       response = await api.refreshTokenEmbedded(headers);
     }
@@ -39,7 +48,8 @@ export async function refreshAccessTokenIfNeededOnEdge(
     logger.error('Failed to refresh token', e);
     return undefined;
   }
-
+  logger.info('response:::::::::', response);
+  logger.info('headers:::::::::', headers);
   const isSecured = config.isSSL;
   if (response === null || !response.ok) {
     const cookiesToRemove = CookieManager.getRequestCookiesHeaderToRemove({
@@ -70,7 +80,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
 
   const newSetCookie = CookieManager.modifySetCookie(cookieHeader, isSecured) ?? [];
   const [session, decodedJwt, refreshToken] = await createSessionFromAccessTokenOnEdge(data);
-
+  logger.info('newSession:::::::::', session);
   if (!session) {
     return {
       session: undefined,
