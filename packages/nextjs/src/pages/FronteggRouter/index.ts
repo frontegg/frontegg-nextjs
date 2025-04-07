@@ -22,5 +22,15 @@
  *    export const getServerSideProps = FronteggRouterProps;
  *    export default FronteggRouter;
  * ```
+ *
+ * If you want to generate static pages, you have to use this functions.
+ *
+ * ```typescript
+ *    import { FronteggRouter, FronteggStaticPaths, FronteggStaticRouterProps } from '@frontegg/nextjs/pages';
+ *
+ *    export const getStaticProps = FronteggStaticRouterProps;
+ *    export const getStaticPaths = FronteggStaticPaths;
+ *    export default FronteggRouter;
+ * ```
  */
-export { FronteggRouter, FronteggRouterProps } from './FronteggRouter';
+export { FronteggRouter, FronteggRouterProps, FronteggStaticPaths, FronteggStaticRouterProps } from './FronteggRouter';
