@@ -7,7 +7,13 @@ import api from '../api';
 import { type NextRequest, NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
-import { buildRequestHeaders, FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER } from '../api/utils';
+import {
+  buildRequestHeaders,
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_FORWARD_IP_HEADER,
+  getClientIp,
+  FRONTEGG_VENDOR_ID_HEADER,
+} from '../api/utils';
 import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
@@ -196,16 +202,19 @@ export const handleHostedLoginCallback = async (
   let clientIp: string | undefined = undefined;
   if (typeof req.headers?.get === 'function') {
     clientIp =
-      req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for') || (req as any).socket?.remoteAddress;
+      getClientIp(req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for')) ||
+      (req as any).socket?.remoteAddress;
   } else if (typeof req.headers === 'object') {
     let requestHeaders: any = { ...req.headers };
     clientIp =
-      requestHeaders['cf-connecting-ip'] || requestHeaders['x-forwarded-for'] || (req as any).socket?.remoteAddress;
+      getClientIp(requestHeaders['cf-connecting-ip'] || requestHeaders['x-forwarded-for']) ||
+      (req as any).socket?.remoteAddress;
   }
 
   if (clientIp && config.shouldForwardIp) {
     headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
+    headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;
   }
 
   const response = await api.exchangeHostedLoginToken(

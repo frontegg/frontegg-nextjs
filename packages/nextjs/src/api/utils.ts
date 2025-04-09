@@ -51,6 +51,7 @@ export const CUSTOM_LOGIN_HEADER = 'frontegg-login-alias';
 export const FRONTEGG_FORWARD_IP_HEADER = 'x-frontegg-forwarded-for';
 export const FRONTEGG_HEADERS_VERIFIER_HEADER = 'x-frontegg-headers-verifier';
 export const FRONTEGG_APPLICATION_ID_HEADER = 'frontegg-requested-application-id';
+export const FRONTEGG_VENDOR_ID_HEADER = 'frontegg-vendor-id';
 
 /**
  * Build fetch request headers, remove invalid http headers
@@ -108,10 +109,14 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     preparedHeaders[FRONTEGG_APPLICATION_ID_HEADER] = headers[FRONTEGG_APPLICATION_ID_HEADER];
   }
 
-  const clientIp = headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for'];
+  const clientIp = getClientIp(
+    headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for']
+  );
+
   if (clientIp && config.shouldForwardIp) {
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     preparedHeaders[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
+    preparedHeaders[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;
   }
 
   if (headers[CUSTOM_LOGIN_HEADER]) {
@@ -164,4 +169,19 @@ export function isMiddlewarePath(path: string): boolean {
   }
 
   return isAuthPath;
+}
+
+/**
+ * Extracts the real client IP address from a raw IP string or array.
+ *
+ * If the input contains multiple IPs (e.g., from the `x-forwarded-for` header),
+ * it returns only the first IP, which typically represents the real client.
+ *
+ * @param rawIp - A single IP string or an array of IPs.
+ * @returns The first IP address as a string, or undefined if not available.
+ */
+export function getClientIp(rawIp?: string | string[] | null): string | undefined {
+  if (!rawIp) return undefined;
+  const ip = Array.isArray(rawIp) ? rawIp[0] : rawIp;
+  return ip.split(',')[0].trim();
 }
