@@ -1,17 +1,29 @@
 # Change Log
 
-## [9.2.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.3) (2025-4-9)
-
-#### **Enhancements**
-1. **Added ability to forward IP**
-   - Added new environment variables FRONTEGG_SHARED_SECRET and FRONTEGG_SHARED_SECRET
-2. **Added frontegg static page rendering feature**: 
-   - Now you can export FronteggStaticRouterProps and FronteggStaticPaths
-3. **Updated Admin Box version**
-4. **Fixed reset password bug**
-
-# Change Log
-
+## [9.2.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.3) (2025-4-9)
+
+
+
+#### **Enhancements**
+
+1. **Added ability to forward IP**
+
+   - Added new environment variables FRONTEGG_SHARED_SECRET and FRONTEGG_SHARED_SECRET
+
+2. **Added frontegg static page rendering feature**: 
+
+   - Now you can export FronteggStaticRouterProps and FronteggStaticPaths
+
+3. **Updated Admin Box version**
+
+4. **Fixed reset password bug**
+
+
+
+# Change Log
+
+
+
 ## [9.2.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.2) (2025-4-9)
 
 These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
