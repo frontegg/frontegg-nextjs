@@ -1,5 +1,12 @@
 # Change Log
 
+## [9.2.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.3) (2025-4-9)
+
+
+### NextJS Wrapper 9.2.3:
+- FR-19751 - Trigger release
+# Change Log
+
 ## [9.2.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.2) (2025-4-9)
 
 These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
