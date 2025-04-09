@@ -1,7 +1,7 @@
 import React from 'react';
 import URL from 'url';
 import { useRouter } from 'next/router';
-import { isAuthRoute } from '../../utils/routing';
+import { defaultFronteggRoutes, getAuthRoutes, isAuthRoute } from '../../utils/routing';
 import { FronteggRouterBase } from '../../common/FronteggRouterBase';
 
 export function FronteggRouter() {
@@ -23,5 +23,21 @@ export function FronteggRouterProps(context: any) {
   return {
     notFound,
     props: {},
+  };
+}
+
+export function FronteggStaticRouterProps() {
+  return {
+    props: {},
+  };
+}
+
+export function FronteggStaticPaths() {
+  const { routesArr } = getAuthRoutes();
+  const filteredRoutes = routesArr.filter((route) => route !== defaultFronteggRoutes.authenticatedUrl);
+
+  return {
+    paths: filteredRoutes,
+    fallback: true,
   };
 }
