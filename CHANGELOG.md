@@ -13,19 +13,6 @@ These changes enhance user experience during upgrades and improve session consis
 
 # Change Log
 
-## [9.2.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.0...v9.2.1) (2024-11-26)
-
-#### **Enhancements**
-1. **Improved Backward Compatibility**: 
-   - The deprecated `getSessionOnEdge` function now triggers a warning instead of throwing an error, ensuring smoother upgrades for users.
-
-2. **Seamless Token Refresh in Middleware**: 
-   - Fixed an issue where refreshed tokens were not forwarded to SSR components after middleware processing. Updated cookies are now correctly synchronized, ensuring consistent session handling across the application.
-
-These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
-
-# Change Log
-
 ## [9.2.0](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.2.0) (2024-11-25)
 
 - FR-18699 - Removed entitlements automatic 30 seconds refresh mechanism
