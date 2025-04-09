@@ -29,6 +29,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 
 To Add Frontegg to your existing Next.JS project, follow below steps:
 
+
 Use package manager to install Frontegg Next.JS library.
 
    ```bash
