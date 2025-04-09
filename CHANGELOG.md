@@ -1,5 +1,9 @@
 # Change Log
 
+## [9.2.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.2) (2025-4-9)
+
+These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
+
 ## [9.2.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.0...v9.2.1) (2024-11-26)
 
 #### **Enhancements**
@@ -10,8 +14,6 @@
    - Fixed an issue where refreshed tokens were not forwarded to SSR components after middleware processing. Updated cookies are now correctly synchronized, ensuring consistent session handling across the application.
 
 These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
-
-# Change Log
 
 ## [9.2.0](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.2.0) (2024-11-25)
 
