@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, ReactNode } from 'react';
 import { ClientFronteggProvider } from './ClientFronteggProvider';
 import { getAppHeaders, getAppSession } from './helpers';
 import config from '../config';
@@ -11,7 +11,9 @@ import { FRONTEGG_HOSTED_LOGIN_MIGRATION_WARNING } from './consts';
 
 export type FronteggAppProviderProps = PropsWithChildren<
   Omit<ClientFronteggProviderProps, 'contextOptions' | 'envAppUrl' | 'envBaseUrl' | 'envClientId'>
->;
+> & {
+  alwaysVisibleChildren?: ReactNode;
+};
 
 export const FronteggAppProvider = async (options: FronteggAppProviderProps) => {
   const { envAppUrl, ...appEnvConfig } = config.appEnvConfig;

@@ -3,7 +3,7 @@ import { WithFronteggAppOptions } from '../pages';
 import { AppEnvConfig, PasswordsMap } from './types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
 import { EnvVariables } from './constants';
-import { InvalidFronteggEnv } from '../utils/errors';
+import { FronteggEnvNotFound, InvalidFronteggEnv } from '../utils/errors';
 
 const setupEnvVariables = {
   FRONTEGG_APP_URL: process.env.FRONTEGG_APP_URL,
@@ -21,6 +21,7 @@ const setupEnvVariables = {
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
   FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
   FRONTEGG_FORWARD_IP: process.env.FRONTEGG_FORWARD_IP,
+  FRONTEGG_SSG_EXPORT: process.env.FRONTEGG_SSG_EXPORT,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
   VERCEL: process.env.VERCEL,
   VERCEL_URL: process.env.VERCEL_URL,
@@ -30,9 +31,17 @@ class Config {
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
 
   constructor() {
-    if (typeof window === 'undefined') {
-      this.validatePassword();
+    if (!this.isSSGExport) {
+      if (typeof window === 'undefined') {
+        this.validatePassword();
+      }
     }
+  }
+
+  get isSSGExport(): boolean {
+    const isSSGExport =
+      getEnvOrDefault(EnvVariables.FRONTEGG_SSG_EXPORT, setupEnvVariables.FRONTEGG_SSG_EXPORT) ?? 'false';
+    return isSSGExport === 'true';
   }
 
   get appUrl(): string {
@@ -44,7 +53,10 @@ class Config {
   }
 
   get baseUrl(): string {
-    const baseUrl = getEnv(EnvVariables.FRONTEGG_BASE_URL) ?? setupEnvVariables.FRONTEGG_BASE_URL;
+    const baseUrl = getEnvOrDefault(EnvVariables.FRONTEGG_BASE_URL, setupEnvVariables.FRONTEGG_BASE_URL);
+    if (!baseUrl) {
+      throw new FronteggEnvNotFound(EnvVariables.FRONTEGG_BASE_URL);
+    }
     if (baseUrl.endsWith('/')) {
       return baseUrl.slice(0, -1);
     }
@@ -56,7 +68,11 @@ class Config {
   }
 
   get clientId(): string {
-    return getEnv(EnvVariables.FRONTEGG_CLIENT_ID) ?? setupEnvVariables.FRONTEGG_CLIENT_ID;
+    const clientId = getEnv(EnvVariables.FRONTEGG_CLIENT_ID ?? setupEnvVariables.FRONTEGG_CLIENT_ID);
+    if (!clientId) {
+      throw new FronteggEnvNotFound(EnvVariables.FRONTEGG_CLIENT_ID);
+    }
+    return clientId;
   }
 
   get appId(): string | undefined {
@@ -176,9 +192,17 @@ class Config {
   }
 
   get password(): PasswordsMap {
-    const encryptionPasswordEnv =
-      getEnv(EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD) ?? setupEnvVariables.FRONTEGG_ENCRYPTION_PASSWORD;
+    const encryptionPasswordEnv = getEnvOrDefault(
+      EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD,
+      setupEnvVariables.FRONTEGG_ENCRYPTION_PASSWORD
+    );
 
+    if (!encryptionPasswordEnv) {
+      throw new InvalidFronteggEnv(
+        EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD,
+        `Hex string.\n\nFor quick password generation use the following command:\nnode -e "console.log(crypto.randomBytes(32).toString('hex'))"`
+      );
+    }
     return normalizeStringPasswordToMap(encryptionPasswordEnv);
   }
 
