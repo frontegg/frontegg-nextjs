@@ -72,6 +72,7 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
     <>
       <SSGRequestAuthorize isSSG={props.isSSG} shouldRequestAuthorize={props.shouldRequestAuthorize} />
       <CustomComponentRegister app={app} themeOptions={props.themeOptions} />
+      {props.alwaysVisibleChildren}
     </>
   );
   return (

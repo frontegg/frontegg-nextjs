@@ -6,7 +6,7 @@ import { getSessionOnEdge, shouldByPassMiddleware, redirectToLogin } from '@fron
 export const middleware = async (request: NextRequest) => {
   const { pathname, searchParams, origin } = request.nextUrl;
 
-  if (shouldByPassMiddleware(pathname /*, options: optional bypass configuration */)) {
+  if (shouldByPassMiddleware(pathname, request.headers)) {
     return NextResponse.next();
   }
 
