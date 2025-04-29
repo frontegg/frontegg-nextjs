@@ -77,6 +77,7 @@ export interface FronteggProviderOptions extends Omit<FronteggAppOptions, 'conte
 
 export interface FronteggProviderProps extends FronteggProviderOptions {
   children?: ReactNode;
+  alwaysVisibleChildren?: ReactNode;
   router: AppRouterInstance | NextRouter;
   appName?: string;
 }
