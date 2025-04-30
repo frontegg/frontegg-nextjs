@@ -12,7 +12,7 @@
     "demo12": "lerna run dev --stream --scope '@frontegg/example-pages'",
     "demo-ssg": "lerna run dev --stream --scope '@frontegg/example-ssg'",
     "quick-starter": "cd demos/quick-starter-demo && yarn dev",
-    "build": "cross-env NODE_ENV='production' lerna run build --stream --ignore '@frontegg/example-app-directory' --ignore '@frontegg/example-pages'",
+    "build": "cross-env NODE_ENV='production' lerna run build --stream --ignore '@frontegg/example-app-directory' --ignore '@frontegg/example-pages' --ignore '@frontegg/example-ssg'",
     "test": "lerna run test --stream --scope '@frontegg/nextjs'",
     "start:middleware-test-server": "node tests/middleware-test/middleware-test-server.js",
     "start:test-demo12": "concurrently \"yarn start:middleware-test-server\" \"yarn demo12\"",
