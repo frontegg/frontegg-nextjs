@@ -88,3 +88,21 @@ export const getRefreshTokenCookieNameVariants = () => {
     ];
   }
 };
+
+export function getCookieExpirationDate(defaultDate: Date): Date {
+  const isHosted = true;
+
+  if (isHosted) {
+    const now = new Date();
+    now.setMonth(now.getMonth() + 1);
+    return now;
+  }
+
+  return defaultDate;
+}
+
+export const MONTH_IN_SECONDS = 30 * 24 * 60 * 60; // 2592000
+
+export function getTtlInSeconds(): number {
+  return MONTH_IN_SECONDS;
+}

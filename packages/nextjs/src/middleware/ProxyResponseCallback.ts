@@ -13,6 +13,7 @@ import {
 } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
+import { getCookieExpirationDate } from '../utils/cookies/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**
@@ -71,7 +72,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
               if (session) {
                 const sessionCookie = CookieManager.create({
                   value: session,
-                  expires: new Date(decodedJwt.exp * 1000),
+                  expires: getCookieExpirationDate(new Date(decodedJwt.exp * 1000)),
                   secure: isSecured,
                   req,
                 });

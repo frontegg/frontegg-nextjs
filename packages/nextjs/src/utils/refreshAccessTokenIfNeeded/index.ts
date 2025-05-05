@@ -22,6 +22,7 @@ import {
   getClientIp,
   FRONTEGG_VENDOR_ID_HEADER,
 } from '../../api/utils';
+import { getCookieExpirationDate } from '../cookies/helpers';
 
 export { isRuntimeNextRequest };
 /**
@@ -131,7 +132,7 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
     }
     const cookieValue = CookieManager.create({
       value: session,
-      expires: new Date(decodedJwt.exp * 1000),
+      expires: getCookieExpirationDate(new Date(decodedJwt.exp * 1000)),
       secure: isSecured,
       req: nextJsRequest,
     });

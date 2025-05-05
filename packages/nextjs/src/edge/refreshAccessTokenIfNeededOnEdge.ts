@@ -6,6 +6,7 @@ import api from '../api';
 import fronteggLogger from '../utils/fronteggLogger';
 import JwtManager from '../utils/jwt';
 import encryptionEdge from '../utils/encryption-edge';
+import { getCookieExpirationDate, getTtlInSeconds } from '../utils/cookies/helpers';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.refreshAccessTokenIfNeededOnEdge' });
 
@@ -15,7 +16,6 @@ export async function refreshAccessTokenIfNeededOnEdge(
   const sealFromCookies = CookieManager.getSessionCookieFromRequest(req);
   console.log('sealFromCookiesOnEdge', sealFromCookies);
   if (!sealFromCookies) {
-    //Change meee
     logger.info('no cookies found');
     return undefined;
   }
@@ -49,7 +49,6 @@ export async function refreshAccessTokenIfNeededOnEdge(
     return undefined;
   }
   logger.info('response:::::::::', response);
-  logger.info('headers:::::::::', headers);
   const isSecured = config.isSSL;
   if (response === null || !response.ok) {
     const cookiesToRemove = CookieManager.getRequestCookiesHeaderToRemove({
@@ -92,7 +91,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
 
   const cookieValue = CookieManager.create({
     value: session,
-    expires: new Date(decodedJwt.exp * 1000),
+    expires: getCookieExpirationDate(new Date(decodedJwt.exp * 1000)),
     secure: isSecured,
     req,
   });
@@ -124,6 +123,6 @@ export async function createSessionFromAccessTokenOnEdge(data: any): Promise<[st
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
   const tokens = { accessToken, refreshToken };
-  const session = await encryptionEdge.sealTokens(tokens, decodedJwt.exp);
+  const session = await encryptionEdge.sealTokens(tokens, getTtlInSeconds());
   return [session, decodedJwt, refreshToken];
 }

@@ -1,6 +1,7 @@
 import type { FronteggUserTokens } from '../types';
 import JwtManager from '../utils/jwt';
 import encryption from '../utils/encryption';
+import { getTtlInSeconds } from '../utils/cookies/helpers';
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -9,7 +10,7 @@ export async function createSessionFromAccessToken(data: any): Promise<[string, 
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
   const tokens = { accessToken, refreshToken };
-  const session = await encryption.sealTokens(tokens, decodedJwt.exp);
+  const session = await encryption.sealTokens(tokens, getTtlInSeconds());
   return [session, decodedJwt, refreshToken];
 }
 

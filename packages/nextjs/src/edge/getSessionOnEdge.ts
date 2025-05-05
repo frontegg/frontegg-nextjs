@@ -18,6 +18,7 @@ import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
 import { shouldByPassMiddleware } from './shouldBypassMiddleware';
+import { getCookieExpirationDate, getTtlInSeconds } from '../utils/cookies/helpers';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.getSessionOnEdge' });
 
@@ -183,7 +184,8 @@ async function createSessionFromAccessTokenEdge(data: any): Promise<[string, any
   decodedJwt.expiresIn = Math.floor((decodedJwt.exp * 1000 - Date.now()) / 1000);
 
   const tokens = { accessToken, refreshToken };
-  const session = await encryptionEdge.sealTokens(tokens, decodedJwt.exp);
+
+  const session = await encryptionEdge.sealTokens(tokens, getTtlInSeconds());
   return [session, decodedJwt, refreshToken];
 }
 
@@ -232,9 +234,10 @@ export const handleHostedLoginCallback = async (
     return NextResponse.redirect(config.appUrl);
   }
   const isSecured = config.isSSL;
+
   const cookieValue = CookieManager.create({
     value: session,
-    expires: new Date(decodedJwt.exp * 1000),
+    expires: getCookieExpirationDate(new Date(decodedJwt.exp * 1000)),
     secure: isSecured,
   });
 
@@ -245,7 +248,7 @@ export const handleHostedLoginCallback = async (
   const refreshCookie = CookieManager.create({
     cookieName,
     value: refreshToken ?? '',
-    expires: new Date(decodedJwt.exp * 1000),
+    expires: getCookieExpirationDate(new Date(decodedJwt.exp * 1000)),
     secure: isSecured,
   });
   const sessionCookieHeaders: [string, string][] = cookieValue.map((cookie) => ['set-cookie', cookie]);
