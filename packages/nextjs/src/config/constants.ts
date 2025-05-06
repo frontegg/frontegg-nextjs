@@ -112,6 +112,15 @@ export enum EnvVariables {
    * In order to enable this feature, you need to provide {@link EnvVariables.FRONTEGG_SHARED_SECRET}
    */
   FRONTEGG_FORWARD_IP = 'FRONTEGG_FORWARD_IP',
+
+  /**
+   * Where the Nextjs build output will be stored as static files
+   * for SSG and ISR pages, this env variable will disable environment variables
+   * checking and will not throw an error if the env variables are for SSR
+   *
+   * NOTE: you cannot use this env with SSR.
+   */
+  FRONTEGG_SSG_EXPORT = 'FRONTEGG_SSG_EXPORT',
   /**
    * This Env variable assign automatically when deploying you Next.js application
    * to Vercel deployments service, and will be used to detect to dynamically configure
