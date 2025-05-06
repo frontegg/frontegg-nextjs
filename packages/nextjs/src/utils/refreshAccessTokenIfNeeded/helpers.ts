@@ -8,7 +8,6 @@ import config from '../../config';
 
 import { FRONTEGG_FORWARDED_SESSION_KEY } from '../common/constants';
 import { FronteggNextJSSession } from '../../types';
-import { CommonUrls } from '../common/urls';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
   if (cookies == null) {
@@ -106,16 +105,6 @@ export function isSamlCallback(url: string): boolean {
  */
 export function isSSOPostRequest(url: string): boolean {
   return url === '/frontegg/auth/saml/callback' || url === '/frontegg/auth/oidc/callback';
-}
-
-/**
- * Checks if the request URL is a refresh token request.
- * This is used to determine if the current request is targeting
- * one of the predefined refresh token URLs (embedded or hosted modes).
- */
-export function isRefreshTokenRequest(url: string): boolean {
-  const refreshTokenUrls = [CommonUrls.refreshToken.embedded, CommonUrls.refreshToken.hosted];
-  return refreshTokenUrls.includes(url);
 }
 
 /**
