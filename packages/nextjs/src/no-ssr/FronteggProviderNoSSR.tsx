@@ -10,6 +10,7 @@ import AppContext from '../common/AppContext';
 import useOnRedirectTo from '../utils/useOnRedirectTo';
 import ExpireInListener from './ExpireInListener';
 import { createStore, FronteggStore } from '@frontegg/redux-store';
+import NoSSRStoreHolder from './NoSSRStoreHolder';
 
 export type FronteggProviderNoSSRProps = PropsWithChildren<FronteggAppOptions>;
 
@@ -23,7 +24,6 @@ const Connector: FC<ConnectorProps> = (_props) => {
   const { router, appName, hostedLoginBox, customLoginBox, ...props } = _props;
   const baseName = props.basename ?? router.basePath;
   const storeHolderRef = useRef<{ store?: FronteggStore }>({});
-
   const onRedirectTo = useOnRedirectTo(baseName, router, props.authOptions?.routes);
 
   const contextOptions: ContextOptions = {
@@ -31,7 +31,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
     ...props.contextOptions,
   };
 
-  const storeHolder = storeHolderRef.current;
+  const storeHolder = NoSSRStoreHolder.getInstance() ?? storeHolderRef.current;
   let sharedStore = storeHolder.store;
   if (!sharedStore) {
     sharedStore = createStore({
@@ -49,6 +49,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
       },
     });
     storeHolder.store = sharedStore;
+    storeHolderRef.current.store = sharedStore;
   }
 
   let app: FronteggApp;
@@ -59,6 +60,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
     app = initialize(
       {
         ...props,
+        store: sharedStore,
         hostedLoginBox: hostedLoginBox ?? false,
         basename: props.basename ?? baseName,
         authOptions: {
@@ -70,13 +72,10 @@ const Connector: FC<ConnectorProps> = (_props) => {
       },
       appName ?? 'default'
     );
+    app.store.dispatch({ type: 'auth/requestAuthorize', payload: true });
   }
 
   ContextHolder.for(appName ?? 'default').setOnRedirectTo(onRedirectTo);
-
-  useEffect(() => {
-    app.store.dispatch({ type: 'auth/requestAuthorize', payload: true });
-  }, [app]);
 
   return (
     <AppContext.Provider value={app}>
