@@ -57,7 +57,7 @@ export const shouldByPassMiddleware = (
   if (isFronteggRoutes) return _options.bypassFronteggRoutes;
 
   // noinspection RedundantIfStatementJS
-  if (headers.has('next-router-prefetch') || headers.get('purpose') === 'prefetch') {
+  if ((headers.has('next-router-prefetch') || headers.get('purpose') === 'prefetch') && pathname !== '/') {
     /** bypass prefetch requests on hovering links that leads to SSG pages **/
     return true;
   }
