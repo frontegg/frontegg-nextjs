@@ -57,33 +57,34 @@ const initializeFronteggApp = ({
         return options.envBaseUrl;
       }
     },
-    beforeRequestInterceptor: (options, url) => {
+    beforeRequestInterceptor: (reqOptions, url) => {
       /**
        * Determines whether the authorization header should be removed from a request.
        * @param {String} urlStr - The URL of the request.
        */
       try {
-        if (url && options.headers) {
+        if (url && reqOptions.headers) {
           const { pathname, origin } = new URL(url);
-          if (typeof window !== 'undefined' && origin != window.location.origin) {
-            return { ...options, url };
+          if (typeof window !== 'undefined' && origin !== window.location.origin) {
+            return { ...reqOptions, url };
           }
-          if (
-            [
-              CommonUrls.refreshToken.embedded,
-              CommonUrls.refreshToken.hosted,
-              CommonUrls.activateAccount.activate,
-              CommonUrls.logout,
-            ].find((path) => pathname.endsWith(path)) != undefined
-          ) {
-            delete options.headers['authorization'];
-            delete options.headers['Authorization'];
+
+          const excludedPaths = [
+            CommonUrls.refreshToken.embedded,
+            CommonUrls.refreshToken.hosted,
+            CommonUrls.activateAccount.activate,
+            CommonUrls.logout,
+          ];
+
+          if (excludedPaths.some((path) => pathname.endsWith(path))) {
+            delete reqOptions.headers['authorization'];
+            delete reqOptions.headers['Authorization'];
           }
         }
       } catch (e) {
         /** ignore */
       }
-      return { ...options, url };
+      return { ...reqOptions, url };
     },
     clientId: options.envClientId,
     appId: options.envAppId,
