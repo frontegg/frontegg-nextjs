@@ -1,4 +1,5 @@
 import { FronteggAppProvider } from '@frontegg/nextjs/app';
+import AppLoader from '../components/app-loader';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,7 +7,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head></head>
       <body>
         {/* @ts-expect-error Server Component for more details visit: https://github.com/vercel/next.js/issues/42292 */}
-        <FronteggAppProvider authOptions={{ keepSessionAlive: true }} customLoginOptions={{ paramKey: 'organization' }}>
+        <FronteggAppProvider
+          customLoader
+          authOptions={{ keepSessionAlive: true }}
+          customLoginOptions={{ paramKey: 'organization' }}
+          alwaysVisibleChildren={<AppLoader />}
+        >
           {children}
         </FronteggAppProvider>
       </body>
