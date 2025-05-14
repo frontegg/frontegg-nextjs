@@ -8,6 +8,7 @@ import { FRONTEGG_AFTER_AUTH_REDIRECT_URL } from '../utils/common/constants';
 import AppContext from './AppContext';
 import React from 'react';
 import { ParsedUrlQuery } from 'querystring';
+import { getAfterAuthRedirectUrl } from './helpers';
 
 interface FronteggRouterBaseProps {
   queryParams?: ParsedUrlQuery;
@@ -34,8 +35,10 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
 
     if (app.options.hostedLoginBox) {
       if (pathname === routesObj.loginUrl) {
+        const redirectUrl = getAfterAuthRedirectUrl(queryParams);
+
         if (queryParams.redirectUrl) {
-          localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, `${window.location.origin}${queryParams.redirectUrl}`);
+          localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, `${window.location.origin}${redirectUrl}`);
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {
