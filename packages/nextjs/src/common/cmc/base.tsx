@@ -7,7 +7,6 @@ import { AppContext } from '../..';
 
 
 export type RenderableFronteggComponent = keyof Pick<FronteggApp, 'renderChangePasswordForm' | 'renderInviteUserDialog' | 'renderProfilePage' | 'renderUsersTable'>;
-export type AvailableFronteggHooks = keyof Pick<FronteggApp, 'getUsersTableStore' | 'getInviteUserDialogStore'>;
 export type FronteggCMCComponentProps<K extends CMCComponentProps> = Pick<K, 'themeOptions' | 'props' | 'localizations' | 'hostStyle'>
 
 export const CMCComponent: FC<FronteggCMCComponentProps<CMCComponentProps> & { renderComponent: RenderableFronteggComponent }> = memo(

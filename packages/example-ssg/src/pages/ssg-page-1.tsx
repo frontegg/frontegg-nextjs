@@ -13,8 +13,8 @@ export default function SsgPage1() {
   const app = AppHolder.getInstance('default')
   const [appLoading, setLoading] = useState(app.loading);
 
-  const { openDialog: openInviteUserDialog } = useInviteUserDialog();
-  const { onSearch } = useUsersTable();
+  const { openDialog: openInviteUserDialog,  } = useInviteUserDialog();
+  const { onSearch,  } = useUsersTable();
   // console.log({ appLoading, isLoading, isAuthenticated, app })
   useEffect(() => {
     // single time load listener that trigger when the login-box cdn js files is loaded
@@ -61,7 +61,24 @@ export default function SsgPage1() {
           onSearch(e.target.value)
         }} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <UsersTable props={{}} hostStyle={{ width: '100%', height: '450px', marginBottom: '50px' }} />
+          <UsersTable props={{}}  themeOptions={{
+            adminPortal: {
+              components: {
+                MuiTableCell: {
+                  styleOverrides: {
+                    head: {
+                      background: 'lightgreen',
+                      border: '1px solid red',
+                    },
+                    body: {
+                      background: 'pink',
+                      border: '1px solid red',
+                    },
+                  },
+                },
+              },
+            }
+          }} hostStyle={{ width: '100%', height: '450px', marginBottom: '50px' }} />
           <ProfilePage props={{}} hostStyle={{ width: '100%', height: '350px', marginBottom: '50px' }} />
           <ChangePasswordForm props={{}} hostStyle={{ width: '100%', height: '150px', marginBottom: '50px' }} />
           <InviteUserDialog props={{}} hostStyle={{ width: '100%', height: '0px', marginBottom: '50px' }} />

@@ -3,8 +3,8 @@ import { FronteggProviderNoSSR } from '@frontegg/nextjs';
 
 
 const contextOptions = {
-  baseUrl: 'https://app-tzfpgdmacxhi.stg.frontegg.com',
-  clientId: 'b9e58548-4c78-4292-88bd-d3d6c9ee015b',
+  baseUrl: '',
+  clientId: '',
 }
 
 // eslint-disable-next-line
