@@ -1,5 +1,9 @@
 # Change Log
 
+## [9.2.4](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.3...v9.2.4) (2025-5-14)
+
+
+
 ## [9.2.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.3) (2025-5-6)
 
 - FR-18986 - Added tooltip functionality for individual chips in GroupsChipsList component
