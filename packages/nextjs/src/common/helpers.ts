@@ -1,6 +1,7 @@
 import type { FronteggUserTokens } from '../types';
 import JwtManager from '../utils/jwt';
 import encryption from '../utils/encryption';
+import { ParsedUrlQuery } from 'querystring';
 
 export async function createSessionFromAccessToken(data: any): Promise<[string, any, string] | []> {
   const accessToken = data.accessToken ?? data.access_token;
@@ -19,3 +20,18 @@ export async function getTokensFromCookie(cookie?: string): Promise<FronteggUser
   }
   return await encryption.unsealTokens(cookie);
 }
+
+export const getAfterAuthRedirectUrl = (queryParams: ParsedUrlQuery) => {
+  const redirectPath = queryParams.redirectUrl;
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(queryParams)) {
+    if (key !== 'redirectUrl' && value !== undefined) {
+      query.append(key, String(value));
+    }
+  }
+
+  const redirectUrl = query.toString() ? `${redirectPath}?${query.toString()}` : redirectPath;
+
+  return `${window.location.origin}${redirectUrl}`;
+};
