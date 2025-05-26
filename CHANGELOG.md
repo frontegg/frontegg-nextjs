@@ -1,5 +1,9 @@
 # Change Log
 
+## [9.2.5](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.4...v9.2.5) (2025-5-26)
+
+
+
 ## [9.2.4](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.3...v9.2.4) (2025-5-14)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/example-ssg",
-  "version": "9.2.1",
+  "version": "9.2.5",
   "private": true,
   "scripts": {
     "clean": "rm -rf  ./node_modules && rm -rf ./.next",
