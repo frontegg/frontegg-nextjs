@@ -1,5 +1,28 @@
 # Change Log
 
+## [9.2.4](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.3...v9.2.4) (2025-5-14)
+
+
+
+## [9.2.3](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.3) (2025-5-6)
+
+- FR-18986 - Added tooltip functionality for individual chips in GroupsChipsList component
+- FR-20385 - Fixed user impersonation with identifiers
+- FR-20254 - Added localizations for activate with social logins
+- FR-20280 - Added support for signup with phone number
+
+
+### NextJS Wrapper 9.2.3:
+- FR-20225 - Add support for StrictMode when using SSG export
+- Update README.md
+- FR-20225 - Fix SSG env variable check and add strict mode support
+- FR-19751 - Trigger release
+# Change Log
+
+## [9.2.2](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.2...v9.2.2) (2025-4-9)
+
+These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
+
 ## [9.2.1](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.0...v9.2.1) (2024-11-26)
 
 #### **Enhancements**
@@ -10,8 +33,6 @@
    - Fixed an issue where refreshed tokens were not forwarded to SSR components after middleware processing. Updated cookies are now correctly synchronized, ensuring consistent session handling across the application.
 
 These changes enhance user experience during upgrades and improve session consistency for applications with short token expiration times.
-
-# Change Log
 
 ## [9.2.0](https://github.com/frontegg/frontegg-nextjs/compare/v9.1.1...v9.2.0) (2024-11-25)
 

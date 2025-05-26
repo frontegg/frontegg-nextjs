@@ -1,0 +1,72 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  background: cornflowerblue;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 4px;
+  color: white;
+  font-weight: 800;
+  outline: none;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+button:hover {
+  background: #4881e8;
+}
+button:active {
+  background: #2f6fe1;
+}
+
+
+button.red {
+    background: #ff4d4d;
+}
+button.red:hover {
+    background: #ff3333;
+}
+button.red:active {
+    background: #ff1a1a;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}

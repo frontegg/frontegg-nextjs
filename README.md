@@ -3,9 +3,6 @@
 Frontegg is a web platform where SaaS companies can set up their fully managed, scalable and brand aware - SaaS features
 and integrate them into their SaaS portals in up to 5 lines of code.
 
-
-### You are reading v6 docs, v7 docs under construction, Visit [the latest changelog](https://github.com/frontegg/frontegg-nextjs/releases/tag/v7.0.0) for migration from v6.
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -28,6 +25,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
 ### Add Frontegg to Next.JS project
 
 To Add Frontegg to your existing Next.JS project, follow below steps:
+
 
 Use package manager to install Frontegg Next.JS library.
 

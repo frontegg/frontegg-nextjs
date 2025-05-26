@@ -5,6 +5,8 @@ test('@frontegg/nextjs/pages exports test', () => {
   const requiredExports: Set<string> = new Set<string>([
     'FronteggRouter',
     'FronteggRouterProps',
+    'FronteggStaticRouterProps',
+    'FronteggStaticPaths',
     'withFronteggApp',
     'getSession',
     'withSSRSession',
