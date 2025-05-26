@@ -4,6 +4,10 @@ import { fronteggSSOPathRewrite, fronteggPathRewrite, defaultFronteggHeaders } f
 import { isInternalRequest, rewritePath } from './helpers';
 import { getSession } from '../pages';
 import { CorsOptions, FronteggApiMiddlewareType } from './types';
+import config from '../config';
+import { isFronteggLogoutUrl } from './helpers';
+import CookieManager from '../utils/cookies';
+import { getTokensFromCookie } from '../common';
 
 const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
   new Promise<void>(async (resolve) => {
@@ -17,12 +21,19 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
     if (process.env['FRONTEGG_TEST_URL'] && req.url == '/frontegg/middleware-test') {
       options.target = process.env['FRONTEGG_TEST_URL'];
     }
-
     const headers: Record<string, string> = {};
     if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
       const session = await getSession(req);
       if (session?.accessToken) {
         headers['authorization'] = 'Bearer ' + session.accessToken;
+      }
+    }
+
+    if (config.isHostedLogin && isFronteggLogoutUrl(req.url || '') && !headers['authorization']) {
+      const sessionCookie = CookieManager.getSessionCookieFromRequest(req);
+      const tokens = await getTokensFromCookie(sessionCookie);
+      if (tokens?.accessToken) {
+        headers['authorization'] = 'Bearer ' + tokens.accessToken;
       }
     }
     FronteggProxy.web(req, res, {
