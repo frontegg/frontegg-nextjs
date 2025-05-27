@@ -56,8 +56,15 @@ export const shouldByPassMiddleware = (
   if (isFronteggMiddleware) return _options.bypassFronteggMiddleware;
   if (isFronteggRoutes) return _options.bypassFronteggRoutes;
 
+  const isPrefetchRequest = headers.has('next-router-prefetch') || headers.get('purpose') === 'prefetch';
+  const secFetchModeHeader = headers.get('sec-fetch-mode');
+  const secFetchDestHeader = headers.get('sec-fetch-dest');
+
+  const isBrowserAddressBarPrefetch =
+    isPrefetchRequest && secFetchModeHeader === 'navigate' && secFetchDestHeader === 'document';
+
   // noinspection RedundantIfStatementJS
-  if ((headers.has('next-router-prefetch') || headers.get('purpose') === 'prefetch') && pathname !== '/') {
+  if (isPrefetchRequest && !isBrowserAddressBarPrefetch) {
     /** bypass prefetch requests on hovering links that leads to SSG pages **/
     return true;
   }
