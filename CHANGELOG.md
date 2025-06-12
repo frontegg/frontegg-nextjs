@@ -1,5 +1,20 @@
 # Change Log
 
+## [9.2.6](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.5...v9.2.6) (2025-6-12)
+
+- FR-20862 - Fixed useLoginHint and add tests to simulate hosted prelogin flow
+- FR-21121 - Added reset password with email&#x2F;sms actions and a Forgot password sms otc page 
+- FR-21097 - Added suspense to renderCMCComponent
+- FR-21120 - Added BaseOTC component and use it in login otc flows
+- FR-21112 - Added password recovery selector and a determinePasswordRecoveryStrategy function
+- FR-21118 - Fixed default language handle
+- FR-20838 - Added search functionality to roles popper
+- FR-20178 - Added generic IdentifierField and used it in login and forgot password flows
+- FR-20945 - Added username in profile
+- FR-20868 - Added usernames
+
+
+
 ## [9.2.5](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.4...v9.2.5) (2025-5-26)
 
 
