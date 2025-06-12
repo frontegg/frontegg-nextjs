@@ -1,4 +1,4 @@
-import { AdminPortal, ChangePasswordForm, InviteUserDialog, ProfilePage, useAuth, useInviteUserDialog, UsersTable, useUsersTable } from '@frontegg/nextjs';
+import { AdminPortal, ChangePasswordForm, EditEmailForm, InviteUserDialog, ProfilePage, useAuth, useInviteUserDialog, UsersTable, useUsersTable } from '@frontegg/nextjs';
 import Link from 'next/link';
 import { AppHolder } from '@frontegg/js/AppHolder';
 import { useEffect, useState } from 'react';
@@ -82,6 +82,7 @@ export default function SsgPage1() {
           <ProfilePage props={{}} hostStyle={{ width: '100%', height: '350px', marginBottom: '50px' }} />
           <ChangePasswordForm props={{}} hostStyle={{ width: '100%', height: '150px', marginBottom: '50px' }} />
           <InviteUserDialog props={{}} hostStyle={{ width: '100%', height: '0px', marginBottom: '50px' }} />
+          <EditEmailForm props={{}} hostStyle={{ width: '100%', height: '350px', margin: '50px 0' }} />
         </div>
       </div>
       <Testing />
