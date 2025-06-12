@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangePasswordFormProps, InviteUserDialogProps, ProfilePageProps, UsersTableProps } from '@frontegg/types';
+import { ChangePasswordFormProps, EditEmailFormProps, InviteUserDialogProps, ProfilePageProps, UsersTableProps } from '@frontegg/types';
 import React, { FC } from 'react';
 import { CMCComponent, FronteggCMCComponentProps } from './base';
 
@@ -18,4 +18,8 @@ export const ChangePasswordForm: FC<FronteggCMCComponentProps<ChangePasswordForm
 
 export const ProfilePage: FC<FronteggCMCComponentProps<ProfilePageProps>> = (props) => {
     return <CMCComponent renderComponent="renderProfilePage" {...props} />
+}
+
+export const EditEmailForm: FC<FronteggCMCComponentProps<EditEmailFormProps>> = (props) => {
+    return <CMCComponent renderComponent="renderEditEmailForm" {...props} />
 }
