@@ -13,6 +13,10 @@ import {
 } from './helpers';
 import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
+import { gunzip } from 'zlib';
+import { promisify } from 'util';
+
+const gunzipAsync = promisify(gunzip);
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
 /**
@@ -39,6 +43,20 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
       const isSuccess = statusCode >= 200 && statusCode < 400;
       let bodyStr = buffer.toString('utf-8');
       const isLogout = isFronteggLogoutUrl(url);
+
+      // Check if response is gzipped
+      const isGzipped = proxyRes.headers['content-encoding'] === 'gzip';
+      if (isGzipped) {
+        console.log('isGzipped', isGzipped);
+        try {
+          const decompressed = await gunzipAsync(buffer);
+          bodyStr = decompressed.toString('utf-8');
+          // Remove content-encoding header since we've decompressed
+          delete proxyRes.headers['content-encoding'];
+        } catch (e) {
+          console.error('Failed to decompress gzip response:', e);
+        }
+      }
 
       if (isLogout) {
         CookieManager.removeCookies({
