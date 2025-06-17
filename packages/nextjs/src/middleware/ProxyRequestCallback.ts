@@ -55,6 +55,13 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
     proxyReq.setHeader('x-frontegg-sdk', req.headers['x-frontegg-sdk'] ?? `@frontegg/nextjs@${sdkVersion.version}`);
     proxyReq.setHeader('x-frontegg-middleware', 'true');
 
+    /**
+     * Request uncompressed responses to avoid handling compression in middleware.
+     * This ensures consistent behavior across different environments and simplifies response processing.
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding
+     */
+    proxyReq.setHeader('Accept-Encoding', 'identity');
+
     const clientIp = getClientIp(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']);
 
     if (clientIp && config.shouldForwardIp) {
