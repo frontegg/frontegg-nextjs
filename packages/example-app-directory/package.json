@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/example-app-directory",
-  "version": "9.2.6",
+  "version": "9.2.7",
   "private": true,
   "scripts": {
     "clean": "rm -rf  ./node_modules && rm -rf ./.next",

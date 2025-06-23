@@ -1,5 +1,21 @@
 # Change Log
 
+## [9.2.7](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.6...v9.2.7) (2025-6-23)
+
+- FR-20838 - Added search for role in the edit roles dialog of users page
+- FR-21222 - Fixed reset password selector icons to be aligned to the center
+- FR-21206 - Fixed user goes to &quot;Forget password?&quot; page after clicking on &quot;Try another method&quot;
+- FR-21208 - Added support for dynamic redirect url after signup
+- FR-21174 - Changed forgot password sms option translation
+- FR-21173 - Fixed password reset success state handling
+
+
+- FR-0000 - Fixed node version
+- FR-21160 - Removed exclusion of set user email policy state
+
+### NextJS Wrapper 9.2.7:
+- FR-20829 Fix MFA error messages
+
 ## [9.2.6](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.5...v9.2.6) (2025-6-12)
 
 - FR-20862 - Fixed useLoginHint and add tests to simulate hosted prelogin flow
