@@ -68,6 +68,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
       console.log('inside ProxyRequestCallback', process.env.VERCEL);
       console.log('req.headers[cf-connecting-ip]', req.headers['cf-connecting-ip']);
       console.log('req.headers[x-forwarded-for]', req.headers['x-forwarded-for']);
+      console.log('req.headers[x-forwarded-for]', req.headers['x-real-ip']);
       proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, clientIp);
       proxyReq.setHeader(FRONTEGG_HEADERS_VERIFIER_HEADER, config.sharedSecret ?? '');
       proxyReq.setHeader(FRONTEGG_VENDOR_ID_HEADER, config.clientId);
