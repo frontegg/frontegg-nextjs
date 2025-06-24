@@ -90,6 +90,9 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
       nextJsRequest.socket?.remoteAddress;
 
     if (clientIp && config.shouldForwardIp) {
+      console.log('inside refreshAccessTokenIfNeeded', process.env.VERCEL);
+      console.log('nextJsRequest.headers[cf-connecting-ip]', nextJsRequest.headers['cf-connecting-ip']);
+      console.log('nextJsRequest.headers[x-forwarded-for]', nextJsRequest.headers['x-forwarded-for']);
       nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
       nextJsRequest.headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
       nextJsRequest.headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;

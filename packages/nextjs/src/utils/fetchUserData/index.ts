@@ -32,6 +32,11 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
     }
 
     if (config.shouldForwardIp) {
+      console.log('inside fetchUserData', process.env.VERCEL);
+      console.log('reqHeaders[cf-connecting-ip]', reqHeaders['cf-connecting-ip']);
+      console.log('reqHeaders[x-vercel-proxied-for]', reqHeaders['x-vercel-proxied-for']);
+      console.log('reqHeaders[x-real-ip]', reqHeaders['x-real-ip']);
+      console.log('reqHeaders[x-forwarded-for]', reqHeaders['x-forwarded-for']);
       logger.debug('Retrieving forwarded IP...');
       const clientIp = getClientIp(
         reqHeaders['cf-connecting-ip'] ||
