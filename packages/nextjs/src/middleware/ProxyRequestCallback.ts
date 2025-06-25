@@ -76,6 +76,10 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
     headersToRemove.map((header) => proxyReq.removeHeader(header));
 
+    if (req.url?.includes('/sso/prelogin')) {
+      proxyReq.removeHeader('cookie');
+    }
+
     logger.debug(`${req.url} | check if request has body`);
     if (req.method !== 'GET' && req.body) {
       logger.debug(`${req.url} | writing request body to proxyReq`);
