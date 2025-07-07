@@ -25,6 +25,4 @@ export interface AppEnvConfig {
   secureJwtEnabled?: boolean;
   /** {@link EnvVariables.FRONTEGG_HOSTED_LOGIN} */
   envHostedLoginBox?: boolean;
-  /** Custom function to resolve client IP */
-  getClientIp?: GetClientIpFunction;
 }

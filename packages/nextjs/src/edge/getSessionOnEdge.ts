@@ -201,23 +201,17 @@ export const handleHostedLoginCallback = async (
   let headers: Record<string, string> = {};
   let clientIp: string | undefined = undefined;
   if (typeof req.headers?.get === 'function') {
-    console.log('req.headers.get(cf-connecting-ip)', req.headers.get('cf-connecting-ip'));
-    console.log('req.headers.get(x-forwarded-for)', req.headers.get('x-forwarded-for'));
     clientIp =
       getClientIp(req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for')) ||
       (req as any).socket?.remoteAddress;
   } else if (typeof req.headers === 'object') {
     let requestHeaders: any = { ...req.headers };
-    console.log('requestHeaders[cf-connecting-ip]', requestHeaders['cf-connecting-ip']);
-    console.log('requestHeaders[x-forwarded-for]', requestHeaders['x-forwarded-for']);
     clientIp =
       getClientIp(requestHeaders['cf-connecting-ip'] || requestHeaders['x-forwarded-for']) ||
       (req as any).socket?.remoteAddress;
   }
 
   if (clientIp && config.shouldForwardIp) {
-    console.log('inside handleHostedLoginCallback', process.env.VERCEL);
-
     headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
     headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;

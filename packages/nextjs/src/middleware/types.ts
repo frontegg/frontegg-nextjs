@@ -11,9 +11,9 @@ export type CorsOptions = {
 
 export type FronteggMiddlewareOptions = {
   getClientIp?: GetClientIpFunction;
+  cors?: CorsOptions;
 };
 
 export type FronteggApiMiddlewareType = ((req: NextApiRequest, res: NextApiResponse) => Promise<void>) & {
-  cors: (options: CorsOptions) => (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
   withOptions: (options: FronteggMiddlewareOptions) => (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
 };

@@ -64,14 +64,9 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
     let clientIp: string | undefined;
 
-    // if (config.isVercel) {
-    //   clientIp = getClientIp(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']);
-    // } else if (config.getClientIp) {
-    //   clientIp = config.getClientIp(req);
-    // }
-
-    if (config.getClientIp) {
-      console.log('config.getClientIp(req)', config.getClientIp(req));
+    if (config.isVercel) {
+      clientIp = getClientIp(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']);
+    } else if (config.getClientIp) {
       clientIp = config.getClientIp(req);
     }
 

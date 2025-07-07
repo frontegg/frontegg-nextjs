@@ -9,6 +9,32 @@ import { isFronteggLogoutUrl } from './helpers';
 import CookieManager from '../utils/cookies';
 import { getTokensFromCookie } from '../common';
 
+const handleCors = (req: NextApiRequest, res: NextApiResponse, corsOptions?: CorsOptions) => {
+  if (!corsOptions) return;
+
+  const {
+    allowedOrigins = ['*'],
+    allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders = ['Content-Type', 'Authorization'],
+    allowCredentials = true,
+  } = corsOptions;
+
+  if (isInternalRequest(req.headers.host ?? '')) {
+    const origin = req.headers.origin ?? '';
+    const combinedHeaders = Array.from(new Set([...defaultFronteggHeaders, ...allowedHeaders]));
+
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+      res.removeHeader('Access-Control-Allow-Origin');
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', allowedMethods.join(','));
+    res.setHeader('Access-Control-Allow-Headers', combinedHeaders.join(','));
+    res.setHeader('Access-Control-Allow-Credentials', allowCredentials ? 'true' : 'false');
+  }
+};
+
 const middlewarePromise = (req: NextApiRequest, res: NextApiResponse, options?: FronteggMiddlewareOptions) =>
   new Promise<void>(async (resolve) => {
     const fronteggUrlPath = rewritePath(req.url ?? '/', fronteggPathRewrite);
@@ -41,6 +67,8 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse, options?: 
       config.getClientIp = options.getClientIp;
     }
 
+    handleCors(req, res, options?.cors);
+
     FronteggProxy.web(req, res, {
       ...proxyOptions,
       headers,
@@ -59,34 +87,6 @@ const FronteggApiMiddleware: FronteggApiMiddlewareType = (async (
 ): Promise<void> => {
   return await middlewarePromise(req, res);
 }) as FronteggApiMiddlewareType;
-
-FronteggApiMiddleware.cors =
-  (options: CorsOptions) =>
-  async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-    const {
-      allowedOrigins = ['*'],
-      allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders = ['Content-Type', 'Authorization'],
-      allowCredentials = true,
-    } = options;
-
-    if (isInternalRequest(req.headers.host ?? '')) {
-      const origin = req.headers.origin ?? '';
-      const combinedHeaders = Array.from(new Set([...defaultFronteggHeaders, ...allowedHeaders]));
-
-      if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-      } else {
-        res.removeHeader('Access-Control-Allow-Origin');
-      }
-
-      res.setHeader('Access-Control-Allow-Methods', allowedMethods.join(','));
-      res.setHeader('Access-Control-Allow-Headers', combinedHeaders.join(','));
-      res.setHeader('Access-Control-Allow-Credentials', allowCredentials ? 'true' : 'false');
-    }
-
-    return middlewarePromise(req, res);
-  };
 
 FronteggApiMiddleware.withOptions =
   (options: FronteggMiddlewareOptions) =>

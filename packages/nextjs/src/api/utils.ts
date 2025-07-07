@@ -114,10 +114,6 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   );
 
   if (clientIp && config.shouldForwardIp) {
-    console.log('inside buildRequestHeaders', process.env.VERCEL);
-    console.log('headers[FRONTEGG_FORWARD_IP_HEADER]', headers[FRONTEGG_FORWARD_IP_HEADER]);
-    console.log('headers[cf-connecting-ip]', headers['cf-connecting-ip']);
-    console.log('headers[x-forwarded-for]', headers['x-forwarded-for']);
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
     preparedHeaders[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
     preparedHeaders[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;
