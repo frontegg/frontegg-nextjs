@@ -3,23 +3,23 @@ import { FronteggProxy } from './FronteggProxy';
 import { fronteggSSOPathRewrite, fronteggPathRewrite, defaultFronteggHeaders } from './constants';
 import { isInternalRequest, rewritePath } from './helpers';
 import { getSession } from '../pages';
-import { CorsOptions, FronteggApiMiddlewareType } from './types';
+import { CorsOptions, FronteggApiMiddlewareType, FronteggMiddlewareOptions } from './types';
 import config from '../config';
 import { isFronteggLogoutUrl } from './helpers';
 import CookieManager from '../utils/cookies';
 import { getTokensFromCookie } from '../common';
 
-const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
+const middlewarePromise = (req: NextApiRequest, res: NextApiResponse, options?: FronteggMiddlewareOptions) =>
   new Promise<void>(async (resolve) => {
     const fronteggUrlPath = rewritePath(req.url ?? '/', fronteggPathRewrite);
     const rewriteUrl = rewritePath(fronteggUrlPath ?? '/', fronteggSSOPathRewrite);
     req.url = rewriteUrl;
     res.on('close', () => resolve());
-    const options = {
+    const proxyOptions = {
       target: process.env['FRONTEGG_BASE_URL'],
     };
     if (process.env['FRONTEGG_TEST_URL'] && req.url == '/frontegg/middleware-test') {
-      options.target = process.env['FRONTEGG_TEST_URL'];
+      proxyOptions.target = process.env['FRONTEGG_TEST_URL'];
     }
     const headers: Record<string, string> = {};
     if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
@@ -36,8 +36,13 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse) =>
         headers['authorization'] = 'Bearer ' + tokens.accessToken;
       }
     }
+
+    if (options?.getClientIp) {
+      config.getClientIp = options.getClientIp;
+    }
+
     FronteggProxy.web(req, res, {
-      ...options,
+      ...proxyOptions,
       headers,
     });
   });
@@ -81,6 +86,12 @@ FronteggApiMiddleware.cors =
     }
 
     return middlewarePromise(req, res);
+  };
+
+FronteggApiMiddleware.withOptions =
+  (options: FronteggMiddlewareOptions) =>
+  async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+    return await middlewarePromise(req, res, options);
   };
 
 export { FronteggApiMiddleware };
