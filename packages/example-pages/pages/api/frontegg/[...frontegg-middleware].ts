@@ -19,7 +19,7 @@ export default FronteggApiMiddleware;
  *  Option to provide client ip
  *
  * export default FronteggApiMiddleware.withOptions({
- * getClientIp: (req) => req.headers['x-your-custom-ip-header']?.toString(),
+ * ipResolver: (req) => req.headers['x-your-custom-ip-header']?.toString(),
  * });
  *
  */

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-export type GetClientIpFunction = (req: NextApiRequest) => string | undefined;
+export type IpResolverFunction = (req: NextApiRequest) => string | undefined;
 
 export type CorsOptions = {
   allowedOrigins?: string[];
@@ -10,7 +10,7 @@ export type CorsOptions = {
 };
 
 export type FronteggMiddlewareOptions = {
-  getClientIp?: GetClientIpFunction;
+  ipResolver?: IpResolverFunction;
   cors?: CorsOptions;
 };
 

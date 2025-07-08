@@ -1,6 +1,7 @@
 import { AuthPageRoutes } from '@frontegg/redux-store';
 import { WithFronteggAppOptions } from '../pages';
-import { AppEnvConfig, GetClientIpFunction, PasswordsMap } from './types';
+import { AppEnvConfig, PasswordsMap } from './types';
+import { IpResolverFunction } from '../middleware/types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
 import { EnvVariables } from './constants';
 import { FronteggEnvNotFound, InvalidFronteggEnv } from '../utils/errors';
@@ -29,7 +30,7 @@ const setupEnvVariables = {
 
 class Config {
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
-  private _getClientIp?: GetClientIpFunction;
+  private _ipResolver?: IpResolverFunction;
 
   constructor() {
     if (!this.isSSGExport) {
@@ -229,12 +230,12 @@ class Config {
     return disableInitialPropsRefreshToken === 'true';
   }
 
-  get getClientIp(): GetClientIpFunction | undefined {
-    return this._getClientIp;
+  get ipResolver(): IpResolverFunction | undefined {
+    return this._ipResolver;
   }
 
-  set getClientIp(fn: GetClientIpFunction | undefined) {
-    this._getClientIp = fn;
+  set ipResolver(fn: IpResolverFunction | undefined) {
+    this._ipResolver = fn;
   }
 
   get appEnvConfig(): AppEnvConfig {

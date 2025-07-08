@@ -63,8 +63,8 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse, options?: 
       }
     }
 
-    if (options?.getClientIp) {
-      config.getClientIp = options.getClientIp;
+    if (options?.ipResolver) {
+      config.ipResolver = options.ipResolver;
     }
 
     handleCors(req, res, options?.cors);

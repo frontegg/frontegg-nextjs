@@ -7,10 +7,6 @@ export type PasswordsMap = { [id: string]: string };
 /**
  * PropTypes passed by FronteggProvider to the ClientSide Frontegg components.
  */
-import { NextApiRequest } from 'next';
-
-export type GetClientIpFunction = (req: NextApiRequest) => string | undefined;
-
 export interface AppEnvConfig {
   /** {@link EnvVariables.FRONTEGG_APP_URL} */
   envAppUrl: string;
