@@ -5,10 +5,21 @@ export default FronteggApiMiddleware;
 /**
  *  Option to support multiple origins in single nextjs backend
  *
- * export default FronteggApiMiddleware.cors({
+ * export default FronteggApiMiddleware.withOptions({
+ * cors: {
  *   allowedOrigins: ['http://localapp1.davidantoon.me:3000', 'http://localapp2.davidantoon.me:3000'],
  *   allowCredentials: true,
  *   allowedMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+ * }
+ * });
+ *
+ */
+
+/**
+ *  Option to provide client ip
+ *
+ * export default FronteggApiMiddleware.withOptions({
+ * ipResolver: (req) => req.headers['x-your-custom-ip-header']?.toString(),
  * });
  *
  */

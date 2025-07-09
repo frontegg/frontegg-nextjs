@@ -1,6 +1,7 @@
 import { AuthPageRoutes } from '@frontegg/redux-store';
 import { WithFronteggAppOptions } from '../pages';
 import { AppEnvConfig, PasswordsMap } from './types';
+import { IpResolverFunction } from '../middleware/types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
 import { EnvVariables } from './constants';
 import { FronteggEnvNotFound, InvalidFronteggEnv } from '../utils/errors';
@@ -29,6 +30,7 @@ const setupEnvVariables = {
 
 class Config {
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
+  private _ipResolver?: IpResolverFunction;
 
   constructor() {
     if (!this.isSSGExport) {
@@ -216,12 +218,24 @@ class Config {
     );
   }
 
+  get isVercel(): boolean {
+    return getEnvOrDefault(EnvVariables.VERCEL, setupEnvVariables.VERCEL) === '1';
+  }
+
   get disableInitialPropsRefreshToken(): boolean {
     const disableInitialPropsRefreshToken = getEnvOrDefault(
       EnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
       setupEnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN
     );
     return disableInitialPropsRefreshToken === 'true';
+  }
+
+  get ipResolver(): IpResolverFunction | undefined {
+    return this._ipResolver;
+  }
+
+  set ipResolver(fn: IpResolverFunction | undefined) {
+    this._ipResolver = fn;
   }
 
   get appEnvConfig(): AppEnvConfig {
