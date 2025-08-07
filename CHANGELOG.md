@@ -1,5 +1,11 @@
 # Change Log
 
+## [9.2.9](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.8...v9.2.9) (2025-8-7)
+
+
+### NextJS Wrapper 9.2.9:
+- FR-20181 Improve IP handling in NextJS
+
 ## [9.2.8](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.7...v9.2.8) (2025-7-7)
 
 - FR-21360 - Fixed CMCComponents React19 compatibility 
