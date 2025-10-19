@@ -69,7 +69,7 @@ export const shouldByPassMiddleware = (
 
   // noinspection RedundantIfStatementJS
   if (isPrefetchRequest && !isBrowserAddressBarPrefetch) {
-    /** bypass prefetch requests on hovering links that leads to SSG pages **/
+    /* bypass prefetch requests on hovering links that leads to SSG pages */
     return true;
   }
 
