@@ -1,5 +1,11 @@
 # Change Log
 
+## [9.2.10](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.9...v9.2.10) (2025-10-19)
+
+
+### NextJS Wrapper 9.2.10:
+- FR-22407 - Fix bypass rules for will-known routes and getInitialProps for pages architecture
+
 ## [9.2.9](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.8...v9.2.9) (2025-8-7)
 
 
