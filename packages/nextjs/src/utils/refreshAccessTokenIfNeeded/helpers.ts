@@ -82,13 +82,6 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
 export function isRuntimeNextRequest(url: string): boolean {
   return url.startsWith('/_next/');
 }
-/**
- * if url starts with /.well-known no need to refresh token
- * we can just return the actual stateless session from the encrypted cookie
- */
-export function isWillKnownRequest(url: string): boolean {
-  return url.startsWith('/.well-known/');
-}
 
 /**
  * If url starts with '/oauth/callback' means that the user navigated back
