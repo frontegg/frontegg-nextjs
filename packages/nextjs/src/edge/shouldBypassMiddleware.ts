@@ -5,6 +5,7 @@ import { defaultFronteggRoutes } from '../utils/routing';
 const staticFilesRegex = new RegExp('^/(_next/static).*');
 const imageOptimizationRegex = new RegExp('^/(_next/image).*');
 const headerRequestsRegex = new RegExp('^/(favicon.ico).*');
+const willKnownRequestsRegex = new RegExp('^/(.well-known)/.*');
 const fronteggMiddlewareRegex = new RegExp('^/(api/frontegg).*');
 
 interface ByPassOptions {
@@ -36,6 +37,7 @@ export const shouldByPassMiddleware = (
     bypassStaticFiles: true,
     bypassImageOptimization: true,
     bypassHeaderRequests: true,
+    bypassWillKnownRoutes: true,
     ...options,
     bypassFronteggMiddleware: true,
     bypassFronteggRoutes: true,
@@ -45,6 +47,7 @@ export const shouldByPassMiddleware = (
   const isStaticFiles = staticFilesRegex.test(pathname);
   const isImageOptimization = imageOptimizationRegex.test(pathname);
   const isHeaderRequests = headerRequestsRegex.test(pathname);
+  const isWillKnownRoutes = willKnownRequestsRegex.test(pathname);
   const isFronteggMiddleware = fronteggMiddlewareRegex.test(pathname);
 
   const { authenticatedUrl, ...authRoutes } = defaultFronteggRoutes;
@@ -54,6 +57,7 @@ export const shouldByPassMiddleware = (
   if (isImageOptimization) return _options.bypassImageOptimization;
   if (isHeaderRequests) return _options.bypassHeaderRequests;
   if (isFronteggMiddleware) return _options.bypassFronteggMiddleware;
+  if (isWillKnownRoutes) return _options.bypassWillKnownRoutes;
   if (isFronteggRoutes) return _options.bypassFronteggRoutes;
 
   const isPrefetchRequest = headers.has('next-router-prefetch') || headers.get('purpose') === 'prefetch';
