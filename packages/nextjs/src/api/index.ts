@@ -43,16 +43,16 @@ const refreshTokenEmbedded = async (headers: Record<string, string>) => {
  */
 const refreshTokenHostedLogin = async (
   headers: Record<string, string>,
-  refresh_token: string,
-  cliendId?: string,
+  refreshToken: string,
+  clientId?: string,
   clientSecret?: string
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
     body: JSON.stringify({
       grant_type: 'refresh_token',
-      refresh_token,
-      client_id: cliendId,
+      refresh_token: refreshToken,
+      client_id: clientId,
       client_secret: clientSecret,
     }),
     headers: buildRequestHeaders(headers),
@@ -132,7 +132,7 @@ export const getMeAuthorization = async (
   headers: Record<string, string>
 ): Promise<IGetUserAuthorizationResponse | undefined> => {
   const res = await Get({
-    //TODO: replace this with rest/api route
+    // TODO: replace this with rest/api route
     url: `${config.baseUrl}/frontegg/identity/resources/users/v1/me/authorization`,
     headers: buildRequestHeaders(headers),
   });
@@ -143,7 +143,7 @@ export const getPublicSettings = async (
   headers: Record<string, string>
 ): Promise<IPublicSettingsResponse | undefined> => {
   const res = await Get({
-    //TODO: export the route url from rest-api and import from there
+    // TODO: export the route url from rest-api and import from there
     url: `${config.baseUrl}/frontegg/tenants/resources/account-settings/v1/public`,
     headers: buildRequestHeaders(headers),
   });

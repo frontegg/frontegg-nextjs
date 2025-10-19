@@ -7,23 +7,34 @@ import fetchUserData from '../../utils/fetchUserData';
 import config from '../../config';
 import { AllUserData } from '../../types';
 import { removeJwtSignatureFrom } from '../../middleware/helpers';
+import { shouldBypassGetInitialProps } from './shouldBypassGetInitialProps';
+import fronteggLogger from '../../utils/fronteggLogger';
 
 export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFronteggAppOptions): FronteggCustomApp => {
   const originalGetInitialProps = app.getInitialProps;
 
   app.getInitialProps = async (appContext: AppContext & AllUserData): Promise<AppInitialProps> => {
     const { ctx, router, Component } = appContext;
-
+    const logger = fronteggLogger.child({ tag: 'withFronteggApp' });
     const isSSG = router.isReady == false && router.isPreview == false;
-
     config.checkHostedLoginConfig(options);
 
     let appEnvConfig = {};
-    let appContextSessionData: AllUserData = {
+    const appContextSessionData: AllUserData = {
       session: null,
       user: null,
       tenants: null,
     };
+    if (shouldBypassGetInitialProps(ctx.req?.url ?? '/', ctx.req?.headers)) {
+      logger.debug('Bypassing get initial props for url: ' + (ctx.req?.url ?? ''));
+      return {
+        pageProps: {
+          ...(originalGetInitialProps ? await originalGetInitialProps(appContext) : {}),
+          ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
+        },
+      };
+    }
+
     let shouldRequestAuthorize = false;
 
     if (ctx.req) {

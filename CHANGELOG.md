@@ -1,5 +1,23 @@
 # Change Log
 
+## [9.2.9](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.8...v9.2.9) (2025-8-7)
+
+
+### NextJS Wrapper 9.2.9:
+- FR-20181 Improve IP handling in NextJS
+
+## [9.2.8](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.7...v9.2.8) (2025-7-7)
+
+- FR-21360 - Fixed CMCComponents React19 compatibility 
+- FR-20601 - Fixed metadata sync when using custom signup fields
+- FR-20601 - Fixed custom signup fields visiblity
+- FR-21194 - Fixed translations options to have all supported languages
+
+
+- FR-21242 - Added customization for select phone number country codes
+
+
+
 ## [9.2.7](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.6...v9.2.7) (2025-6-23)
 
 - FR-20838 - Added search for role in the edit roles dialog of users page
