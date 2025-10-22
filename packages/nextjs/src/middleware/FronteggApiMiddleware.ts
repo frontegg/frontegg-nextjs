@@ -49,7 +49,7 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse, options?: 
     }
     const headers: Record<string, string> = {};
     if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true') {
-      const session = await getSession(req);
+      const session = await getSession(req, res);
       if (session?.accessToken) {
         headers['authorization'] = 'Bearer ' + session.accessToken;
       }
