@@ -1,5 +1,11 @@
 # Change Log
 
+## [9.2.11](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.10...v9.2.11) (2025-10-23)
+
+
+### NextJS Wrapper 9.2.11:
+- FR-22443 Enhance getSession function to require response object
+
 ## [9.2.10](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.9...v9.2.10) (2025-10-19)
 
 
