@@ -1,5 +1,25 @@
 # Change Log
 
+## [9.2.11](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.10...v9.2.11) (2025-11-30)
+
+- FR-22193 - Added admin portal support for searching by username, email, name, etc. in the users table
+
+<!-- CURSOR_SUMMARY -->
+---
+
+> [!NOTE]
+> Updates @frontegg/js and @frontegg/react-hooks to 7.93.0 and refreshes related lockfile entries.
+> 
+> - **Dependencies**:
+>   - Bump `@frontegg/js` and `@frontegg/react-hooks` to `7.93.0` in `packages/nextjs/package.json`.
+>   - Update related Frontegg entries in `yarn.lock` (`@frontegg/types`, `@frontegg/redux-store`, `@frontegg/rest-api`) to `7.93.0`.
+> 
+> <sup>Written by [Cursor Bugbot](https://cursor.com/dashboard?tab=bugbot) for commit 5e41e46c4b54adeb7957e68544a9f317b3a82202. This will update automatically on new commits. Configure [here](https://cursor.com/dashboard?tab=bugbot).</sup>
+<!-- /CURSOR_SUMMARY -->
+
+### NextJS Wrapper 9.2.11:
+- FR-22443 Enhance getSession function to require response object
+
 ## [9.2.10](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.9...v9.2.10) (2025-10-19)
 
 
