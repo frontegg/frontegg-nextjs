@@ -79,7 +79,11 @@ const Connector: FC<ConnectorProps> = (_props) => {
 
   return (
     <AppContext.Provider value={app}>
-      <FronteggStoreProvider {...({ ...props, app } as any)}>{props.children}</FronteggStoreProvider>
+      {React.createElement(FronteggStoreProvider as React.ComponentType<any>, {
+        ...props,
+        app,
+        children: props.children,
+      })}
     </AppContext.Provider>
   );
 };
