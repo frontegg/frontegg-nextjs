@@ -79,6 +79,7 @@ const Connector: FC<ConnectorProps> = (_props) => {
 
   return (
     <AppContext.Provider value={app}>
+      {/* React.createElement + cast: FC from @frontegg/react-hooks doesn't satisfy strict React 18 JSX typings (ReactNode vs ReactPortal). JSX would cause TS2786. */}
       {React.createElement(FronteggStoreProvider as React.ComponentType<any>, {
         ...props,
         app,
