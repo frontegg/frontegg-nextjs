@@ -75,14 +75,21 @@ async function run(argv) {
     console.log(`running '${command}' with ${JSON.stringify(env)}`);
   }
 
-  const { stderr, stdout } = await exec(command, { env: { ...process.env, ...env } });
-  if (stderr) {
-    throw new Error(`'${command}' failed with \n${stderr}`);
-  }
-
-  if (verbose) {
-    // eslint-disable-next-line no-console
-    console.log(stdout);
+  try {
+    const { stderr, stdout } = await exec(command, { env: { ...process.env, ...env } });
+    // Don't treat Node/babel deprecation warnings on stderr as failure
+    if (stderr && !/DeprecationWarning|url\.parse/.test(stderr)) {
+      throw new Error(`'${command}' failed with \n${stderr}`);
+    }
+    if (verbose) {
+      // eslint-disable-next-line no-console
+      console.log(stdout);
+    }
+  } catch (err) {
+    if (err.stderr) {
+      throw new Error(`'${command}' failed with \n${err.stderr}`);
+    }
+    throw err;
   }
 }
 

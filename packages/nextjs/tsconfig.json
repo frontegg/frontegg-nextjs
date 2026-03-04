@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig",
   "include": ["src/**/*.ts*"],
-  "exclude": [
-    "build"
-  ]
+  "exclude": ["build"],
+  "compilerOptions": {
+    "paths": {
+      "iron-session/edge": ["./src/iron-session-edge.d.ts"]
+    }
+  }
 }
