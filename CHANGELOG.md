@@ -1,5 +1,11 @@
 # Change Log
 
+## [9.2.13](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.12...v9.2.13) (2026-3-4)
+
+
+### NextJS Wrapper 9.2.13:
+- updated versions
+
 ## [9.2.12](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.11...v9.2.12) (2025-12-11)
 
 - FR-21830 - Fixed IP location
