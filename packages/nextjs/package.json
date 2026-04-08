@@ -23,11 +23,14 @@
     "build:stable": "node ../../scripts/build node",
     "build:types": "tsc -b tsconfig.build.json",
     "build:copy-files": "node ../../scripts/copy-files.js",
-    "test": "yarn test:unit && node ../../scripts/prepare-env-test-file.js && CI=true npx playwright test",
+    "test": "yarn test:unit && node ../../scripts/prepare-env-test-file.js && CI=true PW_SKIP_WEBSERVER=1 npx playwright test --project=unit-playwright",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:unit": "PW_SKIP_WEBSERVER=1 playwright test --project=unit-playwright",
+    "test:e2e:mocked": "playwright test --project=e2e-mocked",
+    "test:e2e:real": "playwright test --project=e2e-real",
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
