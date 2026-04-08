@@ -252,3 +252,48 @@ describe('CookieManager.removeCookies', () => {
     expect(arr.some((c) => c.startsWith(`${COOKIE_NAME}-1=;`))).toBe(true);
   });
 });
+
+describe('CookieManager.modifySetCookie', () => {
+  it('returns undefined when input is undefined', () => {
+    expect(CookieManager.modifySetCookie(undefined, true)).toBeUndefined();
+  });
+
+  it('returns the input unchanged (empty array) when input is empty', () => {
+    const result = CookieManager.modifySetCookie([], true);
+    expect(result).toEqual([]);
+  });
+
+  it('leaves Secure / SameSite=None intact when isSecured=true', () => {
+    const input = ['fe_other=v; Secure; SameSite=None; HttpOnly'];
+    const result = CookieManager.modifySetCookie(input, true);
+    expect(result).toHaveLength(1);
+    expect(result![0]).toContain('Secure');
+    expect(result![0]).toContain('SameSite=None');
+  });
+
+  it('removes Secure and SameSite=None when isSecured=false', () => {
+    const input = ['fe_other=v; Secure; SameSite=None; HttpOnly'];
+    const result = CookieManager.modifySetCookie(input, false);
+    expect(result).toHaveLength(1);
+    expect(result![0]).not.toContain('Secure');
+    expect(result![0]).not.toContain('SameSite=None');
+    expect(result![0]).toContain('HttpOnly');
+  });
+
+  it('leaves unrelated cookies alone other than trailing semicolon normalization', () => {
+    const input = ['unrelated=value; Path=/; HttpOnly'];
+    const result = CookieManager.modifySetCookie(input, true);
+    expect(result![0]).toContain('unrelated=value');
+    expect(result![0]).toContain('Path=/');
+  });
+
+  it('handles a string input by splitting it into an array via the regex splitter', () => {
+    // modifySetCookie claims to support string input via its internal splitter,
+    // despite its TS signature. Pass-through should not throw and should
+    // return an array.
+    const input = 'a=1; Path=/, b=2; Path=/' as unknown as string[];
+    const result = CookieManager.modifySetCookie(input, true);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result!.length).toBeGreaterThanOrEqual(1);
+  });
+});
