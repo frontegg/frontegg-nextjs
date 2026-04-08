@@ -15,7 +15,7 @@ vi.mock('../../../../src/config', () => ({
 import CookieManager from '../../../../src/utils/cookies';
 import { COOKIE_MAX_LENGTH } from '../../../../src/utils/cookies/constants';
 import { getIndexedCookieName } from '../../../../src/utils/cookies/helpers';
-import { mockIncomingMessage, mockServerResponse, extractCookieValue } from './fixtures';
+import { mockIncomingMessage, mockFetchRequest, mockServerResponse, extractCookieValue } from './fixtures';
 
 const COOKIE_NAME = 'fe_session';
 const COOKIE_DOMAIN = 'example.com';
@@ -295,5 +295,54 @@ describe('CookieManager.modifySetCookie', () => {
     const result = CookieManager.modifySetCookie(input, true);
     expect(Array.isArray(result)).toBe(true);
     expect(result!.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('CookieManager.getSessionCookieFromRequest', () => {
+  it('returns a single cookie value unchanged when session is not chunked', () => {
+    const req = mockIncomingMessage({ [COOKIE_NAME]: 'whole-session' });
+    const result = CookieManager.getSessionCookieFromRequest(req);
+    expect(result).toBe('whole-session');
+  });
+
+  it('returns undefined when the request argument is not provided', () => {
+    expect(CookieManager.getSessionCookieFromRequest(undefined)).toBeUndefined();
+  });
+
+  it('returns undefined when no session cookies are present', () => {
+    const req = mockIncomingMessage({ unrelated: 'x' });
+    expect(CookieManager.getSessionCookieFromRequest(req)).toBeUndefined();
+  });
+
+  it('concatenates chunked session cookies in index order', () => {
+    const req = mockIncomingMessage({
+      [`${COOKIE_NAME}-1`]: 'part1',
+      [`${COOKIE_NAME}-2`]: 'part2',
+      [`${COOKIE_NAME}-3`]: 'part3',
+    });
+    const result = CookieManager.getSessionCookieFromRequest(req);
+    expect(result).toBe('part1part2part3');
+  });
+
+  it('ignores unrelated cookies around the session chunks', () => {
+    const req = mockIncomingMessage({
+      other: 'x',
+      [`${COOKIE_NAME}-1`]: 'A',
+      [`${COOKIE_NAME}-2`]: 'B',
+      noise: 'y',
+    });
+    expect(CookieManager.getSessionCookieFromRequest(req)).toBe('AB');
+  });
+
+  it('supports Fetch-style Request objects (credentials branch)', () => {
+    const req = mockFetchRequest({ [COOKIE_NAME]: 'fetch-session' });
+    expect(CookieManager.getSessionCookieFromRequest(req)).toBe('fetch-session');
+  });
+
+  it('reads chunks in numeric index order regardless of cookie-header ordering', () => {
+    // Build cookie header with chunks out of order.
+    const header = `${COOKIE_NAME}-2=B; ${COOKIE_NAME}-1=A; ${COOKIE_NAME}-3=C`;
+    const req = mockIncomingMessage(header);
+    expect(CookieManager.getSessionCookieFromRequest(req)).toBe('ABC');
   });
 });
