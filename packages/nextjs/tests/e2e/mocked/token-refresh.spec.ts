@@ -20,7 +20,7 @@ test.describe('mocked token refresh', () => {
     test.skip(
       !process.env.FRONTEGG_E2E_MOCK_NEAR_EXPIRY_COOKIE,
       'requires FRONTEGG_E2E_MOCK_NEAR_EXPIRY_COOKIE — session cookie is encrypted ' +
-        'and must be produced by the middleware (no forge helper yet)',
+        'and must be produced by the middleware (no forge helper yet)'
     );
 
     let refreshCount = 0;
@@ -42,7 +42,7 @@ test.describe('mocked token refresh', () => {
   test('refresh returns 401 clears cookies and redirects to login', async ({ page, context }) => {
     test.skip(
       !process.env.FRONTEGG_E2E_MOCK_NEAR_EXPIRY_COOKIE,
-      'requires a forged near-expiry session cookie (not yet available)',
+      'requires a forged near-expiry session cookie (not yet available)'
     );
 
     await setupFronteggMocks(page, { refreshStatus: 401 });
@@ -66,7 +66,7 @@ test.describe('mocked token refresh', () => {
   test('concurrent navigations only trigger one refresh call', async ({ page, context }) => {
     test.skip(
       !process.env.FRONTEGG_E2E_MOCK_NEAR_EXPIRY_COOKIE,
-      'requires a forged near-expiry session cookie (not yet available)',
+      'requires a forged near-expiry session cookie (not yet available)'
     );
 
     let refreshCount = 0;

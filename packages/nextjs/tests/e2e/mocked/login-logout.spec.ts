@@ -20,9 +20,7 @@ test.describe('mocked login/logout', () => {
     // login flow, which lives under the `/account/login` or `/oauth/` path.
     // We accept either to stay resilient against minor middleware changes.
     const landedOnLogin =
-      finalUrl.includes('/account/login') ||
-      finalUrl.includes('/oauth/') ||
-      finalUrl.includes('login');
+      finalUrl.includes('/account/login') || finalUrl.includes('/oauth/') || finalUrl.includes('login');
 
     expect(response, 'expected a response object').not.toBeNull();
     expect(landedOnLogin, `expected a login redirect, got ${finalUrl}`).toBe(true);
@@ -35,7 +33,7 @@ test.describe('mocked login/logout', () => {
     test.skip(
       !process.env.FRONTEGG_E2E_MOCK_SESSION_COOKIE,
       'requires FRONTEGG_E2E_MOCK_SESSION_COOKIE — session cookie is encrypted; ' +
-        'see tests/e2e/mocked/fixtures/intercepts.ts for mock user payload',
+        'see tests/e2e/mocked/fixtures/intercepts.ts for mock user payload'
     );
 
     await context.addCookies([
@@ -57,7 +55,7 @@ test.describe('mocked login/logout', () => {
   test('logout click clears session and redirects', async ({ page, context }) => {
     test.skip(
       !process.env.FRONTEGG_E2E_MOCK_SESSION_COOKIE,
-      'requires a pre-authenticated session; see companion test above',
+      'requires a pre-authenticated session; see companion test above'
     );
 
     await context.addCookies([
@@ -73,7 +71,10 @@ test.describe('mocked login/logout', () => {
     ]);
 
     await page.goto('/');
-    await page.getByRole('link', { name: /logout/i }).first().click();
+    await page
+      .getByRole('link', { name: /logout/i })
+      .first()
+      .click();
 
     await page.waitForLoadState('domcontentloaded');
     const cookies = await context.cookies();
