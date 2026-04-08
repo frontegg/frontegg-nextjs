@@ -23,7 +23,11 @@
     "build:stable": "node ../../scripts/build node",
     "build:types": "tsc -b tsconfig.build.json",
     "build:copy-files": "node ../../scripts/copy-files.js",
-    "test": "node ../../scripts/prepare-env-test-file.js && CI=true npx playwright test",
+    "test": "yarn test:unit && node ../../scripts/prepare-env-test-file.js && CI=true npx playwright test",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:unit:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
@@ -34,7 +38,11 @@
     "jose": "^5.9.6"
   },
   "devDependencies": {
-    "@types/http-proxy": "^1.17.17"
+    "@types/http-proxy": "^1.17.17",
+    "@types/node": "^20",
+    "@vitest/coverage-v8": "^1.6.0",
+    "jsdom": "^24.0.0",
+    "vitest": "^1.6.0"
   },
   "peerDependencies": {
     "react": "^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
