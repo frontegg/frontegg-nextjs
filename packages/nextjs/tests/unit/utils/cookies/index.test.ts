@@ -346,3 +346,37 @@ describe('CookieManager.getSessionCookieFromRequest', () => {
     expect(CookieManager.getSessionCookieFromRequest(req)).toBe('ABC');
   });
 });
+
+describe('CookieManager.getSessionCookieFromRedirectedResponse', () => {
+  it('extracts a single session cookie value from res set-cookie array', () => {
+    const res = mockServerResponse({
+      'set-cookie': [`${COOKIE_NAME}=redirected-session; Path=/; HttpOnly`],
+    });
+    expect(CookieManager.getSessionCookieFromRedirectedResponse(res)).toBe('redirected-session');
+  });
+
+  it('extracts a session cookie value when set-cookie is a string, not array', () => {
+    const res = mockServerResponse({
+      'set-cookie': `${COOKIE_NAME}=single-string-session; Path=/`,
+    });
+    expect(CookieManager.getSessionCookieFromRedirectedResponse(res)).toBe('single-string-session');
+  });
+
+  it('concatenates chunked session cookies from set-cookie header', () => {
+    const res = mockServerResponse({
+      'set-cookie': [`${COOKIE_NAME}-1=X; Path=/`, `${COOKIE_NAME}-2=Y; Path=/`, `${COOKIE_NAME}-3=Z; Path=/`],
+    });
+    expect(CookieManager.getSessionCookieFromRedirectedResponse(res)).toBe('XYZ');
+  });
+
+  it('returns undefined when response argument is undefined', () => {
+    expect(CookieManager.getSessionCookieFromRedirectedResponse(undefined)).toBeUndefined();
+  });
+
+  it('returns undefined when set-cookie header does not include session cookies', () => {
+    const res = mockServerResponse({
+      'set-cookie': ['other=value; Path=/'],
+    });
+    expect(CookieManager.getSessionCookieFromRedirectedResponse(res)).toBeUndefined();
+  });
+});
