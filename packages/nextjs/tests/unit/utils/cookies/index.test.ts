@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../../../../src/config', () => ({
   default: {
@@ -149,5 +149,106 @@ describe('CookieManager.create', () => {
     // Last entries should be the new cookie
     const newCookie = cookies[cookies.length - 1];
     expect(newCookie).toContain(`${COOKIE_NAME}=new-session-value`);
+  });
+});
+
+describe('CookieManager.removeCookies', () => {
+  it('sets expired empty cookies for a single provided cookieName', () => {
+    const res = mockServerResponse();
+    CookieManager.removeCookies({
+      cookieNames: [COOKIE_NAME],
+      isSecured: true,
+      cookieDomain: COOKIE_DOMAIN,
+      res,
+    });
+
+    expect(res.setHeader).toHaveBeenCalledTimes(1);
+    const [headerName, value] = res.setHeader.mock.calls[0];
+    expect(headerName).toBe('set-cookie');
+    const arr = value as string[];
+    expect(Array.isArray(arr)).toBe(true);
+    // Should include an empty value for the provided cookie name
+    const mainRemoval = arr.find((c) => c.startsWith(`${COOKIE_NAME}=;`));
+    expect(mainRemoval).toBeDefined();
+    expect(mainRemoval).toContain('HttpOnly');
+    // Expires should be set (to epoch/now)
+    expect(mainRemoval).toMatch(/Expires=/);
+  });
+
+  it('creates empty cookies for multiple chunked cookie names', () => {
+    const res = mockServerResponse();
+    CookieManager.removeCookies({
+      cookieNames: [COOKIE_NAME, `${COOKIE_NAME}-1`, `${COOKIE_NAME}-2`],
+      isSecured: true,
+      cookieDomain: COOKIE_DOMAIN,
+      res,
+    });
+
+    const arr = res.setHeader.mock.calls[0][1] as string[];
+    expect(arr.some((c) => c.startsWith(`${COOKIE_NAME}=;`))).toBe(true);
+    expect(arr.some((c) => c.startsWith(`${COOKIE_NAME}-1=;`))).toBe(true);
+    expect(arr.some((c) => c.startsWith(`${COOKIE_NAME}-2=;`))).toBe(true);
+  });
+
+  it('appends to an existing set-cookie header instead of overwriting', () => {
+    const preExisting = 'other=value; Path=/';
+    const res = mockServerResponse({ 'set-cookie': preExisting });
+    CookieManager.removeCookies({
+      cookieNames: [COOKIE_NAME],
+      isSecured: true,
+      cookieDomain: COOKIE_DOMAIN,
+      res,
+    });
+
+    const arr = res.setHeader.mock.calls[0][1] as string[];
+    expect(arr[0]).toBe(preExisting);
+    expect(arr.length).toBeGreaterThan(1);
+  });
+
+  it('appends when existing set-cookie header is already an array', () => {
+    const res = mockServerResponse({ 'set-cookie': ['a=1', 'b=2'] });
+    CookieManager.removeCookies({
+      cookieNames: [COOKIE_NAME],
+      isSecured: true,
+      cookieDomain: COOKIE_DOMAIN,
+      res,
+    });
+
+    const arr = res.setHeader.mock.calls[0][1] as string[];
+    expect(arr[0]).toBe('a=1');
+    expect(arr[1]).toBe('b=2');
+    expect(arr.length).toBeGreaterThan(2);
+  });
+
+  it('omits Secure when isSecured=false', () => {
+    const res = mockServerResponse();
+    CookieManager.removeCookies({
+      cookieNames: [COOKIE_NAME],
+      isSecured: false,
+      cookieDomain: COOKIE_DOMAIN,
+      res,
+    });
+
+    const arr = res.setHeader.mock.calls[0][1] as string[];
+    const mainRemoval = arr.find((c) => c.startsWith(`${COOKIE_NAME}=;`))!;
+    expect(mainRemoval).not.toContain('Secure');
+  });
+
+  it('falls back to parsing cookies from req when cookieNames not provided', () => {
+    const res = mockServerResponse();
+    const req = mockIncomingMessage({
+      [COOKIE_NAME]: 'old',
+      [`${COOKIE_NAME}-1`]: 'chunk1',
+    });
+    CookieManager.removeCookies({
+      isSecured: true,
+      cookieDomain: COOKIE_DOMAIN,
+      res,
+      req,
+    });
+
+    const arr = res.setHeader.mock.calls[0][1] as string[];
+    expect(arr.some((c) => c.startsWith(`${COOKIE_NAME}=;`))).toBe(true);
+    expect(arr.some((c) => c.startsWith(`${COOKIE_NAME}-1=;`))).toBe(true);
   });
 });
