@@ -78,7 +78,7 @@ async function run(argv) {
   try {
     const { stderr, stdout } = await exec(command, { env: { ...process.env, ...env } });
     // Don't treat Node/babel deprecation warnings on stderr as failure
-    if (stderr && !/DeprecationWarning|url\.parse/.test(stderr)) {
+    if (stderr && !/DeprecationWarning|url\.parse|Browserslist|caniuse-lite/.test(stderr)) {
       throw new Error(`'${command}' failed with \n${stderr}`);
     }
     if (verbose) {
