@@ -54,7 +54,7 @@ const config: PlaywrightTestConfig = {
       testMatch: ['e2e/mocked/**/*.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: 'http://localhost:3000',
+        baseURL: process.env.FRONTEGG_APP_URL ?? 'http://localhost:3000',
       },
     },
     {
