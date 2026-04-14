@@ -3,6 +3,14 @@ import { devices } from '@playwright/test';
 
 // @ts-ignore
 require('dotenv').config();
+// Load the example app's .env.local so E2E tests can forge session cookies
+// with the same encryption password / client ID the running app uses.
+// Values from .env.local take precedence (they overwrite matching keys).
+// @ts-ignore
+require('dotenv').config({
+  path: require('path').resolve(__dirname, '../example-app-directory/.env.local'),
+  override: true,
+});
 
 const isCI = !!process.env.CI;
 const realBaseURL = process.env.FRONTEGG_APP_URL ?? 'http://localhost:3000';

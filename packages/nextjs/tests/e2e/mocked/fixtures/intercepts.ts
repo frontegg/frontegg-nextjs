@@ -9,8 +9,27 @@ import type { Page, Route } from '@playwright/test';
  * realistically without requiring a real tenant.
  */
 
-export const MOCK_ACCESS_TOKEN =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLW1vY2siLCJpYXQiOjAsImV4cCI6OTk5OTk5OTk5OX0.mock-signature';
+/** Build a base64url-encoded JWT with realistic claims (unsigned). */
+function buildMockAccessToken(): string {
+  const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
+  const payload = Buffer.from(
+    JSON.stringify({
+      sub: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      email: 'mock-user@example.com',
+      name: 'Mock User',
+      iss: 'frontegg-mock',
+      aud: 'frontegg-mock',
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      tenantId: 'tenant-mock',
+      roles: ['Admin'],
+      permissions: ['read', 'write'],
+    })
+  ).toString('base64url');
+  return `${header}.${payload}.mock-signature`;
+}
+
+export const MOCK_ACCESS_TOKEN = buildMockAccessToken();
 export const MOCK_REFRESH_TOKEN = 'mock-refresh-token';
 
 export const MOCK_USER = {

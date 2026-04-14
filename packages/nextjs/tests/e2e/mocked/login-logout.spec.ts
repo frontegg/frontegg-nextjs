@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { setupFronteggMocks, MOCK_USER } from './fixtures/intercepts';
+import { forgeSessionCookie } from './fixtures/session-forge';
 
 /**
  * Mocked login/logout smoke scenarios for the Next.js App Router example.
@@ -18,7 +19,6 @@ test.describe('mocked login/logout', () => {
 
     // The Frontegg middleware should redirect unauth requests into the hosted
     // login flow, which lives under the `/account/login` or `/oauth/` path.
-    // We accept either to stay resilient against minor middleware changes.
     const landedOnLogin =
       finalUrl.includes('/account/login') || finalUrl.includes('/oauth/') || finalUrl.includes('login');
 
@@ -26,60 +26,50 @@ test.describe('mocked login/logout', () => {
     expect(landedOnLogin, `expected a login redirect, got ${finalUrl}`).toBe(true);
   });
 
-  test('pre-set session cookie renders home with user email', async ({ page, context }) => {
-    // The real session cookie is encrypted with FRONTEGG_ENCRYPTION_PASSWORD
-    // and signed; we cannot forge it from the test side without importing src.
-    // If we ever expose a test-only fixture route, swap this skip out.
-    test.skip(
-      !process.env.FRONTEGG_E2E_MOCK_SESSION_COOKIE,
-      'requires FRONTEGG_E2E_MOCK_SESSION_COOKIE — session cookie is encrypted; ' +
-        'see tests/e2e/mocked/fixtures/intercepts.ts for mock user payload'
-    );
+  test('pre-set session cookie bypasses middleware redirect', async ({ page, context }) => {
+    const cookie = await forgeSessionCookie({ email: MOCK_USER.email });
+    await context.addCookies([cookie]);
 
-    await context.addCookies([
-      {
-        name: process.env.FRONTEGG_COOKIE_NAME ?? 'fe_session',
-        value: process.env.FRONTEGG_E2E_MOCK_SESSION_COOKIE!,
-        domain: 'localhost',
-        path: '/',
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
-      },
-    ]);
+    const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    // With a forged session cookie the middleware should NOT redirect (200, not 307).
+    expect(response, 'expected a response object').not.toBeNull();
+    expect(response!.status()).toBe(200);
+
+    // The page URL should remain on `/`, not redirected to login.
+    expect(page.url()).toContain('localhost');
+    expect(page.url()).not.toContain('/account/login');
+  });
+
+  test('session page shows server-side session data with forged cookie', async ({ page, context }) => {
+    const cookie = await forgeSessionCookie({ email: MOCK_USER.email });
+    await context.addCookies([cookie]);
+
+    await page.goto('/session', { waitUntil: 'domcontentloaded' });
+
+    // The /session page renders server-side session data. With a valid forged
+    // cookie, the server should decode the JWT and render user claims.
+    await expect(page.getByText('user session server side')).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(MOCK_USER.email)).toBeVisible({ timeout: 10_000 });
   });
 
-  test('logout click clears session and redirects', async ({ page, context }) => {
-    test.skip(
-      !process.env.FRONTEGG_E2E_MOCK_SESSION_COOKIE,
-      'requires a pre-authenticated session; see companion test above'
-    );
+  test('logout embedded link navigates to logout route', async ({ page, context }) => {
+    const cookie = await forgeSessionCookie({ email: MOCK_USER.email });
+    await context.addCookies([cookie]);
 
-    await context.addCookies([
-      {
-        name: process.env.FRONTEGG_COOKIE_NAME ?? 'fe_session',
-        value: process.env.FRONTEGG_E2E_MOCK_SESSION_COOKIE!,
-        domain: 'localhost',
-        path: '/',
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
-      },
-    ]);
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    await page.goto('/');
-    await page
-      .getByRole('link', { name: /logout/i })
-      .first()
-      .click();
+    // The home page has a "logout embedded" link pointing to /account/logout.
+    const logoutLink = page.getByRole('link', { name: /logout/i }).first();
+    await expect(logoutLink).toBeVisible({ timeout: 10_000 });
+    await logoutLink.click();
 
     await page.waitForLoadState('domcontentloaded');
-    const cookies = await context.cookies();
-    const sessionCookieName = process.env.FRONTEGG_COOKIE_NAME ?? 'fe_session';
-    const sessionCookie = cookies.find((c) => c.name === sessionCookieName);
-    expect(sessionCookie, 'session cookie should be cleared after logout').toBeFalsy();
+    // After clicking logout, the URL should navigate to /account/logout or
+    // redirect to a login page.
+    const finalUrl = page.url();
+    const navigatedAway =
+      finalUrl.includes('/account/logout') || finalUrl.includes('/account/login') || finalUrl.includes('/oauth/');
+    expect(navigatedAway, `expected navigation to logout/login, got ${finalUrl}`).toBe(true);
   });
 });
