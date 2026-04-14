@@ -115,4 +115,13 @@ export async function setupFronteggMocks(page: Page, options: MockOptions = {}):
       body: '{}',
     });
   });
+
+  // Catch-all for unmocked Frontegg requests — log them for debugging but
+  // let them through so tests don't break unexpectedly.
+  await page.route('**/*frontegg*/**', async (route: Route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+    console.log(`[unmocked-frontegg] ${method} ${url}`);
+    await route.fallback();
+  });
 }

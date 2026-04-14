@@ -13,16 +13,16 @@ test.describe('mocked login/logout', () => {
     await setupFronteggMocks(page);
   });
 
-  test('unauthenticated visit redirects to hosted login', async ({ page }) => {
-    const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
-    const finalUrl = page.url();
+  test('unauthenticated visit redirects to hosted login', async ({ page, request }) => {
+    // Verify the raw middleware response is a 307 redirect
+    const rawResponse = await request.get('/', { maxRedirects: 0 });
+    expect(rawResponse.status()).toBe(307);
 
-    // The Frontegg middleware should redirect unauth requests into the hosted
-    // login flow, which lives under the `/account/login` or `/oauth/` path.
+    // Also verify the browser follows through to the login page
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const finalUrl = page.url();
     const landedOnLogin =
       finalUrl.includes('/account/login') || finalUrl.includes('/oauth/') || finalUrl.includes('login');
-
-    expect(response, 'expected a response object').not.toBeNull();
     expect(landedOnLogin, `expected a login redirect, got ${finalUrl}`).toBe(true);
   });
 

@@ -23,8 +23,8 @@ test.describe('real-tenant smoke', () => {
     expect(response?.ok() || response?.status() === 302).toBeTruthy();
   });
 
-  test('identity configurations health endpoint returns 2xx', async ({ request }) => {
+  test('identity configurations health endpoint returns 200', async ({ request }) => {
     const response = await request.get('/api/frontegg/identity/resources/configurations/v1');
-    expect(response.status()).toBeLessThan(500);
+    expect(response.status()).toBe(200);
   });
 });
