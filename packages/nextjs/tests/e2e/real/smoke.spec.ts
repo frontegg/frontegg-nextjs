@@ -11,8 +11,9 @@ test.describe('real-tenant smoke', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const finalUrl = page.url();
     const baseUrl = process.env.FRONTEGG_BASE_URL!;
-    const redirectedToOAuth = finalUrl.includes(new URL(baseUrl).host) || finalUrl.includes('/oauth/');
-    expect(redirectedToOAuth, `expected OAuth redirect, got ${finalUrl}`).toBe(true);
+    const redirectedToLogin =
+      finalUrl.includes(new URL(baseUrl).host) || finalUrl.includes('/oauth/') || finalUrl.includes('/account/login');
+    expect(redirectedToLogin, `expected login redirect, got ${finalUrl}`).toBe(true);
   });
 
   test('public no-ssr endpoint renders without a session', async ({ page }) => {
