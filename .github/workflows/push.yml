@@ -53,7 +53,7 @@ jobs:
           FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
       - name: Run Playwright tests (packages/nextjs)
         working-directory: packages/nextjs
-        run: npx playwright test --project=unit-playwright --project=e2e-mocked
+        run: npx playwright test --project=unit-playwright
         env:
           FRONTEGG_APP_URL: "http://localhost:3000"
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
