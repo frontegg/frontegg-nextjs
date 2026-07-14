@@ -75,5 +75,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "resolutions": {
+    "follow-redirects": "^1.16.0",
+    "cookie": "^0.7.0",
+    "@babel/runtime": "^7.26.10"
+  },
   "dependencies": {}
 }
