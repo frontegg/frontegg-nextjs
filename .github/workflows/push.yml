@@ -33,6 +33,15 @@ jobs:
           sudo apt-get update
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
+      - name: Unit tests (vitest)
+        working-directory: packages/nextjs
+        run: yarn test:unit:coverage
+      - name: Upload unit coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-coverage
+          path: packages/nextjs/coverage
+          retention-days: 14
       - name: Run Playwright tests
         run: npx playwright test
         env:
@@ -42,8 +51,14 @@ jobs:
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
           FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
           FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
-      - name: Run Playwright tests
-        run: cd packages/nextjs && yarn test
+      - name: Run Playwright tests (packages/nextjs)
+        working-directory: packages/nextjs
+        run: npx playwright test --project=unit-playwright
+        env:
+          FRONTEGG_APP_URL: "http://localhost:3000"
+          FRONTEGG_BASE_URL: "https://demo.frontegg.com"
+          FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
+          FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
