@@ -1,5 +1,12 @@
 # Change Log
 
+## [9.2.14](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.13...v9.2.14) (2026-7-15)
+
+
+### NextJS Wrapper 9.2.14:
+- fix: bump dependencies and resolve security vulnerabilities
+- test: add unit + E2E test coverage for cookies and token refresh
+
 ## [9.2.13](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.12...v9.2.13) (2026-3-4)
 
 
