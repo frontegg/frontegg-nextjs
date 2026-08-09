@@ -80,6 +80,11 @@ const initializeFronteggApp = ({
             delete reqOptions.headers['authorization'];
             delete reqOptions.headers['Authorization'];
           }
+
+          if (pathname.endsWith('sso/prelogin')) {
+            delete reqOptions.headers['cookie'];
+            delete reqOptions.headers['Cookie'];
+          }
         }
       } catch (e) {
         /** ignore */
