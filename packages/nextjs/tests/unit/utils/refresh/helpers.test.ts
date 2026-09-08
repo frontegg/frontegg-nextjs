@@ -157,6 +157,20 @@ describe('url-classification helpers', () => {
     expect(isOauthCallback('/account/login')).toBe(false);
   });
 
+  it('isOauthCallback follows an overridden hosted login callback route', () => {
+    Object.assign(config, { authRoutes: { hostedLoginRedirectUrl: '/auth/cb' } });
+    expect(isOauthCallback('/auth/cb?code=1')).toBe(true);
+    expect(isOauthCallback('/oauth/callback?code=1')).toBe(false);
+    Object.assign(config, { authRoutes: {} });
+  });
+
+  it('isOauthCallback requires a code when the callback route is the app root', () => {
+    Object.assign(config, { authRoutes: { hostedLoginRedirectUrl: '/' } });
+    expect(isOauthCallback('/?code=1')).toBe(true);
+    expect(isOauthCallback('/dashboard')).toBe(false);
+    Object.assign(config, { authRoutes: {} });
+  });
+
   it('isSamlCallback matches saml and oidc callback prefixes', () => {
     expect(isSamlCallback('/account/saml/callback')).toBe(true);
     expect(isSamlCallback('/account/oidc/callback?x=1')).toBe(true);
