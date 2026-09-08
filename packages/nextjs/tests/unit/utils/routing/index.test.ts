@@ -51,9 +51,14 @@ describe('buildHostedLoginRedirectUri', () => {
     expect(buildHostedLoginRedirectUri()).toBe('https://app.example.com');
   });
 
-  it('does not double the separator when appUrl has a trailing slash', () => {
+  it('leaves a trailing slash on appUrl alone so it still matches the authorize-time URI', () => {
     Object.assign(config, { appUrl: 'https://app.example.com/' });
-    expect(buildHostedLoginRedirectUri()).toBe('https://app.example.com/oauth/callback');
+    expect(buildHostedLoginRedirectUri()).toBe('https://app.example.com//oauth/callback');
+  });
+
+  it('drops a trailing slash on appUrl only when the callback is the app root', () => {
+    Object.assign(config, { appUrl: 'https://app.example.com/', authRoutes: { hostedLoginRedirectUrl: '/' } });
+    expect(buildHostedLoginRedirectUri()).toBe('https://app.example.com');
   });
 });
 

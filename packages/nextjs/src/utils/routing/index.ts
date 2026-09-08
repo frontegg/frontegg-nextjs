@@ -66,9 +66,21 @@ export function getHostedLoginRedirectPath(): string {
  * resulting URI is the bare app URL rather than a trailing slash variant of it.
  */
 export function buildHostedLoginRedirectUri(): string {
-  const appUrl = config.appUrl.endsWith('/') ? config.appUrl.slice(0, -1) : config.appUrl;
   const path = getHostedLoginRedirectPath();
-  return path === '/' ? appUrl : `${appUrl}${path}`;
+  if (path === '/') {
+    /**
+     * The callback is the app root, so the URI is the app URL with no path appended.
+     * A trailing slash is dropped here because the redirect being matched carries no
+     * path at all.
+     */
+    return config.appUrl.endsWith('/') ? config.appUrl.slice(0, -1) : config.appUrl;
+  }
+  /**
+   * Concatenated verbatim, without normalizing a trailing slash on the app URL. This
+   * value has to match the `redirect_uri` sent at authorize time, which is built from
+   * the same unnormalized app URL, so normalizing only one side would break the exchange.
+   */
+  return `${config.appUrl}${path}`;
 }
 
 /**
