@@ -18,6 +18,7 @@ import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
 import { shouldByPassMiddleware } from './shouldBypassMiddleware';
+import { isHostedLoginCallbackPath } from '../utils/routing';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.getSessionOnEdge' });
 
@@ -258,9 +259,8 @@ export const handleHostedLoginCallback = async (
 
 export const isHostedLoginCallback = (pathname: string, searchParams: URLSearchParams): boolean => {
   if (config.secureJwtEnabled) {
-    if (pathname.startsWith('/oauth/callback')) {
-      return searchParams.get('code') != null;
-    }
+    const hasCode = searchParams.get('code') != null;
+    return hasCode && isHostedLoginCallbackPath(pathname, hasCode);
   }
   return false;
 };
