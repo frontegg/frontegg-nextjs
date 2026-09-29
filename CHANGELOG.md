@@ -3,6 +3,20 @@
 ## [9.2.14](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.13...v9.2.14) (2026-9-29)
 
 
+### Highlights
+
+**Impersonation with Hosted Login and secure JWT** ([#448](https://github.com/frontegg/frontegg-nextjs/pull/448))
+
+Impersonation started from the Frontegg portal redirects to the application URL (`{appUrl}?code=...`) instead of `/oauth/callback`, so the Next.js middleware never created the session. To support it, enable the new environment variable:
+
+```
+FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL='true'
+```
+
+- Requires `FRONTEGG_SECURE_JWT_ENABLED='true'`.
+- `FRONTEGG_APP_URL` must be identical to the App URL configured in the Frontegg portal.
+- Off by default, so existing apps are not affected.
+
 ### NextJS Wrapper 9.2.14:
 - fix: accept the hosted login code on the app URL for impersonation
 - fix: honor authRoutes.hostedLoginRedirectUrl for hosted login callback
