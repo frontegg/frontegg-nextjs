@@ -152,6 +152,13 @@ DISABLE_INITIAL_PROPS_REFRESH_TOKEN='true'
 # To enable this feature, you need to provide {@link EnvVariables.FRONTEGG_CLIENT_SECRET}
 FRONTEGG_SECURE_JWT_ENABLED='false'
 
+# Accept the hosted login authorization code on the FRONTEGG_APP_URL itself, in addition to
+# the `/oauth/callback` route. Needed for flows that are started outside the application,
+# like impersonation, which redirect to the application URL configured in the Frontegg portal.
+# Requires FRONTEGG_SECURE_JWT_ENABLED, and the application URL configured in the Frontegg portal
+# must be identical to FRONTEGG_APP_URL.
+FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL='false'
+
 # The Frontegg Hosted Login URL used to redirect the user to the Frontegg login page.
 # Set to 'true' to enable the hosted login feature.
 FRONTEGG_HOSTED_LOGIN='true'
