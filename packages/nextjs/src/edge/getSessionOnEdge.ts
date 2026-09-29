@@ -204,6 +204,7 @@ export const handleHostedLoginCallback = async (
     return NextResponse.next();
   }
 
+  logger.debug('Authorization code received on the hosted login callback route, going to exchange it');
   return exchangeCodeForSession(req, searchParams.get('code') ?? '');
 };
 
@@ -220,6 +221,7 @@ const handleAppUrlLoginCallback = async (
   searchParams: URLSearchParams
 ): Promise<NextResponse | undefined> => {
   try {
+    logger.debug('Authorization code received on the application URL, going to exchange it');
     return await exchangeCodeForSession(req, searchParams.get('code') ?? '', config.appUrl);
   } catch (e) {
     logger.debug('Failed to exchange the authorization code received on the application URL', e);
