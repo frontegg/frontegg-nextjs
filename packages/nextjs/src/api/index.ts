@@ -67,12 +67,13 @@ export const exchangeHostedLoginToken = async (
   headers: Record<string, string>,
   code: string,
   cliendId: string,
-  clientSecret: string
+  clientSecret: string,
+  redirectUri: string = buildHostedLoginRedirectUri()
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
     body: JSON.stringify({
-      redirect_uri: buildHostedLoginRedirectUri(),
+      redirect_uri: redirectUri,
       grant_type: 'authorization_code',
       code,
       client_id: cliendId,
