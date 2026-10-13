@@ -109,9 +109,7 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
     preparedHeaders[FRONTEGG_APPLICATION_ID_HEADER] = headers[FRONTEGG_APPLICATION_ID_HEADER];
   }
 
-  const clientIp = getClientIp(
-    headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for']
-  );
+  const clientIp = resolveTrustedClientIp(headers);
 
   if (clientIp && config.shouldForwardIp) {
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
@@ -184,4 +182,17 @@ export function getClientIp(rawIp?: string | string[] | null): string | undefine
   if (!rawIp) return undefined;
   const ip = Array.isArray(rawIp) ? rawIp[0] : rawIp;
   return ip.split(',')[0].trim();
+}
+
+/**
+ * Reads the client IP only from a header set by trusted infrastructure, never from one the browser controls.
+ */
+export function resolveTrustedClientIp(headers: Record<string, any>): string | undefined {
+  if (config.forwardIpHeader) {
+    return getClientIp(headers[config.forwardIpHeader]);
+  }
+  if (config.isVercel) {
+    return getClientIp(headers['x-forwarded-for']);
+  }
+  return undefined;
 }
