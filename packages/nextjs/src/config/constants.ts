@@ -125,10 +125,9 @@ export enum EnvVariables {
   FRONTEGG_FORWARD_IP = 'FRONTEGG_FORWARD_IP',
 
   /**
-   * Name of a request header that your own proxy or CDN sets to the client IP address,
-   * for example `cf-connecting-ip` behind Cloudflare. When set, {@link EnvVariables.FRONTEGG_FORWARD_IP}
-   * forwards the value of this header only. Without it, the client IP is forwarded only on Vercel,
-   * from the `x-forwarded-for` header that Vercel overwrites.
+   * Name of a request header that your own proxy sets to the client IP address, for setups the SDK
+   * cannot detect, for example `x-real-ip` behind nginx. The rightmost value is used. Only set it when
+   * every request reaches the application through that proxy, otherwise callers can send the header themselves.
    */
   FRONTEGG_FORWARD_IP_HEADER = 'FRONTEGG_FORWARD_IP_HEADER',
 

@@ -29,12 +29,12 @@ const loadPublicKey = async () => {
  * Send HTTP post-request for Frontegg services to refresh token
  * by providing client's fe_ cookies
  */
-const refreshTokenEmbedded = async (headers: Record<string, string>) => {
+const refreshTokenEmbedded = async (headers: Record<string, string>, clientIp?: string) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.embedded}`,
     body: '{}',
     credentials: 'include',
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
 };
 
@@ -46,7 +46,8 @@ const refreshTokenHostedLogin = async (
   headers: Record<string, string>,
   refreshToken: string,
   clientId?: string,
-  clientSecret?: string
+  clientSecret?: string,
+  clientIp?: string
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
@@ -56,7 +57,7 @@ const refreshTokenHostedLogin = async (
       client_id: clientId,
       client_secret: clientSecret,
     }),
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
 };
 
@@ -68,7 +69,8 @@ export const exchangeHostedLoginToken = async (
   code: string,
   cliendId: string,
   clientSecret: string,
-  redirectUri: string = buildHostedLoginRedirectUri()
+  redirectUri: string = buildHostedLoginRedirectUri(),
+  clientIp?: string
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
@@ -80,7 +82,7 @@ export const exchangeHostedLoginToken = async (
       client_secret: clientSecret,
       // code_verifier
     }),
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
 };
 
