@@ -3,13 +3,14 @@ import { getTenants, getMe, getMeAuthorization, getEntitlements } from '../../ap
 import { calculateExpiresInFromExp } from '../common';
 import fronteggLogger from '../fronteggLogger';
 import config from '../../config';
-import { FRONTEGG_APPLICATION_ID_HEADER } from '../../api/utils';
+import { FRONTEGG_APPLICATION_ID_HEADER, resolveTrustedClientIp } from '../../api/utils';
 
 const FULFILLED_STATUS = 'fulfilled';
 
 type FetchUserDataOptions = {
   getSession: () => Promise<FronteggNextJSSession | undefined | null>;
   getHeaders: () => Promise<Record<string, string | string[] | undefined>>;
+  peerAddress?: string;
 };
 
 export default async function fetchUserData(options: FetchUserDataOptions): Promise<AllUserData> {
@@ -25,6 +26,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const { accessToken } = session;
     const reqHeaders = await getHeaders();
+    const clientIp = resolveTrustedClientIp(reqHeaders, options.peerAddress);
     const headers: Record<string, string> = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     if (config.appId) {
@@ -33,10 +35,10 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     logger.debug('Retrieving user data...');
     const [baseUserResult, tenantsResult, entitlementsResult, meAuthorizationResult] = await Promise.allSettled([
-      getMe(headers),
-      getTenants(headers),
-      getEntitlements(headers),
-      getMeAuthorization(headers),
+      getMe(headers, clientIp),
+      getTenants(headers, clientIp),
+      getEntitlements(headers, clientIp),
+      getMeAuthorization(headers, clientIp),
     ]);
 
     logger.debug(
