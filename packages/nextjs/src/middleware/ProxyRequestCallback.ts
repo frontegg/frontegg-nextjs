@@ -9,7 +9,7 @@ import fronteggLogger from '../utils/fronteggLogger';
 import {
   FRONTEGG_HEADERS_VERIFIER_HEADER,
   FRONTEGG_FORWARD_IP_HEADER,
-  getClientIp,
+  resolveTrustedClientIp,
   FRONTEGG_VENDOR_ID_HEADER,
 } from '../api/utils';
 import { headersToRemove } from './constants';
@@ -66,8 +66,8 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
     if (config.ipResolver) {
       clientIp = config.ipResolver(req);
-    } else if (config.isVercel) {
-      clientIp = getClientIp(req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']);
+    } else if (config.isVercel || config.forwardIpHeader) {
+      clientIp = resolveTrustedClientIp(req.headers, req.socket?.remoteAddress);
     }
 
     if (clientIp && config.shouldForwardIp) {

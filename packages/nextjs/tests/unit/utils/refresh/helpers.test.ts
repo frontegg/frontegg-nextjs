@@ -84,7 +84,19 @@ describe('refreshAccessTokenEmbedded', () => {
     const req = { headers: { foo: 'bar' }, cookies: { [key]: 'rt' } } as any;
     const result = await refreshAccessTokenEmbedded(req);
     expect(result).toBe(fakeRes);
-    expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers);
+    expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers, undefined);
+  });
+
+  it('passes the peer address of the request as the client ip', async () => {
+    mockedApi.refreshTokenEmbedded.mockResolvedValueOnce({ ok: true } as any);
+    const key = CookieManager.refreshTokenKey;
+    const req = {
+      headers: { 'x-forwarded-for': '6.6.6.6' },
+      cookies: { [key]: 'rt' },
+      socket: { remoteAddress: '198.51.100.7' },
+    } as any;
+    await refreshAccessTokenEmbedded(req);
+    expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers, '198.51.100.7');
   });
 
   it('attaches frontegg-requested-application-id header when appId set', async () => {
@@ -113,7 +125,13 @@ describe('refreshAccessTokenHostedLogin', () => {
     const req = { headers: {} as Record<string, string> } as any;
     const res = await refreshAccessTokenHostedLogin(req);
     expect(res).toEqual({ ok: true });
-    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(req.headers, 'rt-1');
+    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(
+      req.headers,
+      'rt-1',
+      undefined,
+      undefined,
+      undefined
+    );
   });
 
   it('calls api.refreshTokenHostedLogin with clientId/secret when secureJwtEnabled=true', async () => {
@@ -123,7 +141,13 @@ describe('refreshAccessTokenHostedLogin', () => {
     vi.spyOn(CookieManager, 'getSessionCookieFromRequest').mockReturnValueOnce('seal');
     const req = { headers: {} } as any;
     await refreshAccessTokenHostedLogin(req);
-    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(req.headers, 'rt-2', 'abc-def-ghi', 'super-secret');
+    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(
+      req.headers,
+      'rt-2',
+      'abc-def-ghi',
+      'super-secret',
+      undefined
+    );
   });
 
   it('attaches frontegg-requested-application-id header when appId set', async () => {

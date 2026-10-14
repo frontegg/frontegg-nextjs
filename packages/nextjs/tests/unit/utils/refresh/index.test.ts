@@ -41,27 +41,18 @@ vi.mock('../../../../src/common', () => ({
   getTokensFromCookie: vi.fn(),
 }));
 
-vi.mock('../../../../src/api/utils', async (orig) => {
-  const actual = await orig<typeof import('../../../../src/api/utils')>();
-  return {
-    ...actual,
-    getClientIp: vi.fn(),
-  };
-});
-
 import refreshAccessTokenIfNeeded from '../../../../src/utils/refreshAccessTokenIfNeeded';
 import config from '../../../../src/config';
 import CookieManager from '../../../../src/utils/cookies';
 import * as helpers from '../../../../src/utils/refreshAccessTokenIfNeeded/helpers';
 import createSession from '../../../../src/utils/createSession';
 import { createSessionFromAccessToken } from '../../../../src/common';
-import { getClientIp, FRONTEGG_FORWARD_IP_HEADER } from '../../../../src/api/utils';
+import { FRONTEGG_FORWARD_IP_HEADER, FRONTEGG_HEADERS_VERIFIER_HEADER } from '../../../../src/api/utils';
 
 const mockedCookieManager = vi.mocked(CookieManager);
 const mockedHelpers = vi.mocked(helpers);
 const mockedCreateSession = vi.mocked(createSession);
 const mockedCreateSessionFromAccessToken = vi.mocked(createSessionFromAccessToken);
-const mockedGetClientIp = vi.mocked(getClientIp);
 
 beforeEach(() => {
   Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined });
@@ -73,7 +64,6 @@ beforeEach(() => {
   mockedHelpers.getForwardedSession.mockReturnValue(null);
   mockedCookieManager.modifySetCookie.mockReturnValue([]);
   mockedCookieManager.create.mockReturnValue(['fe_session=cookie-value; Path=/']);
-  mockedGetClientIp.mockReturnValue(undefined);
 });
 
 // ---------- Early-exit branches ----------
@@ -194,38 +184,20 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
 
 // ---------- Embedded + IP forwarding ----------
 describe('refreshAccessTokenIfNeeded — embedded + ip forwarding', () => {
-  it('forwards client ip headers when shouldForwardIp=true and ip available', async () => {
+  it('does not copy the forwarded ip or the shared secret into the incoming request headers', async () => {
     (config as any).shouldForwardIp = true;
-    mockedGetClientIp.mockReturnValue('1.2.3.4');
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
 
     const { req, res } = mockNextPageContext({
       url: '/',
       headers: { 'x-forwarded-for': '1.2.3.4' },
+      remoteAddress: '5.6.7.8',
     });
 
     await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
-    expect((req as any).headers[FRONTEGG_FORWARD_IP_HEADER]).toBe('1.2.3.4');
-  });
-
-  it('uses socket.remoteAddress as ip fallback', async () => {
-    (config as any).shouldForwardIp = true;
-    mockedGetClientIp.mockReturnValue(undefined);
-    mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
-
-    const { req, res } = mockNextPageContext({ url: '/', remoteAddress: '5.6.7.8' });
-    await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
-    expect((req as any).headers[FRONTEGG_FORWARD_IP_HEADER]).toBe('5.6.7.8');
-  });
-
-  it('does NOT forward ip when shouldForwardIp=false', async () => {
-    (config as any).shouldForwardIp = false;
-    mockedGetClientIp.mockReturnValue('1.2.3.4');
-    mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
-
-    const { req, res } = mockNextPageContext({ url: '/' });
-    await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
     expect((req as any).headers[FRONTEGG_FORWARD_IP_HEADER]).toBeUndefined();
+    expect((req as any).headers[FRONTEGG_HEADERS_VERIFIER_HEADER]).toBeUndefined();
+    expect(mockedHelpers.refreshAccessTokenEmbedded).toHaveBeenCalledWith(req);
   });
 });
 

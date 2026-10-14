@@ -55,6 +55,7 @@ export const withFronteggApp = (app: FronteggCustomAppClass, options?: WithFront
           let userData = await fetchUserData({
             getSession: async () => await refreshAccessTokenIfNeeded(ctx),
             getHeaders: async () => ctx.req?.headers ?? {},
+            peerAddress: ctx.req.socket?.remoteAddress,
           });
           if (process.env['FRONTEGG_SECURE_JWT_ENABLED'] === 'true' && userData) {
             userData = removeJwtSignatureFrom(userData);

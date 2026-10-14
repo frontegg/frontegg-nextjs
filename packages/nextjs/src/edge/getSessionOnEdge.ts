@@ -7,13 +7,7 @@ import api from '../api';
 import { type NextRequest, NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
-import {
-  buildRequestHeaders,
-  FRONTEGG_HEADERS_VERIFIER_HEADER,
-  FRONTEGG_FORWARD_IP_HEADER,
-  getClientIp,
-  FRONTEGG_VENDOR_ID_HEADER,
-} from '../api/utils';
+import { resolveTrustedClientIp } from '../api/utils';
 import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
@@ -234,31 +228,23 @@ const exchangeCodeForSession = async (
   code: string,
   redirectUri?: string
 ): Promise<NextResponse> => {
-  let headers: Record<string, string> = {};
-  let clientIp: string | undefined = undefined;
+  const requestHeaders: Record<string, any> = {};
   if (typeof req.headers?.get === 'function') {
-    clientIp =
-      getClientIp(req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for')) ||
-      (req as any).socket?.remoteAddress;
+    (req.headers as Headers).forEach((value, key) => {
+      requestHeaders[key] = value;
+    });
   } else if (typeof req.headers === 'object') {
-    let requestHeaders: any = { ...req.headers };
-    clientIp =
-      getClientIp(requestHeaders['cf-connecting-ip'] || requestHeaders['x-forwarded-for']) ||
-      (req as any).socket?.remoteAddress;
+    Object.assign(requestHeaders, req.headers);
   }
-
-  if (clientIp && config.shouldForwardIp) {
-    headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
-    headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
-    headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;
-  }
+  const clientIp = resolveTrustedClientIp(requestHeaders, (req as any).socket?.remoteAddress);
 
   const response = await api.exchangeHostedLoginToken(
-    buildRequestHeaders(headers),
+    {},
     code,
     config.clientId,
     config.clientSecret!,
-    redirectUri
+    redirectUri,
+    clientIp
   );
 
   const data = await response.json();
