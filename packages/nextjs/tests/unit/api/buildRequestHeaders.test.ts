@@ -28,22 +28,16 @@ beforeEach(() => {
 });
 
 describe('buildRequestHeaders client ip forwarding', () => {
-  it('forwards the trusted client ip with the shared secret and vendor id', () => {
-    const headers = buildRequestHeaders(browserHeaders);
+  it('forwards the given client ip with the shared secret and vendor id', () => {
+    const headers = buildRequestHeaders(browserHeaders, '198.51.100.7');
 
-    expect(headers['x-frontegg-forwarded-for']).toBe('203.0.113.10');
+    expect(headers['x-frontegg-forwarded-for']).toBe('198.51.100.7');
     expect(headers['x-frontegg-headers-verifier']).toBe('shared-secret');
     expect(headers['frontegg-vendor-id']).toBe('vendor-id');
   });
 
-  it('forwards an explicitly resolved client ip instead of reading the headers', () => {
-    const headers = buildRequestHeaders({}, '198.51.100.7');
-
-    expect(headers['x-frontegg-forwarded-for']).toBe('198.51.100.7');
-  });
-
-  it('forwards no client ip when none can be resolved', () => {
-    const headers = buildRequestHeaders({ 'x-frontegg-forwarded-for': '6.6.6.6' });
+  it('does not resolve the client ip from the headers again when none was resolved', () => {
+    const headers = buildRequestHeaders(browserHeaders, undefined);
 
     expect(headers['x-frontegg-forwarded-for']).toBeUndefined();
     expect(headers['x-frontegg-headers-verifier']).toBeUndefined();

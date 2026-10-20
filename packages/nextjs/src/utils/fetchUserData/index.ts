@@ -26,7 +26,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const { accessToken } = session;
     const reqHeaders = await getHeaders();
-    const clientIp = resolveTrustedClientIp(reqHeaders, options.peerAddress);
+    const clientIp = resolveTrustedClientIp({ headers: reqHeaders, socket: { remoteAddress: options.peerAddress } });
     const headers: Record<string, string> = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     if (config.appId) {

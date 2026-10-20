@@ -8,6 +8,9 @@ const CONFIG_BASE = vi.hoisted(() => ({
   clientId: 'abc-def-ghi',
   clientSecret: 'super-secret',
   shouldForwardIp: false,
+  isVercel: false,
+  forwardIpHeader: undefined as string | undefined,
+  ipResolver: undefined,
   isSSL: true,
   rewriteCookieByAppId: false,
   appId: undefined as string | undefined,
@@ -132,19 +135,34 @@ describe('handleSessionOnEdge with a code on the app url', () => {
     expect(mockedExchange.mock.calls[0][4]).toBeUndefined();
   });
 
-  it('passes the trusted client ip to the code exchange and ignores the one sent by the caller', async () => {
+  const exchangeWithHeaders = async (headers: Record<string, string>) => {
     mockSuccessfulExchange();
-    const request = new Request('https://app.example.com/oauth/callback?code=abc', {
-      headers: { 'x-forwarded-for': '6.6.6.6, 198.51.100.7', 'x-frontegg-forwarded-for': '7.7.7.7' },
-    });
-
+    const request = new Request('https://app.example.com/oauth/callback?code=abc', { headers });
     await handleSessionOnEdge({
       request,
       pathname: '/oauth/callback',
       searchParams: params('code=abc'),
       headers: request.headers as any,
     });
+    return mockedExchange.mock.calls[0][5];
+  };
 
-    expect(mockedExchange.mock.calls[0][5]).toBe('198.51.100.7');
+  it('passes the Vercel client ip to the code exchange and ignores the one sent by the caller', async () => {
+    Object.assign(config, { shouldForwardIp: true, isVercel: true });
+
+    const clientIp = await exchangeWithHeaders({
+      'x-forwarded-for': '198.51.100.7',
+      'x-frontegg-forwarded-for': '7.7.7.7',
+    });
+
+    expect(clientIp).toBe('198.51.100.7');
+  });
+
+  it('passes no client ip off Vercel without a configured source', async () => {
+    Object.assign(config, { shouldForwardIp: true });
+
+    const clientIp = await exchangeWithHeaders({ 'x-forwarded-for': '6.6.6.6' });
+
+    expect(clientIp).toBeUndefined();
   });
 });

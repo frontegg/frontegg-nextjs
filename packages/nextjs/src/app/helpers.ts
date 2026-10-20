@@ -3,6 +3,7 @@ import CookieManager from '../utils/cookies';
 import createSession from '../utils/createSession';
 import encryption from '../utils/encryption';
 import { FronteggUserSession, FronteggUserTokens } from '../types';
+import { headersToRecord } from '../api/utils';
 
 /**
  * Support for Next.js 15 breaking changes, where props.params is now a promise-based function
@@ -64,11 +65,7 @@ export const getAppSession = async () => {
   return createSession(cookies, encryption);
 };
 
-export const getAppHeaders = async (): Promise<Record<string, string>> => {
-  const reqHeaders: Record<string, string> = {};
-  (await getRequestHeaders()).forEach((value: string, key: string) => (reqHeaders[key] = value));
-  return reqHeaders;
-};
+export const getAppHeaders = async (): Promise<Record<string, string>> => headersToRecord(await getRequestHeaders());
 
 export async function getAppUserSession(): Promise<FronteggUserSession | undefined> {
   const session = await getAppSession();

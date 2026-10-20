@@ -7,7 +7,7 @@ import api from '../api';
 import { type NextRequest, NextResponse } from 'next/server';
 import config from '../config';
 import JwtManager from '../utils/jwt';
-import { resolveTrustedClientIp } from '../api/utils';
+import { headersToRecord, resolveTrustedClientIp } from '../api/utils';
 import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
@@ -228,15 +228,10 @@ const exchangeCodeForSession = async (
   code: string,
   redirectUri?: string
 ): Promise<NextResponse> => {
-  const requestHeaders: Record<string, any> = {};
-  if (typeof req.headers?.get === 'function') {
-    (req.headers as Headers).forEach((value, key) => {
-      requestHeaders[key] = value;
-    });
-  } else if (typeof req.headers === 'object') {
-    Object.assign(requestHeaders, req.headers);
-  }
-  const clientIp = resolveTrustedClientIp(requestHeaders, (req as any).socket?.remoteAddress);
+  const clientIp = resolveTrustedClientIp({
+    headers: headersToRecord(req.headers),
+    socket: (req as IncomingMessage).socket,
+  });
 
   const response = await api.exchangeHostedLoginToken(
     {},

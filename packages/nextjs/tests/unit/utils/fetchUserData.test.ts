@@ -9,6 +9,7 @@ vi.mock('../../../src/config', () => ({
     shouldForwardIp: true,
     isVercel: false,
     forwardIpHeader: undefined,
+    ipResolver: undefined,
   },
 }));
 
@@ -19,7 +20,7 @@ const CLIENT_IP = '198.51.100.7';
 const fetchMock = vi.fn();
 
 beforeEach(() => {
-  Object.assign(config, { shouldForwardIp: true });
+  Object.assign(config, { shouldForwardIp: true, isVercel: false, forwardIpHeader: undefined, ipResolver: undefined });
   fetchMock.mockResolvedValue({
     ok: true,
     json: async () => ({ id: 'user-id', tenants: [], activeTenant: null }),
@@ -29,7 +30,7 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals());
 
-const loadUserData = async (headers: Record<string, string>, peerAddress: string) => {
+const loadUserData = async (headers: Record<string, string>, peerAddress?: string) => {
   const options = {
     getSession: async () => ({ accessToken: 'access-token', user: { exp: 2000000000 } }) as any,
     getHeaders: async () => headers,
@@ -40,24 +41,38 @@ const loadUserData = async (headers: Record<string, string>, peerAddress: string
 
 describe('fetchUserData client IP compatibility', () => {
   it.each([
-    ['direct connection', {}, CLIENT_IP],
-    ['direct connection with spoofed headers', { 'x-forwarded-for': '6.6.6.6' }, CLIENT_IP],
-    ['private proxy', { 'x-forwarded-for': CLIENT_IP }, '10.0.0.5'],
-  ])('preserves the client IP on all user-data requests for a %s', async (_name, headers, peerAddress) => {
-    const result = await loadUserData(headers, peerAddress);
+    ['Vercel', { isVercel: true }, { 'x-forwarded-for': CLIENT_IP }, undefined],
+    ['configured header', { forwardIpHeader: 'x-real-ip' }, { 'x-real-ip': CLIENT_IP }, '10.0.0.5'],
+    ['custom ipResolver', { ipResolver: (request: any) => request.socket.remoteAddress }, {}, CLIENT_IP],
+  ])(
+    'forwards the client IP on all user-data requests for %s',
+    async (_name, configOverrides, headers, peerAddress) => {
+      Object.assign(config, configOverrides);
+      const result = await loadUserData(headers, peerAddress);
 
-    expect(result.user?.id).toBe('user-id');
+      expect(result.user?.id).toBe('user-id');
+      expect(fetchMock).toHaveBeenCalledTimes(4);
+      for (const [, options] of fetchMock.mock.calls) {
+        expect(options.headers).toMatchObject({
+          authorization: 'Bearer access-token',
+          'frontegg-requested-application-id': 'app-id',
+          'x-frontegg-forwarded-for': CLIENT_IP,
+          'x-frontegg-headers-verifier': 'shared-secret',
+          'frontegg-vendor-id': 'vendor-id',
+        });
+      }
+      expect(headers).not.toHaveProperty('x-frontegg-headers-verifier');
+    }
+  );
+
+  it('forwards no client IP off Vercel when no source is configured', async () => {
+    await loadUserData({ 'x-forwarded-for': '6.6.6.6' }, CLIENT_IP);
+
     expect(fetchMock).toHaveBeenCalledTimes(4);
     for (const [, options] of fetchMock.mock.calls) {
-      expect(options.headers).toMatchObject({
-        authorization: 'Bearer access-token',
-        'frontegg-requested-application-id': 'app-id',
-        'x-frontegg-forwarded-for': CLIENT_IP,
-        'x-frontegg-headers-verifier': 'shared-secret',
-        'frontegg-vendor-id': 'vendor-id',
-      });
+      expect(options.headers).not.toHaveProperty('x-frontegg-forwarded-for');
+      expect(options.headers).not.toHaveProperty('x-frontegg-headers-verifier');
     }
-    expect(headers).not.toHaveProperty('x-frontegg-headers-verifier');
   });
 
   it('keeps IP forwarding disabled when the existing option is off', async () => {

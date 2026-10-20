@@ -3,7 +3,10 @@ import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
 import { fronteggAuthApiRoutesRegex } from '@frontegg/rest-api';
 import { headerCharRegex } from '../utils/common/constants';
-import { isCloudflareIp, isPrivateIp } from '../utils/clientIp';
+import type { NextApiRequest } from 'next';
+import type { IpResolverFunction } from '../middleware/types';
+import { isCloudflareIp, normalizeIp } from '../utils/clientIp';
+import fronteggLogger from '../utils/fronteggLogger';
 
 interface GetRequestOptions {
   url: string;
@@ -57,11 +60,11 @@ export const FRONTEGG_VENDOR_ID_HEADER = 'frontegg-vendor-id';
 /**
  * Build fetch request headers, remove invalid http headers
  * @param headers - Incoming request headers
- * @param clientIp - Client IP to forward, resolved from trusted headers when not provided
+ * @param clientIp - Client IP to forward, see {@link resolveTrustedClientIp}
  */
 export function buildRequestHeaders(
   headers: Record<string, any>,
-  clientIp: string | undefined = resolveTrustedClientIp(headers)
+  clientIp: string | undefined
 ): Record<string, string> {
   let cookie = headers['cookie'];
   if (cookie != null && typeof cookie === 'string') {
@@ -195,27 +198,45 @@ function splitIps(rawIps?: string | string[] | null): string[] {
     .filter(Boolean);
 }
 
-/** Reads proxy hops from the right, skipping private proxies; Vercel overwrites x-forwarded-for, Cloudflare hops give cf-connecting-ip. */
-export function resolveTrustedClientIp(headers: Record<string, any>, peerAddress?: string): string | undefined {
+export function headersToRecord(headers: Headers | Record<string, any>): Record<string, any> {
+  if (typeof headers.get !== 'function') {
+    return { ...headers };
+  }
+  const record: Record<string, any> = {};
+  (headers as Headers).forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
+
+export type ClientIpRequest = { headers: Record<string, any>; socket?: { remoteAddress?: string } };
+
+const clientIpLogger = fronteggLogger.child({ tag: 'resolveTrustedClientIp' });
+
+function resolveWithIpResolver(ipResolver: IpResolverFunction, request: ClientIpRequest): string | undefined {
+  try {
+    return ipResolver(request as NextApiRequest);
+  } catch (e) {
+    clientIpLogger.error('ipResolver failed to resolve the client ip', e);
+    return undefined;
+  }
+}
+
+/** Off Vercel only a configured ipResolver or FRONTEGG_FORWARD_IP_HEADER is trusted; on Vercel a Cloudflare hop gives cf-connecting-ip. */
+export function resolveTrustedClientIp(request: ClientIpRequest): string | undefined {
+  if (!config.shouldForwardIp) {
+    return undefined;
+  }
+  if (config.ipResolver) {
+    return normalizeIp(resolveWithIpResolver(config.ipResolver, request));
+  }
   if (config.forwardIpHeader) {
-    const configuredHeaderIp = splitIps(headers[config.forwardIpHeader]).pop();
-    if (configuredHeaderIp) {
-      return configuredHeaderIp;
-    }
+    return normalizeIp(splitIps(request.headers[config.forwardIpHeader]).pop());
   }
-
-  const hops = config.isVercel
-    ? splitIps(headers['x-forwarded-for']).slice(0, 1)
-    : [...splitIps(headers['x-forwarded-for']), ...(peerAddress ? [peerAddress] : [])];
-  const cloudflareClientIp = getClientIp(headers['cf-connecting-ip']);
-
-  for (const hop of hops.reverse()) {
-    if (cloudflareClientIp && isCloudflareIp(hop)) {
-      return cloudflareClientIp;
-    }
-    if (!isPrivateIp(hop)) {
-      return hop;
-    }
+  if (!config.isVercel) {
+    return undefined;
   }
-  return undefined;
+  const vercelClientIp = normalizeIp(getClientIp(request.headers['x-forwarded-for']));
+  const cloudflareClientIp = normalizeIp(getClientIp(request.headers['cf-connecting-ip']));
+  return vercelClientIp && cloudflareClientIp && isCloudflareIp(vercelClientIp) ? cloudflareClientIp : vercelClientIp;
 }

@@ -38,7 +38,7 @@ export async function refreshAccessTokenEmbedded(request: IncomingMessage): Prom
     if (config.appId) {
       headers['frontegg-requested-application-id'] = config.appId;
     }
-    return await api.refreshTokenEmbedded(headers, resolveTrustedClientIp(headers, request.socket?.remoteAddress));
+    return await api.refreshTokenEmbedded(headers, resolveTrustedClientIp(request));
   }
   return null;
 }
@@ -59,7 +59,7 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
     if (config.appId) {
       headers['frontegg-requested-application-id'] = config.appId;
     }
-    const clientIp = resolveTrustedClientIp(headers, request.socket?.remoteAddress);
+    const clientIp = resolveTrustedClientIp(request);
     if (config.secureJwtEnabled) {
       const clientId = config.clientId;
       const clientSecret = config.clientSecret;

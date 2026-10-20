@@ -62,21 +62,14 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
      */
     proxyReq.setHeader('Accept-Encoding', 'identity');
 
-    let clientIp: string | undefined;
+    headersToRemove.map((header) => proxyReq.removeHeader(header));
 
-    if (config.ipResolver) {
-      clientIp = config.ipResolver(req);
-    } else if (config.isVercel || config.forwardIpHeader) {
-      clientIp = resolveTrustedClientIp(req.headers, req.socket?.remoteAddress);
-    }
-
-    if (clientIp && config.shouldForwardIp) {
+    const clientIp = resolveTrustedClientIp(req);
+    if (clientIp) {
       proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, clientIp);
       proxyReq.setHeader(FRONTEGG_HEADERS_VERIFIER_HEADER, config.sharedSecret ?? '');
       proxyReq.setHeader(FRONTEGG_VENDOR_ID_HEADER, config.clientId);
     }
-
-    headersToRemove.map((header) => proxyReq.removeHeader(header));
 
     logger.debug(`${req.url} | check if request has body`);
     if (req.method !== 'GET' && req.body) {

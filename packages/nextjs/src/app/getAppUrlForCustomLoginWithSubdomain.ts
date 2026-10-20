@@ -1,5 +1,5 @@
 import { getPublicSettings } from '../api';
-import { CUSTOM_LOGIN_HEADER } from '../api/utils';
+import { CUSTOM_LOGIN_HEADER, resolveTrustedClientIp } from '../api/utils';
 import { getAppHeaders } from './helpers';
 
 /**
@@ -37,7 +37,7 @@ export const getAppUrlForCustomLoginWithSubdomain = async (subDomainIndex?: numb
     return undefined;
   }
   const requestHeaders = { ...headers, [CUSTOM_LOGIN_HEADER]: alias };
-  const res = await getPublicSettings(requestHeaders).catch(() => undefined);
+  const res = await getPublicSettings(requestHeaders, resolveTrustedClientIp({ headers })).catch(() => undefined);
   const subDomainAppUrl = res?.applicationUrl;
   if (!subDomainAppUrl) {
     resetGlobalCustomLoginAppUrl();

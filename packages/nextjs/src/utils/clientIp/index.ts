@@ -1,4 +1,4 @@
-// Published at https://www.cloudflare.com/ips/
+// Copied from https://www.cloudflare.com/ips/, update this list when Cloudflare publishes new ranges
 const CLOUDFLARE_RANGES = [
   '173.245.48.0/20',
   '103.21.244.0/22',
@@ -24,22 +24,19 @@ const CLOUDFLARE_RANGES = [
   '2c0f:f248::/32',
 ];
 
-const PRIVATE_RANGES = [
-  '10.0.0.0/8',
-  '172.16.0.0/12',
-  '192.168.0.0/16',
-  '127.0.0.0/8',
-  '169.254.0.0/16',
-  '100.64.0.0/10',
-  '::1/128',
-  'fc00::/7',
-  'fe80::/10',
-];
-
 interface ParsedIp {
   bitsPerPart: number;
   parts: number[];
 }
+
+interface IpRange {
+  network: ParsedIp;
+  prefixLength: number;
+}
+
+const IPV4_WITH_PORT = /^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/;
+const BRACKETED_IPV6 = /^\[([^\]]+)\](?::\d+)?$/;
+const IPV4_MAPPED_PREFIX = /^::ffff:(?=\d{1,3}(?:\.\d{1,3}){3}$)/;
 
 function parseIpv4(ip: string): ParsedIp | undefined {
   const octets = ip.split('.');
@@ -61,23 +58,23 @@ function parseIpv6(ip: string): ParsedIp | undefined {
 }
 
 function parseIp(ip: string): ParsedIp | undefined {
-  const ipv4MappedPrefix = '::ffff:';
-  const address = ip.toLowerCase().startsWith(ipv4MappedPrefix) && ip.includes('.') ? ip.slice(7) : ip;
-  return address.includes(':') ? parseIpv6(address) : parseIpv4(address);
+  return ip.includes(':') ? parseIpv6(ip) : parseIpv4(ip);
 }
 
-function isInRange(ip: string, cidr: string): boolean {
+function parseRange(cidr: string): IpRange {
   const [rangeAddress, prefixLength] = cidr.split('/');
-  const address = parseIp(ip);
-  const range = parseIp(rangeAddress);
-  if (!address || !range || address.bitsPerPart !== range.bitsPerPart) {
+  return { network: parseIp(rangeAddress)!, prefixLength: Number(prefixLength) };
+}
+
+function isInRange(address: ParsedIp, range: IpRange): boolean {
+  if (address.bitsPerPart !== range.network.bitsPerPart) {
     return false;
   }
-  let remainingBits = Number(prefixLength);
+  let remainingBits = range.prefixLength;
   for (let index = 0; index < address.parts.length && remainingBits > 0; index++) {
     const comparedBits = Math.min(address.bitsPerPart, remainingBits);
     const mask = ((1 << comparedBits) - 1) << (address.bitsPerPart - comparedBits);
-    if ((address.parts[index] & mask) !== (range.parts[index] & mask)) {
+    if ((address.parts[index] & mask) !== (range.network.parts[index] & mask)) {
       return false;
     }
     remainingBits -= comparedBits;
@@ -85,6 +82,17 @@ function isInRange(ip: string, cidr: string): boolean {
   return true;
 }
 
-export const isPrivateIp = (ip: string): boolean => PRIVATE_RANGES.some((cidr) => isInRange(ip, cidr));
+const PARSED_CLOUDFLARE_RANGES = CLOUDFLARE_RANGES.map(parseRange);
 
-export const isCloudflareIp = (ip: string): boolean => CLOUDFLARE_RANGES.some((cidr) => isInRange(ip, cidr));
+/** Strips a port, brackets and the IPv4-mapped prefix, and returns undefined for anything that is not an IP address. */
+export function normalizeIp(rawIp?: string): string | undefined {
+  const trimmedIp = rawIp?.trim().toLowerCase() ?? '';
+  const addressWithoutPort = trimmedIp.match(BRACKETED_IPV6)?.[1] ?? trimmedIp.match(IPV4_WITH_PORT)?.[1] ?? trimmedIp;
+  const address = addressWithoutPort.replace(IPV4_MAPPED_PREFIX, '');
+  return parseIp(address) ? address : undefined;
+}
+
+export function isCloudflareIp(ip: string): boolean {
+  const address = parseIp(ip);
+  return !!address && PARSED_CLOUDFLARE_RANGES.some((range) => isInRange(address, range));
+}

@@ -40,7 +40,7 @@ const mockedGetTokens = vi.mocked(getTokensFromCookie);
 
 beforeEach(() => {
   // restore baseline config between tests
-  Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined });
+  Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined, ipResolver: undefined });
 });
 
 describe('hasRefreshTokenCookie', () => {
@@ -87,7 +87,8 @@ describe('refreshAccessTokenEmbedded', () => {
     expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers, undefined);
   });
 
-  it('passes the peer address of the request as the client ip', async () => {
+  it('passes the request to the configured ipResolver and forwards its client ip', async () => {
+    Object.assign(config, { shouldForwardIp: true, ipResolver: (request: any) => request.socket.remoteAddress });
     mockedApi.refreshTokenEmbedded.mockResolvedValueOnce({ ok: true } as any);
     const key = CookieManager.refreshTokenKey;
     const req = {
