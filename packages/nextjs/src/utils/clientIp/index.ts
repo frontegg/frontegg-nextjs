@@ -37,10 +37,12 @@ interface IpRange {
 const IPV4_WITH_PORT = /^(\d{1,3}(?:\.\d{1,3}){3}):\d+$/;
 const BRACKETED_IPV6 = /^\[([^\]]+)\](?::\d+)?$/;
 const IPV4_MAPPED_PREFIX = /^::ffff:(?=\d{1,3}(?:\.\d{1,3}){3}$)/;
+const IPV4_OCTET = /^(?:0|[1-9]\d{0,2})$/;
+const IPV4_MAPPED_HEXTETS = [0, 0, 0, 0, 0, 0xffff];
 
 function parseIpv4(ip: string): ParsedIp | undefined {
   const octets = ip.split('.');
-  const isValid = octets.length === 4 && octets.every((octet) => /^\d{1,3}$/.test(octet) && Number(octet) <= 255);
+  const isValid = octets.length === 4 && octets.every((octet) => IPV4_OCTET.test(octet) && Number(octet) <= 255);
   return isValid ? { bitsPerPart: 8, parts: octets.map(Number) } : undefined;
 }
 
@@ -84,12 +86,54 @@ function isInRange(address: ParsedIp, range: IpRange): boolean {
 
 const PARSED_CLOUDFLARE_RANGES = CLOUDFLARE_RANGES.map(parseRange);
 
-/** Strips a port, brackets and the IPv4-mapped prefix, and returns undefined for anything that is not an IP address. */
-export function normalizeIp(rawIp?: string): string | undefined {
-  const trimmedIp = rawIp?.trim().toLowerCase() ?? '';
+function toIpv4IfMapped(address: ParsedIp): ParsedIp {
+  const isMapped =
+    address.bitsPerPart === 16 && IPV4_MAPPED_HEXTETS.every((hextet, index) => address.parts[index] === hextet);
+  if (!isMapped) {
+    return address;
+  }
+  const [highHextet, lowHextet] = address.parts.slice(6);
+  return { bitsPerPart: 8, parts: [highHextet >> 8, highHextet & 0xff, lowHextet >> 8, lowHextet & 0xff] };
+}
+
+function formatIpv6(hextets: number[]): string {
+  let longestZeroRunStart = -1;
+  let longestZeroRunLength = 1;
+  for (let runStart = 0; runStart < hextets.length; runStart++) {
+    let runLength = 0;
+    while (hextets[runStart + runLength] === 0) {
+      runLength++;
+    }
+    if (runLength > longestZeroRunLength) {
+      longestZeroRunStart = runStart;
+      longestZeroRunLength = runLength;
+    }
+  }
+  const hexParts = hextets.map((hextet) => hextet.toString(16));
+  if (longestZeroRunStart === -1) {
+    return hexParts.join(':');
+  }
+  const head = hexParts.slice(0, longestZeroRunStart).join(':');
+  const tail = hexParts.slice(longestZeroRunStart + longestZeroRunLength).join(':');
+  return `${head}::${tail}`;
+}
+
+/** Returns the canonical form of an IP address (no port or brackets, IPv4-mapped IPv6 as IPv4), or undefined for anything else. */
+export function normalizeIp(rawIp: unknown): string | undefined {
+  if (typeof rawIp !== 'string') {
+    return undefined;
+  }
+  const trimmedIp = rawIp.trim().toLowerCase();
   const addressWithoutPort = trimmedIp.match(BRACKETED_IPV6)?.[1] ?? trimmedIp.match(IPV4_WITH_PORT)?.[1] ?? trimmedIp;
-  const address = addressWithoutPort.replace(IPV4_MAPPED_PREFIX, '');
-  return parseIp(address) ? address : undefined;
+  const parsedIp = parseIp(addressWithoutPort.replace(IPV4_MAPPED_PREFIX, ''));
+  if (!parsedIp) {
+    return undefined;
+  }
+  const address = toIpv4IfMapped(parsedIp);
+  if (address.parts.every((part) => part === 0)) {
+    return undefined;
+  }
+  return address.bitsPerPart === 8 ? address.parts.join('.') : formatIpv6(address.parts);
 }
 
 export function isCloudflareIp(ip: string): boolean {

@@ -1,4 +1,4 @@
-import { FRONTEGG_FORWARD_IP_HEADER, FRONTEGG_HEADERS_VERIFIER_HEADER } from '../api/utils';
+import { FRONTEGG_FORWARD_IP_HEADER, FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_VENDOR_ID_HEADER } from '../api/utils';
 
 export const fronteggPathRewrite = [
   {
@@ -37,4 +37,5 @@ export const headersToRemove = [
   'x-webkit-csp',
   FRONTEGG_FORWARD_IP_HEADER,
   FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_VENDOR_ID_HEADER,
 ];

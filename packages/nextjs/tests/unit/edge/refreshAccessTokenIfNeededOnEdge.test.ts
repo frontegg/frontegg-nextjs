@@ -7,8 +7,7 @@ vi.mock('../../../src/config', () => ({
     isHostedLogin: false,
     shouldForwardIp: true,
     isVercel: true,
-    forwardIpHeader: undefined,
-    ipResolver: undefined,
+    clientIpHeader: undefined,
   },
 }));
 vi.mock('../../../src/api', () => ({

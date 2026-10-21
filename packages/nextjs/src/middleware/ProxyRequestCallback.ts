@@ -1,17 +1,11 @@
 import NextJsPkg from 'next/package.json';
-import { ProxyReqCallback } from 'http-proxy';
-import { ClientRequest } from 'http';
+import { ClientRequest, ServerResponse } from 'http';
 import { NextApiRequest } from 'next';
 import sdkVersion from '../sdkVersion';
 import config from '../config';
 import CookieManager from '../utils/cookies';
 import fronteggLogger from '../utils/fronteggLogger';
-import {
-  FRONTEGG_HEADERS_VERIFIER_HEADER,
-  FRONTEGG_FORWARD_IP_HEADER,
-  resolveTrustedClientIp,
-  FRONTEGG_VENDOR_ID_HEADER,
-} from '../api/utils';
+import { FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_FORWARD_IP_HEADER, FRONTEGG_VENDOR_ID_HEADER } from '../api/utils';
 import { headersToRemove } from './constants';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCallback' });
@@ -21,8 +15,15 @@ const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyRequestCa
  *
  * @param {ClientRequest} proxyReq - Proxy request to be sent
  * @param {NextApiRequest} req - Next.js incoming request
+ * @param {ServerResponse} _res - Next.js response
+ * @param options - Proxy options with the client IP resolved by FronteggApiMiddleware
  */
-const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (proxyReq, req) => {
+const ProxyRequestCallback = (
+  proxyReq: ClientRequest,
+  req: NextApiRequest,
+  _res: ServerResponse,
+  options: { clientIp?: string }
+): void => {
   try {
     logger.info(`${req.url} | Going to proxy request`);
     logger.debug(`${req.url} | parsing request cookies`);
@@ -64,7 +65,7 @@ const ProxyRequestCallback: ProxyReqCallback<ClientRequest, NextApiRequest> = (p
 
     headersToRemove.map((header) => proxyReq.removeHeader(header));
 
-    const clientIp = resolveTrustedClientIp(req);
+    const clientIp = options.clientIp;
     if (clientIp) {
       proxyReq.setHeader(FRONTEGG_FORWARD_IP_HEADER, clientIp);
       proxyReq.setHeader(FRONTEGG_HEADERS_VERIFIER_HEADER, config.sharedSecret ?? '');

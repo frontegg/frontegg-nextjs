@@ -67,7 +67,7 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
       logger.info('going to refresh token (hosted-login mode) (secure-jwt mode)');
       return await api.refreshTokenHostedLogin(headers, tokens.refreshToken, clientId, clientSecret, clientIp);
     } else {
-      logger.info('going to refresh token (hosted-login mode) ', tokens.refreshToken);
+      logger.info('going to refresh token (hosted-login mode)');
       return await api.refreshTokenHostedLogin(headers, tokens.refreshToken, undefined, undefined, clientIp);
     }
   } catch (e) {

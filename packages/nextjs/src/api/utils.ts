@@ -198,7 +198,10 @@ function splitIps(rawIps?: string | string[] | null): string[] {
     .filter(Boolean);
 }
 
-export function headersToRecord(headers: Headers | Record<string, any>): Record<string, any> {
+export function headersToRecord(headers?: Headers | Record<string, any>): Record<string, any> {
+  if (!headers || typeof headers !== 'object') {
+    return {};
+  }
   if (typeof headers.get !== 'function') {
     return { ...headers };
   }
@@ -209,34 +212,37 @@ export function headersToRecord(headers: Headers | Record<string, any>): Record<
   return record;
 }
 
-export type ClientIpRequest = { headers: Record<string, any>; socket?: { remoteAddress?: string } };
+export type ClientIpRequest = { headers: Record<string, any> };
 
 const clientIpLogger = fronteggLogger.child({ tag: 'resolveTrustedClientIp' });
 
-function resolveWithIpResolver(ipResolver: IpResolverFunction, request: ClientIpRequest): string | undefined {
+function resolveWithIpResolver(ipResolver: IpResolverFunction, request: NextApiRequest): string | undefined {
   try {
-    return ipResolver(request as NextApiRequest);
+    const resolvedIp: unknown = ipResolver(request);
+    return typeof resolvedIp === 'string' ? getClientIp(resolvedIp) : undefined;
   } catch (e) {
     clientIpLogger.error('ipResolver failed to resolve the client ip', e);
     return undefined;
   }
 }
 
-/** Off Vercel only a configured ipResolver or FRONTEGG_FORWARD_IP_HEADER is trusted; on Vercel a Cloudflare hop gives cf-connecting-ip. */
-export function resolveTrustedClientIp(request: ClientIpRequest): string | undefined {
+/** Resolves the client IP from the middleware's ipResolver, or from FRONTEGG_CLIENT_IP_HEADER, or on Vercel from its x-forwarded-for. */
+export function resolveTrustedClientIp(request: ClientIpRequest, ipResolver?: IpResolverFunction): string | undefined {
   if (!config.shouldForwardIp) {
     return undefined;
   }
-  if (config.ipResolver) {
-    return normalizeIp(resolveWithIpResolver(config.ipResolver, request));
+  if (ipResolver) {
+    return normalizeIp(resolveWithIpResolver(ipResolver, request as NextApiRequest));
   }
-  if (config.forwardIpHeader) {
-    return normalizeIp(splitIps(request.headers[config.forwardIpHeader]).pop());
+  if (config.clientIpHeader) {
+    return normalizeIp(splitIps(request.headers[config.clientIpHeader]).pop());
   }
   if (!config.isVercel) {
     return undefined;
   }
   const vercelClientIp = normalizeIp(getClientIp(request.headers['x-forwarded-for']));
-  const cloudflareClientIp = normalizeIp(getClientIp(request.headers['cf-connecting-ip']));
-  return vercelClientIp && cloudflareClientIp && isCloudflareIp(vercelClientIp) ? cloudflareClientIp : vercelClientIp;
+  if (!vercelClientIp || !isCloudflareIp(vercelClientIp)) {
+    return vercelClientIp;
+  }
+  return normalizeIp(getClientIp(request.headers['cf-connecting-ip']));
 }

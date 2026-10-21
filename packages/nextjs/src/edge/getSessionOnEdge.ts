@@ -228,10 +228,7 @@ const exchangeCodeForSession = async (
   code: string,
   redirectUri?: string
 ): Promise<NextResponse> => {
-  const clientIp = resolveTrustedClientIp({
-    headers: headersToRecord(req.headers),
-    socket: (req as IncomingMessage).socket,
-  });
+  const clientIp = resolveTrustedClientIp({ headers: headersToRecord(req.headers) });
 
   const response = await api.exchangeHostedLoginToken(
     {},

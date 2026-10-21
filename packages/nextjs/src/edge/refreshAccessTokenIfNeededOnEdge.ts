@@ -22,7 +22,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
   logger.info('going to refresh token');
 
   const headers = headersToRecord(req.headers);
-  const clientIp = resolveTrustedClientIp({ headers, socket: (req as IncomingMessage).socket });
+  const clientIp = resolveTrustedClientIp({ headers });
   const clientId = config.clientId;
   const clientSecret = config.clientSecret;
 

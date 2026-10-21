@@ -9,7 +9,7 @@ vi.mock('../../../src/config', () => ({
     appId: undefined,
     shouldForwardIp: true,
     isVercel: true,
-    forwardIpHeader: undefined,
+    clientIpHeader: undefined,
   },
 }));
 
@@ -24,7 +24,7 @@ const browserHeaders = {
 };
 
 beforeEach(() => {
-  Object.assign(config, { shouldForwardIp: true, isVercel: true, forwardIpHeader: undefined });
+  Object.assign(config, { shouldForwardIp: true, isVercel: true, clientIpHeader: undefined });
 });
 
 describe('buildRequestHeaders client ip forwarding', () => {

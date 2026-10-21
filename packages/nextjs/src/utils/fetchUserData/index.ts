@@ -10,7 +10,6 @@ const FULFILLED_STATUS = 'fulfilled';
 type FetchUserDataOptions = {
   getSession: () => Promise<FronteggNextJSSession | undefined | null>;
   getHeaders: () => Promise<Record<string, string | string[] | undefined>>;
-  peerAddress?: string;
 };
 
 export default async function fetchUserData(options: FetchUserDataOptions): Promise<AllUserData> {
@@ -26,7 +25,7 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const { accessToken } = session;
     const reqHeaders = await getHeaders();
-    const clientIp = resolveTrustedClientIp({ headers: reqHeaders, socket: { remoteAddress: options.peerAddress } });
+    const clientIp = resolveTrustedClientIp({ headers: reqHeaders });
     const headers: Record<string, string> = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     if (config.appId) {
