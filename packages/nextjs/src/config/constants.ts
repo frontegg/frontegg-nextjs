@@ -125,6 +125,13 @@ export enum EnvVariables {
   FRONTEGG_FORWARD_IP = 'FRONTEGG_FORWARD_IP',
 
   /**
+   * Name of a request header that your own proxy sets to the client IP address, for setups the SDK
+   * cannot detect, for example `x-real-ip` behind nginx. The rightmost value is used. Only set it when
+   * every request reaches the application through that proxy, otherwise callers can send the header themselves.
+   */
+  FRONTEGG_CLIENT_IP_HEADER = 'FRONTEGG_CLIENT_IP_HEADER',
+
+  /**
    * Where the Nextjs build output will be stored as static files
    * for SSG and ISR pages, this env variable will disable environment variables
    * checking and will not throw an error if the env variables are for SSR

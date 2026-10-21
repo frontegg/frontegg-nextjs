@@ -16,12 +16,6 @@ import {
 import fronteggLogger from '../fronteggLogger';
 import encryption from '../encryption';
 import createSession from '../createSession';
-import {
-  FRONTEGG_HEADERS_VERIFIER_HEADER,
-  FRONTEGG_FORWARD_IP_HEADER,
-  getClientIp,
-  FRONTEGG_VENDOR_ID_HEADER,
-} from '../../api/utils';
 
 export { isRuntimeNextRequest };
 /**
@@ -83,16 +77,6 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
         logger.debug(`abandon refreshToken for Saml Callback ${url}`);
         return null;
       }
-    }
-
-    const clientIp =
-      getClientIp(nextJsRequest.headers['cf-connecting-ip'] || nextJsRequest.headers['x-forwarded-for']) ||
-      nextJsRequest.socket?.remoteAddress;
-
-    if (clientIp && config.shouldForwardIp) {
-      nextJsRequest.headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
-      nextJsRequest.headers[FRONTEGG_HEADERS_VERIFIER_HEADER] = config.sharedSecret ?? '';
-      nextJsRequest.headers[FRONTEGG_VENDOR_ID_HEADER] = config.clientId;
     }
 
     let response: Response | null;

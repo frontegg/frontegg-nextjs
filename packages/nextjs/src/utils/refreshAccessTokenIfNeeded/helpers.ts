@@ -2,6 +2,7 @@ import fronteggLogger from '../fronteggLogger';
 import CookieManager from '../cookies';
 import { NextApiRequest } from 'next/dist/shared/lib/utils';
 import api from '../../api';
+import { resolveTrustedClientIp } from '../../api/utils';
 import { getTokensFromCookie } from '../../common';
 import { IncomingMessage } from 'http';
 import config from '../../config';
@@ -37,7 +38,7 @@ export async function refreshAccessTokenEmbedded(request: IncomingMessage): Prom
     if (config.appId) {
       headers['frontegg-requested-application-id'] = config.appId;
     }
-    return await api.refreshTokenEmbedded(headers);
+    return await api.refreshTokenEmbedded(headers, resolveTrustedClientIp(request));
   }
   return null;
 }
@@ -58,15 +59,16 @@ export async function refreshAccessTokenHostedLogin(request: IncomingMessage): P
     if (config.appId) {
       headers['frontegg-requested-application-id'] = config.appId;
     }
+    const clientIp = resolveTrustedClientIp(request);
     if (config.secureJwtEnabled) {
       const clientId = config.clientId;
       const clientSecret = config.clientSecret;
 
       logger.info('going to refresh token (hosted-login mode) (secure-jwt mode)');
-      return await api.refreshTokenHostedLogin(headers, tokens.refreshToken, clientId, clientSecret);
+      return await api.refreshTokenHostedLogin(headers, tokens.refreshToken, clientId, clientSecret, clientIp);
     } else {
-      logger.info('going to refresh token (hosted-login mode) ', tokens.refreshToken);
-      return await api.refreshTokenHostedLogin(headers, tokens.refreshToken);
+      logger.info('going to refresh token (hosted-login mode)');
+      return await api.refreshTokenHostedLogin(headers, tokens.refreshToken, undefined, undefined, clientIp);
     }
   } catch (e) {
     logger.error(e);

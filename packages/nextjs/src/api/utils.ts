@@ -3,6 +3,10 @@ import sdkVersion from '../sdkVersion';
 import nextjsPkg from 'next/package.json';
 import { fronteggAuthApiRoutesRegex } from '@frontegg/rest-api';
 import { headerCharRegex } from '../utils/common/constants';
+import type { NextApiRequest } from 'next';
+import type { IpResolverFunction } from '../middleware/types';
+import { isCloudflareIp, normalizeIp } from '../utils/clientIp';
+import fronteggLogger from '../utils/fronteggLogger';
 
 interface GetRequestOptions {
   url: string;
@@ -56,8 +60,12 @@ export const FRONTEGG_VENDOR_ID_HEADER = 'frontegg-vendor-id';
 /**
  * Build fetch request headers, remove invalid http headers
  * @param headers - Incoming request headers
+ * @param clientIp - Client IP to forward, see {@link resolveTrustedClientIp}
  */
-export function buildRequestHeaders(headers: Record<string, any>): Record<string, string> {
+export function buildRequestHeaders(
+  headers: Record<string, any>,
+  clientIp: string | undefined
+): Record<string, string> {
   let cookie = headers['cookie'];
   if (cookie != null && typeof cookie === 'string') {
     cookie = cookie.replace(/fe_session-[^=]*=[^;]*$/, '').replace(/fe_session-[^=]*=[^;]*;/, '');
@@ -108,10 +116,6 @@ export function buildRequestHeaders(headers: Record<string, any>): Record<string
   if (headers[FRONTEGG_APPLICATION_ID_HEADER]) {
     preparedHeaders[FRONTEGG_APPLICATION_ID_HEADER] = headers[FRONTEGG_APPLICATION_ID_HEADER];
   }
-
-  const clientIp = getClientIp(
-    headers[FRONTEGG_FORWARD_IP_HEADER] || headers['cf-connecting-ip'] || headers['x-forwarded-for']
-  );
 
   if (clientIp && config.shouldForwardIp) {
     preparedHeaders[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
@@ -184,4 +188,61 @@ export function getClientIp(rawIp?: string | string[] | null): string | undefine
   if (!rawIp) return undefined;
   const ip = Array.isArray(rawIp) ? rawIp[0] : rawIp;
   return ip.split(',')[0].trim();
+}
+
+function splitIps(rawIps?: string | string[] | null): string[] {
+  const joinedIps = Array.isArray(rawIps) ? rawIps.join(',') : (rawIps ?? '');
+  return joinedIps
+    .split(',')
+    .map((ip) => ip.trim())
+    .filter(Boolean);
+}
+
+export function headersToRecord(headers?: Headers | Record<string, any>): Record<string, any> {
+  if (!headers || typeof headers !== 'object') {
+    return {};
+  }
+  if (typeof headers.get !== 'function') {
+    return { ...headers };
+  }
+  const record: Record<string, any> = {};
+  (headers as Headers).forEach((value, key) => {
+    record[key] = value;
+  });
+  return record;
+}
+
+export type ClientIpRequest = { headers: Record<string, any> };
+
+const clientIpLogger = fronteggLogger.child({ tag: 'resolveTrustedClientIp' });
+
+function resolveWithIpResolver(ipResolver: IpResolverFunction, request: NextApiRequest): string | undefined {
+  try {
+    const resolvedIp: unknown = ipResolver(request);
+    return typeof resolvedIp === 'string' ? getClientIp(resolvedIp) : undefined;
+  } catch (e) {
+    clientIpLogger.error('ipResolver failed to resolve the client ip', e);
+    return undefined;
+  }
+}
+
+/** Resolves the client IP from the middleware's ipResolver, or from FRONTEGG_CLIENT_IP_HEADER, or on Vercel from its x-forwarded-for. */
+export function resolveTrustedClientIp(request: ClientIpRequest, ipResolver?: IpResolverFunction): string | undefined {
+  if (!config.shouldForwardIp) {
+    return undefined;
+  }
+  if (ipResolver) {
+    return normalizeIp(resolveWithIpResolver(ipResolver, request as NextApiRequest));
+  }
+  if (config.clientIpHeader) {
+    return normalizeIp(splitIps(request.headers[config.clientIpHeader]).pop());
+  }
+  if (!config.isVercel) {
+    return undefined;
+  }
+  const vercelClientIp = normalizeIp(getClientIp(request.headers['x-forwarded-for']));
+  if (!vercelClientIp || !isCloudflareIp(vercelClientIp)) {
+    return vercelClientIp;
+  }
+  return normalizeIp(getClientIp(request.headers['cf-connecting-ip']));
 }

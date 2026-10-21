@@ -3,6 +3,7 @@ import type { IncomingMessage } from 'http';
 import CookieManager from '../utils/cookies';
 import config from '../config';
 import api from '../api';
+import { headersToRecord, resolveTrustedClientIp } from '../api/utils';
 import fronteggLogger from '../utils/fronteggLogger';
 import JwtManager from '../utils/jwt';
 import encryptionEdge from '../utils/encryption-edge';
@@ -20,20 +21,17 @@ export async function refreshAccessTokenIfNeededOnEdge(
 
   logger.info('going to refresh token');
 
-  const reqHeaders = req.headers as any as Map<string, string>;
-  const headers: Record<string, string> = {};
-  reqHeaders.forEach((value: string, key: string) => {
-    headers[key] = value;
-  });
+  const headers = headersToRecord(req.headers);
+  const clientIp = resolveTrustedClientIp({ headers });
   const clientId = config.clientId;
   const clientSecret = config.clientSecret;
 
   let response: Response | null;
   try {
     if (config.isHostedLogin) {
-      response = await api.refreshTokenHostedLogin(headers, refreshCookie, clientId, clientSecret);
+      response = await api.refreshTokenHostedLogin(headers, refreshCookie, clientId, clientSecret, clientIp);
     } else {
-      response = await api.refreshTokenEmbedded(headers);
+      response = await api.refreshTokenEmbedded(headers, clientIp);
     }
   } catch (e) {
     logger.error('Failed to refresh token', e);

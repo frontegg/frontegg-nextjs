@@ -8,6 +8,7 @@ import config from '../config';
 import { isFronteggLogoutUrl } from './helpers';
 import CookieManager from '../utils/cookies';
 import { getTokensFromCookie } from '../common';
+import { resolveTrustedClientIp } from '../api/utils';
 
 const handleCors = (req: NextApiRequest, res: NextApiResponse, corsOptions?: CorsOptions) => {
   if (!corsOptions) return;
@@ -63,16 +64,12 @@ const middlewarePromise = (req: NextApiRequest, res: NextApiResponse, options?: 
       }
     }
 
-    if (options?.ipResolver) {
-      config.ipResolver = options.ipResolver;
-    }
-
     handleCors(req, res, options?.cors);
 
-    FronteggProxy.web(req, res, {
-      ...proxyOptions,
-      headers,
-    });
+    // Resolved before http-proxy appends the socket address to x-forwarded-for
+    const clientIp = resolveTrustedClientIp(req, options?.ipResolver);
+    const fronteggProxyOptions = { ...proxyOptions, headers, clientIp };
+    FronteggProxy.web(req, res, fronteggProxyOptions);
   });
 
 /**

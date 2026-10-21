@@ -1,3 +1,5 @@
+import { FRONTEGG_FORWARD_IP_HEADER, FRONTEGG_HEADERS_VERIFIER_HEADER, FRONTEGG_VENDOR_ID_HEADER } from '../api/utils';
+
 export const fronteggPathRewrite = [
   {
     patternStr: '^/api/',
@@ -33,4 +35,7 @@ export const headersToRemove = [
   'feature-policy',
   'l5d-client-id',
   'x-webkit-csp',
+  FRONTEGG_FORWARD_IP_HEADER,
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_VENDOR_ID_HEADER,
 ];

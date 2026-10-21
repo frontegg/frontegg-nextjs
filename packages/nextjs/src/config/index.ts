@@ -1,7 +1,6 @@
 import { AuthPageRoutes } from '@frontegg/redux-store';
 import { WithFronteggAppOptions } from '../pages';
 import { AppEnvConfig, PasswordsMap } from './types';
-import { IpResolverFunction } from '../middleware/types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
 import { EnvVariables } from './constants';
 import { FronteggEnvNotFound, InvalidFronteggEnv } from '../utils/errors';
@@ -23,6 +22,7 @@ const setupEnvVariables = {
   FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
   FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL: process.env.FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL,
   FRONTEGG_FORWARD_IP: process.env.FRONTEGG_FORWARD_IP,
+  FRONTEGG_CLIENT_IP_HEADER: process.env.FRONTEGG_CLIENT_IP_HEADER,
   FRONTEGG_SSG_EXPORT: process.env.FRONTEGG_SSG_EXPORT,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
   VERCEL: process.env.VERCEL,
@@ -31,7 +31,6 @@ const setupEnvVariables = {
 
 class Config {
   public fronteggAppOptions: Partial<WithFronteggAppOptions> = {};
-  private _ipResolver?: IpResolverFunction;
 
   constructor() {
     if (!this.isSSGExport) {
@@ -123,6 +122,13 @@ class Config {
     return (
       getEnvOrDefault(EnvVariables.FRONTEGG_FORWARD_IP, setupEnvVariables.FRONTEGG_FORWARD_IP ?? 'false') === 'true'
     );
+  }
+
+  get clientIpHeader(): string | undefined {
+    return getEnvOrDefault(
+      EnvVariables.FRONTEGG_CLIENT_IP_HEADER,
+      setupEnvVariables.FRONTEGG_CLIENT_IP_HEADER
+    )?.toLowerCase();
   }
 
   get jwtPublicKeyJson(): string | undefined {
@@ -238,14 +244,6 @@ class Config {
       setupEnvVariables.DISABLE_INITIAL_PROPS_REFRESH_TOKEN
     );
     return disableInitialPropsRefreshToken === 'true';
-  }
-
-  get ipResolver(): IpResolverFunction | undefined {
-    return this._ipResolver;
-  }
-
-  set ipResolver(fn: IpResolverFunction | undefined) {
-    this._ipResolver = fn;
   }
 
   get appEnvConfig(): AppEnvConfig {
