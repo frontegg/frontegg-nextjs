@@ -26,32 +26,26 @@ const expectRouterBase = (element: ReactElement<RouterBaseProps>) => {
 
 describe('FronteggAppRouter', () => {
   it('renders the router synchronously for plain params (Next.js 13/14)', () => {
-    // Act
     const element = FronteggAppRouter({ params: LOGIN_PARAMS, searchParams: QUERY });
 
-    // Assert
     expectRouterBase(element as ReactElement<RouterBaseProps>);
   });
 
   it('awaits promise params and searchParams (Next.js 15+)', async () => {
-    // Act
     const result = FronteggAppRouter({ params: Promise.resolve(LOGIN_PARAMS), searchParams: Promise.resolve(QUERY) });
 
-    // Assert
     expect(result).toBeInstanceOf(Promise);
     expectRouterBase((await result) as ReactElement<RouterBaseProps>);
   });
 
   it('calls notFound for a non-auth route with plain params', () => {
-    // Act + Assert
+    // + Assert
     expect(() => FronteggAppRouter({ params: UNKNOWN_PARAMS, searchParams: {} })).toThrow(NOT_FOUND_ERROR);
   });
 
   it('rejects with notFound for a non-auth route with promise params', async () => {
-    // Act
     const result = FronteggAppRouter({ params: Promise.resolve(UNKNOWN_PARAMS), searchParams: Promise.resolve({}) });
 
-    // Assert
     await expect(result).rejects.toThrow(NOT_FOUND_ERROR);
   });
 });

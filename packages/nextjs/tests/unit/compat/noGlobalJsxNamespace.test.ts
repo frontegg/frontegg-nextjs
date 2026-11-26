@@ -26,13 +26,10 @@ const findGlobalJsxUsages = (filePath: string): string[] =>
 
 describe('React 19 type compatibility', () => {
   it('does not reference the global JSX namespace, which @types/react 19 removed', () => {
-    // Arrange
     const sourceFiles = listSourceFiles(SRC_DIR);
 
-    // Act
     const usages = sourceFiles.flatMap(findGlobalJsxUsages);
 
-    // Assert
     expect(usages).toEqual([]);
   });
 });

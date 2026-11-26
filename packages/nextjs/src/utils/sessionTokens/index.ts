@@ -1,7 +1,4 @@
-/**
- * Server-only: seals and unseals the session cookie with iron-session.
- * Client components must not import this module (see utils/encryption/index.browser.ts).
- */
+// Server-only session sealing; client components must not import this module.
 import type { FronteggUserTokens } from '../../types';
 import JwtManager from '../jwt';
 import encryption from '../encryption';

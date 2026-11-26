@@ -168,13 +168,12 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
   it('isHostedLogin + isOauthCallback removes cookies and continues', async () => {
     (config as any).isHostedLogin = true;
     mockedHelpers.isOauthCallback.mockReturnValue(true);
-    // refreshAccessTokenHostedLogin returns null → end with removeCookies + null
     mockedHelpers.refreshAccessTokenHostedLogin.mockResolvedValueOnce(null);
 
     const { req, res } = mockNextPageContext({ url: '/oauth/callback?code=1' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
-    // once for the callback itself, once more because the (null) refresh response failed
-    expect(mockedCookieManager.removeCookies).toHaveBeenCalledTimes(2);
+    // once for the callback itself; a refresh with no response keeps the remaining cookies
+    expect(mockedCookieManager.removeCookies).toHaveBeenCalledTimes(1);
     expect(mockedCookieManager.removeCookies).toHaveBeenNthCalledWith(1, {
       isSecured: true,
       cookieDomain: 'example.com',

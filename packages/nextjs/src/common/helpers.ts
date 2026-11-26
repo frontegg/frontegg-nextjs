@@ -1,7 +1,6 @@
 import type { ParsedUrlQuery } from 'querystring';
 
-// Client-safe helpers only: this module is imported by 'use client' components.
-// Server-only session helpers live in utils/sessionTokens.
+// Client-safe only ('use client' components import this); server session helpers live in utils/sessionTokens.
 
 export const getAfterAuthRedirectUrl = (queryParams: ParsedUrlQuery) => {
   const redirectPath = queryParams.redirectUrl;

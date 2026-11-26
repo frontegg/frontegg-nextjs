@@ -2,10 +2,7 @@ import { describe, it, expect } from 'vitest';
 import * as mainEntry from '../../../src';
 import { createSessionFromAccessToken, getTokensFromCookie } from '../../../src/utils/sessionTokens';
 
-/**
- * The main `@frontegg/nextjs` entry is imported by customers' client and server code alike.
- * Moving server-only helpers out of client paths must not drop anything from it.
- */
+/** Moving server-only helpers out of client paths must not drop anything from the main entry. */
 describe('@frontegg/nextjs main entry', () => {
   it.each([
     'FronteggBaseProvider',

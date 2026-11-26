@@ -3,16 +3,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-/**
- * Guards the client/server boundary at the source level. iron-session's crypto dependency
- * (@peculiar/webcrypto >= 1.6) imports `node:crypto`, which breaks `next build` as soon as
- * it lands in a client bundle. Two rules keep it out:
- *  1. 'use client' modules never import server-only packages, even transitively and even
- *     through a browser-stubbed module.
- *  2. Any other path from a client-reachable entry to iron-session goes through
- *     utils/encryption, which ships a browser stub (index.browser.ts, mapped through the
- *     `browser` field that scripts/copy-files.js writes).
- */
+/** 'use client' modules never reach server-only packages; shared entries reach iron-session only via the browser-stubbed module. */
 const SRC = path.resolve(__dirname, '../../../src');
 const SERVER_ONLY = /^(iron-session$|http-proxy|next\/headers|node:|fs$)/;
 const BROWSER_STUBBED = new Set([path.join(SRC, 'utils/encryption/index.ts')]);

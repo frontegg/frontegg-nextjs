@@ -49,8 +49,7 @@ async function createModulePackages({ from, to }) {
         // ? "./index.js"
         // : path.posix.join("../node", directoryPackage, "index.js"),
         types: "./index.d.ts",
-        // A folder with an index.browser.js (e.g. utils/encryption) ships a browser-safe build;
-        // bundlers use it for client code so server-only dependencies stay out of browser bundles.
+        // A folder with an index.browser.js ships a browser build that bundlers use for client code.
         ...((await fse.pathExists(path.join(to, directoryPackage, BROWSER_ENTRY)))
           ? { browser: `./${BROWSER_ENTRY}` }
           : {})
