@@ -111,7 +111,7 @@ test.skip(
 );
 ```
 
-Real-tenant tests run only in the nightly workflow (`.github/workflows/nightly-e2e.yml`) or manually via `workflow_dispatch`.
+Real-tenant tests run on every push (`push.yml`) and nightly (`.github/workflows/nightly-e2e.yml`).
 
 ## CI
 
@@ -122,6 +122,7 @@ Real-tenant tests run only in the nightly workflow (`.github/workflows/nightly-e
 3. Root-level `npx playwright test` for the `tests/middleware-test/` stress suite
 4. `npx playwright test --project=unit-playwright` in `packages/nextjs`
 5. `node scripts/prepare-e2e-env-file.js --force`, then `npx playwright test --project=e2e-mocked` in `packages/nextjs`
+6. `npx playwright test --project=e2e-real` in `packages/nextjs` against the tenant in the `FRONTEGG_BASE_URL` / `FRONTEGG_CLIENT_ID` repo secrets (fails if they are missing)
 
 `publish.yml` and `publish-prerelease.yml` run `yarn test` (vitest + `unit-playwright`) before tagging or publishing.
 

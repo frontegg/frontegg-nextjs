@@ -71,6 +71,22 @@ jobs:
       - name: Run mocked E2E (packages/nextjs)
         working-directory: packages/nextjs
         run: npx playwright test --project=e2e-mocked
+      # The mocked .env.local trusts a test JWT key; the real tenant's tokens must be verified against its own JWKS.
+      - name: Remove mocked E2E env
+        run: rm -f packages/example-app-directory/.env.local
+      - name: Run real-tenant E2E (packages/nextjs)
+        working-directory: packages/nextjs
+        env:
+          FRONTEGG_BASE_URL: ${{ secrets.FRONTEGG_BASE_URL }}
+          FRONTEGG_CLIENT_ID: ${{ secrets.FRONTEGG_CLIENT_ID }}
+          FRONTEGG_APP_URL: "http://localhost:3000"
+        run: |
+          # The specs skip themselves without these, which would look like a pass.
+          if [ -z "$FRONTEGG_BASE_URL" ] || [ -z "$FRONTEGG_CLIENT_ID" ]; then
+            echo "::error::FRONTEGG_BASE_URL and FRONTEGG_CLIENT_ID secrets are required for the real-tenant E2E"
+            exit 1
+          fi
+          npx playwright test --project=e2e-real
       - uses: actions/upload-artifact@v4
         if: always()
         with:
