@@ -14,6 +14,7 @@ import { sealData } from 'iron-session';
 import { SignJWT, importJWK } from 'jose';
 import type { Cookie } from '@playwright/test';
 import testPublicJwk from './test-public-jwk.json';
+import testPrivateJwk from './test-private-jwk.json';
 
 // ---------------------------------------------------------------------------
 // Test RSA key pair (2048-bit, generated for E2E tests only)
@@ -23,19 +24,7 @@ import testPublicJwk from './test-public-jwk.json';
 // into the example app's .env.local as FRONTEGG_JWT_PUBLIC_KEY.
 export const TEST_PUBLIC_JWK = testPublicJwk;
 
-const TEST_PRIVATE_JWK = {
-  kty: 'RSA',
-  n: 'lBbZk4BdWKe3aLYuTlhArlqooIklNzqsKP1IsLwxMY1x3dServG2TyFgl9O6uUVhccvim57moz3Qm0iVnRKBuSRXzWzCXKjoof1kZcJi9d5lPqWkR6aYjrEOhd13GhmpSWjneW5wOR-_M8-Sej2Bz5sP-ik6L7zz9h-iid4w5d6MbBxgWotk28tgR85HyPy9l5X5QZIOAAYW6rg5DanlnAzyQ4sDuJANBqFNrGNnkqyd-tzNp5kblf3ecpuWwe5sjvYR7tIMMHxnXtqSUs-Sq_ubr1ndtlCO5fokNJpg9j5XM2e6auynmBJLfjVKdmpudxabCaQ9DM651WKhKSX9AQ',
-  e: 'AQAB',
-  d: 'hHfsKQWqeqOMbR6KTYqkUVLHhNMpdz4EwqXPYEj3uFvOf6CyUcvmSOKShT3gydpGUIURMCP0LBIfiMhlDRyA7hyUbi3brwdpEX6ZUG2SGF3YMzH4wh9EWGAJnbV91Nsfk4tDhFxGBtNfNfl4DeD3Pb53jE9UvV9I2-Fwg-M92mDcsEqcMWXujU8E3kaP1ZViKRIpByMGPl2SFsrwlSa1fY9sOVu95-Rxo1aXbcEWCY-G6pNQvYXm3-MUcPal4FY-3hOXHI4DIy2-44y63E6tri-CnHAz6pi5-r3a2-iCS_91w4fsmYc2OF2w8pL3u7qTrlQC8Fo6yZsBo7nArMxx',
-  p: 'yXOcBTVSfMx3AuOEB8yOG8c6b7TO-7uVwxEb7svdZB2UkqfgqGw26EC2MVM1vy8VS6xIrAhbLsi6RQ7FVxYUTt9qlMRIzbKD8umNebJ7XhX9mfR1J6hZa4ATpY0Gdfg_8ooFXl6iFHcCb8hMUajLFOiNzXqCOWCZVyOL6hrG4N0',
-  q: 'vDA5mBauJZmuRtX8oj0bqezqRT9LZa9SWgygur7nAnQbrzhqrJwg24Q0osHf8mdW-FdoRijst9DakTKZyDwUHFbe0eqnSgPn0SswdPQhTBNZdjgn_lJhvQZa8SCTga4OUM5I_x2sCwa0SghWnwb5jaPhdhBnItFInsmdQ3bWmHU',
-  dp: 'QH4fg9dXShbXPviBi1GkaSY2Ag8beKHMRz_R9ngTr3p81xqhpKnIRkB5U381JLi5E5nbRiACuQ6P-43IBaJO7BVAdNIGELxG29yDa2OFdVCK-N-3JfQSdITzRTvJxrisGESxhU28i9qx0AGK1VW5dj8hLpg62o2fabM6lr7tzo0',
-  dq: 'vB3Y9Nd3Lc76D4VJDUTYqnxRkvc6f2NKhwmoggTjF-jI49cZi4JmtgjqNOho3P_ASG_XpIq0VutIEWzrnOWxlMKh6mUO5UYSLV1nCwIfZtTQ0QRBtlDTswjvT6qoyTEczlnnTl5y5HLHNlovfLiULapsboDnGD7swQ35Tr80tSE',
-  qi: 'eAcGGGtZEn7y-fD5yPc1a0xquhPoPiylT5koSWYwB258K7dvvQQY3uKhbXGfbXSosCuEgJDrVmKmh2iUORcP_2uyCqCchwo5PtQpMRUdlv-5pp3o1CBOXZYpY-VDd3Fk6NFeUYYV2LWm5YaMkjqpsJBBeSrmmHIN7Y_SgchQF84',
-  alg: 'RS256',
-  use: 'sig',
-};
+const TEST_PRIVATE_JWK = testPrivateJwk;
 
 // ---------------------------------------------------------------------------
 // JWT builder

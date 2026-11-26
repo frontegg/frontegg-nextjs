@@ -10,6 +10,7 @@ This package has two parallel test systems. Pick the right tool for the kind of 
 | Legacy unit/export  | Playwright | `tests/{middleware,utils,exports}/**/*.spec.ts` | `yarn test:e2e --project=unit-playwright` |
 | E2E mocked          | Playwright | `tests/e2e/mocked/**/*.spec.ts` | `yarn test:e2e --project=e2e-mocked` |
 | E2E real tenant     | Playwright | `tests/e2e/real/**/*.spec.ts`   | `yarn test:e2e --project=e2e-real`   |
+| E2E server flows    | Playwright | `tests/e2e/flows/**/*.spec.ts`  | `yarn test:e2e:flows`                |
 
 `yarn test` runs `test:unit` followed by the existing Playwright flow.
 
@@ -93,6 +94,23 @@ node scripts/prepare-e2e-env-file.js --force  # overwrite an existing .env.local
 
 `FRONTEGG_APP_URL`, `FRONTEGG_BASE_URL`, `FRONTEGG_CLIENT_ID` and `FRONTEGG_ENCRYPTION_PASSWORD` are taken from the environment when set; otherwise test defaults are used (random client ID and password, `https://demo.frontegg.com`). Playwright loads the same `.env.local`, so the tests and the app always agree. A few API-proxy specs pass through to `FRONTEGG_BASE_URL`, so they need network access to it.
 
+### Server-side flow E2E (mock Frontegg backend)
+
+The mocked suite above fakes Frontegg in the browser, so it never sees the calls the SDK makes from the Next.js server. `playwright.flows.config.ts` covers those: it starts `tests/e2e/mock-frontegg/server.js`, a small local stand-in for Frontegg (JWKS, token refresh, OAuth code exchange, user data, logout), and points example apps at it with `FRONTEGG_BASE_URL`:
+
+| Project | App | Covers |
+| ------- | --- | ------ |
+| `flows-embedded` | `example-app-directory` on :3100 | middleware session check and refresh, cookies forwarded to the app after a refresh, chunked sessions, rejected refresh, JWKS download, `/api/frontegg` proxy refresh and logout |
+| `flows-hosted` | `example-app-directory` on :3101, hosted login + secure JWT | full hosted login through `/oauth/authorize`, code exchange, refresh-token grant, hosted logout |
+| `flows-pages` | `example-pages` on :3102 | `withSSRSession`, `getSession`, initial-load refresh, refresh before `getServerSideProps`, no-SSR page, logout |
+
+Tests inspect what the server sent through the mock's control API (`GET /__mock/requests`, `POST /__mock/reset`, `POST /__mock/config` to fail refreshes or grow tokens); see `tests/e2e/flows/fixtures/mock-backend.ts`. The example app exposes two probe routes for these tests: `/e2e/session` (what the App Router helpers resolve) and `/e2e/request-cookies` (cookies the server code received).
+
+```bash
+yarn build                 # the example apps use the built SDK
+yarn test:e2e:flows        # in packages/nextjs
+```
+
 ### Writing a new mocked E2E test
 
 1. Create `tests/e2e/mocked/<scenario>.spec.ts`.
@@ -122,6 +140,7 @@ Real-tenant tests run only in the nightly workflow (`.github/workflows/nightly-e
 | Unit tests and coverage | `yarn test:unit:coverage` in `packages/nextjs`; fails below the thresholds in `vitest.config.ts`; uploads `coverage/` |
 | Playwright unit specs | `npx playwright test --project=unit-playwright` in `packages/nextjs` |
 | Mocked E2E | builds the SDK, runs `node scripts/prepare-e2e-env-file.js --force`, then `npx playwright test --project=e2e-mocked` |
+| Server-side flows E2E | builds the SDK, then `npx playwright test -c playwright.flows.config.ts` against the mock backend |
 | Middleware stress suite | builds the SDK, then root-level `npx playwright test` for `tests/middleware-test/` |
 | CI result | passes only if all of the above passed; mark this one as the required check |
 

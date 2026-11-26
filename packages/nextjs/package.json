@@ -31,6 +31,7 @@
     "test:e2e:unit": "PW_SKIP_WEBSERVER=1 playwright test --project=unit-playwright",
     "test:e2e:mocked": "playwright test --project=e2e-mocked",
     "test:e2e:real": "playwright test --project=e2e-real",
+    "test:e2e:flows": "playwright test -c playwright.flows.config.ts",
     "lint-json": "eslint -c .eslintrc.json -o ./lint-report.json --format json --no-color ./src/**/*.{ts,tsx}"
   },
   "dependencies": {
