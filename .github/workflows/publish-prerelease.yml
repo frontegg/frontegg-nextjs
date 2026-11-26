@@ -8,7 +8,8 @@ on:
 jobs:
   createReleasePullRequest:
     if: "!contains(join(github.event.pull_request.labels.*.name, ','), 'Release') && github.event.pull_request.merged == true"
-    runs-on: ubuntu-latest
+    # Pinned: the repo's Playwright version cannot install Chromium on ubuntu-latest (26.04).
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -25,6 +26,10 @@ jobs:
         run: |
           yarn install
           yarn build
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run tests
+        run: yarn test
       - name: Git Identity
         run: |
           git config --global user.name 'frontegg'
