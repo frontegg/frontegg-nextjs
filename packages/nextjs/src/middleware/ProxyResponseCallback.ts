@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 import { NextApiResponse } from 'next';
 import config from '../config';
 import CookieManager from '../utils/cookies';
-import { createSessionFromAccessToken } from '../common';
+import { createSessionFromAccessToken } from '../utils/sessionTokens';
 import {
   extractAccessToken,
   getHostedLogoutUrl,

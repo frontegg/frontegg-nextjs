@@ -4,11 +4,12 @@ import { createRoot, Root } from 'react-dom/client';
 
 const AppContext = vi.hoisted(() => ({ current: null as any }));
 
-vi.mock('../../../src', async () => {
+vi.mock('../../../src/common/AppContext', async () => {
   const react = await import('react');
   AppContext.current = react.createContext(null);
-  return { AppContext: AppContext.current, useSnapshot: (state: any) => state };
+  return { default: AppContext.current };
 });
+vi.mock('@frontegg/react-hooks', () => ({ useSnapshot: (state: any) => state }));
 vi.mock('@frontegg/redux-store', () => ({ createProxy: (state: any) => state }));
 
 import { useInviteUserDialog, useUsersTable } from '../../../src/common/cmc/hooks';

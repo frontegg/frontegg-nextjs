@@ -12,7 +12,7 @@ vi.mock('../../../../src/api', () => ({
   },
 }));
 
-vi.mock('../../../../src/common', () => ({
+vi.mock('../../../../src/utils/sessionTokens', () => ({
   getTokensFromCookie: vi.fn(),
   createSessionFromAccessToken: vi.fn(),
 }));
@@ -30,7 +30,7 @@ import {
   getForwardedSession,
 } from '../../../../src/utils/refreshAccessTokenIfNeeded/helpers';
 import api from '../../../../src/api';
-import { getTokensFromCookie } from '../../../../src/common';
+import { getTokensFromCookie } from '../../../../src/utils/sessionTokens';
 import config from '../../../../src/config';
 import CookieManager from '../../../../src/utils/cookies';
 import { FRONTEGG_FORWARDED_SESSION_KEY } from '../../../../src/utils/common/constants';

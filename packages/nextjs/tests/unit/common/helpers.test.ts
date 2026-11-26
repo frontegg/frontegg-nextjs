@@ -5,11 +5,8 @@ vi.mock('../../../src/utils/encryption', () => ({ default: { sealTokens: vi.fn()
 
 import JwtManager from '../../../src/utils/jwt';
 import encryption from '../../../src/utils/encryption';
-import {
-  createSessionFromAccessToken,
-  getAfterAuthRedirectUrl,
-  getTokensFromCookie,
-} from '../../../src/common/helpers';
+import { getAfterAuthRedirectUrl } from '../../../src/common/helpers';
+import { createSessionFromAccessToken, getTokensFromCookie } from '../../../src/utils/sessionTokens';
 
 const mockedVerify = vi.mocked(JwtManager.verify);
 const mockedSeal = vi.mocked(encryption.sealTokens);

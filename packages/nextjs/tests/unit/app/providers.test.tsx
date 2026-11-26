@@ -19,7 +19,9 @@ vi.mock('../../../src/config', () => ({
     appUrl: 'https://app.example.com',
   },
 }));
-vi.mock('../../../src/common', () => ({ FronteggBaseProvider: vi.fn((props: any) => props.children) }));
+vi.mock('../../../src/common/FronteggBaseProvider', () => ({
+  FronteggBaseProvider: vi.fn((props: any) => props.children),
+}));
 vi.mock('../../../src/common/FronteggRouterBase', () => ({ FronteggRouterBase: vi.fn(() => null) }));
 vi.mock('next/navigation', () => ({ useRouter: vi.fn(() => ({ push: vi.fn() })), notFound: vi.fn() }));
 vi.mock('../../../src/utils/fetchUserData', () => ({ default: vi.fn() }));
@@ -29,7 +31,7 @@ vi.mock('../../../src/app/getAppUrlForCustomLoginWithSubdomain', () => ({
 }));
 
 import config from '../../../src/config';
-import { FronteggBaseProvider } from '../../../src/common';
+import { FronteggBaseProvider } from '../../../src/common/FronteggBaseProvider';
 import { FronteggRouterBase } from '../../../src/common/FronteggRouterBase';
 import { notFound, useRouter } from 'next/navigation';
 import fetchUserData from '../../../src/utils/fetchUserData';

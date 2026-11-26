@@ -12,13 +12,13 @@ vi.mock('../../../src/config', () => ({ default: { ...CONFIG_BASE } }));
 vi.mock('../../../src/middleware/FronteggProxy', () => ({ FronteggProxy: { web: vi.fn() } }));
 vi.mock('../../../src/pages', () => ({ getSession: vi.fn() }));
 vi.mock('../../../src/utils/cookies', () => ({ default: { getSessionCookieFromRequest: vi.fn() } }));
-vi.mock('../../../src/common', () => ({ getTokensFromCookie: vi.fn() }));
+vi.mock('../../../src/utils/sessionTokens', () => ({ getTokensFromCookie: vi.fn() }));
 
 import config from '../../../src/config';
 import { FronteggProxy } from '../../../src/middleware/FronteggProxy';
 import { getSession } from '../../../src/pages';
 import CookieManager from '../../../src/utils/cookies';
-import { getTokensFromCookie } from '../../../src/common';
+import { getTokensFromCookie } from '../../../src/utils/sessionTokens';
 import { FronteggApiMiddleware } from '../../../src/middleware';
 
 const mockedWeb = vi.mocked(FronteggProxy.web);

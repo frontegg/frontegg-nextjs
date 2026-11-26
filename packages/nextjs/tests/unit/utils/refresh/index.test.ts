@@ -36,7 +36,7 @@ vi.mock('../../../../src/utils/encryption', () => ({
   default: { sealTokens: vi.fn(), unsealTokens: vi.fn() },
 }));
 
-vi.mock('../../../../src/common', () => ({
+vi.mock('../../../../src/utils/sessionTokens', () => ({
   createSessionFromAccessToken: vi.fn(),
   getTokensFromCookie: vi.fn(),
 }));
@@ -46,7 +46,7 @@ import config from '../../../../src/config';
 import CookieManager from '../../../../src/utils/cookies';
 import * as helpers from '../../../../src/utils/refreshAccessTokenIfNeeded/helpers';
 import createSession from '../../../../src/utils/createSession';
-import { createSessionFromAccessToken } from '../../../../src/common';
+import { createSessionFromAccessToken } from '../../../../src/utils/sessionTokens';
 import {
   FRONTEGG_FORWARD_IP_HEADER,
   FRONTEGG_HEADERS_VERIFIER_HEADER,

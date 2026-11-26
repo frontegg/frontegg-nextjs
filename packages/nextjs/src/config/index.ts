@@ -1,5 +1,5 @@
 import { AuthPageRoutes } from '@frontegg/redux-store';
-import { WithFronteggAppOptions } from '../pages';
+import type { WithFronteggAppOptions } from '../pages';
 import { AppEnvConfig, PasswordsMap } from './types';
 import { IpResolverFunction } from '../middleware/types';
 import { generateAppUrl, generateCookieDomain, getEnv, getEnvOrDefault, normalizeStringPasswordToMap } from './helpers';
