@@ -20,8 +20,7 @@ import testPrivateJwk from './test-private-jwk.json';
 // Test RSA key pair (2048-bit, generated for E2E tests only)
 // ---------------------------------------------------------------------------
 
-// The public half is shared with scripts/prepare-e2e-env-file.js, which writes it
-// into the example app's .env.local as FRONTEGG_JWT_PUBLIC_KEY.
+// Shared with scripts/prepare-e2e-env-file.js, which writes it into .env.local as FRONTEGG_JWT_PUBLIC_KEY.
 export const TEST_PUBLIC_JWK = testPublicJwk;
 
 const TEST_PRIVATE_JWK = testPrivateJwk;

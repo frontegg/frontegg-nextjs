@@ -1,15 +1,4 @@
-/**
- * Writes packages/example-app-directory/.env.local for the mocked E2E suite
- * (packages/nextjs/tests/e2e/mocked).
- *
- * The mocked tests forge session cookies signed with a test RSA key, so the
- * example app must trust that key (FRONTEGG_JWT_PUBLIC_KEY) and seal cookies
- * with the same encryption password the tests read back via dotenv.
- *
- * Values come from the environment when set, otherwise safe test defaults.
- * An existing .env.local is left alone unless --force is passed, so a
- * developer's real config is never overwritten by accident.
- */
+// Writes the example app's .env.local for mocked E2E (test JWT key + shared password); keeps an existing file unless --force.
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
