@@ -32,11 +32,9 @@ describe.each([
   ['encryption-edge', edgeEncryption],
 ])('%s', (_name, utils) => {
   it('round-trips tokens through sealTokens and unsealTokens', async () => {
-    // Act
     const sealed = await utils.sealTokens(TOKENS, ONE_HOUR_SEC);
     const unsealed = await utils.unsealTokens(sealed);
 
-    // Assert
     expect(unsealed).toEqual(TOKENS);
   });
 
@@ -64,26 +62,20 @@ describe.each([
   });
 
   it('does not return tokens when unsealing with a different password', async () => {
-    // Arrange
     const sealed = await utils.sealTokens(TOKENS, ONE_HOUR_SEC);
     mockConfig.password = { 1: PASSWORD_B };
 
-    // Act
     const result = await unsealOrUndefined(utils, sealed);
 
-    // Assert
     expect(result).toBeUndefined();
   });
 
   it('unseals a cookie sealed with a rotated-out password when it is still in the password map', async () => {
-    // Arrange
     const sealed = await utils.sealTokens(TOKENS, ONE_HOUR_SEC);
     mockConfig.password = { 2: PASSWORD_B, 1: PASSWORD_A };
 
-    // Act
     const result = await utils.unsealTokens(sealed);
 
-    // Assert
     expect(result).toEqual(TOKENS);
   });
 
@@ -97,16 +89,13 @@ describe.each([
   });
 
   it('does not return tokens after the seal ttl has expired', async () => {
-    // Arrange
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
     const sealed = await utils.sealTokens(TOKENS, ONE_HOUR_SEC);
     vi.setSystemTime(Date.now() + TWO_HOURS_MS);
 
-    // Act
     const result = await unsealOrUndefined(utils, sealed);
 
-    // Assert
     expect(result).toBeUndefined();
   });
 });

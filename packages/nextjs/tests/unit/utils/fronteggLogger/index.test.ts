@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { LEVELS, LEVEL_NAMES } from '../../../../src/utils/fronteggLogger/constants';
 
-/**
- * The global setup mocks the logger, so this file loads the real implementation
- * through vi.importActual after resetting the module registry. The log level is
- * computed at module load time from env vars, hence a fresh import per scenario.
- */
+/** setup.ts mocks the logger, so load the real one per scenario (its level is read from env at import). */
 type LoggerModule = typeof import('../../../../src/utils/fronteggLogger');
 
 const LOGGER_PATH = '../../../../src/utils/fronteggLogger';
@@ -68,13 +64,10 @@ describe('constants', () => {
 
 describe('FronteggLogger default level', () => {
   it('defaults to warn when no env vars are set', async () => {
-    // Arrange
     const Logger = await loadLogger();
 
-    // Act
     emitAll(Logger.child({ tag: 'test' }));
 
-    // Assert
     expect(emittedLevels()).toEqual({ debug: 0, info: 0, warn: 1, error: 1 });
   });
 
@@ -124,14 +117,11 @@ describe('FronteggLogger instance', () => {
   });
 
   it('prefixes messages with an ISO timestamp, the level label and the tag', async () => {
-    // Arrange
     const Logger = await loadLogger();
     const logger = Logger.child({ tag: 'MyTag', level: 'debug' });
 
-    // Act
     logger.info('hello', { a: 1 });
 
-    // Assert
     const [timestamp, prefix, ...rest] = consoleSpies.info.mock.calls[0];
     expect(timestamp).toMatch(ISO_DATE);
     expect(prefix).toBe(`|INFO| ${' '.repeat(20)}MyTag:`);
@@ -172,14 +162,11 @@ describe('FronteggLogger instance', () => {
   });
 
   it('truncates long tags to 25 characters keeping the head and the tail', async () => {
-    // Arrange
     const Logger = await loadLogger();
     const longTag = 'SessionCreator.createSession.extra';
 
-    // Act
     Logger.child({ tag: longTag }).error('x');
 
-    // Assert
     const tag = (consoleSpies.error.mock.calls[0][1] as string).replace('|ERROR| ', '').replace(/:$/, '');
     expect(tag).toHaveLength(25);
     expect(tag).toBe(`${longTag.slice(0, 7)}...${longTag.slice(-15)}`);

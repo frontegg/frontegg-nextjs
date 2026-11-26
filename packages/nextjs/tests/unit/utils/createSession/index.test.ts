@@ -27,13 +27,10 @@ afterEach(() => {
 
 describe('createSession', () => {
   it('returns undefined without decrypting when the cookie is missing', async () => {
-    // Arrange
     const encryption = makeEncryption(async () => ({ accessToken: 'a' }));
 
-    // Act
     const result = await createSession(undefined, encryption);
 
-    // Assert
     expect(result).toBeUndefined();
     expect(encryption.unsealTokens).not.toHaveBeenCalled();
   });
@@ -64,15 +61,12 @@ describe('createSession', () => {
   });
 
   it('builds a session from the unsealed tokens and the verified jwt payload', async () => {
-    // Arrange
     const payload = { sub: 'user-1', email: 'u@example.com', exp: NOW_SEC + 600 };
     mockJwt.verify.mockResolvedValue({ payload, protectedHeader: { alg: 'RS256' } });
     const encryption = makeEncryption(async () => ({ accessToken: 'access', refreshToken: 'refresh' }));
 
-    // Act
     const result = await createSession('sealed-cookie', encryption);
 
-    // Assert
     expect(encryption.unsealTokens).toHaveBeenCalledWith('sealed-cookie');
     expect(mockJwt.verify).toHaveBeenCalledWith('access');
     expect(result).toEqual({ accessToken: 'access', refreshToken: 'refresh', user: payload });

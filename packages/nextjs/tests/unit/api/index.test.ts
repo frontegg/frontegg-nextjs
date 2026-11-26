@@ -32,14 +32,11 @@ afterEach(() => {
 
 describe('loadPublicKey', () => {
   it('fetches the jwks with force-cache and returns the first key', async () => {
-    // Arrange
     const keys = [{ kid: 'first' }, { kid: 'second' }];
     fetchMock.mockResolvedValue(jsonResponse({ keys }));
 
-    // Act
     const key = await api.loadPublicKey();
 
-    // Assert
     expect(fetchMock).toHaveBeenCalledWith(`${BASE}/.well-known/jwks.json`, { cache: 'force-cache' });
     expect(key).toEqual({ kid: 'first' });
   });
@@ -53,14 +50,11 @@ describe('loadPublicKey', () => {
 
 describe('refreshTokenEmbedded', () => {
   it('posts an empty body to the embedded refresh endpoint with built headers', async () => {
-    // Arrange
     const response = jsonResponse({ accessToken: 'a' });
     fetchMock.mockResolvedValue(response);
 
-    // Act
     const result = await api.refreshTokenEmbedded({ cookie: 'fe_refresh_x=1', authorization: 'Bearer t' });
 
-    // Assert
     const [url, init] = lastCall();
     expect(url).toBe(`${BASE}/frontegg/identity/resources/auth/v1/user/token/refresh`);
     expect(init).toMatchObject({ method: 'POST', body: '{}', credentials: 'include' });
@@ -130,13 +124,10 @@ describe.each([
   ['getPublicSettings', getPublicSettings, `${BASE}/frontegg/tenants/resources/account-settings/v1/public`],
 ])('%s', (_name, fn, expectedUrl) => {
   it('sends a GET request with built headers to the expected endpoint', async () => {
-    // Arrange
     fetchMock.mockResolvedValue(jsonResponse({}));
 
-    // Act
     await (fn as (h: Record<string, string>) => Promise<unknown>)({ authorization: 'Bearer abc' });
 
-    // Assert
     const [url, init] = lastCall();
     expect(url).toBe(expectedUrl);
     expect(init.method).toBe('GET');

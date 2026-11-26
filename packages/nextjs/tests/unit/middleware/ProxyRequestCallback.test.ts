@@ -53,7 +53,6 @@ beforeEach(() => {
 
 describe('ProxyRequestCallback cookies', () => {
   it('forwards only fe_ cookies that are not the session cookie', () => {
-    // Arrange
     mockedParseCookies.mockReturnValue({
       fe_refresh_abc: 'refresh',
       fe_device_abc: 'device',
@@ -63,10 +62,8 @@ describe('ProxyRequestCallback cookies', () => {
     });
     const proxyReq = createProxyReq();
 
-    // Act
     invoke(proxyReq, createReq());
 
-    // Assert
     expect(proxyReq.headers['cookie']).toBe('fe_refresh_abc=refresh; fe_device_abc=device; ');
   });
 
@@ -79,15 +76,12 @@ describe('ProxyRequestCallback cookies', () => {
   });
 
   it('renames app id based cookies to client id based cookies when rewriting by app id', () => {
-    // Arrange
     Object.assign(config, { rewriteCookieByAppId: true, appId: 'app-id-99', clientId: 'client-id-1234' });
     mockedParseCookies.mockReturnValue({ 'fe_refresh_appid-99': 'r', fe_device_appid99: 'd' });
     const proxyReq = createProxyReq();
 
-    // Act
     invoke(proxyReq, createReq());
 
-    // Assert
     expect(proxyReq.headers['cookie']).toBe('fe_refresh_clientid-1234=r; fe_device_clientid1234=d; ');
   });
 
@@ -135,16 +129,13 @@ describe('ProxyRequestCallback headers', () => {
 
 describe('ProxyRequestCallback client ip forwarding', () => {
   it('forwards the ip from a custom ip resolver when forwarding is enabled', () => {
-    // Arrange
     const ipResolver = vi.fn(() => '10.0.0.1');
     Object.assign(config, { ipResolver, shouldForwardIp: true, sharedSecret: 'shh' });
     const proxyReq = createProxyReq();
     const req = createReq();
 
-    // Act
     invoke(proxyReq, req);
 
-    // Assert
     expect(ipResolver).toHaveBeenCalledWith(req);
     expect(proxyReq.headers['x-frontegg-forwarded-for']).toBe('10.0.0.1');
     expect(proxyReq.headers['x-frontegg-headers-verifier']).toBe('shh');
@@ -200,14 +191,11 @@ describe('ProxyRequestCallback client ip forwarding', () => {
 
 describe('ProxyRequestCallback body', () => {
   it('re-serializes a parsed body as json for non GET requests', () => {
-    // Arrange
     const proxyReq = createProxyReq();
     const body = { email: 'ü@example.com' };
 
-    // Act
     invoke(proxyReq, createReq({ method: 'POST', body }));
 
-    // Assert
     const serialized = JSON.stringify(body);
     expect(proxyReq.headers['Content-Type']).toBe('application/json');
     expect(proxyReq.headers['Content-Length']).toBe(Buffer.byteLength(serialized));

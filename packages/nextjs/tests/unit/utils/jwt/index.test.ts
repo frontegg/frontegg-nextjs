@@ -55,15 +55,12 @@ beforeEach(() => {
 
 describe('JwtManager.verify with FRONTEGG_JWT_PUBLIC_KEY', () => {
   it('verifies a token signed by the configured public key and returns its payload', async () => {
-    // Arrange
     mockConfig.jwtPublicKeyJson = JSON.stringify(publicJwk);
     const JwtManager = await loadJwtManager();
     const token = await signToken(signingKey, { tenantId: 't-1' });
 
-    // Act
     const { payload, protectedHeader } = await JwtManager.verify(token);
 
-    // Assert
     expect(payload).toMatchObject({ sub: 'user-1', email: 'user@example.com', tenantId: 't-1' });
     expect(protectedHeader.alg).toBe(ALG);
     expect(mockApi.loadPublicKey).not.toHaveBeenCalled();
@@ -94,16 +91,14 @@ describe('JwtManager.verify with FRONTEGG_JWT_PUBLIC_KEY', () => {
   });
 
   it('caches the imported public key across verify calls', async () => {
-    // Arrange
     mockConfig.jwtPublicKeyJson = JSON.stringify(publicJwk);
     const JwtManager = await loadJwtManager();
     await JwtManager.verify(await signToken(signingKey));
     mockConfig.jwtPublicKeyJson = JSON.stringify(otherPublicJwk);
 
-    // Act
     const result = await JwtManager.verify(await signToken(signingKey));
 
-    // Assert: the first key is still used even though config changed
+    // the first key is still used even though config changed
     expect(result.payload.sub).toBe('user-1');
     await expect(JwtManager.verify(await signToken(otherSigningKey))).rejects.toThrow();
   });
@@ -111,15 +106,12 @@ describe('JwtManager.verify with FRONTEGG_JWT_PUBLIC_KEY', () => {
 
 describe('JwtManager.verify with JWKS fallback', () => {
   it('loads the public key from frontegg jwks when the env value is not valid JSON', async () => {
-    // Arrange
     mockConfig.jwtPublicKeyJson = '{not json';
     mockApi.loadPublicKey.mockResolvedValue(publicJwk);
     const JwtManager = await loadJwtManager();
 
-    // Act
     const { payload } = await JwtManager.verify(await signToken(signingKey));
 
-    // Assert
     expect(payload.sub).toBe('user-1');
     expect(mockApi.loadPublicKey).toHaveBeenCalledTimes(1);
   });
@@ -136,20 +128,18 @@ describe('JwtManager.verify with JWKS fallback', () => {
   });
 
   it('propagates jwks loading failures and retries on the next call', async () => {
-    // Arrange
     mockConfig.jwtPublicKeyJson = '{not json';
     mockApi.loadPublicKey.mockRejectedValueOnce(new Error('jwks unavailable')).mockResolvedValueOnce(publicJwk);
     const JwtManager = await loadJwtManager();
     const token = await signToken(signingKey);
 
-    // Act + Assert
+    // + Assert
     await expect(JwtManager.verify(token)).rejects.toThrow('jwks unavailable');
     await expect(JwtManager.verify(token)).resolves.toMatchObject({ payload: { sub: 'user-1' } });
     expect(mockApi.loadPublicKey).toHaveBeenCalledTimes(2);
   });
 
   it('works end-to-end with the real api.loadPublicKey and a mocked fetch', async () => {
-    // Arrange
     mockConfig.jwtPublicKeyJson = '{not json';
     const actualApi = await vi.importActual<typeof import('../../../../src/api')>('../../../../src/api');
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ keys: [publicJwk] })));
@@ -159,10 +149,8 @@ describe('JwtManager.verify with JWKS fallback', () => {
     const JwtManager = await loadJwtManager();
 
     try {
-      // Act
       const { payload } = await JwtManager.verify(await signToken(signingKey));
 
-      // Assert
       expect(payload.sub).toBe('user-1');
       expect(fetchMock).toHaveBeenCalledWith('https://auth.example.com/.well-known/jwks.json', {
         cache: 'force-cache',
@@ -173,12 +161,8 @@ describe('JwtManager.verify with JWKS fallback', () => {
     }
   });
 
-  /**
-   * When FRONTEGG_JWT_PUBLIC_KEY is unset, the real `config.jwtPublicKeyJson` getter throws
-   * (getEnv raises FronteggEnvNotFound) inside the same try block, which routes to the JWKS fallback.
-   */
+  /** With no FRONTEGG_JWT_PUBLIC_KEY the real config getter throws, which routes JwtManager to the JWKS fallback. */
   it('loads the public key from frontegg jwks when FRONTEGG_JWT_PUBLIC_KEY is unset', async () => {
-    // Arrange
     Object.defineProperty(mockConfig, 'jwtPublicKeyJson', {
       configurable: true,
       get: () => {
@@ -189,10 +173,8 @@ describe('JwtManager.verify with JWKS fallback', () => {
     const JwtManager = await loadJwtManager();
 
     try {
-      // Act
       const { payload } = await JwtManager.verify(await signToken(signingKey));
 
-      // Assert
       expect(payload.sub).toBe('user-1');
       expect(mockApi.loadPublicKey).toHaveBeenCalledTimes(1);
     } finally {

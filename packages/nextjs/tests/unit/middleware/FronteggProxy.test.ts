@@ -13,7 +13,6 @@ afterEach(() => {
 
 describe('FronteggProxy', () => {
   it('creates a self handled, origin changing proxy and wires the request and response callbacks', async () => {
-    // Arrange
     vi.stubEnv('FRONTEGG_BASE_URL', 'https://auth.example.com');
     const { createProxyServer } = (await import('http-proxy')) as any;
     const { default: ProxyRequestCallback } = await import('../../../src/middleware/ProxyRequestCallback');
@@ -27,10 +26,8 @@ describe('FronteggProxy', () => {
     }) as any);
     proxyServer.on.mockImplementation((...args: any[]) => onCalls.push(args));
 
-    // Act
     const { FronteggProxy } = await import('../../../src/middleware/FronteggProxy');
 
-    // Assert
     expect(FronteggProxy).toBe(proxyServer);
     expect(createCalls).toEqual([
       { target: 'https://auth.example.com', changeOrigin: true, selfHandleResponse: true, xfwd: true },

@@ -3,10 +3,8 @@ import { FronteggEnvNotFound, InvalidFronteggEnv } from '../../../../src/utils/e
 
 describe('FronteggEnvNotFound', () => {
   it('lists every missing variable name in the message', () => {
-    // Act
     const error = new FronteggEnvNotFound('FRONTEGG_BASE_URL', 'FRONTEGG_CLIENT_ID');
 
-    // Assert
     expect(error.message).toBe(
       'Missing one or more environment variables (FRONTEGG_BASE_URL, FRONTEGG_CLIENT_ID). add it to the .env.local file.'
     );

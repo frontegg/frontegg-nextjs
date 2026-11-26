@@ -31,10 +31,9 @@ describe('shouldByPassMiddleware', () => {
   });
 
   it('protects static files, images and favicon when their bypass is disabled', () => {
-    // Arrange
     const options = { bypassStaticFiles: false, bypassImageOptimization: false, bypassHeaderRequests: false };
 
-    // Act & Assert
+    // & Assert
     expect(shouldByPassMiddleware('/_next/static/a.js', headers(), options)).toBe(false);
     expect(shouldByPassMiddleware('/_next/image', headers(), options)).toBe(false);
     expect(shouldByPassMiddleware('/favicon.ico', headers(), options)).toBe(false);
@@ -70,10 +69,8 @@ describe('shouldByPassMiddleware', () => {
 
 describe('redirectToLogin', () => {
   it('redirects to the login route of the app url carrying the original path', () => {
-    // Act
     const response = redirectToLogin('/dashboard');
 
-    // Assert
     expect(response.status).toBe(307);
     expect(response.headers.get('location')).toBe(
       `https://app.example.com/account/login?redirectUrl=${encodeURIComponent('/dashboard')}`

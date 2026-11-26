@@ -8,10 +8,8 @@ import { buildLoginRoute, buildLogoutRoute } from '../../../src/api/urls';
 
 describe('buildLoginRoute', () => {
   it('builds the login route on the configured app url with an encoded redirectUrl', () => {
-    // Act
     const { asPath, asUrl } = buildLoginRoute('/dashboard?tab=1&x=a b');
 
-    // Assert
     expect(asPath).toBe('https://app.example.com/account/login?redirectUrl=%2Fdashboard%3Ftab%3D1%26x%3Da%20b');
     expect(asUrl.searchParams.get('redirectUrl')).toBe('/dashboard?tab=1&x=a b');
     expect(asUrl.pathname).toBe('/account/login');

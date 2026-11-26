@@ -41,9 +41,7 @@ const createRes = () => {
   }) as any;
 };
 
-/**
- * Resolves the middleware promise by simulating the proxy closing the response once it was handed the request.
- */
+/** Resolves the middleware promise by simulating the proxy closing the response once it was handed the request. */
 const run = async (handler: (req: any, res: any) => Promise<void>, req: any, res = createRes()) => {
   mockedWeb.mockImplementationOnce(((_req: any, response: any) => response.emit('close')) as any);
   await handler(req, res);
@@ -64,13 +62,10 @@ afterEach(() => {
 
 describe('FronteggApiMiddleware routing', () => {
   it('strips the /api prefix and proxies to the frontegg base url', async () => {
-    // Arrange
     const req = createReq('/api/frontegg/identity/resources/auth/v1/user');
 
-    // Act
     const { proxyOptions } = await run(FronteggApiMiddleware, req);
 
-    // Assert
     expect(req.url).toBe('/frontegg/identity/resources/auth/v1/user');
     expect(mockedWeb).toHaveBeenCalledWith(req, expect.anything(), {
       target: 'https://auth.example.com',
@@ -114,15 +109,12 @@ describe('FronteggApiMiddleware routing', () => {
 
 describe('FronteggApiMiddleware authorization header', () => {
   it('adds the session access token when secure jwt is enabled', async () => {
-    // Arrange
     vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedGetSession.mockResolvedValue({ accessToken: 'session-token' } as any);
     const req = createReq('/api/frontegg/user');
 
-    // Act
     const { res, proxyOptions } = await run(FronteggApiMiddleware, req);
 
-    // Assert
     expect(mockedGetSession).toHaveBeenCalledWith(req, res);
     expect(proxyOptions.headers).toEqual({ authorization: 'Bearer session-token' });
   });
@@ -143,15 +135,12 @@ describe('FronteggApiMiddleware authorization header', () => {
   });
 
   it('authorizes hosted logout with tokens from the session cookie', async () => {
-    // Arrange
     Object.assign(config, { isHostedLogin: true });
     mockedGetSessionCookie.mockReturnValue('sealed-cookie');
     mockedGetTokensFromCookie.mockResolvedValue({ accessToken: 'cookie-token', refreshToken: 'r' });
 
-    // Act
     const { proxyOptions } = await run(FronteggApiMiddleware, createReq('/api/frontegg/oauth/logout'));
 
-    // Assert
     expect(mockedGetTokensFromCookie).toHaveBeenCalledWith('sealed-cookie');
     expect(proxyOptions.headers).toEqual({ authorization: 'Bearer cookie-token' });
   });
@@ -195,16 +184,13 @@ describe('FronteggApiMiddleware.withOptions', () => {
   });
 
   it('applies the cors defaults to internal requests from an allowed origin', async () => {
-    // Arrange
     const req = createReq('/api/frontegg/user', { host: 'app.example.com', origin: 'https://site.example.com' });
 
-    // Act
     const { res } = await run(
       FronteggApiMiddleware.withOptions({ cors: { allowedOrigins: ['https://site.example.com'] } }),
       req
     );
 
-    // Assert
     expect(res.headers).toEqual({
       'Access-Control-Allow-Origin': 'https://site.example.com',
       'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH,OPTIONS',

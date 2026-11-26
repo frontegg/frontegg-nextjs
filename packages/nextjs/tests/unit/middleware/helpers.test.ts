@@ -28,17 +28,14 @@ beforeEach(() => {
 
 describe('rewritePath', () => {
   it('rewrites the first matching pattern from an array of rules', () => {
-    // Arrange
     const rules = [
       { patternStr: '^/nope/', replaceStr: '/x/' },
       { patternStr: '^/api/', replaceStr: '/' },
       { patternStr: '^/api/frontegg', replaceStr: '/never' },
     ];
 
-    // Act
     const result = rewritePath('/api/frontegg/identity', rules);
 
-    // Assert
     expect(result).toBe('/frontegg/identity');
   });
 
@@ -89,10 +86,8 @@ describe('logout url predicates', () => {
 
 describe('getHostedLogoutUrl', () => {
   it('defaults the post logout redirect to the app url', () => {
-    // Act
     const { asPath } = getHostedLogoutUrl();
 
-    // Assert
     expect(asPath).toBe(
       `https://auth.example.com/oauth/logout?post_logout_redirect_uri=${encodeURIComponent('https://app.example.com/')}`
     );
@@ -164,7 +159,6 @@ describe('removeJwtSignatureFrom', () => {
   });
 
   it('redacts header and signature of top level jwts and drops refresh tokens', () => {
-    // Arrange
     const body = {
       accessToken: jwt('p1'),
       access_token: jwt('p2'),
@@ -175,10 +169,8 @@ describe('removeJwtSignatureFrom', () => {
       other: 'kept',
     };
 
-    // Act
     const result: any = removeJwtSignatureFrom(body);
 
-    // Assert
     expect(result).toEqual({
       accessToken: 'REDACTED_FOR_SECURITY.p1.REDACTED_FOR_SECURITY',
       access_token: 'REDACTED_FOR_SECURITY.p2.REDACTED_FOR_SECURITY',

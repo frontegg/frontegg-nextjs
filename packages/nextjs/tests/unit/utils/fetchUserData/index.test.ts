@@ -54,23 +54,18 @@ afterEach(() => {
 
 describe('fetchUserData', () => {
   it('returns an empty object and makes no api calls when there is no session', async () => {
-    // Arrange
     const getHeaders = vi.fn();
 
-    // Act
     const result = await fetchUserData({ getSession: vi.fn().mockResolvedValue(null), getHeaders });
 
-    // Assert
     expect(result).toEqual({});
     expect(getHeaders).not.toHaveBeenCalled();
     expect(mockApi.getMe).not.toHaveBeenCalled();
   });
 
   it('merges session, profile, authorization and entitlements into the user and returns tenants', async () => {
-    // Act
     const result = await run();
 
-    // Assert
     expect(result).toEqual({
       session: SESSION,
       user: {
@@ -86,10 +81,8 @@ describe('fetchUserData', () => {
   });
 
   it('calls every endpoint with the request headers plus a bearer authorization header', async () => {
-    // Act
     await run({ cookie: 'a=1', authorization: 'Bearer old' });
 
-    // Assert
     const expected = { cookie: 'a=1', authorization: 'Bearer access-token' };
     [mockApi.getMe, mockApi.getTenants, mockApi.getEntitlements, mockApi.getMeAuthorization].forEach((fn) => {
       expect(fn).toHaveBeenCalledTimes(1);

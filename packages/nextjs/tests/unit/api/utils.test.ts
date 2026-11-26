@@ -46,13 +46,10 @@ afterEach(() => {
 
 describe('Get', () => {
   it('sends a GET request with credentials included by default', async () => {
-    // Arrange
     const headers = { a: 'b' };
 
-    // Act
     await Get({ url: 'https://x.test/path', headers });
 
-    // Assert
     expect(fetchMock).toHaveBeenCalledWith('https://x.test/path', {
       method: 'GET',
       credentials: 'include',
@@ -138,7 +135,6 @@ describe('removeInvalidHeaders', () => {
 
 describe('buildRequestHeaders', () => {
   it('forwards known request headers and adds frontegg sdk identification headers', () => {
-    // Arrange
     const incoming = {
       authorization: 'Bearer token',
       'accept-encoding': 'gzip',
@@ -149,10 +145,8 @@ describe('buildRequestHeaders', () => {
       'x-not-forwarded': 'dropped',
     };
 
-    // Act
     const result = buildRequestHeaders(incoming);
 
-    // Assert
     expect(result).toEqual({
       authorization: 'Bearer token',
       'accept-encoding': 'gzip',
@@ -197,22 +191,14 @@ describe('buildRequestHeaders', () => {
       expect(result.cookie).toBe('fe_refresh_clientid=r1; other=x');
     });
 
-    /**
-     * SUSPECTED BUG (src/api/utils.ts buildRequestHeaders): the refresh cookie names are built with
-     * `id.replace('-', '')`, which strips only the FIRST dash, while src/utils/cookies uses
-     * `replace(/-/g, '')`. The ids below ('client-id', 'app-id') have a single dash, so these rewrite
-     * tests pass; with a real multi-dash UUID the rewrite would not match the browser's cookie names.
-     */
+    /** Known gap: rewrite uses `replace('-', '')` (first dash only); these single-dash ids hide it for real UUIDs. */
     it('renames the app refresh cookie to the client refresh cookie when rewriteCookieByAppId is on', () => {
-      // Arrange
       Object.assign(mockConfig, { rewriteCookieByAppId: true, appId: 'app-id' });
 
-      // Act
       const result = buildRequestHeaders({
         cookie: 'fe_refresh_clientid=stale; fe_refresh_appid=fresh; other=x',
       });
 
-      // Assert
       expect(result.cookie).toContain('fe_refresh_clientid=fresh');
       expect(result.cookie).not.toContain('stale');
       expect(result.cookie).not.toContain('fe_refresh_appid');
@@ -236,15 +222,12 @@ describe('buildRequestHeaders', () => {
     });
 
     it('drops the client refresh cookie and renames the app refresh cookie when rewriteCookieByAppId is on', () => {
-      // Arrange
       Object.assign(mockConfig, { rewriteCookieByAppId: true, appId: 'app-id' });
 
-      // Act
       const result = buildRequestHeaders({
         cookie: { a: '1', fe_refresh_clientid: 'stale', fe_refresh_appid: 'fresh' },
       });
 
-      // Assert
       expect(result.cookie).toBe('a=1; fe_refresh_clientid=fresh');
     });
   });
@@ -271,13 +254,10 @@ describe('buildRequestHeaders', () => {
     });
 
     it('forwards the first x-forwarded-for ip with verifier and vendor headers when enabled', () => {
-      // Arrange
       Object.assign(mockConfig, { shouldForwardIp: true });
 
-      // Act
       const result = buildRequestHeaders({ 'x-forwarded-for': '1.1.1.1, 2.2.2.2' });
 
-      // Assert
       expect(result[FRONTEGG_FORWARD_IP_HEADER]).toBe('1.1.1.1');
       expect(result[FRONTEGG_HEADERS_VERIFIER_HEADER]).toBe('shared-secret');
       expect(result[FRONTEGG_VENDOR_ID_HEADER]).toBe('client-id');
