@@ -141,6 +141,7 @@ Real-tenant tests run only in the nightly workflow (`.github/workflows/nightly-e
 | Playwright unit specs | `npx playwright test --project=unit-playwright` in `packages/nextjs` |
 | Mocked E2E | builds the SDK, runs `node scripts/prepare-e2e-env-file.js --force`, then `npx playwright test --project=e2e-mocked` |
 | Server-side flows E2E | builds the SDK, then `npx playwright test -c playwright.flows.config.ts` against the mock backend |
+| Fresh install build (4 jobs) | packs the SDK and installs it into a new App Router / Pages Router app on Next 14 and 15 **without the repo lockfile**, then `next build` (`scripts/fresh-install-smoke.js`); catches breaking transitive releases the lockfile hides |
 | Middleware stress suite | builds the SDK, then root-level `npx playwright test` for `tests/middleware-test/` |
 | CI result | passes only if all of the above passed; mark this one as the required check |
 
