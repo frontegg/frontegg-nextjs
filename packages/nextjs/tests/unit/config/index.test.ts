@@ -2,11 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { EnvVariables } from '../../../src/config/constants';
 import { clearFronteggEnv, loadConfig, restoreFronteggEnv, setEnv, unsetEnv, VALID_PASSWORD } from './envHelpers';
 
-/**
- * These tests run in jsdom, where `window` is defined, so the Config constructor
- * skips password validation. Server-side constructor behaviour is covered in
- * `index.server.test.ts`.
- */
+/** jsdom defines `window`, so password validation is skipped here; see index.server.test.ts. */
 
 const BASE_ENV = {
   FRONTEGG_APP_URL: 'https://app.example.com',
@@ -27,23 +23,20 @@ afterEach(() => {
 
 describe('config module', () => {
   it('re-exports EnvVariables from constants', async () => {
-    // Act
     vi.resetModules();
     const mod = await import('../../../src/config');
 
-    // Assert
     expect(mod.EnvVariables).toStrictEqual(EnvVariables);
     expect(mod.EnvVariables.FRONTEGG_APP_URL).toBe('FRONTEGG_APP_URL');
   });
 
   it('does not validate the encryption password in the browser (window defined)', async () => {
-    // Arrange: missing password would throw on the server
+    // missing password would throw on the server
     setEnv({ FRONTEGG_APP_URL: BASE_ENV.FRONTEGG_APP_URL });
 
-    // Act
     const config = await loadConfig();
 
-    // Assert: construction succeeded even though the password getter itself is invalid
+    // construction succeeded even though the password getter itself is invalid
     expect(config.appUrl).toBe(BASE_ENV.FRONTEGG_APP_URL);
     expect(() => config.password).toThrow(
       `Invalid environment variable (${EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD}), must be a valid Hex string.`
@@ -73,12 +66,11 @@ describe('Config.isSSGExport', () => {
   });
 
   it('falls back to the value captured at module load when the env is later removed', async () => {
-    // Arrange
     setEnv({ FRONTEGG_SSG_EXPORT: 'true' });
     const config = await loadConfig();
     unsetEnv(EnvVariables.FRONTEGG_SSG_EXPORT);
 
-    // Act + Assert
+    // + Assert
     expect(config.isSSGExport).toBe(true);
   });
 });
@@ -174,11 +166,7 @@ describe('Config.clientId', () => {
     expect(() => config.clientId).toThrow(`(${EnvVariables.FRONTEGG_CLIENT_ID})`);
   });
 
-  /**
-   * KNOWN BUG (src/config/index.ts:74): `getEnv(EnvVariables.FRONTEGG_CLIENT_ID ?? setupEnvVariables.FRONTEGG_CLIENT_ID)`
-   * applies `??` to the (always defined) env *name*, so the load-time snapshot is never used,
-   * unlike every other getter. This test describes the intended behaviour and is expected to fail.
-   */
+  /** Known bug (src/config/index.ts:74): `??` applies to the env name, so clientId never uses the load-time value. */
   it.fails('falls back to the value captured at module load when the env is later removed', async () => {
     setEnv(BASE_ENV);
     const config = await loadConfig();
@@ -299,13 +287,7 @@ describe('Config.jwtPublicKeyJson', () => {
     expect(config.jwtPublicKeyJson).toBe('{"kty":"RSA"}');
   });
 
-  /**
-   * JwtManager relies on this throw: it reads the getter inside a try block and falls back to
-   * downloading the JWKS from Frontegg when it throws. Returning undefined instead would make
-   * JwtManager parse '{}' and fail to import a key, so keep this behaviour (or change both together).
-   * Note: the `?? setupEnvVariables.FRONTEGG_JWT_PUBLIC_KEY` fallback in the getter is unreachable,
-   * because getEnv throws before `??` is evaluated.
-   */
+  /** JwtManager relies on this throw to fall back to the JWKS download; change both together. */
   it('throws FronteggEnvNotFound when FRONTEGG_JWT_PUBLIC_KEY is not set', async () => {
     setEnv(BASE_ENV);
     const config = await loadConfig();
@@ -400,11 +382,10 @@ describe('Config.authRoutes', () => {
   });
 
   it('returns routes from fronteggAppOptions.authOptions.routes', async () => {
-    // Arrange
     const config = await loadConfig();
     config.fronteggAppOptions = { authOptions: { routes: { loginUrl: '/custom-login' } } };
 
-    // Act + Assert
+    // + Assert
     expect(config.authRoutes).toEqual({ loginUrl: '/custom-login' });
   });
 
@@ -488,15 +469,12 @@ describe('Config.disableInitialPropsRefreshToken', () => {
 
 describe('Config.ipResolver', () => {
   it('is undefined by default and returns the resolver once set', async () => {
-    // Arrange
     const config = await loadConfig();
     const resolver = vi.fn(() => '1.2.3.4');
 
-    // Act
     const before = config.ipResolver;
     config.ipResolver = resolver;
 
-    // Assert
     expect(before).toBeUndefined();
     expect(config.ipResolver).toBe(resolver);
   });
@@ -513,7 +491,6 @@ describe('Config.ipResolver', () => {
 
 describe('Config.appEnvConfig', () => {
   it('collects the client-side env config from the individual getters', async () => {
-    // Arrange
     setEnv({
       ...BASE_ENV,
       FRONTEGG_APP_ID: 'app-id-1',
@@ -522,10 +499,8 @@ describe('Config.appEnvConfig', () => {
     });
     const config = await loadConfig();
 
-    // Act
     const appEnvConfig = config.appEnvConfig;
 
-    // Assert
     expect(appEnvConfig).toEqual({
       envAppUrl: 'https://app.example.com',
       envBaseUrl: 'https://tenant.frontegg.com',

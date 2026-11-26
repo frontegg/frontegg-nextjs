@@ -27,10 +27,7 @@ import initializeFronteggApp from '../../../../src/utils/initializeFronteggApp';
 import { CommonUrls } from '../../../../src/utils/common/urls';
 import { baseOptions, lastStoreContext } from './fixtures';
 
-/**
- * On the server there is no `window`, so the interceptor cannot compare origins and
- * applies the excluded-path rule to every absolute URL.
- */
+/** Without `window` the interceptor can't compare origins, so the excluded-path rule applies to every absolute URL. */
 describe('initializeFronteggApp beforeRequestInterceptor on the server', () => {
   beforeEach(() => {
     mocks.createStore.mockReturnValue({});
@@ -38,15 +35,13 @@ describe('initializeFronteggApp beforeRequestInterceptor on the server', () => {
   });
 
   it('strips authorization headers for excluded paths on any origin', () => {
-    // Arrange: guard that this file really runs without a window (otherwise the origin check applies)
+    // guard that this file really runs without a window (otherwise the origin check applies)
     expect(typeof window).toBe('undefined');
     const context = lastStoreContext(mocks.createStore);
     const url = `https://any-origin.example.com${CommonUrls.refreshToken.hosted}`;
 
-    // Act
     const result = context.beforeRequestInterceptor({ headers: { authorization: 'Bearer a', other: 'x' } }, url);
 
-    // Assert
     expect(result).toEqual({ headers: { other: 'x' }, url });
   });
 

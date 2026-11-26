@@ -18,22 +18,17 @@ beforeEach(() => {
 
 describe('getAuthRoutes', () => {
   it('returns the default routes as both an object and an array of paths', () => {
-    // Act
     const { routesObj, routesArr } = getAuthRoutes();
 
-    // Assert
     expect(routesObj).toEqual(defaultFronteggRoutes);
     expect(routesArr).toEqual(Object.values(defaultFronteggRoutes));
   });
 
   it('merges config.authRoutes overrides on top of the defaults', () => {
-    // Arrange
     mockConfig.authRoutes = { loginUrl: '/sign-in', customUrl: '/custom' };
 
-    // Act
     const { routesObj, routesArr } = getAuthRoutes();
 
-    // Assert
     expect(routesObj.loginUrl).toBe('/sign-in');
     expect(routesObj.customUrl).toBe('/custom');
     expect(routesObj.logoutUrl).toBe(defaultFronteggRoutes.logoutUrl);
@@ -109,14 +104,13 @@ describe('isAuthRoute (hosted login)', () => {
   );
 
   it('honors overridden login, logout and hosted callback routes', () => {
-    // Arrange
     mockConfig.authRoutes = {
       loginUrl: '/sign-in',
       logoutUrl: '/sign-out',
       hostedLoginRedirectUrl: '/auth/cb',
     };
 
-    // Act + Assert
+    // + Assert
     expect(isAuthRoute('/sign-in')).toBe(true);
     expect(isAuthRoute('/sign-out')).toBe(true);
     expect(isAuthRoute('/auth/cb')).toBe(true);

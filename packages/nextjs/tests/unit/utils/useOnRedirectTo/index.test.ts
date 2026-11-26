@@ -37,14 +37,11 @@ afterEach(() => {
 
 describe('useOnRedirectTo', () => {
   it('pushes the path through the router by default', () => {
-    // Arrange
     const router = createRouter();
     const { result } = renderOnRedirectTo({ baseName: '', router });
 
-    // Act
     result.current('/dashboard');
 
-    // Assert
     expect(router.push).toHaveBeenCalledWith('/dashboard');
     expect(router.replace).not.toHaveBeenCalled();
   });
@@ -114,56 +111,45 @@ describe('useOnRedirectTo', () => {
   });
 
   it('treats custom auth routes as auth routes and passes them to isAuthRoute', () => {
-    // Arrange
     const router = createRouter();
     const routes = { loginUrl: '/my-login' };
     const { result } = renderOnRedirectTo({ baseName: '', router, routes });
 
-    // Act
     result.current('/my-login');
 
-    // Assert
     expect(isAuthRouteSpy).toHaveBeenCalledWith('/my-login', routes);
     expect(router.push).toHaveBeenCalledWith('/my-login?foo=bar');
   });
 
   it('picks up new routes after a rerender', () => {
-    // Arrange
     const router = createRouter();
     const { result, rerender } = renderOnRedirectTo({ baseName: '', router, routes: { loginUrl: '/first' } });
 
-    // Act
     rerender({ baseName: '', router, routes: { loginUrl: '/second' } });
     result.current('/second');
 
-    // Assert
     expect(router.push).toHaveBeenCalledWith('/second?foo=bar');
   });
 
   it('uses the latest baseName and router after a rerender', () => {
-    // Arrange
     const firstRouter = createRouter();
     const secondRouter = createRouter();
     const { result, rerender } = renderOnRedirectTo({ baseName: '/one', router: firstRouter });
 
-    // Act
     rerender({ baseName: '/two', router: secondRouter });
     result.current('/two/page');
 
-    // Assert
     expect(secondRouter.push).toHaveBeenCalledWith('/page');
     expect(firstRouter.push).not.toHaveBeenCalled();
   });
 
   it('performs a full page navigation via window.location when opts.refresh is true', () => {
-    // Arrange: hash-only navigation is supported by jsdom, so the href change is observable
+    // hash-only navigation is supported by jsdom, so the href change is observable
     const router = createRouter();
     const { result } = renderOnRedirectTo({ baseName: '', router });
 
-    // Act
     result.current(`${INITIAL_PATH}?foo=bar#after-refresh`, { refresh: true });
 
-    // Assert
     expect(window.location.hash).toBe('#after-refresh');
     expect(router.push).not.toHaveBeenCalled();
     expect(router.replace).not.toHaveBeenCalled();

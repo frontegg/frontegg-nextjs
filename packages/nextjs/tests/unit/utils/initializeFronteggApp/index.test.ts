@@ -53,14 +53,11 @@ beforeEach(() => {
 
 describe('initializeFronteggApp - store and app lifecycle', () => {
   it('creates a new store and saves it on the storeHolder when none exists', () => {
-    // Arrange
     const storeHolder: any = {};
     const options = baseOptions({ previewMode: true, urlStrategy: 'hash' } as any);
 
-    // Act
     run(options, storeHolder);
 
-    // Assert
     expect(mocks.createStore).toHaveBeenCalledTimes(1);
     expect(mocks.createStore).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -76,27 +73,21 @@ describe('initializeFronteggApp - store and app lifecycle', () => {
   });
 
   it('reuses an existing store from the storeHolder', () => {
-    // Arrange
     const existingStore = { id: 'existing' };
 
-    // Act
     const app: any = run(baseOptions(), { store: existingStore });
 
-    // Assert
     expect(mocks.createStore).not.toHaveBeenCalled();
     expect(mocks.initialize).toHaveBeenCalledWith(expect.objectContaining({ store: existingStore }), 'default');
     expect(app.store).toBe(existingStore);
   });
 
   it('returns an existing app instance and attaches the shared store to it', () => {
-    // Arrange
     const existingApp: any = { name: 'existing-app' };
     mocks.getInstance.mockReturnValue(existingApp);
 
-    // Act
     const app = run();
 
-    // Assert
     expect(mocks.getInstance).toHaveBeenCalledWith('default');
     expect(mocks.initialize).not.toHaveBeenCalled();
     expect(app).toBe(existingApp);
@@ -104,13 +95,10 @@ describe('initializeFronteggApp - store and app lifecycle', () => {
   });
 
   it('initializes a new app with the merged options when no app instance exists', () => {
-    // Arrange
     const options = baseOptions({ basename: '/base', customLoginBox: true, hostedLoginBox: true } as any);
 
-    // Act
     const app: any = run(options);
 
-    // Assert
     expect(mocks.initialize).toHaveBeenCalledTimes(1);
     const [initOptions, name] = mocks.initialize.mock.calls[0];
     expect(name).toBe('default');
@@ -168,16 +156,13 @@ describe('initializeFronteggApp - auth options', () => {
   });
 
   it('builds user data with the session tokens when a session and user exist', () => {
-    // Arrange
     const options = baseOptions({
       session: { accessToken: 'access', refreshToken: 'refresh' },
       user: { id: 'user-1', email: 'user@example.com' },
     } as any);
 
-    // Act
     const auth = authStateFor(options);
 
-    // Assert
     expect(auth.isAuthenticated).toBe(true);
     expect(auth.user).toEqual({
       id: 'user-1',
@@ -209,7 +194,6 @@ describe('initializeFronteggApp - auth options', () => {
   });
 
   it('builds tenantsState from tenants / activeTenant and lets authOptions.tenantsState override it', () => {
-    // Arrange
     const tenants = [{ tenantId: 't1' }, { tenantId: 't2' }];
     const options = baseOptions({
       tenants,
@@ -217,10 +201,8 @@ describe('initializeFronteggApp - auth options', () => {
       authOptions: { tenantsState: { loading: true } },
     } as any);
 
-    // Act
     const auth = authStateFor(options);
 
-    // Assert
     expect(auth.tenantsState).toEqual({ tenants, activeTenant: tenants[0], loading: true });
   });
 
@@ -266,13 +248,10 @@ describe('initializeFronteggApp - context options', () => {
   });
 
   it('routes regular API paths to the Frontegg base url', () => {
-    // Arrange
     const context = contextFor();
 
-    // Act
     const url = context.baseUrl('/identity/resources/users/v2/me');
 
-    // Assert
     expect(mocks.isMiddlewarePath).toHaveBeenCalledWith('/identity/resources/users/v2/me');
     expect(url).toBe(BASE_URL);
   });
@@ -299,15 +278,12 @@ describe('initializeFronteggApp - additionalHeadersResolver', () => {
   });
 
   it('prepends headers returned by a user provided resolver function', async () => {
-    // Arrange
     const userHeaders = [{ key: 'x-custom', value: '1' }];
     const resolver = vi.fn(async () => userHeaders);
     const context = contextFor(baseOptions({ contextOptions: { additionalHeadersResolver: resolver } } as any));
 
-    // Act
     const headers = await context.additionalHeadersResolver();
 
-    // Assert
     expect(resolver).toHaveBeenCalledTimes(1);
     expect(headers).toEqual([...userHeaders, ...SDK_HEADERS]);
   });
@@ -339,14 +315,11 @@ describe('initializeFronteggApp - beforeRequestInterceptor', () => {
     ['activate account', CommonUrls.activateAccount.activate],
     ['logout', CommonUrls.logout],
   ])('strips authorization headers for same-origin %s requests', (_label, path) => {
-    // Arrange
     const context = contextFor();
     const url = `${ORIGIN}/api${path}`;
 
-    // Act
     const result = context.beforeRequestInterceptor({ method: 'POST', headers: authHeaders() }, url);
 
-    // Assert
     expect(result.url).toBe(url);
     expect(result.method).toBe('POST');
     expect(result.headers).toEqual({ 'x-other': 'keep' });

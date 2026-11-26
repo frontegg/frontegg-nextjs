@@ -15,13 +15,10 @@ describe('chunkString', () => {
   });
 
   it('reassembles to the original string', () => {
-    // Arrange
     const original = 'x'.repeat(1234) + 'y'.repeat(17);
 
-    // Act
     const chunks = chunkString(original, 100);
 
-    // Assert
     expect(chunks.join('')).toBe(original);
     expect(chunks.every((chunk) => chunk.length <= 100)).toBe(true);
     expect(chunks).toHaveLength(13);
@@ -36,12 +33,11 @@ describe('calculateExpiresInFromExp', () => {
   });
 
   it('returns the number of seconds left until exp', () => {
-    // Arrange
     vi.useFakeTimers();
     vi.setSystemTime(NOW_MS);
     const exp = NOW_MS / 1000 + 3600;
 
-    // Act + Assert
+    // + Assert
     expect(calculateExpiresInFromExp(exp)).toBe(3600);
   });
 
@@ -60,11 +56,11 @@ describe('calculateExpiresInFromExp', () => {
   });
 
   it('floors partial seconds', () => {
-    // Arrange: 500ms after a whole second, so 10s exp leaves 9.5s
+    // 500ms after a whole second, so 10s exp leaves 9.5s
     vi.useFakeTimers();
     vi.setSystemTime(NOW_MS + 500);
 
-    // Act + Assert
+    // + Assert
     expect(calculateExpiresInFromExp(NOW_MS / 1000 + 10)).toBe(9);
   });
 });

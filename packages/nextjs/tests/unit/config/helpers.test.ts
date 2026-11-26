@@ -26,30 +26,24 @@ afterEach(() => {
 
 describe('getEnv', () => {
   it('returns the value of a defined environment variable', () => {
-    // Arrange
     setEnv({ [CUSTOM_ENV_NAME]: 'some-value' });
 
-    // Act
     const value = getEnv(CUSTOM_ENV_NAME);
 
-    // Assert
     expect(value).toBe('some-value');
   });
 
   it('throws FronteggEnvNotFound naming the variable when it is missing', () => {
-    // Act
     const act = () => getEnv(CUSTOM_ENV_NAME);
 
-    // Assert
     expect(act).toThrow(FronteggEnvNotFound);
     expect(act).toThrow(`Missing one or more environment variables (${CUSTOM_ENV_NAME})`);
   });
 
   it('treats an empty string as a missing variable', () => {
-    // Arrange
     setEnv({ [CUSTOM_ENV_NAME]: '' });
 
-    // Act + Assert
+    // + Assert
     expect(() => getEnv(CUSTOM_ENV_NAME)).toThrow(FronteggEnvNotFound);
   });
 });
@@ -80,10 +74,8 @@ describe('generateCookieDomain', () => {
   });
 
   it('throws InvalidFronteggEnv for FRONTEGG_APP_URL when the URL cannot be parsed', () => {
-    // Act
     const act = () => generateCookieDomain('not a url');
 
-    // Assert
     expect(act).toThrow(InvalidFronteggEnv);
     expect(act).toThrow(`Invalid environment variable (${EnvVariables.FRONTEGG_APP_URL}), must be a valid Valid URL`);
   });
@@ -95,13 +87,10 @@ describe('normalizeStringPasswordToMap', () => {
   });
 
   it('returns an existing password map as-is', () => {
-    // Arrange
     const passwords = { 1: 'first', 2: 'second' };
 
-    // Act
     const result = normalizeStringPasswordToMap(passwords);
 
-    // Assert
     expect(result).toBe(passwords);
   });
 });
@@ -126,10 +115,9 @@ describe('generateAppUrl', () => {
   });
 
   it('ignores VERCEL_URL when the VERCEL flag is not set', () => {
-    // Arrange
     setEnv({ VERCEL_URL: 'my-app-123.vercel.app' });
 
-    // Act + Assert
+    // + Assert
     expect(() => generateAppUrl()).toThrow(`(${EnvVariables.FRONTEGG_APP_URL})`);
   });
 
@@ -146,13 +134,10 @@ describe('generateAppUrl', () => {
   });
 
   it('throws naming VERCEL and VERCEL_URL when on Vercel but VERCEL_URL is missing', () => {
-    // Arrange
     setEnv({ VERCEL: '1' });
 
-    // Act
     const act = () => generateAppUrl();
 
-    // Assert
     expect(act).toThrow(FronteggEnvNotFound);
     expect(act).toThrow(`(${EnvVariables.VERCEL}, ${EnvVariables.VERCEL_URL})`);
   });
@@ -165,11 +150,10 @@ describe('generateAppUrl', () => {
   });
 
   it('overrides the env app url with global.customLoginAppUrl when set', () => {
-    // Arrange
     setEnv({ FRONTEGG_APP_URL: 'https://vendor.example.com' });
     global.customLoginAppUrl = 'https://tenant.example.com';
 
-    // Act + Assert
+    // + Assert
     expect(generateAppUrl()).toBe('https://tenant.example.com');
   });
 

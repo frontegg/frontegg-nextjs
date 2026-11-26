@@ -91,11 +91,10 @@ describe('CookieManager.getRefreshCookieFromRequestEdge', () => {
   );
 
   it('looks up the appId based refresh cookie when rewriteCookieByAppId is enabled', () => {
-    // Arrange
     Object.assign(configState, { rewriteCookieByAppId: true, appId: 'app-id-42' });
     const req = mockIncomingMessage({ fe_refresh_abcdefghi: 'client-token', 'fe_refresh_app-id-42': 'app-token' });
 
-    // Act + Assert
+    // + Assert
     expect(CookieManager.getRefreshCookieFromRequestEdge(req)).toBe('app-token');
   });
 });
@@ -119,7 +118,6 @@ describe('CookieManager.parseCookieFromArray', () => {
   });
 
   it('concatenates chunked session cookies in index order regardless of input order', () => {
-    // Arrange
     const cookies = [
       { name: `${COOKIE_NAME}-3`, value: 'CCC' },
       { name: 'unrelated', value: 'zzz' },
@@ -127,55 +125,39 @@ describe('CookieManager.parseCookieFromArray', () => {
       { name: `${COOKIE_NAME}-2`, value: 'BBB' },
     ];
 
-    // Act
     const session = CookieManager.parseCookieFromArray(cookies);
 
-    // Assert
     expect(session).toBe('AAABBBCCC');
   });
 
-  /**
-   * KNOWN BUG (src/utils/cookies/index.ts:240-241): chunks are ordered by the LAST CHARACTER of
-   * their name (`parseInt(a.name.slice(-1))`), so `fe_session-10` sorts as 0 and lands before
-   * `fe_session-1`. Sessions split into 10+ chunks are reassembled in the wrong order.
-   * Expected to fail until the full numeric suffix is parsed.
-   */
+  /** Known bug (src/utils/cookies/index.ts:240): chunks sort by the last digit, so 10+ chunks reassemble out of order. */
   it.fails('concatenates 10 or more chunks in numeric order', () => {
-    // Arrange
     const cookies = Array.from({ length: 11 }, (_, i) => ({
       name: `${COOKIE_NAME}-${i + 1}`,
       value: String.fromCharCode(65 + i),
     }));
 
-    // Act
     const session = CookieManager.parseCookieFromArray(cookies);
 
-    // Assert
     expect(session).toBe('ABCDEFGHIJK');
   });
 });
 
 describe('CookieManager.create - removal of stale cookies', () => {
   it('does not emit a removal cookie when the request only has the cookie being replaced', () => {
-    // Arrange
     const req = mockIncomingMessage({ [COOKIE_NAME]: 'old-session' });
 
-    // Act
     const cookies = CookieManager.create({ req, value: 'new', secure: true, expires: EXPIRES });
 
-    // Assert
     expect(cookies).toHaveLength(1);
     expect(cookies[0]).toContain(`${COOKIE_NAME}=new`);
   });
 
   it('expires stale chunk cookies using config.cookieDomain when no domain is given', () => {
-    // Arrange
     const req = mockIncomingMessage({ [`${COOKIE_NAME}-1`]: 'old-a', [`${COOKIE_NAME}-2`]: 'old-b' });
 
-    // Act
     const cookies = CookieManager.create({ req, value: 'new', secure: false, expires: EXPIRES });
 
-    // Assert
     expect(namesOf(cookies)).toEqual([`${COOKIE_NAME}-1`, `${COOKIE_NAME}-2`, COOKIE_NAME]);
     const [firstRemoval, secondRemoval] = cookies;
     expect(firstRemoval).toMatch(new RegExp(`^${COOKIE_NAME}-1=;`));
@@ -215,10 +197,8 @@ describe('CookieManager.create - removal of stale cookies', () => {
 
 describe('CookieManager.createEmptyCookies', () => {
   it('expires the given cookies plus every refresh-token name variant by default', () => {
-    // Act
     const cookies = CookieManager.createEmptyCookies(true, COOKIE_DOMAIN, ['a', 'b']);
 
-    // Assert
     expect(namesOf(cookies)).toEqual([
       'a',
       'b',
@@ -285,35 +265,30 @@ describe('CookieManager.getRequestCookiesHeaderToRemove', () => {
   });
 
   it('swallows errors while reading the request and only removes refresh-token cookies', () => {
-    // Arrange: a request whose headers cannot be read
+    // a request whose headers cannot be read
     const req = {
       get headers(): never {
         throw new Error('headers unavailable');
       },
     } as unknown as IncomingMessage;
 
-    // Act
     const cookies = CookieManager.getRequestCookiesHeaderToRemove({
       isSecured: true,
       cookieDomain: COOKIE_DOMAIN,
       req,
     });
 
-    // Assert
     expect(namesOf(cookies)).toEqual(['fe_refresh_abc-def-ghi', 'fe_refresh_abcdef-ghi', 'fe_refresh_abcdefghi']);
   });
 });
 
 describe('CookieManager.removeCookies - existing header shapes', () => {
   it('flattens an object-shaped existing set-cookie header before appending', () => {
-    // Arrange
     const res = mockServerResponse();
     res.getHeader.mockReturnValue({ 0: 'first=1', 1: 'second=2' });
 
-    // Act
     CookieManager.removeCookies({ cookieNames: ['gone'], isSecured: true, cookieDomain: COOKIE_DOMAIN, res });
 
-    // Assert
     const [, headers] = res.setHeader.mock.calls[0];
     expect(headers.slice(0, 2)).toEqual(['first=1', 'second=2']);
     expect(namesOf(headers.slice(2))).toEqual([
@@ -361,13 +336,10 @@ describe('CookieManager.modifySetCookie - name and domain rewriting', () => {
   });
 
   it('renames the refresh cookie to the appId based name when rewriteCookieByAppId is enabled', () => {
-    // Arrange
     Object.assign(configState, { rewriteCookieByAppId: true, appId: 'app-id' });
 
-    // Act
     const result = CookieManager.modifySetCookie(['fe_refresh_abcdef-ghi=token; Path=/'], true);
 
-    // Assert
     expect(result).toEqual(['fe_refresh_appid=token;Path=/;']);
   });
 

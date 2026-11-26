@@ -69,10 +69,8 @@ describe('cookieSerializer.serialize edge cases', () => {
   });
 
   it('emits attributes in a stable order', () => {
-    // Arrange
     const expires = new Date('2030-01-01T00:00:00Z');
 
-    // Act
     const serialized = cookieSerializer.serialize('n', 'v', {
       sameSite: 'strict',
       priority: 'low',
@@ -84,7 +82,6 @@ describe('cookieSerializer.serialize edge cases', () => {
       maxAge: 60,
     });
 
-    // Assert
     expect(serialized).toBe(
       `n=v; Max-Age=60; Domain=example.com; Path=/; Expires=${expires.toUTCString()}; HttpOnly; Secure; Priority=Low; SameSite=Strict`
     );

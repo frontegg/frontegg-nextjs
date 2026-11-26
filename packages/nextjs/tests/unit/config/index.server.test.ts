@@ -3,10 +3,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { EnvVariables } from '../../../src/config/constants';
 import { clearFronteggEnv, loadConfig, restoreFronteggEnv, setEnv, VALID_PASSWORD } from './envHelpers';
 
-/**
- * Server-side (no `window`) behaviour of the Config singleton: the constructor validates
- * FRONTEGG_ENCRYPTION_PASSWORD at import time unless FRONTEGG_SSG_EXPORT is enabled.
- */
+/** On the server the Config constructor validates the password at import unless FRONTEGG_SSG_EXPORT is set. */
 
 const INVALID_PASSWORD_MESSAGE = `Invalid environment variable (${EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD}), must be a valid Hex string.`;
 
@@ -24,13 +21,10 @@ describe('Config constructor on the server', () => {
   });
 
   it('loads successfully with a valid 64-char hex encryption password', async () => {
-    // Arrange
     setEnv({ FRONTEGG_ENCRYPTION_PASSWORD: VALID_PASSWORD });
 
-    // Act
     const config = await loadConfig();
 
-    // Assert
     expect(config.password).toEqual({ 1: VALID_PASSWORD });
   });
 
@@ -57,13 +51,10 @@ describe('Config constructor on the server', () => {
   });
 
   it('skips password validation when FRONTEGG_SSG_EXPORT is "true"', async () => {
-    // Arrange
     setEnv({ FRONTEGG_SSG_EXPORT: 'true' });
 
-    // Act
     const config = await loadConfig();
 
-    // Assert
     expect(config.isSSGExport).toBe(true);
     expect(() => config.password).toThrow(INVALID_PASSWORD_MESSAGE);
   });

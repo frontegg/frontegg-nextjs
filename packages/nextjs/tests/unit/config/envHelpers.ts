@@ -40,10 +40,7 @@ export const setEnv = (vars: EnvMap) => {
 
 export const unsetEnv = (...names: string[]) => names.forEach((name) => delete process.env[name]);
 
-/**
- * Re-evaluate `src/config` so that its module-level `setupEnvVariables` snapshot
- * and the `new Config()` constructor run against the current `process.env`.
- */
+/** Re-imports src/config so its env snapshot and constructor run against the current process.env. */
 export const loadConfig = async () => {
   vi.resetModules();
   const mod = await import('../../../src/config');
