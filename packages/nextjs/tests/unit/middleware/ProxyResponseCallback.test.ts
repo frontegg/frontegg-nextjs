@@ -73,10 +73,12 @@ beforeEach(() => {
   Object.assign(config, CONFIG_BASE);
   mockedModifySetCookie.mockReturnValue(['fe_refresh=abc']);
   mockedIsSSOPost.mockReturnValue(false);
+  // pin the flag so a value from the host environment cannot change the forwarded bodies
+  vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', '');
 });
 
 afterEach(() => {
-  delete process.env['FRONTEGG_SECURE_JWT_ENABLED'];
+  vi.unstubAllEnvs();
 });
 
 describe('ProxyResponseCallback logout', () => {
@@ -158,7 +160,7 @@ describe('ProxyResponseCallback successful responses', () => {
 
   it('strips jwt signatures from the forwarded body when secure jwt is enabled', async () => {
     // Arrange
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedCreateSession.mockResolvedValue(['sealed', { exp: 1 }, 'r'] as any);
     mockedCreateCookie.mockReturnValue(['fe_session=sealed']);
     const body = JSON.stringify({ accessToken: 'h.payload.s', refreshToken: 'r' });
@@ -168,6 +170,8 @@ describe('ProxyResponseCallback successful responses', () => {
 
     // Assert
     const expectedBody = JSON.stringify({ accessToken: 'REDACTED_FOR_SECURITY.payload.REDACTED_FOR_SECURITY' });
+    // the session is still sealed from the original, unredacted tokens
+    expect(mockedCreateSession).toHaveBeenCalledWith({ accessToken: 'h.payload.s', refreshToken: 'r' });
     expect(res.end).toHaveBeenCalledWith(expectedBody);
     expect(res.headers['content-length']).toBe(Buffer.byteLength(expectedBody));
   });
@@ -203,6 +207,35 @@ describe('ProxyResponseCallback successful responses', () => {
     const res = await respond(createProxyRes(200), createReq('/frontegg/tenants'), '{}');
 
     expect(res.headers['set-cookie']).toEqual([]);
+  });
+
+  it('does not forward connection-level framing headers, since the body is re-sent with its own length', async () => {
+    // Arrange: a chunked upstream response
+    const upstreamHeaders = {
+      'transfer-encoding': 'chunked',
+      connection: 'keep-alive',
+      'keep-alive': 'timeout=5',
+      'content-type': 'application/json',
+    };
+
+    // Act
+    const res = await respond(createProxyRes(200, upstreamHeaders), createReq('/frontegg/tenants'), '{"a":1}');
+
+    // Assert
+    expect(res.headers['transfer-encoding']).toBeUndefined();
+    expect(res.headers['connection']).toBeUndefined();
+    expect(res.headers['keep-alive']).toBeUndefined();
+    expect(res.headers['content-type']).toBe('application/json');
+    expect(res.headers['content-length']).toBe(Buffer.byteLength('{"a":1}'));
+  });
+
+  it('does not forward framing headers on failed responses either', async () => {
+    const upstreamHeaders = { 'transfer-encoding': 'chunked', 'content-length': '999' };
+
+    const res = await respond(createProxyRes(401, upstreamHeaders), createReq('/frontegg/tenants'), '{}');
+
+    expect(res.headers['transfer-encoding']).toBeUndefined();
+    expect(res.headers['content-length']).toBeUndefined();
   });
 
   it('never forwards a cookie header from upstream', async () => {
