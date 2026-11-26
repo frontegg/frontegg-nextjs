@@ -97,6 +97,25 @@ describe('handleSessionOnEdge', () => {
     expect(location.searchParams.get('tab')).toBe('1');
   });
 
+  it('redirects to login and clears cookies when the refresh is rejected', async () => {
+    // Arrange: refreshAccessTokenIfNeededOnEdge returns removal cookies but no session
+    mockedRefresh.mockResolvedValue({
+      session: undefined,
+      headers: { 'set-cookie': 'fe_session=; Max-Age=0, fe_refresh_abc=; Max-Age=0' },
+    });
+
+    // Act
+    const response = await run('/dashboard', 'tab=1');
+
+    // Assert
+    expect(response.status).toBe(307);
+    const location = new URL(response.headers.get('location')!);
+    expect(location.pathname).toBe('/account/login');
+    expect(location.searchParams.get('redirectUrl')).toBe('/dashboard');
+    expect(response.headers.get('x-middleware-next')).toBeNull();
+    expect(response.headers.get('set-cookie')).toBe('fe_session=; Max-Age=0, fe_refresh_abc=; Max-Age=0');
+  });
+
   it('continues when the session cookie holds a valid session', async () => {
     mockedCreateSession.mockResolvedValue(SESSION);
 
@@ -278,9 +297,11 @@ describe('handleHostedLoginCallback', () => {
 describe('checkSessionOnEdge', () => {
   it('returns the cookie session without refreshing', async () => {
     mockedCreateSession.mockResolvedValue(SESSION);
+    const request = new Request('https://app.example.com/', { headers: { cookie: 'theme=dark; fe_session=sealed' } });
 
-    const result = await checkSessionOnEdge(new Request('https://app.example.com/'));
+    const result = await checkSessionOnEdge(request);
 
+    expect(mockedCreateSession).toHaveBeenCalledWith('sealed', encryptionEdge);
     expect(result).toEqual({ session: SESSION });
     expect(mockedRefresh).not.toHaveBeenCalled();
   });
@@ -300,9 +321,13 @@ describe('checkSessionOnEdge', () => {
 describe('getSessionOnEdge', () => {
   it('resolves the session from the request cookie and logs a deprecation notice', async () => {
     mockedCreateSession.mockResolvedValue(SESSION);
+    const request = new Request('https://app.example.com/', {
+      headers: { cookie: 'fe_session-1=part1; fe_session-2=part2' },
+    });
 
-    const session = await getSessionOnEdge(new Request('https://app.example.com/'));
+    const session = await getSessionOnEdge(request);
 
+    expect(mockedCreateSession).toHaveBeenCalledWith('part1part2', encryptionEdge);
     expect(session).toBe(SESSION);
     expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('Deprecation Notice'));
   });

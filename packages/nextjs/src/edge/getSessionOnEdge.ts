@@ -48,8 +48,14 @@ export const handleSessionOnEdge = async (params: HandleSessionOnEdge): Promise<
   }
 
   const edgeSession = await checkSessionOnEdge(request);
-  if (!edgeSession) {
-    return redirectToLogin(pathname, searchParams);
+  if (!edgeSession?.session) {
+    // A rejected refresh still returns headers that clear the stale session cookies; keep them on the redirect.
+    const loginRedirect = redirectToLogin(pathname, searchParams);
+    const clearCookies = edgeSession?.headers?.['set-cookie'];
+    if (clearCookies) {
+      loginRedirect.headers.set('set-cookie', clearCookies);
+    }
+    return loginRedirect;
   }
   if (edgeSession.headers) {
     return NextResponse.next({
