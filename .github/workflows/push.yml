@@ -27,6 +27,11 @@ jobs:
           node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
       - run: yarn install
       - run: yarn build
+      - name: Generate a throwaway encryption password for this run
+        run: |
+          password=$(openssl rand -hex 32)
+          echo "::add-mask::$password"
+          echo "FRONTEGG_ENCRYPTION_PASSWORD=$password" >> "$GITHUB_ENV"
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -49,18 +54,32 @@ jobs:
           FRONTEGG_APP_URL: "http://localhost:3000"
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
           FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
-          FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
-      - name: Run Playwright tests (packages/nextjs)
+      - name: Run Playwright unit specs (packages/nextjs)
         working-directory: packages/nextjs
         run: npx playwright test --project=unit-playwright
+        env:
+          PW_SKIP_WEBSERVER: "1"
+          FRONTEGG_APP_URL: "http://localhost:3000"
+          FRONTEGG_BASE_URL: "https://demo.frontegg.com"
+          FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
+      - name: Prepare example app env for mocked E2E
+        run: node scripts/prepare-e2e-env-file.js --force
         env:
           FRONTEGG_APP_URL: "http://localhost:3000"
           FRONTEGG_BASE_URL: "https://demo.frontegg.com"
           FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
-          FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
+      - name: Run mocked E2E (packages/nextjs)
+        working-directory: packages/nextjs
+        run: npx playwright test --project=e2e-mocked
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
           path: playwright-report/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-nextjs
+          path: packages/nextjs/playwright-report/
           retention-days: 14

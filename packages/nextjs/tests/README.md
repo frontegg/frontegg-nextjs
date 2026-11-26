@@ -29,14 +29,7 @@ yarn test:unit:coverage     # with v8 coverage + HTML report in coverage/
 
 ### Coverage gates
 
-`vitest.config.ts` currently enforces the following on the initial slice of the codebase:
-
-- `src/utils/cookies/**`
-- `src/utils/refreshAccessTokenIfNeeded/**`
-
-Thresholds: **lines 80%**, **statements 80%**, **functions 80%**, **branches 75%**.
-
-When you add tests for a new module, add it to the `coverage.include` array in `vitest.config.ts` and hit the same gates.
+`vitest.config.ts` measures all of `src/` (type-only files excluded). Thresholds: **lines 95%**, **statements 95%**, **functions 95%**, **branches 90%**. New source files are picked up automatically, so add tests alongside them.
 
 ### Writing a new unit test
 
@@ -83,7 +76,7 @@ FRONTEGG_BASE_URL=... FRONTEGG_CLIENT_ID=... FRONTEGG_APP_URL=http://localhost:3
   yarn test:e2e --project=e2e-real
 ```
 
-### Mocked E2E scenarios and the session-cookie caveat
+### Mocked E2E setup
 
 `tests/e2e/mocked/fixtures/intercepts.ts` exports `setupFronteggMocks(page)` which stubs:
 
@@ -91,16 +84,14 @@ FRONTEGG_BASE_URL=... FRONTEGG_CLIENT_ID=... FRONTEGG_APP_URL=http://localhost:3
 - `GET /identity/resources/users/v2/me`
 - `POST /oauth/logout`
 
-Scenarios that require the browser to arrive **already authenticated** (e.g. "home page renders with user name", "token refresh near expiry", "concurrent dedup") skip by default because forging a valid encrypted `fe_session` cookie requires either importing `src/**` (forbidden in the test slice) or running a real login.
+Authenticated scenarios forge `fe_session` cookies with `fixtures/session-forge.ts`: the JWT inside is signed with a test RSA key, and the cookie is sealed with `FRONTEGG_ENCRYPTION_PASSWORD`. The example app accepts them only if its `.env.local` trusts the test public key (`fixtures/test-public-jwk.json`) and uses the same password. Generate that file once from the repo root:
 
-To enable them, set:
+```bash
+node scripts/prepare-e2e-env-file.js          # skips if .env.local already exists
+node scripts/prepare-e2e-env-file.js --force  # overwrite an existing .env.local
+```
 
-- `FRONTEGG_E2E_MOCK_SESSION_COOKIE` — a valid, encrypted session cookie value
-- `FRONTEGG_E2E_MOCK_NEAR_EXPIRY_COOKIE` — a session cookie with a short-lived access token
-
-Generate these once from a real login run (either manually or via a future fixture helper), then export them in your shell / CI secrets.
-
-The unauthenticated scenario (first visit redirects to login) runs without setup.
+`FRONTEGG_APP_URL`, `FRONTEGG_BASE_URL`, `FRONTEGG_CLIENT_ID` and `FRONTEGG_ENCRYPTION_PASSWORD` are taken from the environment when set; otherwise test defaults are used (random client ID and password, `https://demo.frontegg.com`). Playwright loads the same `.env.local`, so the tests and the app always agree. A few API-proxy specs pass through to `FRONTEGG_BASE_URL`, so they need network access to it.
 
 ### Writing a new mocked E2E test
 
@@ -124,23 +115,22 @@ Real-tenant tests run only in the nightly workflow (`.github/workflows/nightly-e
 
 ## CI
 
-`.github/workflows/push.yml` on every PR:
+`.github/workflows/push.yml` on every push (all steps are blocking):
 
-1. Install, build
-2. `yarn test:unit:coverage` in `packages/nextjs` — uploads `coverage/` as an artifact
-3. Root-level `npx playwright test` for the `tests/middleware-test/` stress suite (unchanged)
-4. `npx playwright test --project=unit-playwright --project=e2e-mocked` in `packages/nextjs`
+1. Install, build, generate a throwaway `FRONTEGG_ENCRYPTION_PASSWORD` for the run
+2. `yarn test:unit:coverage` in `packages/nextjs`: fails below the thresholds in `vitest.config.ts`; uploads `coverage/` as an artifact
+3. Root-level `npx playwright test` for the `tests/middleware-test/` stress suite
+4. `npx playwright test --project=unit-playwright` in `packages/nextjs`
+5. `node scripts/prepare-e2e-env-file.js --force`, then `npx playwright test --project=e2e-mocked` in `packages/nextjs`
+
+`publish.yml` and `publish-prerelease.yml` run `yarn test` (vitest + `unit-playwright`) before tagging or publishing.
 
 `.github/workflows/nightly-e2e.yml` runs `--project=e2e-real` on a cron + manual dispatch.
 
-## What's NOT covered yet
+## Known bugs marked with `it.fails`
 
-The following are deliberately out of scope for the current test slice:
+These tests assert the correct behaviour and are expected to fail until the source is fixed. When one starts passing, vitest reports it: remove the `.fails` marker in the same change as the fix.
 
-- React component tests (`src/app/*`, `src/pages/*`, `src/no-ssr/*`, `src/common/*`)
-- Edge runtime (`src/edge/**`) — needs an edge test environment
-- API handlers (`src/api/**`)
-- Middleware proxy callbacks (`ProxyRequestCallback.ts`, `ProxyResponseCallback.ts`)
-- Encryption utilities (`src/utils/encryption/**`, `src/utils/encryption-edge/**`)
-
-See `docs/plans/2026-04-08-initial-test-coverage.md` for the roadmap of follow-up slices.
+- `tests/unit/config/index.test.ts`: `config.clientId` never falls back to the value read at startup (misplaced `??` in `src/config/index.ts`).
+- `tests/unit/utils/useOnRedirectTo/index.server.test.ts`: `typeof window == undefined` is always false, so a server-side redirect with `{ refresh: true }` throws.
+- `tests/unit/utils/cookies/index.gaps.test.ts`: session cookies split into 10+ chunks are reassembled out of order.

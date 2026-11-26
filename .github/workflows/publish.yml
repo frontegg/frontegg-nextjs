@@ -36,6 +36,10 @@ jobs:
         run: |
           yarn install
           yarn build
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run tests
+        run: yarn test
       - name: Set Current Version
         id: set_current_version
         if: startsWith(github.event.pull_request.title, 'v')
