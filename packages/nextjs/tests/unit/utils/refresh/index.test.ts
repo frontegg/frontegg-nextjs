@@ -149,7 +149,7 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
     mockedCookieManager.getSessionCookieFromRequest.mockReturnValue('seal');
     mockedCreateSession.mockResolvedValueOnce(undefined);
     // refresh path returns null response → null result
-    mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
+    mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(mockRefreshResponse({ ok: false, status: 401 }));
 
     const { req, res } = mockNextPageContext({ url: '/_next/data/page.json' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
@@ -231,12 +231,12 @@ describe('refreshAccessTokenIfNeeded — embedded + ip forwarding', () => {
 
 // ---------- Refresh-response handling ----------
 describe('refreshAccessTokenIfNeeded — refresh response handling', () => {
-  it('returns null and removes cookies when refresh response is null', async () => {
+  it('returns null and keeps cookies when the refresh gets no response', async () => {
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
     const { req, res } = mockNextPageContext({ url: '/' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
     expect(result).toBeNull();
-    expect(mockedCookieManager.removeCookies).toHaveBeenCalled();
+    expect(mockedCookieManager.removeCookies).not.toHaveBeenCalled();
   });
 
   it('returns null and removes cookies when refresh response is not ok', async () => {

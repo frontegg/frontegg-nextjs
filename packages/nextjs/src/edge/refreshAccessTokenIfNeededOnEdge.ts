@@ -6,6 +6,7 @@ import api from '../api';
 import fronteggLogger from '../utils/fronteggLogger';
 import JwtManager from '../utils/jwt';
 import encryptionEdge from '../utils/encryption-edge';
+import { isRefreshRejected } from '../utils/common/refreshResponse';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.refreshAccessTokenIfNeededOnEdge' });
 
@@ -42,6 +43,10 @@ export async function refreshAccessTokenIfNeededOnEdge(
 
   const isSecured = config.isSSL;
   if (response === null || !response.ok) {
+    if (!isRefreshRejected(response)) {
+      logger.warn(`Token refresh failed (status ${response?.status ?? 'none'}), keeping the session cookies`);
+      return undefined;
+    }
     const cookiesToRemove = CookieManager.getRequestCookiesHeaderToRemove({
       cookieDomain: config.cookieDomain,
       isSecured,
@@ -111,12 +116,7 @@ function splitNameValue(pair: string): [string, string] {
   return [pair.slice(0, separatorIndex).trim(), pair.slice(separatorIndex + 1).trim()];
 }
 
-/**
- * Builds the `cookie` request header the app should receive after the middleware refreshed the session.
- * Starts from the incoming request cookies and applies each `set-cookie` on top:
- * new values replace old ones, cookies set to an empty value (removals) are dropped,
- * and every other request cookie is kept as-is.
- */
+/** Request cookies with each set-cookie applied: new values replace old ones and empty values remove the cookie. */
 export function mergeSetCookiesIntoCookieHeader(cookieHeader: string | null, setCookies: string[]): string {
   const requestCookies: [string, string][] = (cookieHeader ?? '')
     .split(';')

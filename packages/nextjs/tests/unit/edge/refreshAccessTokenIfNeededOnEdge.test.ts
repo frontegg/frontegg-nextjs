@@ -159,11 +159,33 @@ describe('refreshAccessTokenIfNeededOnEdge', () => {
     });
   });
 
+  it('clears session cookies when Frontegg rejects the refresh token with 400', async () => {
+    mocks.api.refreshTokenEmbedded.mockResolvedValue(new Response('', { status: 400 }));
+    mocks.cookieManager.getRequestCookiesHeaderToRemove.mockReturnValue(['fe_session=; Max-Age=0']);
+
+    const result = await refreshAccessTokenIfNeededOnEdge(buildRequest());
+
+    expect(result).toEqual({ session: undefined, headers: { 'set-cookie': 'fe_session=; Max-Age=0' } });
+  });
+
   it('returns undefined when the refresh fails and there is nothing to clear', async () => {
-    mocks.api.refreshTokenEmbedded.mockResolvedValue(null);
+    mocks.api.refreshTokenEmbedded.mockResolvedValue(new Response('', { status: 401 }));
     mocks.cookieManager.getRequestCookiesHeaderToRemove.mockReturnValue(undefined);
 
     expect(await refreshAccessTokenIfNeededOnEdge(buildRequest())).toBeUndefined();
+  });
+
+  it.each([
+    ['a Frontegg outage (503)', () => new Response('', { status: 503 })],
+    ['rate limiting (429)', () => new Response('', { status: 429 })],
+    ['no response', () => null],
+  ])('keeps the session cookies on %s so the user is not logged out', async (_case, response) => {
+    mocks.api.refreshTokenEmbedded.mockResolvedValue(response());
+
+    const result = await refreshAccessTokenIfNeededOnEdge(buildRequest());
+
+    expect(result).toBeUndefined();
+    expect(mocks.cookieManager.getRequestCookiesHeaderToRemove).not.toHaveBeenCalled();
   });
 
   it('returns only the upstream set-cookie headers when no session can be sealed', async () => {
