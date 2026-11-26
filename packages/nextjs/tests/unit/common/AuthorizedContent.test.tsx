@@ -65,14 +65,11 @@ describe('AuthorizedContent', () => {
   });
 
   it('delegates rendering to the render prop with the authorization result', () => {
-    // Arrange
     givenUser({ roles: keys('viewer') });
     const render = vi.fn((isAuthorized: boolean) => (isAuthorized ? 'yes' : 'no'));
 
-    // Act
     const html = renderToString(<AuthorizedContent requiredRoles={['admin']} render={render} />);
 
-    // Assert
     expect(render).toHaveBeenCalledWith(false);
     expect(html).toBe('no');
   });

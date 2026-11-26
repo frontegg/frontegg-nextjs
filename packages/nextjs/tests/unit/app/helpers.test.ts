@@ -50,13 +50,10 @@ describe('handleOptionalPromiseObject', () => {
 
 describe('getAppSession', () => {
   it('creates the session from the synchronous cookie store', async () => {
-    // Arrange
     mockedCreateSession.mockResolvedValue(SESSION);
 
-    // Act
     const session = await getAppSession();
 
-    // Assert
     expect(mockedParseCookies).toHaveBeenCalledWith(COOKIE_LIST);
     expect(mockedCreateSession).toHaveBeenCalledWith('sealed', encryption);
     expect(session).toBe(SESSION);

@@ -57,7 +57,6 @@ afterEach(async () => {
 
 describe('useUsersTable', () => {
   it('returns an idle default store until the app store resolves, then the app store', async () => {
-    // Arrange
     const store = deferred<any>();
     const app = { getUsersTableStore: vi.fn(() => store.promise) };
     const snapshots: any[] = [];
@@ -66,12 +65,10 @@ describe('useUsersTable', () => {
       return null;
     };
 
-    // Act
     await render(<Probe />, app);
     const initial = snapshots[snapshots.length - 1];
     await act(async () => store.resolve({ searchQuery: 'bob', searching: true }));
 
-    // Assert
     expect(app.getUsersTableStore).toHaveBeenCalledWith({ id: 'table-1' });
     expect(initial).toMatchObject({ searchQuery: '', searching: false });
     expect(initial.onSearch()).toBeUndefined();
@@ -79,7 +76,6 @@ describe('useUsersTable', () => {
   });
 
   it('keeps the default store and logs when the app store fails', async () => {
-    // Arrange
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const error = new Error('not ready');
     const app = { getUsersTableStore: vi.fn(() => Promise.reject(error)) };
@@ -89,10 +85,8 @@ describe('useUsersTable', () => {
       return null;
     };
 
-    // Act
     await render(<Probe />, app);
 
-    // Assert
     expect(consoleError).toHaveBeenCalledWith('Error getting users table store', error);
     expect(snapshot).toMatchObject({ searchQuery: '', searching: false });
   });
@@ -100,7 +94,6 @@ describe('useUsersTable', () => {
 
 describe('useInviteUserDialog', () => {
   it('returns a closed default dialog until the app store resolves, then the app store', async () => {
-    // Arrange
     const appStore = { dialogOpen: true, openDialog: vi.fn(), closeDialog: vi.fn() };
     const app = { getInviteUserDialogStore: vi.fn(() => Promise.resolve(appStore)) };
     const snapshots: any[] = [];
@@ -109,10 +102,8 @@ describe('useInviteUserDialog', () => {
       return null;
     };
 
-    // Act
     await render(<Probe />, app);
 
-    // Assert
     expect(app.getInviteUserDialogStore).toHaveBeenCalledWith({ id: 'dialog-1' });
     expect(snapshots[0]).toMatchObject({ dialogOpen: false });
     expect(snapshots[0].openDialog()).toBeUndefined();
@@ -145,14 +136,12 @@ describe('CMC components', () => {
     [ProfilePage, 'renderProfilePage'],
     [EditEmailForm, 'renderEditEmailForm'],
   ] as const)('%o renders through app.%s into a styled host element', async (Component: any, renderer) => {
-    // Arrange
     const app = { [renderer]: vi.fn(async () => ({ unmount: vi.fn() })) };
     const props = { id: 'x' };
     const themeOptions = { palette: {} };
     const localizations = { en: {} };
     const containerStyle = { padding: 1 };
 
-    // Act
     await render(
       <Component
         props={props}
@@ -164,7 +153,6 @@ describe('CMC components', () => {
       app
     );
 
-    // Assert
     const host = container.firstElementChild as HTMLDivElement;
     expect(host.style.width).toBe('10px');
     expect(app[renderer]).toHaveBeenCalledWith(host, props, { themeOptions, localizations, containerStyle });

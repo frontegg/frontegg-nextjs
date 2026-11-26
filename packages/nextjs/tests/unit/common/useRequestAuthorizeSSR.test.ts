@@ -9,16 +9,13 @@ afterEach(() => {
 
 describe('useRequestAuthorizeSSR', () => {
   it('hydrates the store with the server user, merging session tokens into the user', () => {
-    // Arrange
     const app = createApp();
     const user = { id: 'u', email: 'a@b.c' } as any;
     const tenants = [{ id: 't' }] as any;
     const session = { accessToken: 'session-access', refreshToken: 'session-refresh' } as any;
 
-    // Act
     useRequestAuthorizeSSR({ app, user, tenants, session });
 
-    // Assert
     expect(app.store.dispatch).toHaveBeenCalledWith({
       type: 'auth/requestAuthorizeSSR',
       payload: {

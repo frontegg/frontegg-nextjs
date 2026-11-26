@@ -46,24 +46,19 @@ describe('resetGlobalCustomLoginAppUrl', () => {
 
 describe('getAppUrlForCustomLoginWithSubdomain', () => {
   it('does nothing when no subdomain index is configured', async () => {
-    // Act
     const result = await getAppUrlForCustomLoginWithSubdomain(undefined);
 
-    // Assert
     expect(result).toBeUndefined();
     expect(mockedGetAppHeaders).not.toHaveBeenCalled();
     expect((global as any).customLoginAppUrl).toBe('https://stale.example.com');
   });
 
   it('resolves and stores the tenant application url for a subdomain alias', async () => {
-    // Arrange
     mockedGetAppHeaders.mockResolvedValue({ host: 'acme.example.com', cookie: 'c' });
     mockedGetPublicSettings.mockResolvedValue({ applicationUrl: 'https://acme.example.com' } as any);
 
-    // Act
     const result = await getAppUrlForCustomLoginWithSubdomain(0);
 
-    // Assert
     expect(mockedGetPublicSettings).toHaveBeenCalledWith({
       host: 'acme.example.com',
       cookie: 'c',

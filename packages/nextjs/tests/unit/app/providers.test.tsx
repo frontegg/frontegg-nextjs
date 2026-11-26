@@ -61,11 +61,9 @@ afterEach(() => {
 
 describe('ClientFronteggProvider', () => {
   it('wires the next router, the env base path and a tenant resolver into the base provider', () => {
-    // Arrange
     vi.stubEnv('__NEXT_ROUTER_BASEPATH', '/base');
     vi.stubGlobal('window', { location: { hostname: 'acme.example.com', search: '' } });
 
-    // Act
     const html = renderToString(
       <ClientFronteggProvider
         {...({ envAppUrl: 'https://app.example.com', contextOptions: { requestCredentials: 'include' } } as any)}
@@ -75,7 +73,6 @@ describe('ClientFronteggProvider', () => {
       </ClientFronteggProvider>
     );
 
-    // Assert
     expect(html).toBe('<b>child</b>');
     const props = mockedBaseProvider.mock.calls[0][0] as any;
     expect(props.router).toBe(vi.mocked(useRouter).mock.results[0].value);
@@ -102,14 +99,11 @@ describe('ClientFronteggProvider', () => {
 
 describe('FronteggAppProvider', () => {
   it('builds client provider props from env config, user data and options', async () => {
-    // Arrange
     const userData = { user: { id: 'u' }, tenants: [], session: { accessToken: 'a' } };
     mockedFetchUserData.mockResolvedValue(userData as any);
 
-    // Act
     const element: any = await FronteggAppProvider({ customLoginOptions: { subDomainIndex: 1 } } as any);
 
-    // Assert
     expect(element.type).toBe(ClientFronteggProvider);
     expect(mockedFetchUserData).toHaveBeenCalledWith({ getSession: getAppSession, getHeaders: getAppHeaders });
     expect(mockedSubdomainAppUrl).toHaveBeenCalledWith(1);
@@ -163,13 +157,11 @@ describe('FronteggAppProvider', () => {
 
 describe('FronteggAppRouter', () => {
   it('renders the router base for auth routes with sync props', () => {
-    // Act
     const element: any = FronteggAppRouter({
       params: { 'frontegg-router': ['account', 'login'] },
       searchParams: { redirectUrl: '/x' },
     });
 
-    // Assert
     expect(element.type).toBe(FronteggRouterBase);
     expect(element.props).toEqual({
       pathArr: ['account', 'login'],

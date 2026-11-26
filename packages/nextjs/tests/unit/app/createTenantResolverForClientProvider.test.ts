@@ -13,11 +13,10 @@ describe('createTenantResolverForClientProvider', () => {
   });
 
   it('resolves the tenant from the configured subdomain index', () => {
-    // Arrange
     stubLocation({ hostname: 'acme.eu.example.com', search: '' });
     const resolver = createTenantResolverForClientProvider({ subDomainIndex: 0 } as any)!;
 
-    // Act & Assert
+    // & Assert
     expect(resolver()).toEqual({ tenant: 'acme' });
   });
 

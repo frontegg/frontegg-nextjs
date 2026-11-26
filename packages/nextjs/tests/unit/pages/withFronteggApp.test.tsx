@@ -67,17 +67,14 @@ afterEach(() => {
 
 describe('withFronteggApp getInitialProps bypass', () => {
   it('only runs the original initial props for bypassed urls', async () => {
-    // Arrange
     const app = createApp(async () => ({ fromApp: 1 }));
     const appContext = createAppContext({
       req: { url: '/favicon.ico', headers: {} },
       componentGetInitialProps: async () => ({ fromPage: 2 }),
     });
 
-    // Act
     const result = await getInitialProps(app, appContext);
 
-    // Assert
     expect(result).toEqual({ pageProps: { fromApp: 1, fromPage: 2 } });
     expect(mockedFetchUserData).not.toHaveBeenCalled();
     expect(mockedRefresh).not.toHaveBeenCalled();
@@ -100,13 +97,10 @@ describe('withFronteggApp getInitialProps bypass', () => {
 
 describe('withFronteggApp getInitialProps on the client', () => {
   it('does not fetch user data or request authorize without a server request', async () => {
-    // Arrange
     const appContext: any = { ...createAppContext(), ctx: {} };
 
-    // Act
     const result = await getInitialProps(createApp(), appContext);
 
-    // Assert
     expect(mockedShouldBypass).toHaveBeenCalledWith('/', undefined);
     expect(result).toEqual({ pageProps: { shouldRequestAuthorize: false } });
     expect(appContext).toMatchObject({ session: null, user: null, tenants: null });
@@ -123,16 +117,13 @@ describe('withFronteggApp getInitialProps on the server', () => {
   });
 
   it('fetches user data and exposes it to the app, the page and page props', async () => {
-    // Arrange
     const userData = { session: { accessToken: 'a' }, user: { id: 'u' }, tenants: [{ id: 't' }] };
     mockedFetchUserData.mockResolvedValue(userData as any);
     const originalGetInitialProps = vi.fn(async (ctx: any) => ({ appSawUser: ctx.user.id }));
     const appContext: any = createAppContext({ componentGetInitialProps: async () => ({ page: true }) });
 
-    // Act
     const result = await getInitialProps(createApp(originalGetInitialProps), appContext);
 
-    // Assert
     expect(appContext.user).toEqual({ id: 'u' });
     expect(result.pageProps).toEqual({
       appSawUser: 'u',
@@ -144,16 +135,13 @@ describe('withFronteggApp getInitialProps on the server', () => {
   });
 
   it('resolves the session and request headers lazily for fetchUserData', async () => {
-    // Arrange
     mockedFetchUserData.mockResolvedValue(undefined as any);
     mockedRefresh.mockResolvedValue({ accessToken: 'a' } as any);
     const appContext = createAppContext();
 
-    // Act
     await getInitialProps(createApp(), appContext);
     const { getSession, getHeaders } = mockedFetchUserData.mock.calls[0][0];
 
-    // Assert
     await expect(getSession()).resolves.toEqual({ accessToken: 'a' });
     expect(mockedRefresh).toHaveBeenCalledWith(appContext.ctx);
     await expect(getHeaders()).resolves.toEqual({ cookie: 'c' });
@@ -176,7 +164,6 @@ describe('withFronteggApp getInitialProps on the server', () => {
   });
 
   it('redacts token signatures from user data when secure jwt is enabled', async () => {
-    // Arrange
     vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedFetchUserData.mockResolvedValue({
       session: { accessToken: jwt('s'), refreshToken: 'r' },
@@ -184,26 +171,21 @@ describe('withFronteggApp getInitialProps on the server', () => {
       tenants: [],
     } as any);
 
-    // Act
     const result = await getInitialProps(createApp(), createAppContext());
 
-    // Assert
     expect(result.pageProps.session).toEqual({ accessToken: 'REDACTED_FOR_SECURITY.s.REDACTED_FOR_SECURITY' });
     expect(result.pageProps.user).toEqual({ id: 'u' });
   });
 
   it('resolves only the session for runtime next.js requests that are not bypassed', async () => {
-    // Arrange
     // shouldBypassGetInitialProps bypasses every /_next/ url, so the runtime branch is only reachable in isolation
     mockedShouldBypass.mockReturnValueOnce(false);
     vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedRefresh.mockResolvedValue({ accessToken: jwt('rt'), refreshToken: 'r' } as any);
     const appContext = createAppContext({ req: { url: '/_next/data/build/page.json', headers: {} } });
 
-    // Act
     const result = await getInitialProps(createApp(), appContext);
 
-    // Assert
     expect(mockedFetchUserData).not.toHaveBeenCalled();
     expect(result.pageProps).toEqual({
       session: { accessToken: 'REDACTED_FOR_SECURITY.rt.REDACTED_FOR_SECURITY' },
@@ -230,7 +212,6 @@ describe('withFronteggApp rendered app', () => {
   });
 
   it('wraps the app with the pages provider fed from page props and options', () => {
-    // Arrange
     const app = createApp();
     const Wrapped: any = withFronteggApp(app, { contextOptions: { tenantResolver: undefined } } as any);
     const pageProps = {
@@ -248,10 +229,8 @@ describe('withFronteggApp rendered app', () => {
       shouldRequestAuthorize: true,
     };
 
-    // Act
     const html = renderToString(<Wrapped pageProps={pageProps} __N_SSG />);
 
-    // Assert
     expect(html).toBe('<span>Hello</span>');
     expect(Wrapped.getInitialProps).toBe(app.getInitialProps);
     const { children, ...providerProps } = mockedProvider.mock.calls[0][0] as any;

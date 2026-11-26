@@ -24,14 +24,12 @@ import { FronteggBaseProvider } from '../../../src/common/FronteggBaseProvider';
 
 describe('FronteggBaseProvider on the server', () => {
   it('renders children without client only always visible children', () => {
-    // Act
     const html = renderToString(
       <FronteggBaseProvider router={{} as any} {...({ alwaysVisibleChildren: <em>always</em> } as any)}>
         <span>child</span>
       </FronteggBaseProvider>
     );
 
-    // Assert
     expect(html).toBe('<span>child</span>');
     expect(vi.mocked(FronteggStoreProvider as any).mock.calls[0][0].alwaysVisibleChildren).toBeUndefined();
     expect(CustomComponentRegister).not.toHaveBeenCalled();

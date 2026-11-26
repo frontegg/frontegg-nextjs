@@ -28,13 +28,11 @@ describe('createSessionFromAccessToken', () => {
   });
 
   it('seals camelCase tokens and returns the decoded jwt with seconds until expiry', async () => {
-    // Act
     const [session, decodedJwt, refreshToken] = await createSessionFromAccessToken({
       accessToken: 'access',
       refreshToken: 'refresh',
     });
 
-    // Assert
     expect(mockedVerify).toHaveBeenCalledWith('access');
     expect(mockedSeal).toHaveBeenCalledWith({ accessToken: 'access', refreshToken: 'refresh' }, EXP);
     expect(session).toBe('sealed');
@@ -77,10 +75,8 @@ describe('getAfterAuthRedirectUrl', () => {
   });
 
   it('appends the remaining query params to the redirect path', () => {
-    // Act
     const result = getAfterAuthRedirectUrl({ redirectUrl: '/dashboard', tab: '2', q: 'a b' });
 
-    // Assert
     expect(result).toBe(`${window.location.origin}/dashboard?tab=2&q=a+b`);
   });
 

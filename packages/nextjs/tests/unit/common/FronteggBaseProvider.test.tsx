@@ -71,7 +71,6 @@ afterEach(async () => {
 
 describe('FronteggBaseProvider setup', () => {
   it('initializes the frontegg app and exposes it to children through AppContext', async () => {
-    // Arrange
     const props = { envAppUrl: 'https://app.example.com', authOptions: { routes: { loginUrl: '/signin' } } };
     let contextApp: unknown;
     const Consumer = () => {
@@ -79,10 +78,8 @@ describe('FronteggBaseProvider setup', () => {
       return <span>child</span>;
     };
 
-    // Act
     await render(props, <Consumer />);
 
-    // Assert
     expect(config.fronteggAppOptions).toMatchObject(props);
     expect(mockedUseOnRedirectTo).toHaveBeenCalledWith('', router, { loginUrl: '/signin' });
     expect(mockedInitialize).toHaveBeenCalledWith({
@@ -116,15 +113,12 @@ describe('FronteggBaseProvider setup', () => {
 
 describe('FronteggBaseProvider server session hydration', () => {
   it('hydrates tokens, user and store from the server session', async () => {
-    // Arrange
     const session = { accessToken: 'access', refreshToken: 'refresh' };
     const user = { id: 'u' };
     const tenants = [{ id: 't' }];
 
-    // Act
     await render({ shouldRequestAuthorize: true, isSSG: false, session, user, tenants });
 
-    // Assert
     expect(contextHolder.setAccessToken).toHaveBeenCalledWith('access');
     expect(contextHolder.setUser).toHaveBeenCalledWith(user);
     expect(app.store.dispatch).toHaveBeenCalledWith({
@@ -157,10 +151,8 @@ describe('FronteggBaseProvider server session hydration', () => {
 
 describe('FronteggBaseProvider static page authorization', () => {
   it('silently requests authorize once for static pages', async () => {
-    // Act
     await render({ shouldRequestAuthorize: true, isSSG: true });
 
-    // Assert
     expect(hooks.setAuthState).toHaveBeenNthCalledWith(1, { silentRefreshing: true });
     expect(hooks.requestAuthorize).toHaveBeenCalledTimes(1);
     expect(hooks.setAuthState).toHaveBeenLastCalledWith({ silentRefreshing: false });

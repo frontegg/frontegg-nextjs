@@ -64,7 +64,6 @@ afterEach(async () => {
 
 describe('FronteggProviderNoSSR', () => {
   it('creates a shared store and initializes a new frontegg app on first render', async () => {
-    // Arrange
     const authOptions = { routes: { loginUrl: '/signin' } };
     let contextApp: any;
     const Consumer = () => {
@@ -72,10 +71,8 @@ describe('FronteggProviderNoSSR', () => {
       return <span>child</span>;
     };
 
-    // Act
     await render({ authOptions, contextOptions: { baseUrl: 'https://auth.example.com' } }, <Consumer />);
 
-    // Assert
     expect(useOnRedirectTo).toHaveBeenCalledWith('/base', router, authOptions.routes);
     expect(mockedCreateStore).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -108,14 +105,11 @@ describe('FronteggProviderNoSSR', () => {
   });
 
   it('reuses an already initialized app and attaches the shared store to it', async () => {
-    // Arrange
     const existingApp: any = { store: undefined };
     mockedGetInstance.mockReturnValue(existingApp);
 
-    // Act
     await render({ appName: 'admin' } as any);
 
-    // Assert
     expect(mockedGetInstance).toHaveBeenCalledWith('admin');
     expect(mockedInitialize).not.toHaveBeenCalled();
     expect(existingApp.store).toBe(store);

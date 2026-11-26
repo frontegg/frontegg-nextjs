@@ -18,10 +18,9 @@ describe('shouldBypassGetInitialProps', () => {
   });
 
   it('honors options that disable each bypass', () => {
-    // Arrange
     const options = { bypassNextJsFiles: false, bypassHeaderRequests: false, bypassWillKnownRoutes: false };
 
-    // Act & Assert
+    // & Assert
     expect(shouldBypassGetInitialProps('/_next/static/a.js', undefined, options)).toBe(false);
     expect(shouldBypassGetInitialProps('/favicon.ico', undefined, options)).toBe(false);
     expect(shouldBypassGetInitialProps('/.well-known/x', undefined, options)).toBe(false);

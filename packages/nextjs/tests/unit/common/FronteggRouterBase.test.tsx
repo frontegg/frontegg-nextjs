@@ -62,15 +62,13 @@ describe('FronteggRouterBase with hosted login', () => {
     expect(localStorage.getItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL)).toBeNull();
   });
 
-  it('remembers where to return after login, currently storing the origin twice (documents a known bug)', async () => {
-    await render({ pathArr: ['account', 'login'], queryParams: { redirectUrl: '/dashboard' } }, true);
+  it('remembers where to return after login as a single absolute url', async () => {
+    await render({ pathArr: ['account', 'login'], queryParams: { redirectUrl: '/dashboard', tab: '2' } }, true);
 
     expect(loginWithRedirect).toHaveBeenCalledTimes(1);
-    // BUG: getAfterAuthRedirectUrl already returns an absolute url, and FronteggRouterBase prefixes
-    // window.location.origin again, so the stored value is not a valid url. The correct value would be
-    // `${origin}/dashboard`. This assertion locks in current behaviour so a fix is a visible change.
-    const { origin } = window.location;
-    expect(localStorage.getItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL)).toBe(`${origin}${origin}/dashboard`);
+    const stored = localStorage.getItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL);
+    expect(stored).toBe(`${window.location.origin}/dashboard?tab=2`);
+    expect(new URL(stored as string).host).toBe(window.location.host);
   });
 
   it('logs out on the logout route', async () => {
@@ -116,8 +114,7 @@ describe('FronteggRouterBase with embedded login', () => {
   });
 
   it('navigates to the authenticated url instead of requesting authorize on the hosted login callback route', async () => {
-    // jsdom cannot navigate, it reports the attempted location change as a "not implemented" error;
-    // a non-root authenticated url makes sure the assignment is a real navigation and not a no-op
+    // jsdom reports navigation as "not implemented"; a non-root url makes the assignment a real navigation
     Object.assign(config, { authRoutes: { authenticatedUrl: '/dashboard' } });
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 

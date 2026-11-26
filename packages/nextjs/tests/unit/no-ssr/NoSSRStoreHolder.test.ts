@@ -14,14 +14,11 @@ describe('NoSSRStoreHolder', () => {
   });
 
   it('returns the same holder on every call so the store is shared across renders', async () => {
-    // Arrange
     const NoSSRStoreHolder = await loadHolder();
     const store = { getState: vi.fn() } as any;
 
-    // Act
     NoSSRStoreHolder.getInstance().store = store;
 
-    // Assert
     expect(NoSSRStoreHolder.getInstance()).toBe(NoSSRStoreHolder.getInstance());
     expect(NoSSRStoreHolder.getInstance().store).toBe(store);
   });

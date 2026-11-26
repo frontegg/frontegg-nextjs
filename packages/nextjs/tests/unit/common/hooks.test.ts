@@ -35,14 +35,11 @@ afterEach(() => {
 
 describe('useLogoutHostedLogin', () => {
   it('logs out and navigates to the hosted logout route returning to the current page', () => {
-    // Arrange
     givenContextBaseUrl('https://auth.example.com');
     const logoutHostedLogin = useLogoutHostedLogin();
 
-    // Act
     logoutHostedLogin();
 
-    // Assert
     expect(mockedContextFor).toHaveBeenCalledWith('my-app');
     expect(logout).toHaveBeenCalledWith(expect.any(Function));
     expect(location.href).toBe(logoutUrlFor('https://auth.example.com', 'https://app.example.com/current'));

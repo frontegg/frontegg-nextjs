@@ -31,16 +31,13 @@ beforeEach(() => {
 
 describe('FronteggRouter', () => {
   it('passes the catch all path segments and the remaining query to the router base', () => {
-    // Arrange
     mockedUseRouter.mockReturnValue({
       query: { 'frontegg-router': ['account', 'login'], redirectUrl: '/x' },
       route: '/[...frontegg-router]',
     } as any);
 
-    // Act
     renderToString(<FronteggRouter />);
 
-    // Assert
     expect(mockedRouterBase.mock.calls[0][0]).toEqual({
       pathArr: ['account', 'login'],
       queryParams: { redirectUrl: '/x' },
@@ -73,13 +70,12 @@ describe('FronteggRouterProps', () => {
   });
 
   it('resolves client side data requests from the catch all query array', () => {
-    // Arrange
     const context = {
       resolvedUrl: '/_next/data/build-id/account/logout.json',
       req: { query: { 'frontegg-router': ['account', 'logout'] } },
     };
 
-    // Act & Assert
+    // & Assert
     expect(FronteggRouterProps(context).notFound).toBe(false);
   });
 
@@ -106,10 +102,8 @@ describe('static routing helpers', () => {
   });
 
   it('lists every auth route except the authenticated root with fallback enabled', () => {
-    // Act
     const { paths, fallback } = FronteggStaticPaths();
 
-    // Assert
     expect(fallback).toBe(true);
     expect(paths).toContain('/account/login');
     expect(paths).toContain('/oauth/callback');

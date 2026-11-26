@@ -39,31 +39,25 @@ beforeEach(() => {
 
 describe('getSession', () => {
   it('reads the session cookie from the request', async () => {
-    // Arrange
     const req = { headers: { cookie: 'fe_session=x' } } as any;
     mockedFromRequest.mockReturnValue('x');
     mockedCreateSession.mockResolvedValue(SESSION);
 
-    // Act
     const session = await getSession(req, undefined);
 
-    // Assert
     expect(mockedFromRequest).toHaveBeenCalledWith(req);
     expect(mockedCreateSession).toHaveBeenCalledWith('x', encryption);
     expect(session).toBe(SESSION);
   });
 
   it('reads the session cookie from the request when the response has no new session cookie', async () => {
-    // Arrange
     const req = { headers: {} } as any;
     const res = createRes(['other=1']);
     mockedFromRequest.mockReturnValue('from-request');
     mockedCreateSession.mockResolvedValue(SESSION);
 
-    // Act
     const session = await getSession(req, res);
 
-    // Assert
     expect(mockedHasSetSessionCookie).toHaveBeenCalledWith(['other=1']);
     expect(mockedFromResponse).not.toHaveBeenCalled();
     expect(mockedFromRequest).toHaveBeenCalledWith(req);
@@ -72,15 +66,12 @@ describe('getSession', () => {
   });
 
   it('prefers a session cookie already set on the response by a previous redirect', async () => {
-    // Arrange
     const res = createRes(['fe_session=fresh']);
     mockedHasSetSessionCookie.mockReturnValue(true);
     mockedFromResponse.mockReturnValue('fresh');
 
-    // Act
     await getSession({} as any, res);
 
-    // Assert
     expect(mockedFromResponse).toHaveBeenCalledWith(res);
     expect(mockedFromRequest).not.toHaveBeenCalled();
     expect(mockedCreateSession).toHaveBeenCalledWith('fresh', encryption);
@@ -89,28 +80,22 @@ describe('getSession', () => {
 
 describe('withSSRSession', () => {
   it('calls the handler with the context and the session when authenticated', async () => {
-    // Arrange
     mockedCreateSession.mockResolvedValue(SESSION);
     const handler = vi.fn(async () => ({ props: { ok: true } }));
     const context = createContext('/dashboard');
 
-    // Act
     const result = await withSSRSession(handler)(context);
 
-    // Assert
     expect(handler).toHaveBeenCalledWith(context, SESSION);
     expect(result).toEqual({ props: { ok: true } });
   });
 
   it('redirects unauthenticated users to the login page with the resolved url', async () => {
-    // Arrange
     mockedCreateSession.mockResolvedValue(undefined);
     const handler = vi.fn();
 
-    // Act
     const result: any = await withSSRSession(handler)(createContext('/dashboard'));
 
-    // Assert
     expect(handler).not.toHaveBeenCalled();
     expect(result).toEqual({
       redirect: { permanent: false, destination: '/account/login?redirectUrl=%2Fdashboard' },

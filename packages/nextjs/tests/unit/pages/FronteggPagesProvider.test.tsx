@@ -14,18 +14,15 @@ const mockedBaseProvider = vi.mocked(FronteggBaseProvider);
 
 describe('FronteggPagesProvider', () => {
   it('passes the next router and its base path to the base provider', () => {
-    // Arrange
     const router = { basePath: '/docs' } as any;
     mockedUseRouter.mockReturnValue(router);
 
-    // Act
     const html = renderToString(
       <FronteggPagesProvider {...({ envAppUrl: 'https://app.example.com' } as any)}>
         <i>child</i>
       </FronteggPagesProvider>
     );
 
-    // Assert
     expect(html).toBe('<i>child</i>');
     expect(mockedBaseProvider.mock.calls[0][0]).toMatchObject({
       router,
