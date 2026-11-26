@@ -3,7 +3,7 @@ import { getTenants, getMe, getMeAuthorization, getEntitlements } from '../../ap
 import { calculateExpiresInFromExp } from '../common';
 import fronteggLogger from '../fronteggLogger';
 import config from '../../config';
-import { FRONTEGG_APPLICATION_ID_HEADER, FRONTEGG_FORWARD_IP_HEADER, getClientIp } from '../../api/utils';
+import { FRONTEGG_APPLICATION_ID_HEADER, resolveTrustedClientIp } from '../../api/utils';
 
 const FULFILLED_STATUS = 'fulfilled';
 
@@ -25,32 +25,19 @@ export default async function fetchUserData(options: FetchUserDataOptions): Prom
 
     const { accessToken } = session;
     const reqHeaders = await getHeaders();
+    const clientIp = resolveTrustedClientIp({ headers: reqHeaders });
     const headers: Record<string, string> = { ...reqHeaders, authorization: `Bearer ${accessToken}` };
 
     if (config.appId) {
       headers[FRONTEGG_APPLICATION_ID_HEADER] = config.appId;
     }
 
-    if (config.shouldForwardIp) {
-      logger.debug('Retrieving forwarded IP...');
-      const clientIp = getClientIp(
-        reqHeaders['cf-connecting-ip'] ||
-          reqHeaders['x-vercel-proxied-for'] ||
-          reqHeaders['x-real-ip'] ||
-          reqHeaders['x-forwarded-for']
-      );
-
-      if (clientIp) {
-        headers[FRONTEGG_FORWARD_IP_HEADER] = clientIp;
-      }
-    }
-
     logger.debug('Retrieving user data...');
     const [baseUserResult, tenantsResult, entitlementsResult, meAuthorizationResult] = await Promise.allSettled([
-      getMe(headers),
-      getTenants(headers),
-      getEntitlements(headers),
-      getMeAuthorization(headers),
+      getMe(headers, clientIp),
+      getTenants(headers, clientIp),
+      getEntitlements(headers, clientIp),
+      getMeAuthorization(headers, clientIp),
     ]);
 
     logger.debug(

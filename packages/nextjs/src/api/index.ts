@@ -29,12 +29,12 @@ const loadPublicKey = async () => {
  * Send HTTP post-request for Frontegg services to refresh token
  * by providing client's fe_ cookies
  */
-const refreshTokenEmbedded = async (headers: Record<string, string>) => {
+const refreshTokenEmbedded = async (headers: Record<string, string>, clientIp?: string) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.embedded}`,
     body: '{}',
     credentials: 'include',
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
 };
 
@@ -46,7 +46,8 @@ const refreshTokenHostedLogin = async (
   headers: Record<string, string>,
   refreshToken: string,
   clientId?: string,
-  clientSecret?: string
+  clientSecret?: string,
+  clientIp?: string
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
@@ -56,7 +57,7 @@ const refreshTokenHostedLogin = async (
       client_id: clientId,
       client_secret: clientSecret,
     }),
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
 };
 
@@ -68,7 +69,8 @@ export const exchangeHostedLoginToken = async (
   code: string,
   cliendId: string,
   clientSecret: string,
-  redirectUri: string = buildHostedLoginRedirectUri()
+  redirectUri: string = buildHostedLoginRedirectUri(),
+  clientIp?: string
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
@@ -80,7 +82,7 @@ export const exchangeHostedLoginToken = async (
       client_secret: clientSecret,
       // code_verifier
     }),
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
 };
 
@@ -88,8 +90,11 @@ export const exchangeHostedLoginToken = async (
  *
  * @param headers
  */
-export const getMe = async (headers: Record<string, string>): Promise<ILoginResponse | undefined> => {
-  const headersToSend = buildRequestHeaders(headers);
+export const getMe = async (
+  headers: Record<string, string>,
+  clientIp?: string
+): Promise<ILoginResponse | undefined> => {
+  const headersToSend = buildRequestHeaders(headers, clientIp);
   const res = await Get({
     url: `${config.baseUrl}/frontegg${fronteggUsersUrl}`,
     headers: headersToSend,
@@ -102,9 +107,10 @@ export const getMe = async (headers: Record<string, string>): Promise<ILoginResp
  * @param headers
  */
 export const getEntitlements = async (
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  clientIp?: string
 ): Promise<UserEntitlementsResponseV2 | undefined> => {
-  const headersToSend = buildRequestHeaders(headers);
+  const headersToSend = buildRequestHeaders(headers, clientIp);
   const res = await Get({
     url: `${config.baseUrl}${fronteggEntitlementsV2Url}`,
     headers: headersToSend,
@@ -117,11 +123,12 @@ export const getEntitlements = async (
  * @param headers
  */
 export const getTenants = async (
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  clientIp?: string
 ): Promise<GetCurrentUserTenantsResponse | undefined> => {
   const res = await Get({
     url: `${config.baseUrl}/frontegg${fronteggTenantsV3Url}`,
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
   return parseHttpResponse(res);
 };
@@ -131,23 +138,25 @@ export const getTenants = async (
  * @param headers
  */
 export const getMeAuthorization = async (
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  clientIp?: string
 ): Promise<IGetUserAuthorizationResponse | undefined> => {
   const res = await Get({
     // TODO: replace this with rest/api route
     url: `${config.baseUrl}/frontegg/identity/resources/users/v1/me/authorization`,
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
   return parseHttpResponse(res);
 };
 
 export const getPublicSettings = async (
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  clientIp?: string
 ): Promise<IPublicSettingsResponse | undefined> => {
   const res = await Get({
     // TODO: export the route url from rest-api and import from there
     url: `${config.baseUrl}/frontegg/tenants/resources/account-settings/v1/public`,
-    headers: buildRequestHeaders(headers),
+    headers: buildRequestHeaders(headers, clientIp),
   });
   return parseHttpResponse(res);
 };

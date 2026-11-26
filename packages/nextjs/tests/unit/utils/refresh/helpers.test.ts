@@ -33,6 +33,7 @@ import api from '../../../../src/api';
 import { getTokensFromCookie } from '../../../../src/common';
 import config from '../../../../src/config';
 import CookieManager from '../../../../src/utils/cookies';
+import fronteggLogger from '../../../../src/utils/fronteggLogger';
 import { FRONTEGG_FORWARDED_SESSION_KEY } from '../../../../src/utils/common/constants';
 
 const mockedApi = vi.mocked(api);
@@ -40,7 +41,7 @@ const mockedGetTokens = vi.mocked(getTokensFromCookie);
 
 beforeEach(() => {
   // restore baseline config between tests
-  Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined });
+  Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined, clientIpHeader: undefined });
 });
 
 describe('hasRefreshTokenCookie', () => {
@@ -84,7 +85,19 @@ describe('refreshAccessTokenEmbedded', () => {
     const req = { headers: { foo: 'bar' }, cookies: { [key]: 'rt' } } as any;
     const result = await refreshAccessTokenEmbedded(req);
     expect(result).toBe(fakeRes);
-    expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers);
+    expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers, undefined);
+  });
+
+  it('forwards the client ip from the configured header', async () => {
+    Object.assign(config, { shouldForwardIp: true, clientIpHeader: 'x-real-ip' });
+    mockedApi.refreshTokenEmbedded.mockResolvedValueOnce({ ok: true } as any);
+    const key = CookieManager.refreshTokenKey;
+    const req = {
+      headers: { 'x-forwarded-for': '6.6.6.6', 'x-real-ip': '198.51.100.7' },
+      cookies: { [key]: 'rt' },
+    } as any;
+    await refreshAccessTokenEmbedded(req);
+    expect(mockedApi.refreshTokenEmbedded).toHaveBeenCalledWith(req.headers, '198.51.100.7');
   });
 
   it('attaches frontegg-requested-application-id header when appId set', async () => {
@@ -113,7 +126,26 @@ describe('refreshAccessTokenHostedLogin', () => {
     const req = { headers: {} as Record<string, string> } as any;
     const res = await refreshAccessTokenHostedLogin(req);
     expect(res).toEqual({ ok: true });
-    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(req.headers, 'rt-1');
+    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(
+      req.headers,
+      'rt-1',
+      undefined,
+      undefined,
+      undefined
+    );
+  });
+
+  it('does not log the refresh token', async () => {
+    const logger = { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() };
+    vi.spyOn(fronteggLogger, 'child').mockReturnValueOnce(logger as any);
+    mockedGetTokens.mockResolvedValueOnce({ refreshToken: 'rt-secret' } as any);
+    mockedApi.refreshTokenHostedLogin.mockResolvedValueOnce({ ok: true } as any);
+    vi.spyOn(CookieManager, 'getSessionCookieFromRequest').mockReturnValueOnce('seal');
+
+    await refreshAccessTokenHostedLogin({ headers: {} } as any);
+
+    const loggedValues = Object.values(logger).flatMap((logMethod) => logMethod.mock.calls.flat());
+    expect(loggedValues).not.toContain('rt-secret');
   });
 
   it('calls api.refreshTokenHostedLogin with clientId/secret when secureJwtEnabled=true', async () => {
@@ -123,7 +155,13 @@ describe('refreshAccessTokenHostedLogin', () => {
     vi.spyOn(CookieManager, 'getSessionCookieFromRequest').mockReturnValueOnce('seal');
     const req = { headers: {} } as any;
     await refreshAccessTokenHostedLogin(req);
-    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(req.headers, 'rt-2', 'abc-def-ghi', 'super-secret');
+    expect(mockedApi.refreshTokenHostedLogin).toHaveBeenCalledWith(
+      req.headers,
+      'rt-2',
+      'abc-def-ghi',
+      'super-secret',
+      undefined
+    );
   });
 
   it('attaches frontegg-requested-application-id header when appId set', async () => {
