@@ -1,18 +1,4 @@
-/**
- * Fresh-install smoke build: does a brand-new Next.js app that installs the packed SDK build?
- *
- * The repo's yarn.lock pins transitive dependencies, so CI never sees what a customer gets from
- * `npm install` today. This copies an example app out of the monorepo, installs the SDK tarball
- * with NO lockfile (latest matching transitive versions), and runs `next build`.
- *
- * Usage:
- *   node scripts/fresh-install-smoke.js --tarball <path.tgz> --example <app|pages> --next <version>
- *   (or --sdk-version <npm version> instead of --tarball, e.g. to check a published release)
- *     [--react <version>] [--out <dir>]
- *
- * Exits non-zero when install or build fails. Type errors in the example code are ignored on
- * purpose: this checks that the SDK bundles and builds, not that the examples type-check.
- */
+// Installs the packed SDK into a fresh example app with no lockfile and runs next build (usage: see parseArgs).
 const fs = require('fs');
 const os = require('os');
 const path = require('path');

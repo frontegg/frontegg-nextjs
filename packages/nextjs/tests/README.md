@@ -100,11 +100,11 @@ The mocked suite above fakes Frontegg in the browser, so it never sees the calls
 
 | Project | App | Covers |
 | ------- | --- | ------ |
-| `flows-embedded` | `example-app-directory` on :3100 | middleware session check and refresh, cookies forwarded to the app after a refresh, chunked sessions, rejected refresh, JWKS download, `/api/frontegg` proxy refresh and logout |
+| `flows-embedded` | `example-app-directory` on :3100 | middleware session check and refresh, cookies forwarded to the app after a refresh, chunked sessions, rejected refresh, a Frontegg outage during refresh (keeps the refresh cookie), JWKS download, `/api/frontegg` proxy refresh and logout |
 | `flows-hosted` | `example-app-directory` on :3101, hosted login + secure JWT | full hosted login through `/oauth/authorize`, code exchange, refresh-token grant, hosted logout |
 | `flows-pages` | `example-pages` on :3102 | `withSSRSession`, `getSession`, initial-load refresh, refresh before `getServerSideProps`, no-SSR page, logout |
 
-Tests inspect what the server sent through the mock's control API (`GET /__mock/requests`, `POST /__mock/reset`, `POST /__mock/config` to fail refreshes or grow tokens); see `tests/e2e/flows/fixtures/mock-backend.ts`. The example app exposes two probe routes for these tests: `/e2e/session` (what the App Router helpers resolve) and `/e2e/request-cookies` (cookies the server code received).
+Tests inspect what the server sent through the mock's control API (`GET /__mock/requests`, `POST /__mock/reset`, `POST /__mock/config` to fail refreshes or grow tokens); see `tests/e2e/flows/fixtures/mock-backend.ts`. The example app exposes two probe routes for these tests: `/e2e/session` (what the App Router helpers resolve, without token values) and `/e2e/request-cookies` (cookies the server code received). Both return 404 unless `FRONTEGG_E2E_PROBES=1`, which only `playwright.flows.config.ts` sets.
 
 ```bash
 yarn build                 # the example apps use the built SDK
