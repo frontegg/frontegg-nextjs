@@ -76,17 +76,12 @@ jobs:
         run: rm -f packages/example-app-directory/.env.local
       - name: Run real-tenant E2E (packages/nextjs)
         working-directory: packages/nextjs
+        # Defaults to the public demo tenant used above; set the FRONTEGG_BASE_URL / FRONTEGG_CLIENT_ID secrets to test another tenant.
         env:
-          FRONTEGG_BASE_URL: ${{ secrets.FRONTEGG_BASE_URL }}
-          FRONTEGG_CLIENT_ID: ${{ secrets.FRONTEGG_CLIENT_ID }}
+          FRONTEGG_BASE_URL: ${{ secrets.FRONTEGG_BASE_URL || 'https://demo.frontegg.com' }}
+          FRONTEGG_CLIENT_ID: ${{ secrets.FRONTEGG_CLIENT_ID || 'b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca' }}
           FRONTEGG_APP_URL: "http://localhost:3000"
-        run: |
-          # The specs skip themselves without these, which would look like a pass.
-          if [ -z "$FRONTEGG_BASE_URL" ] || [ -z "$FRONTEGG_CLIENT_ID" ]; then
-            echo "::error::FRONTEGG_BASE_URL and FRONTEGG_CLIENT_ID secrets are required for the real-tenant E2E"
-            exit 1
-          fi
-          npx playwright test --project=e2e-real
+        run: npx playwright test --project=e2e-real
       - uses: actions/upload-artifact@v4
         if: always()
         with:
