@@ -1,5 +1,95 @@
 # Change Log
 
+## [9.2.14](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.13...v9.2.14) (2026-9-29)
+
+
+### Highlights
+
+**Impersonation with Hosted Login and secure JWT** ([#448](https://github.com/frontegg/frontegg-nextjs/pull/448))
+
+Impersonation started from the Frontegg portal redirects to the application URL (`{appUrl}?code=...`) instead of `/oauth/callback`, so the Next.js middleware never created the session. To support it, enable the new environment variable:
+
+```
+FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL='true'
+```
+
+- Requires `FRONTEGG_SECURE_JWT_ENABLED='true'`.
+- `FRONTEGG_APP_URL` must be identical to the App URL configured in the Frontegg portal.
+- Off by default, so existing apps are not affected.
+
+### NextJS Wrapper 9.2.14:
+- fix: accept the hosted login code on the app URL for impersonation
+- fix: honor authRoutes.hostedLoginRedirectUrl for hosted login callback
+- fix: bump dependencies and resolve security vulnerabilities
+- test: add unit + E2E test coverage for cookies and token refresh
+
+## [9.2.13](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.12...v9.2.13) (2026-3-4)
+
+
+### NextJS Wrapper 9.2.13:
+- updated versions
+
+## [9.2.12](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.11...v9.2.12) (2025-12-11)
+
+- FR-21830 - Fixed IP location
+
+
+- FR-22289 - Added support new columns in users table
+
+<!-- CURSOR_SUMMARY -->
+---
+
+> [!NOTE]
+> Upgrade Frontegg dependencies to 7.95.0 and update lockfile accordingly.
+> 
+> - **Dependencies**:
+>   - Upgrade `packages/nextjs/package.json` to `@frontegg/js@7.95.0` and `@frontegg/react-hooks@7.95.0`.
+>   - Update `yarn.lock` accordingly, cascading to `@frontegg/{redux-store,rest-api,types}@7.95.0`.
+> 
+> <sup>Written by [Cursor Bugbot](https://cursor.com/dashboard?tab=bugbot) for commit 55e2eec8141ccc74188e8b18429ce1500155abd8. This will update automatically on new commits. Configure [here](https://cursor.com/dashboard?tab=bugbot).</sup>
+<!-- /CURSOR_SUMMARY -->
+- FR-22193 - Added admin portal support for searching by username, email, name, etc. in the users table
+
+<!-- CURSOR_SUMMARY -->
+---
+
+> [!NOTE]
+> Updates @frontegg/js and @frontegg/react-hooks to 7.93.0 and refreshes related lockfile entries.
+> 
+> - **Dependencies**:
+>   - Bump `@frontegg/js` and `@frontegg/react-hooks` to `7.93.0` in `packages/nextjs/package.json`.
+>   - Update related Frontegg entries in `yarn.lock` (`@frontegg/types`, `@frontegg/redux-store`, `@frontegg/rest-api`) to `7.93.0`.
+> 
+> <sup>Written by [Cursor Bugbot](https://cursor.com/dashboard?tab=bugbot) for commit 5e41e46c4b54adeb7957e68544a9f317b3a82202. This will update automatically on new commits. Configure [here](https://cursor.com/dashboard?tab=bugbot).</sup>
+<!-- /CURSOR_SUMMARY -->
+
+
+## [9.2.11](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.10...v9.2.11) (2025-11-30)
+
+- FR-22193 - Added admin portal support for searching by username, email, name, etc. in the users table
+
+<!-- CURSOR_SUMMARY -->
+---
+
+> [!NOTE]
+> Updates @frontegg/js and @frontegg/react-hooks to 7.93.0 and refreshes related lockfile entries.
+> 
+> - **Dependencies**:
+>   - Bump `@frontegg/js` and `@frontegg/react-hooks` to `7.93.0` in `packages/nextjs/package.json`.
+>   - Update related Frontegg entries in `yarn.lock` (`@frontegg/types`, `@frontegg/redux-store`, `@frontegg/rest-api`) to `7.93.0`.
+> 
+> <sup>Written by [Cursor Bugbot](https://cursor.com/dashboard?tab=bugbot) for commit 5e41e46c4b54adeb7957e68544a9f317b3a82202. This will update automatically on new commits. Configure [here](https://cursor.com/dashboard?tab=bugbot).</sup>
+<!-- /CURSOR_SUMMARY -->
+
+### NextJS Wrapper 9.2.11:
+- FR-22443 Enhance getSession function to require response object
+
+## [9.2.10](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.9...v9.2.10) (2025-10-19)
+
+
+### NextJS Wrapper 9.2.10:
+- FR-22407 - Fix bypass rules for will-known routes and getInitialProps for pages architecture
+
 ## [9.2.9](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.8...v9.2.9) (2025-8-7)
 
 

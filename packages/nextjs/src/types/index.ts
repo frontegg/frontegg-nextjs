@@ -2,7 +2,7 @@ import type { FronteggAppOptions } from '@frontegg/types';
 import type { ILoginResponse, ITenantsResponse } from '@frontegg/rest-api';
 import type { IncomingMessage } from 'http';
 import type { ReactNode } from 'react';
-import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { NextRouter } from 'next/router';
 
 export interface EncryptionUtils {

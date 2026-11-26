@@ -1,5 +1,9 @@
 import cookieSerializer from './serializer';
-import type { RequestCookie } from 'next/dist/server/web/spec-extension/cookies';
+/** Cookie shape for Next.js 14+ cookies() API compatibility */
+interface RequestCookie {
+  name: string;
+  value: string;
+}
 import config from '../../config';
 import { CookieSerializeOptions, CreateCookieOptions, RemoveCookiesOptions, RequestType, ResponseType } from './types';
 import { COOKIE_MAX_LENGTH } from './constants';

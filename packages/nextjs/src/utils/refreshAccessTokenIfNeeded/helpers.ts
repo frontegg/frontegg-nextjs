@@ -7,6 +7,7 @@ import { IncomingMessage } from 'http';
 import config from '../../config';
 
 import { FRONTEGG_FORWARDED_SESSION_KEY } from '../common/constants';
+import { isHostedLoginCallbackPath } from '../routing';
 import { FronteggNextJSSession } from '../../types';
 
 export function hasRefreshTokenCookie(cookies: Record<string, any>): boolean {
@@ -84,11 +85,13 @@ export function isRuntimeNextRequest(url: string): boolean {
 }
 
 /**
- * If url starts with '/oauth/callback' means that the user navigated back
+ * If url points at the hosted login callback route means that the user navigated back
  * from frontegg hosted login, in this scenario no need to SSR refresh token
  */
 export function isOauthCallback(url: string): boolean {
-  return url.startsWith('/oauth/callback');
+  const [pathname, query] = url.split('?');
+  const hasCode = new URLSearchParams(query ?? '').get('code') != null;
+  return isHostedLoginCallbackPath(pathname, hasCode);
 }
 
 /**

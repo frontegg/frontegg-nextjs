@@ -12,6 +12,7 @@ import {
 
 import { UserEntitlementsResponseV2 } from '@frontegg/types';
 import { CommonUrls } from '../utils/common/urls';
+import { buildHostedLoginRedirectUri } from '../utils/routing';
 
 /**
  * Send HTTP GET to frontegg domain public route to download the JWT public key
@@ -66,12 +67,13 @@ export const exchangeHostedLoginToken = async (
   headers: Record<string, string>,
   code: string,
   cliendId: string,
-  clientSecret: string
+  clientSecret: string,
+  redirectUri: string = buildHostedLoginRedirectUri()
 ) => {
   return Post({
     url: `${config.baseUrl}${CommonUrls.refreshToken.hosted}`,
     body: JSON.stringify({
-      redirect_uri: `${config.appUrl}/oauth/callback`,
+      redirect_uri: redirectUri,
       grant_type: 'authorization_code',
       code,
       client_id: cliendId,

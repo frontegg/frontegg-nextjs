@@ -18,6 +18,7 @@ import fronteggLogger from '../utils/fronteggLogger';
 import { refreshAccessTokenIfNeededOnEdge } from './refreshAccessTokenIfNeededOnEdge';
 import { redirectToLogin } from './redirectToLogin';
 import { shouldByPassMiddleware } from './shouldBypassMiddleware';
+import { isHostedLoginCallbackPath } from '../utils/routing';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.getSessionOnEdge' });
 
@@ -33,6 +34,13 @@ export const handleSessionOnEdge = async (params: HandleSessionOnEdge): Promise<
 
   if (isHostedLoginCallback(pathname, searchParams)) {
     return handleHostedLoginCallback(request, pathname, searchParams);
+  }
+
+  if (isAppUrlLoginCallback(pathname, searchParams)) {
+    const response = await handleAppUrlLoginCallback(request, searchParams);
+    if (response) {
+      return response;
+    }
   }
 
   if (shouldByPassMiddleware(pathname, headers /*, options: optional bypass configuration */)) {
@@ -196,8 +204,36 @@ export const handleHostedLoginCallback = async (
     return NextResponse.next();
   }
 
-  const code = searchParams.get('code') ?? '';
+  logger.debug('Authorization code received on the hosted login callback route, going to exchange it');
+  return exchangeCodeForSession(req, searchParams.get('code') ?? '');
+};
 
+/**
+ * Handle an authorization code that landed on the application URL instead of the hosted
+ * login callback route, see {@link isAppUrlLoginCallback}.
+ *
+ * The `code` query param on the application URL is not guaranteed to be a Frontegg
+ * authorization code, so a failed exchange resolves to `undefined` and the request
+ * continues through the regular session handling.
+ */
+const handleAppUrlLoginCallback = async (
+  req: IncomingMessage | Request,
+  searchParams: URLSearchParams
+): Promise<NextResponse | undefined> => {
+  try {
+    logger.debug('Authorization code received on the application URL, going to exchange it');
+    return await exchangeCodeForSession(req, searchParams.get('code') ?? '', config.appUrl);
+  } catch (e) {
+    logger.debug('Failed to exchange the authorization code received on the application URL', e);
+    return undefined;
+  }
+};
+
+const exchangeCodeForSession = async (
+  req: IncomingMessage | Request,
+  code: string,
+  redirectUri?: string
+): Promise<NextResponse> => {
   let headers: Record<string, string> = {};
   let clientIp: string | undefined = undefined;
   if (typeof req.headers?.get === 'function') {
@@ -221,7 +257,8 @@ export const handleHostedLoginCallback = async (
     buildRequestHeaders(headers),
     code,
     config.clientId,
-    config.clientSecret!
+    config.clientSecret!,
+    redirectUri
   );
 
   const data = await response.json();
@@ -258,9 +295,28 @@ export const handleHostedLoginCallback = async (
 
 export const isHostedLoginCallback = (pathname: string, searchParams: URLSearchParams): boolean => {
   if (config.secureJwtEnabled) {
-    if (pathname.startsWith('/oauth/callback')) {
-      return searchParams.get('code') != null;
-    }
+    const hasCode = searchParams.get('code') != null;
+    return hasCode && isHostedLoginCallbackPath(pathname, hasCode);
   }
   return false;
+};
+
+const withoutTrailingSlash = (path: string): string => (path.endsWith('/') ? path.slice(0, -1) : path);
+
+/**
+ * Whether the request is an authorization code landing on the application URL.
+ *
+ * Flows that are started outside the application, like impersonation, redirect to the
+ * application URL configured in the Frontegg portal and not to the hosted login callback
+ * route. The code is issued against that URL, so it has to be exchanged with the application
+ * URL as the `redirect_uri`.
+ */
+export const isAppUrlLoginCallback = (pathname: string, searchParams: URLSearchParams): boolean => {
+  if (!config.secureJwtEnabled || !config.hostedLoginCallbackOnAppUrl) {
+    return false;
+  }
+  if (searchParams.get('code') == null) {
+    return false;
+  }
+  return withoutTrailingSlash(pathname) === withoutTrailingSlash(new URL(config.appUrl).pathname);
 };

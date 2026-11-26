@@ -1,0 +1,45 @@
+name: Nightly real-tenant E2E
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nightly-e2e-real
+  cancel-in-progress: false
+
+env:
+  CI: true
+
+jobs:
+  e2e-real:
+    name: Run real-tenant Playwright suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: E2E real
+        working-directory: packages/nextjs
+        env:
+          FRONTEGG_BASE_URL: ${{ secrets.FRONTEGG_BASE_URL }}
+          FRONTEGG_CLIENT_ID: ${{ secrets.FRONTEGG_CLIENT_ID }}
+          FRONTEGG_ENCRYPTION_PASSWORD: ${{ secrets.FRONTEGG_ENCRYPTION_PASSWORD }}
+          FRONTEGG_APP_URL: http://localhost:3000
+          FRONTEGG_TEST_URL: http://localhost:3001
+        run: npx playwright test --project=e2e-real
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-nightly
+          path: packages/nextjs/playwright-report/
+          retention-days: 14

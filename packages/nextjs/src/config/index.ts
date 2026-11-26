@@ -21,6 +21,7 @@ const setupEnvVariables = {
   FRONTEGG_COOKIE_SAME_SITE: process.env.FRONTEGG_COOKIE_SAME_SITE,
   FRONTEGG_JWT_PUBLIC_KEY: process.env.FRONTEGG_JWT_PUBLIC_KEY,
   FRONTEGG_SECURE_JWT_ENABLED: process.env.FRONTEGG_SECURE_JWT_ENABLED,
+  FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL: process.env.FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL,
   FRONTEGG_FORWARD_IP: process.env.FRONTEGG_FORWARD_IP,
   FRONTEGG_SSG_EXPORT: process.env.FRONTEGG_SSG_EXPORT,
   DISABLE_INITIAL_PROPS_REFRESH_TOKEN: process.env.DISABLE_INITIAL_PROPS_REFRESH_TOKEN,
@@ -133,6 +134,15 @@ class Config {
       getEnvOrDefault(
         EnvVariables.FRONTEGG_SECURE_JWT_ENABLED,
         setupEnvVariables.FRONTEGG_SECURE_JWT_ENABLED ?? 'false'
+      ) == 'true'
+    );
+  }
+
+  get hostedLoginCallbackOnAppUrl(): boolean {
+    return (
+      getEnvOrDefault(
+        EnvVariables.FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL,
+        setupEnvVariables.FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL ?? 'false'
       ) == 'true'
     );
   }

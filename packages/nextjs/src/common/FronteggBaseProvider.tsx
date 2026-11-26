@@ -71,15 +71,21 @@ const Connector: FC<FronteggProviderProps> = ({ router, appName = 'default', ...
   const alwaysVisibleChildren = isSSR ? undefined : (
     <>
       <SSGRequestAuthorize isSSG={props.isSSG} shouldRequestAuthorize={props.shouldRequestAuthorize} />
-      <CustomComponentRegister app={app} themeOptions={props.themeOptions} />
+      {React.createElement(CustomComponentRegister as React.ComponentType<{ app: typeof app; themeOptions: any }>, {
+        app,
+        themeOptions: props.themeOptions,
+      })}
       {props.alwaysVisibleChildren}
     </>
   );
   return (
     <AppContext.Provider value={app}>
-      <FronteggStoreProvider {...({ ...props, app } as any)} alwaysVisibleChildren={alwaysVisibleChildren}>
-        {props.children}
-      </FronteggStoreProvider>
+      {React.createElement(FronteggStoreProvider as React.ComponentType<any>, {
+        ...props,
+        app,
+        alwaysVisibleChildren,
+        children: props.children,
+      })}
     </AppContext.Provider>
   );
 };

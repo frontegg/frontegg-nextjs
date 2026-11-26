@@ -75,14 +75,22 @@ async function run(argv) {
     console.log(`running '${command}' with ${JSON.stringify(env)}`);
   }
 
-  const { stderr, stdout } = await exec(command, { env: { ...process.env, ...env } });
-  if (stderr) {
-    throw new Error(`'${command}' failed with \n${stderr}`);
-  }
-
-  if (verbose) {
-    // eslint-disable-next-line no-console
-    console.log(stdout);
+  try {
+    const { stderr, stdout } = await exec(command, { env: { ...process.env, ...env } });
+    // Don't treat Node/babel deprecation warnings or Browserslist data-age
+    // notices (e.g. "caniuse-lite is N months old") on stderr as failure
+    if (stderr && !/DeprecationWarning|url\.parse|Browserslist|caniuse-lite/.test(stderr)) {
+      throw new Error(`'${command}' failed with \n${stderr}`);
+    }
+    if (verbose) {
+      // eslint-disable-next-line no-console
+      console.log(stdout);
+    }
+  } catch (err) {
+    if (err.stderr) {
+      throw new Error(`'${command}' failed with \n${err.stderr}`);
+    }
+    throw err;
   }
 }
 

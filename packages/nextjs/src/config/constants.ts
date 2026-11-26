@@ -107,6 +107,17 @@ export enum EnvVariables {
   FRONTEGG_HOSTED_LOGIN = 'FRONTEGG_HOSTED_LOGIN',
 
   /**
+   * Accept the hosted login authorization code on the {@link EnvVariables.FRONTEGG_APP_URL} itself,
+   * in addition to the `/oauth/callback` route. Flows that are started outside the application,
+   * like impersonation, redirect to the application URL configured in the Frontegg portal
+   * instead of the callback route.
+   *
+   * Requires {@link EnvVariables.FRONTEGG_SECURE_JWT_ENABLED}, and the application URL configured
+   * in the Frontegg portal must be identical to {@link EnvVariables.FRONTEGG_APP_URL}.
+   */
+  FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL = 'FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL',
+
+  /**
    * Forward client IP address to Frontegg gateway, used to detect the client's IP address
    * when the Next.js application using frontegg middleware proxy service
    * In order to enable this feature, you need to provide {@link EnvVariables.FRONTEGG_SHARED_SECRET}

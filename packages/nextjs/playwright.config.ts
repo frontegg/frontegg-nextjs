@@ -3,42 +3,74 @@ import { devices } from '@playwright/test';
 
 // @ts-ignore
 require('dotenv').config();
+// Load the example app's .env.local so E2E tests can forge session cookies
+// with the same encryption password / client ID the running app uses.
+// Values from .env.local take precedence (they overwrite matching keys).
+// @ts-ignore
+require('dotenv').config({
+  path: require('path').resolve(__dirname, '../example-app-directory/.env.local'),
+  override: true,
+});
+
+const isCI = !!process.env.CI;
+const realBaseURL = process.env.FRONTEGG_APP_URL ?? 'http://localhost:3000';
 
 const config: PlaywrightTestConfig = {
   testDir: './tests',
   /* Maximum time one test can run for. */
-  timeout: 5000,
+  timeout: 30_000,
   expect: {
-    /**
-     * Maximum time expect() should wait for the condition to be met.
-     * For example in `await expect(locator).toHaveText();`
-     */
     timeout: 5000,
   },
   /* Run tests in files in parallel */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  // @ts-ignore
-  forbidOnly: !!process.env.CI,
+  forbidOnly: isCI,
   /* Retry on CI only */
   retries: 0,
   /* Opt out of parallel tests on CI. */
-  // @ts-ignore
-  workers: process.env.CI ? 4 : undefined,
+  workers: isCI ? 4 : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list', { printSteps: true }],
     ['html', { open: 'never' }],
   ],
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
 
-  /* Configure projects for major browsers */
+  /* Dev server for E2E projects only. unit-playwright does not need it. */
+  webServer: process.env.PW_SKIP_WEBSERVER
+    ? undefined
+    : {
+        command: 'yarn workspace @frontegg/example-app-directory dev',
+        url: 'http://localhost:3000',
+        reuseExistingServer: !isCI,
+        timeout: 120_000,
+        stdout: 'pipe',
+        stderr: 'pipe',
+      },
+
   projects: [
     {
-      name: 'chromium',
+      name: 'unit-playwright',
+      testMatch: ['middleware/**/*.spec.ts', 'utils/**/*.spec.ts', 'exports/**/*.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
+      },
+    },
+    {
+      name: 'e2e-mocked',
+      testMatch: ['e2e/mocked/**/*.spec.ts'],
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.FRONTEGG_APP_URL ?? 'http://localhost:3000',
+      },
+    },
+    {
+      name: 'e2e-real',
+      testMatch: ['e2e/real/**/*.spec.ts'],
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: realBaseURL,
       },
     },
   ],

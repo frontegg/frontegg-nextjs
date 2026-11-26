@@ -19,6 +19,7 @@ and integrate them into their SaaS portals in up to 5 lines of code.
   - [withSSRSession](#withssrsession)
   - [Next.js middlewares usage](#nextjs-middlewares-usage)
   - for more [visit](https://docs.frontegg.com/docs/self-service-introduction)
+- [Security](#security)
 
 ## Installation
 
@@ -150,6 +151,13 @@ DISABLE_INITIAL_PROPS_REFRESH_TOKEN='true'
 # Enable secure JWT by removing the signature from the JWT token.
 # To enable this feature, you need to provide {@link EnvVariables.FRONTEGG_CLIENT_SECRET}
 FRONTEGG_SECURE_JWT_ENABLED='false'
+
+# Accept the hosted login authorization code on the FRONTEGG_APP_URL itself, in addition to
+# the `/oauth/callback` route. Needed for flows that are started outside the application,
+# like impersonation, which redirect to the application URL configured in the Frontegg portal.
+# Requires FRONTEGG_SECURE_JWT_ENABLED, and the application URL configured in the Frontegg portal
+# must be identical to FRONTEGG_APP_URL.
+FRONTEGG_HOSTED_LOGIN_CALLBACK_ON_APP_URL='false'
 
 # The Frontegg Hosted Login URL used to redirect the user to the Frontegg login page.
 # Set to 'true' to enable the hosted login feature.
@@ -383,5 +391,21 @@ export const config = {
 ## Quick start frontegg with vercel
 
 To easily clone frontegg app sample and deploy with Vercel click [here](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffrontegg%2Ffrontegg-nextjs%2Ftree%2Fmaster%2Fdemos%2Fquick-starter-demo&env=FRONTEGG_BASE_URL,FRONTEGG_CLIENT_ID,FRONTEGG_ENCRYPTION_PASSWORD&envDescription=Used%20to%20connect%20to%20your%20frontegg%20account%20and%20encrypt%20the%20frontegg%20session%20cookie&envLink=https%3A%2F%2Fdocs.frontegg.com%2Fdocs%2Fnextjs-12-13-ssr-hosted-login%23step-4-setup-environment&project-name=my-frontegg-app&repository-name=my-frontegg-app&demo-title=Authentication&demo-description=Basic%20application%20with%20Frontegg%20authentication%20&demo-url=https%3A%2F%2Fmy-frontegg-app.vercel.app&demo-image=https%3A%2F%2Ffronteggprodeustorage.blob.core.windows.net%2Fpublic-vendor-assets%2F4f091b2c-5755-4145-a313-10d9a530276f%2Fassets%2Flogo-fa2b14b1-d07d-49fd-8c24-a51f5d92c4d7.png)
+
+## Security
+
+The `@frontegg/nextjs` SDK is actively maintained, and its dependencies are kept on current, patched versions. Patched versions of transitive dependencies are enforced through the `resolutions` field in the root `package.json`.
+
+To keep your application protected, always use the latest release:
+
+```bash
+yarn add @frontegg/nextjs@latest
+# or
+npm install @frontegg/nextjs@latest
+```
+
+### Reporting a vulnerability
+
+If you discover a security vulnerability in this SDK, please report it responsibly by emailing **security@frontegg.com**. Please do not open a public GitHub issue for security reports.
 
 
