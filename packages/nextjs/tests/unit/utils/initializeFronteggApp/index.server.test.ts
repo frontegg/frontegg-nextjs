@@ -37,12 +37,9 @@ describe('initializeFronteggApp beforeRequestInterceptor on the server', () => {
     initializeFronteggApp({ options: baseOptions(), onRedirectTo: vi.fn(), storeHolder: {} });
   });
 
-  it('runs without a window object', () => {
-    expect(typeof window).toBe('undefined');
-  });
-
   it('strips authorization headers for excluded paths on any origin', () => {
-    // Arrange
+    // Arrange: guard that this file really runs without a window (otherwise the origin check applies)
+    expect(typeof window).toBe('undefined');
     const context = lastStoreContext(mocks.createStore);
     const url = `https://any-origin.example.com${CommonUrls.refreshToken.hosted}`;
 

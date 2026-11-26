@@ -90,7 +90,7 @@ describe('JwtManager.verify with FRONTEGG_JWT_PUBLIC_KEY', () => {
     mockConfig.jwtPublicKeyJson = JSON.stringify(publicJwk);
     const JwtManager = await loadJwtManager();
 
-    await expect(JwtManager.verify('not-a-jwt')).rejects.toThrow();
+    await expect(JwtManager.verify('not-a-jwt')).rejects.toThrow('Invalid Compact JWS');
   });
 
   it('caches the imported public key across verify calls', async () => {
@@ -169,6 +169,7 @@ describe('JwtManager.verify with JWKS fallback', () => {
       });
     } finally {
       vi.unstubAllGlobals();
+      delete (mockConfig as { baseUrl?: string }).baseUrl;
     }
   });
 

@@ -53,15 +53,14 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  delete process.env['FRONTEGG_SECURE_JWT_ENABLED'];
-  delete process.env.__NEXT_ROUTER_BASEPATH;
+  vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
 
 describe('ClientFronteggProvider', () => {
   it('wires the next router, the env base path and a tenant resolver into the base provider', () => {
     // Arrange
-    process.env.__NEXT_ROUTER_BASEPATH = '/base';
+    vi.stubEnv('__NEXT_ROUTER_BASEPATH', '/base');
     vi.stubGlobal('window', { location: { hostname: 'acme.example.com', search: '' } });
 
     // Act
@@ -151,7 +150,7 @@ describe('FronteggAppProvider', () => {
   });
 
   it('redacts token signatures when secure jwt is enabled', async () => {
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedFetchUserData.mockResolvedValue({ session: { accessToken: jwt('p'), refreshToken: 'r' }, user: {} } as any);
 
     const element: any = await FronteggAppProvider({} as any);
@@ -207,7 +206,14 @@ describe('FronteggAppRouter', () => {
       searchParams: { route: ['account', 'login'] },
     });
 
+    // the resolved route only gates the auth route check; the router base still receives the raw segments
     expect(element.type).toBe(FronteggRouterBase);
+    expect(element.props).toEqual({
+      pathArr: ['_next', 'data', 'id.json'],
+      queryParams: { route: ['account', 'login'] },
+      isAppDirEnabled: true,
+    });
+    expect(mockedNotFound).not.toHaveBeenCalled();
   });
 
   it('resolves next data requests from a single search param value', () => {

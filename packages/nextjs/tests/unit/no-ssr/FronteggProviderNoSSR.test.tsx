@@ -12,7 +12,10 @@ vi.mock('@frontegg/rest-api', () => ({ ContextHolder: { for: vi.fn(() => context
 vi.mock('@frontegg/redux-store', () => ({ createStore: vi.fn() }));
 vi.mock('next/router', () => ({ useRouter: vi.fn() }));
 vi.mock('../../../src/utils/useOnRedirectTo', () => ({ default: vi.fn() }));
-vi.mock('../../../src/no-ssr/ExpireInListener', () => ({ default: () => null }));
+vi.mock('../../../src/no-ssr/ExpireInListener', async () => {
+  const react = await import('react');
+  return { default: () => react.createElement('i', { 'data-testid': 'expire-in-listener' }) };
+});
 
 import { AppHolder, initialize } from '@frontegg/js';
 import { FronteggStoreProvider } from '@frontegg/react-hooks';
@@ -101,6 +104,7 @@ describe('FronteggProviderNoSSR', () => {
     expect(contextApp).toEqual({ store });
     expect(vi.mocked(FronteggStoreProvider as any).mock.calls[0][0].app).toBe(contextApp);
     expect(container.textContent).toBe('child');
+    expect(container.querySelector('[data-testid="expire-in-listener"]')).not.toBeNull();
   });
 
   it('reuses an already initialized app and attaches the shared store to it', async () => {

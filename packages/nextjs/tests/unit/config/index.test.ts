@@ -40,8 +40,14 @@ describe('config module', () => {
     // Arrange: missing password would throw on the server
     setEnv({ FRONTEGG_APP_URL: BASE_ENV.FRONTEGG_APP_URL });
 
-    // Act + Assert
-    await expect(loadConfig()).resolves.toBeDefined();
+    // Act
+    const config = await loadConfig();
+
+    // Assert: construction succeeded even though the password getter itself is invalid
+    expect(config.appUrl).toBe(BASE_ENV.FRONTEGG_APP_URL);
+    expect(() => config.password).toThrow(
+      `Invalid environment variable (${EnvVariables.FRONTEGG_ENCRYPTION_PASSWORD}), must be a valid Hex string.`
+    );
   });
 });
 
@@ -297,13 +303,16 @@ describe('Config.jwtPublicKeyJson', () => {
    * JwtManager relies on this throw: it reads the getter inside a try block and falls back to
    * downloading the JWKS from Frontegg when it throws. Returning undefined instead would make
    * JwtManager parse '{}' and fail to import a key, so keep this behaviour (or change both together).
+   * Note: the `?? setupEnvVariables.FRONTEGG_JWT_PUBLIC_KEY` fallback in the getter is unreachable,
+   * because getEnv throws before `??` is evaluated.
    */
-  it('throws when FRONTEGG_JWT_PUBLIC_KEY is not set', async () => {
+  it('throws FronteggEnvNotFound when FRONTEGG_JWT_PUBLIC_KEY is not set', async () => {
     setEnv(BASE_ENV);
     const config = await loadConfig();
-    unsetEnv(EnvVariables.FRONTEGG_JWT_PUBLIC_KEY);
 
-    expect(() => config.jwtPublicKeyJson).toThrow();
+    expect(() => config.jwtPublicKeyJson).toThrow(
+      `Missing one or more environment variables (${EnvVariables.FRONTEGG_JWT_PUBLIC_KEY})`
+    );
   });
 });
 

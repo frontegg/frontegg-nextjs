@@ -62,7 +62,7 @@ const getInitialProps = async (app: any, appContext: any, options?: any) => {
 };
 
 afterEach(() => {
-  delete process.env['FRONTEGG_SECURE_JWT_ENABLED'];
+  vi.unstubAllEnvs();
 });
 
 describe('withFronteggApp getInitialProps bypass', () => {
@@ -89,7 +89,7 @@ describe('withFronteggApp getInitialProps bypass', () => {
     expect(result).toEqual({ pageProps: {} });
   });
 
-  it('validates the hosted login options on every call', async () => {
+  it('validates the hosted login options even for bypassed urls', async () => {
     const options = { hostedLoginBox: true };
 
     await getInitialProps(createApp(), createAppContext({ req: { url: '/favicon.ico' } }), options);
@@ -177,7 +177,7 @@ describe('withFronteggApp getInitialProps on the server', () => {
 
   it('redacts token signatures from user data when secure jwt is enabled', async () => {
     // Arrange
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedFetchUserData.mockResolvedValue({
       session: { accessToken: jwt('s'), refreshToken: 'r' },
       user: { id: 'u' },
@@ -196,7 +196,7 @@ describe('withFronteggApp getInitialProps on the server', () => {
     // Arrange
     // shouldBypassGetInitialProps bypasses every /_next/ url, so the runtime branch is only reachable in isolation
     mockedShouldBypass.mockReturnValueOnce(false);
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedRefresh.mockResolvedValue({ accessToken: jwt('rt'), refreshToken: 'r' } as any);
     const appContext = createAppContext({ req: { url: '/_next/data/build/page.json', headers: {} } });
 

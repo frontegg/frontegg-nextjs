@@ -82,6 +82,10 @@ describe('getRefreshTokenCookieNameVariants', () => {
   it('falls back to clientId variants when rewriteCookieByAppId is enabled without an appId', () => {
     Object.assign(configState, { rewriteCookieByAppId: true, appId: undefined });
 
-    expect(getRefreshTokenCookieNameVariants()[2]).toBe('fe_refresh_abcdefghi');
+    expect(getRefreshTokenCookieNameVariants()).toEqual([
+      'fe_refresh_abc-def-ghi',
+      'fe_refresh_abcdef-ghi',
+      'fe_refresh_abcdefghi',
+    ]);
   });
 });

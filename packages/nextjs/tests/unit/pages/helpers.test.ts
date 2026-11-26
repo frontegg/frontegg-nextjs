@@ -54,13 +54,21 @@ describe('getSession', () => {
   });
 
   it('reads the session cookie from the request when the response has no new session cookie', async () => {
+    // Arrange
+    const req = { headers: {} } as any;
     const res = createRes(['other=1']);
+    mockedFromRequest.mockReturnValue('from-request');
+    mockedCreateSession.mockResolvedValue(SESSION);
 
-    await getSession({} as any, res);
+    // Act
+    const session = await getSession(req, res);
 
+    // Assert
     expect(mockedHasSetSessionCookie).toHaveBeenCalledWith(['other=1']);
     expect(mockedFromResponse).not.toHaveBeenCalled();
-    expect(mockedFromRequest).toHaveBeenCalled();
+    expect(mockedFromRequest).toHaveBeenCalledWith(req);
+    expect(mockedCreateSession).toHaveBeenCalledWith('from-request', encryption);
+    expect(session).toBe(SESSION);
   });
 
   it('prefers a session cookie already set on the response by a previous redirect', async () => {

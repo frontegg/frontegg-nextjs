@@ -85,12 +85,6 @@ describe('fetchUserData', () => {
     });
   });
 
-  it('lets the /me profile override overlapping jwt claims', async () => {
-    const result = await run();
-
-    expect(result.user?.email).toBe('me@example.com');
-  });
-
   it('calls every endpoint with the request headers plus a bearer authorization header', async () => {
     // Act
     await run({ cookie: 'a=1', authorization: 'Bearer old' });

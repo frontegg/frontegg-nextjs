@@ -153,7 +153,7 @@ describe('extractAccessToken', () => {
   });
 
   it('throws on a non json body', () => {
-    expect(() => extractAccessToken('<html>')).toThrow();
+    expect(() => extractAccessToken('<html>')).toThrow(SyntaxError);
   });
 });
 

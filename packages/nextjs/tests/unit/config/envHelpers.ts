@@ -49,8 +49,3 @@ export const loadConfig = async () => {
   const mod = await import('../../../src/config');
   return mod.default;
 };
-
-export const loadHelpers = async () => {
-  vi.resetModules();
-  return import('../../../src/config/helpers');
-};

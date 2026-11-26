@@ -62,11 +62,15 @@ describe('FronteggRouterBase with hosted login', () => {
     expect(localStorage.getItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL)).toBeNull();
   });
 
-  it('remembers where to return after login when a redirect url is given', async () => {
+  it('remembers where to return after login, currently storing the origin twice (documents a known bug)', async () => {
     await render({ pathArr: ['account', 'login'], queryParams: { redirectUrl: '/dashboard' } }, true);
 
     expect(loginWithRedirect).toHaveBeenCalledTimes(1);
-    expect(localStorage.getItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL)).not.toBeNull();
+    // BUG: getAfterAuthRedirectUrl already returns an absolute url, and FronteggRouterBase prefixes
+    // window.location.origin again, so the stored value is not a valid url. The correct value would be
+    // `${origin}/dashboard`. This assertion locks in current behaviour so a fix is a visible change.
+    const { origin } = window.location;
+    expect(localStorage.getItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL)).toBe(`${origin}${origin}/dashboard`);
   });
 
   it('logs out on the logout route', async () => {
@@ -111,13 +115,20 @@ describe('FronteggRouterBase with embedded login', () => {
     expect(requestAuthorize).toHaveBeenCalledWith(true);
   });
 
-  it('does not request authorize on the hosted login callback route', async () => {
-    // jsdom cannot navigate, it reports the attempted location change as an error
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+  it('navigates to the authenticated url instead of requesting authorize on the hosted login callback route', async () => {
+    // jsdom cannot navigate, it reports the attempted location change as a "not implemented" error;
+    // a non-root authenticated url makes sure the assignment is a real navigation and not a no-op
+    Object.assign(config, { authRoutes: { authenticatedUrl: '/dashboard' } });
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    await render({ pathArr: ['oauth', 'callback'], isAppDirEnabled: true }, false);
+    try {
+      await render({ pathArr: ['oauth', 'callback'], isAppDirEnabled: true }, false);
 
-    expect(requestAuthorize).not.toHaveBeenCalled();
-    vi.mocked(console.error).mockRestore();
+      expect(requestAuthorize).not.toHaveBeenCalled();
+      const errors = consoleError.mock.calls.map(([message]) => String(message));
+      expect(errors.some((message) => message.includes('Not implemented: navigation'))).toBe(true);
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

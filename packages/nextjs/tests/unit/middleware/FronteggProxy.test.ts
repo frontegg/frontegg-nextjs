@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 const proxyServer = vi.hoisted(() => ({ on: vi.fn(), web: vi.fn() }));
 
@@ -7,10 +7,14 @@ vi.mock('http-proxy', () => ({ createProxyServer: vi.fn(() => proxyServer) }));
 vi.mock('../../../src/middleware/ProxyRequestCallback', () => ({ default: vi.fn() }));
 vi.mock('../../../src/middleware/ProxyResponseCallback', () => ({ default: vi.fn() }));
 
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
 describe('FronteggProxy', () => {
   it('creates a self handled, origin changing proxy and wires the request and response callbacks', async () => {
     // Arrange
-    process.env['FRONTEGG_BASE_URL'] = 'https://auth.example.com';
+    vi.stubEnv('FRONTEGG_BASE_URL', 'https://auth.example.com');
     const { createProxyServer } = (await import('http-proxy')) as any;
     const { default: ProxyRequestCallback } = await import('../../../src/middleware/ProxyRequestCallback');
     const { default: ProxyResponseCallback } = await import('../../../src/middleware/ProxyResponseCallback');
@@ -35,6 +39,5 @@ describe('FronteggProxy', () => {
       ['proxyReq', ProxyRequestCallback],
       ['proxyRes', ProxyResponseCallback],
     ]);
-    delete process.env['FRONTEGG_BASE_URL'];
   });
 });

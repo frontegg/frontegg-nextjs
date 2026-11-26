@@ -52,13 +52,14 @@ const run = async (handler: (req: any, res: any) => Promise<void>, req: any, res
 
 beforeEach(() => {
   Object.assign(config, CONFIG_BASE);
-  process.env['FRONTEGG_BASE_URL'] = 'https://auth.example.com';
+  vi.stubEnv('FRONTEGG_BASE_URL', 'https://auth.example.com');
+  // pin the env flags the middleware branches on, so values from the host environment cannot leak in
+  vi.stubEnv('FRONTEGG_TEST_URL', '');
+  vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', '');
 });
 
 afterEach(() => {
-  delete process.env['FRONTEGG_BASE_URL'];
-  delete process.env['FRONTEGG_TEST_URL'];
-  delete process.env['FRONTEGG_SECURE_JWT_ENABLED'];
+  vi.unstubAllEnvs();
 });
 
 describe('FronteggApiMiddleware routing', () => {
@@ -95,7 +96,7 @@ describe('FronteggApiMiddleware routing', () => {
   });
 
   it('targets the test url for the middleware test route when configured', async () => {
-    process.env['FRONTEGG_TEST_URL'] = 'http://localhost:9999';
+    vi.stubEnv('FRONTEGG_TEST_URL', 'http://localhost:9999');
 
     const { proxyOptions } = await run(FronteggApiMiddleware, createReq('/api/frontegg/middleware-test'));
 
@@ -103,7 +104,7 @@ describe('FronteggApiMiddleware routing', () => {
   });
 
   it('keeps the base url for other routes even when a test url is configured', async () => {
-    process.env['FRONTEGG_TEST_URL'] = 'http://localhost:9999';
+    vi.stubEnv('FRONTEGG_TEST_URL', 'http://localhost:9999');
 
     const { proxyOptions } = await run(FronteggApiMiddleware, createReq('/api/frontegg/other'));
 
@@ -114,7 +115,7 @@ describe('FronteggApiMiddleware routing', () => {
 describe('FronteggApiMiddleware authorization header', () => {
   it('adds the session access token when secure jwt is enabled', async () => {
     // Arrange
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedGetSession.mockResolvedValue({ accessToken: 'session-token' } as any);
     const req = createReq('/api/frontegg/user');
 
@@ -127,7 +128,7 @@ describe('FronteggApiMiddleware authorization header', () => {
   });
 
   it('omits the authorization header when there is no secure session', async () => {
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedGetSession.mockResolvedValue(undefined);
 
     const { proxyOptions } = await run(FronteggApiMiddleware, createReq('/api/frontegg/user'));
@@ -166,7 +167,7 @@ describe('FronteggApiMiddleware authorization header', () => {
 
   it('prefers the secure session token over the cookie on hosted logout', async () => {
     Object.assign(config, { isHostedLogin: true });
-    process.env['FRONTEGG_SECURE_JWT_ENABLED'] = 'true';
+    vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedGetSession.mockResolvedValue({ accessToken: 'session-token' } as any);
 
     const { proxyOptions } = await run(FronteggApiMiddleware, createReq('/api/frontegg/oauth/logout'));

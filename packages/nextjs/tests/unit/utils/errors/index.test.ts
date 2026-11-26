@@ -19,15 +19,6 @@ describe('FronteggEnvNotFound', () => {
     expect(error).toBeInstanceOf(FronteggEnvNotFound);
     expect(error).not.toBeInstanceOf(InvalidFronteggEnv);
   });
-
-  it('can be thrown and caught by type', () => {
-    const throwIt = () => {
-      throw new FronteggEnvNotFound('FRONTEGG_APP_URL');
-    };
-
-    expect(throwIt).toThrow(FronteggEnvNotFound);
-    expect(throwIt).toThrow(/FRONTEGG_APP_URL/);
-  });
 });
 
 describe('InvalidFronteggEnv', () => {

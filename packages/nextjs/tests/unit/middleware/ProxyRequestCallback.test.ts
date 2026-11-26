@@ -14,23 +14,15 @@ const CONFIG_BASE = vi.hoisted(() => ({
 
 vi.mock('../../../src/config', () => ({ default: { ...CONFIG_BASE } }));
 vi.mock('../../../src/utils/cookies', () => ({ default: { parseCookieHeader: vi.fn() } }));
-vi.mock('../../../src/api/utils', () => ({
-  FRONTEGG_FORWARD_IP_HEADER: 'x-frontegg-forwarded-for',
-  FRONTEGG_HEADERS_VERIFIER_HEADER: 'x-frontegg-headers-verifier',
-  FRONTEGG_VENDOR_ID_HEADER: 'frontegg-vendor-id',
-  getClientIp: vi.fn(),
-}));
 
 import NextJsPkg from 'next/package.json';
 import config from '../../../src/config';
 import CookieManager from '../../../src/utils/cookies';
-import { getClientIp } from '../../../src/api/utils';
 import sdkVersion from '../../../src/sdkVersion';
 import ProxyRequestCallback from '../../../src/middleware/ProxyRequestCallback';
 import { headersToRemove } from '../../../src/middleware/constants';
 
 const mockedParseCookies = vi.mocked(CookieManager.parseCookieHeader);
-const mockedGetClientIp = vi.mocked(getClientIp);
 
 const createProxyReq = () => {
   const headers: Record<string, any> = {};
@@ -170,23 +162,20 @@ describe('ProxyRequestCallback client ip forwarding', () => {
 
   it('resolves the ip from cloudflare header on vercel', () => {
     Object.assign(config, { isVercel: true, shouldForwardIp: true });
-    mockedGetClientIp.mockReturnValue('1.1.1.1');
     const proxyReq = createProxyReq();
 
     invoke(proxyReq, createReq({ headers: { 'cf-connecting-ip': '1.1.1.1', 'x-forwarded-for': '2.2.2.2' } }));
 
-    expect(mockedGetClientIp).toHaveBeenCalledWith('1.1.1.1');
     expect(proxyReq.headers['x-frontegg-forwarded-for']).toBe('1.1.1.1');
   });
 
-  it('falls back to x-forwarded-for on vercel when cloudflare header is missing', () => {
+  it('falls back to the first x-forwarded-for ip on vercel when cloudflare header is missing', () => {
     Object.assign(config, { isVercel: true, shouldForwardIp: true });
-    mockedGetClientIp.mockReturnValue('2.2.2.2');
     const proxyReq = createProxyReq();
 
     invoke(proxyReq, createReq({ headers: { 'x-forwarded-for': '2.2.2.2, 3.3.3.3' } }));
 
-    expect(mockedGetClientIp).toHaveBeenCalledWith('2.2.2.2, 3.3.3.3');
+    expect(proxyReq.headers['x-frontegg-forwarded-for']).toBe('2.2.2.2');
   });
 
   it('does not forward the ip when forwarding is disabled', () => {
@@ -202,9 +191,9 @@ describe('ProxyRequestCallback client ip forwarding', () => {
     Object.assign(config, { shouldForwardIp: true });
     const proxyReq = createProxyReq();
 
-    invoke(proxyReq, createReq());
+    invoke(proxyReq, createReq({ headers: { 'x-forwarded-for': '2.2.2.2' } }));
 
-    expect(mockedGetClientIp).not.toHaveBeenCalled();
+    // proxy headers are only trusted on vercel or through a custom ip resolver
     expect(proxyReq.headers['x-frontegg-forwarded-for']).toBeUndefined();
   });
 });

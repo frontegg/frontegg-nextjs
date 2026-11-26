@@ -30,12 +30,9 @@ const renderOnServer = (baseName: string, router: NextRouter) => {
 };
 
 describe('useOnRedirectTo on the server', () => {
-  it('runs without a window object', () => {
-    expect(typeof window).toBe('undefined');
-  });
-
   it('pushes a non auth route through the router without touching window', () => {
-    // Arrange
+    // Arrange: guard that this file really runs without a window
+    expect(typeof window).toBe('undefined');
     const router = createRouter();
     const onRedirectTo = renderOnServer('/app', router);
 

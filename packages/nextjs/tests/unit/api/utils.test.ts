@@ -197,6 +197,12 @@ describe('buildRequestHeaders', () => {
       expect(result.cookie).toBe('fe_refresh_clientid=r1; other=x');
     });
 
+    /**
+     * SUSPECTED BUG (src/api/utils.ts buildRequestHeaders): the refresh cookie names are built with
+     * `id.replace('-', '')`, which strips only the FIRST dash, while src/utils/cookies uses
+     * `replace(/-/g, '')`. The ids below ('client-id', 'app-id') have a single dash, so these rewrite
+     * tests pass; with a real multi-dash UUID the rewrite would not match the browser's cookie names.
+     */
     it('renames the app refresh cookie to the client refresh cookie when rewriteCookieByAppId is on', () => {
       // Arrange
       Object.assign(mockConfig, { rewriteCookieByAppId: true, appId: 'app-id' });

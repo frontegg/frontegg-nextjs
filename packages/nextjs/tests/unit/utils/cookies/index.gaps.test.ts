@@ -263,7 +263,7 @@ describe('CookieManager.getRequestCookiesHeaderToRemove', () => {
   it('returns only refresh-token removals when no request is given', () => {
     const cookies = CookieManager.getRequestCookiesHeaderToRemove({ isSecured: true, cookieDomain: COOKIE_DOMAIN });
 
-    expect(namesOf(cookies)).toHaveLength(3);
+    expect(namesOf(cookies)).toEqual(['fe_refresh_abc-def-ghi', 'fe_refresh_abcdef-ghi', 'fe_refresh_abcdefghi']);
   });
 
   it('removes the unchunked and every chunked session cookie found in the request', () => {

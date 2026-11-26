@@ -53,7 +53,8 @@ function okRefreshResponse(setCookies: string[] = []): Response {
 
 beforeEach(() => {
   mocks.config.isHostedLogin = false;
-  mocks.cookieManager.modifySetCookie.mockImplementation((cookies: string[]) => cookies);
+  // like the real implementation, return a new array (the unit appends the session cookies to it)
+  mocks.cookieManager.modifySetCookie.mockImplementation((cookies: string[]) => [...cookies]);
   mocks.cookieManager.getRefreshCookieFromRequestEdge.mockReturnValue('old-refresh');
   mocks.jwtVerify.mockResolvedValue({ payload: { sub: 'user-1', exp: FUTURE_EXP } });
   mocks.sealTokens.mockResolvedValue('sealed-session');
@@ -127,6 +128,7 @@ describe('refreshAccessTokenIfNeededOnEdge', () => {
       'client-id',
       'client-secret'
     );
+    expect(mocks.api.refreshTokenEmbedded).not.toHaveBeenCalled();
   });
 
   it('returns undefined when the refresh request throws', async () => {
@@ -142,8 +144,15 @@ describe('refreshAccessTokenIfNeededOnEdge', () => {
       'fe_refresh=; Max-Age=0',
     ]);
 
-    const result = await refreshAccessTokenIfNeededOnEdge(buildRequest());
+    const req = buildRequest();
 
+    const result = await refreshAccessTokenIfNeededOnEdge(req);
+
+    expect(mocks.cookieManager.getRequestCookiesHeaderToRemove).toHaveBeenCalledWith({
+      cookieDomain: 'localhost',
+      isSecured: true,
+      req,
+    });
     expect(result).toEqual({
       session: undefined,
       headers: { 'set-cookie': 'fe_session=; Max-Age=0, fe_refresh=; Max-Age=0' },
@@ -170,8 +179,17 @@ describe('refreshAccessTokenIfNeededOnEdge', () => {
     mocks.api.refreshTokenEmbedded.mockResolvedValue(okRefreshResponse(['fe_refresh_x=r1; Path=/']));
     mocks.cookieManager.create.mockReturnValue(['fe_session=sealed-session; Path=/']);
 
-    const result = await refreshAccessTokenIfNeededOnEdge(buildRequest());
+    const req = buildRequest();
 
+    const result = await refreshAccessTokenIfNeededOnEdge(req);
+
+    expect(mocks.cookieManager.modifySetCookie).toHaveBeenCalledWith(['fe_refresh_x=r1; Path=/'], true);
+    expect(mocks.cookieManager.create).toHaveBeenCalledWith({
+      value: 'sealed-session',
+      expires: new Date(FUTURE_EXP * 1000),
+      secure: true,
+      req,
+    });
     expect(result?.session).toEqual({
       accessToken: 'new-access',
       refreshToken: 'new-refresh',

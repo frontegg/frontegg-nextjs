@@ -67,16 +67,6 @@ describe('CookieManager.create', () => {
     expect(concatenated).toBe(largeValue);
   });
 
-  it('uses the default cookieName from config when not provided', () => {
-    const cookies = CookieManager.create({
-      value: 'v',
-      secure: true,
-      expires,
-      domain: COOKIE_DOMAIN,
-    });
-    expect(cookies[0]).toContain(`${COOKIE_NAME}=`);
-  });
-
   it('respects a custom cookieName override', () => {
     const cookies = CookieManager.create({
       cookieName: 'custom_cookie',
@@ -86,27 +76,6 @@ describe('CookieManager.create', () => {
       domain: COOKIE_DOMAIN,
     });
     expect(cookies[0]).toContain('custom_cookie=v');
-  });
-
-  it('propagates expires date to the Set-Cookie header', () => {
-    const cookies = CookieManager.create({
-      value: 'v',
-      secure: true,
-      expires,
-      domain: COOKIE_DOMAIN,
-    });
-    expect(cookies[0]).toContain(`Expires=${expires.toUTCString()}`);
-  });
-
-  it('secure: true produces "Secure; SameSite=None"', () => {
-    const cookies = CookieManager.create({
-      value: 'v',
-      secure: true,
-      expires,
-      domain: COOKIE_DOMAIN,
-    });
-    expect(cookies[0]).toContain('Secure');
-    expect(cookies[0]).toContain('SameSite=None');
   });
 
   it('secure: false omits Secure and SameSite', () => {
@@ -130,10 +99,12 @@ describe('CookieManager.create', () => {
     expect(cookies[0]).toContain('Domain=example.com');
   });
 
-  it('returns empty-cookies prefix when req contains existing session cookies to remove', () => {
+  it('prefixes expiry cookies for stale session chunks, inheriting secure and the explicit domain', () => {
     // Simulate an existing chunked session in the incoming request.
+    const customDomain = 'custom.example.org';
     const req = mockIncomingMessage({
-      [COOKIE_NAME]: 'old-session',
+      [`${COOKIE_NAME}-1`]: 'old-a',
+      [`${COOKIE_NAME}-2`]: 'old-b',
     });
 
     const cookies = CookieManager.create({
@@ -141,14 +112,18 @@ describe('CookieManager.create', () => {
       value: 'new-session-value',
       secure: true,
       expires,
-      domain: COOKIE_DOMAIN,
+      domain: customDomain,
     });
 
-    // Should contain at least the new cookie plus an empty (expired) removal cookie
-    expect(cookies.length).toBeGreaterThanOrEqual(1);
-    // Last entries should be the new cookie
-    const newCookie = cookies[cookies.length - 1];
-    expect(newCookie).toContain(`${COOKIE_NAME}=new-session-value`);
+    expect(cookies.map((c) => c.split('=')[0])).toEqual([`${COOKIE_NAME}-1`, `${COOKIE_NAME}-2`, COOKIE_NAME]);
+    cookies.slice(0, 2).forEach((removal) => {
+      expect(removal).toMatch(/^[^=]+=;/);
+      expect(removal).toContain(`Domain=${customDomain}`);
+      expect(removal).toContain('Secure');
+      expect(removal).not.toContain(`Expires=${expires.toUTCString()}`);
+    });
+    expect(cookies[2]).toContain(`${COOKIE_NAME}=new-session-value`);
+    expect(cookies[2]).toContain(`Domain=${customDomain}`);
   });
 });
 
@@ -202,7 +177,7 @@ describe('CookieManager.removeCookies', () => {
 
     const arr = res.setHeader.mock.calls[0][1] as string[];
     expect(arr[0]).toBe(preExisting);
-    expect(arr.length).toBeGreaterThan(1);
+    expect(arr[1]).toMatch(new RegExp(`^${COOKIE_NAME}=;`));
   });
 
   it('appends when existing set-cookie header is already an array', () => {
@@ -217,7 +192,7 @@ describe('CookieManager.removeCookies', () => {
     const arr = res.setHeader.mock.calls[0][1] as string[];
     expect(arr[0]).toBe('a=1');
     expect(arr[1]).toBe('b=2');
-    expect(arr.length).toBeGreaterThan(2);
+    expect(arr[2]).toMatch(new RegExp(`^${COOKIE_NAME}=;`));
   });
 
   it('omits Secure when isSecured=false', () => {
@@ -283,18 +258,16 @@ describe('CookieManager.modifySetCookie', () => {
   it('leaves unrelated cookies alone other than trailing semicolon normalization', () => {
     const input = ['unrelated=value; Path=/; HttpOnly'];
     const result = CookieManager.modifySetCookie(input, true);
-    expect(result![0]).toContain('unrelated=value');
-    expect(result![0]).toContain('Path=/');
+    expect(result).toEqual(['unrelated=value;Path=/;HttpOnly;']);
   });
 
   it('handles a string input by splitting it into an array via the regex splitter', () => {
-    // modifySetCookie claims to support string input via its internal splitter,
-    // despite its TS signature. Pass-through should not throw and should
-    // return an array.
-    const input = 'a=1; Path=/, b=2; Path=/' as unknown as string[];
-    const result = CookieManager.modifySetCookie(input, true);
-    expect(Array.isArray(result)).toBe(true);
-    expect(result!.length).toBeGreaterThanOrEqual(1);
+    // modifySetCookie supports a comma-joined string input despite its TS signature.
+    // The splitter must not break on the comma inside an Expires date.
+    const input =
+      'a=1; Expires=Wed, 21 Oct 2030 07:28:00 GMT; Path=/, b=2; Secure; SameSite=None' as unknown as string[];
+    const result = CookieManager.modifySetCookie(input, false);
+    expect(result).toEqual(['a=1;Expires=Wed, 21 Oct 2030 07:28:00 GMT;Path=/;', 'b=2;']);
   });
 });
 

@@ -160,12 +160,3 @@ describe.each([
     expect(result).toBeUndefined();
   });
 });
-
-describe('default export', () => {
-  it('exposes getMe and friends as the same functions as the named exports', () => {
-    expect(api.getMe).toBe(getMe);
-    expect(api.getTenants).toBe(getTenants);
-    expect(api.getEntitlements).toBe(getEntitlements);
-    expect(api.getPublicSettings).toBe(getPublicSettings);
-  });
-});

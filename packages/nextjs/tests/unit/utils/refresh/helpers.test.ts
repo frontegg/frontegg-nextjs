@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { FRONTEGG_CONFIG_BASE } from './fixtures';
 
 vi.mock('../../../../src/config', () => ({
@@ -40,7 +40,12 @@ const mockedGetTokens = vi.mocked(getTokensFromCookie);
 
 beforeEach(() => {
   // restore baseline config between tests
-  Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined });
+  Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined, authRoutes: undefined });
+});
+
+afterEach(() => {
+  // undo vi.spyOn(CookieManager, ...) so the real CookieManager is intact for later tests
+  vi.restoreAllMocks();
 });
 
 describe('hasRefreshTokenCookie', () => {
@@ -104,6 +109,8 @@ describe('refreshAccessTokenHostedLogin', () => {
     vi.spyOn(CookieManager, 'getSessionCookieFromRequest').mockReturnValueOnce('seal');
     const result = await refreshAccessTokenHostedLogin(req);
     expect(result).toBeNull();
+    expect(mockedGetTokens).toHaveBeenCalledWith('seal');
+    expect(mockedApi.refreshTokenHostedLogin).not.toHaveBeenCalled();
   });
 
   it('calls api.refreshTokenHostedLogin without secret when secureJwtEnabled=false', async () => {
@@ -161,14 +168,12 @@ describe('url-classification helpers', () => {
     Object.assign(config, { authRoutes: { hostedLoginRedirectUrl: '/auth/cb' } });
     expect(isOauthCallback('/auth/cb?code=1')).toBe(true);
     expect(isOauthCallback('/oauth/callback?code=1')).toBe(false);
-    Object.assign(config, { authRoutes: {} });
   });
 
   it('isOauthCallback requires a code when the callback route is the app root', () => {
     Object.assign(config, { authRoutes: { hostedLoginRedirectUrl: '/' } });
     expect(isOauthCallback('/?code=1')).toBe(true);
     expect(isOauthCallback('/dashboard')).toBe(false);
-    Object.assign(config, { authRoutes: {} });
   });
 
   it('isSamlCallback matches saml and oidc callback prefixes', () => {
