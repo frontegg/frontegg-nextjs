@@ -15,7 +15,8 @@ env:
 jobs:
   e2e-real:
     name: Run real-tenant Playwright suite
-    runs-on: ubuntu-latest
+    # Pinned: the repo's Playwright version cannot install Chromium on ubuntu-latest (26.04).
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Read .nvmrc
@@ -35,7 +36,6 @@ jobs:
           FRONTEGG_CLIENT_ID: ${{ secrets.FRONTEGG_CLIENT_ID }}
           FRONTEGG_ENCRYPTION_PASSWORD: ${{ secrets.FRONTEGG_ENCRYPTION_PASSWORD }}
           FRONTEGG_APP_URL: http://localhost:3000
-          FRONTEGG_TEST_URL: http://localhost:3001
         run: npx playwright test --project=e2e-real
       - uses: actions/upload-artifact@v4
         if: always()
