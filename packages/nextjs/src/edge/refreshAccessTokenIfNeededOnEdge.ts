@@ -89,11 +89,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
   newSetCookie.push(...cookieValue);
 
   const forwardedHeaders = req.headers as Headers;
-  newSetCookie.forEach((cookie) => {
-    // get cookie name and value only
-    const [name, value] = cookie.split(';')[0].split('=');
-    forwardedHeaders.set('cookie', `${name}=${value}`);
-  });
+  forwardedHeaders.set('cookie', mergeSetCookiesIntoCookieHeader(forwardedHeaders.get('cookie'), newSetCookie));
   return {
     session: {
       accessToken: data.accessToken ?? data.access_token,
@@ -105,6 +101,39 @@ export async function refreshAccessTokenIfNeededOnEdge(
     },
     forwardedHeaders,
   };
+}
+
+function splitNameValue(pair: string): [string, string] {
+  const separatorIndex = pair.indexOf('=');
+  if (separatorIndex === -1) {
+    return [pair.trim(), ''];
+  }
+  return [pair.slice(0, separatorIndex).trim(), pair.slice(separatorIndex + 1).trim()];
+}
+
+/**
+ * Builds the `cookie` request header the app should receive after the middleware refreshed the session.
+ * Starts from the incoming request cookies and applies each `set-cookie` on top:
+ * new values replace old ones, cookies set to an empty value (removals) are dropped,
+ * and every other request cookie is kept as-is.
+ */
+export function mergeSetCookiesIntoCookieHeader(cookieHeader: string | null, setCookies: string[]): string {
+  const requestCookies: [string, string][] = (cookieHeader ?? '')
+    .split(';')
+    .filter((pair) => pair.trim() !== '')
+    .map(splitNameValue);
+
+  const merged = setCookies.reduce((cookies, setCookie) => {
+    const [name, value] = splitNameValue(setCookie.split(';')[0]);
+    if (value === '') {
+      cookies.delete(name);
+    } else {
+      cookies.set(name, value);
+    }
+    return cookies;
+  }, new Map<string, string>(requestCookies));
+
+  return Array.from(merged, ([name, value]) => `${name}=${value}`).join('; ');
 }
 
 export async function createSessionFromAccessTokenOnEdge(data: any): Promise<[string, any, string] | []> {
