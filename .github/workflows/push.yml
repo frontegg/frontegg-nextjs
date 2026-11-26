@@ -101,6 +101,29 @@ jobs:
           path: packages/nextjs/playwright-report-flows/
           retention-days: 14
 
+  fresh-install:
+    name: 'Fresh install build (${{ matrix.example }} router, next ${{ matrix.next }})'
+    runs-on: ubuntu-24.04
+    # Installs the packed SDK into a new app WITHOUT the repo lockfile, like a customer would,
+    # so a breaking transitive release (e.g. @peculiar/webcrypto 1.6+) fails here first.
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [app, pages]
+        next: ['14.2.35', '15.5.29']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          build: 'true'
+      - name: Pack the SDK
+        run: npm pack ./dist/@frontegg/nextjs --pack-destination "$RUNNER_TEMP"
+      - name: Install into a fresh app and build
+        run: |
+          node scripts/fresh-install-smoke.js \
+            --tarball "$(ls "$RUNNER_TEMP"/frontegg-nextjs-*.tgz)" \
+            --example ${{ matrix.example }} --next ${{ matrix.next }} \
+            --out "$RUNNER_TEMP/smoke-app"
 
   middleware-stress:
     name: 'Middleware stress suite'
@@ -132,7 +155,7 @@ jobs:
   ci-result:
     name: 'CI result'
     if: always()
-    needs: [unit, playwright-unit, e2e-mocked, e2e-flows, middleware-stress]
+    needs: [unit, playwright-unit, e2e-mocked, e2e-flows, fresh-install, middleware-stress]
     runs-on: ubuntu-24.04
     steps:
       - name: Fail unless every job succeeded
