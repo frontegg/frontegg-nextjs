@@ -11,12 +11,15 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['src/utils/cookies/**', 'src/utils/refreshAccessTokenIfNeeded/**'],
+      include: ['src/**'],
+      // Type-only files have no runtime code, so v8 would always report them as 0%.
+      exclude: ['src/**/*.d.ts', 'src/**/types.ts', 'src/types/**'],
+      // CI fails below these. Current coverage is ~99% lines / ~97% branches; keep headroom for small refactors.
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 75,
-        statements: 80,
+        lines: 95,
+        functions: 95,
+        branches: 90,
+        statements: 95,
       },
     },
   },
