@@ -115,13 +115,17 @@ Real-tenant tests run only in the nightly workflow (`.github/workflows/nightly-e
 
 ## CI
 
-`.github/workflows/push.yml` on every push (all steps are blocking):
+`.github/workflows/push.yml` runs on every push as separate parallel jobs, each its own check on the PR (shared setup lives in `.github/actions/setup`):
 
-1. Install, build, generate a throwaway `FRONTEGG_ENCRYPTION_PASSWORD` for the run
-2. `yarn test:unit:coverage` in `packages/nextjs`: fails below the thresholds in `vitest.config.ts`; uploads `coverage/` as an artifact
-3. Root-level `npx playwright test` for the `tests/middleware-test/` stress suite
-4. `npx playwright test --project=unit-playwright` in `packages/nextjs`
-5. `node scripts/prepare-e2e-env-file.js --force`, then `npx playwright test --project=e2e-mocked` in `packages/nextjs`
+| Check | What it runs |
+| ----- | ------------ |
+| Unit tests and coverage | `yarn test:unit:coverage` in `packages/nextjs`; fails below the thresholds in `vitest.config.ts`; uploads `coverage/` |
+| Playwright unit specs | `npx playwright test --project=unit-playwright` in `packages/nextjs` |
+| Mocked E2E | builds the SDK, runs `node scripts/prepare-e2e-env-file.js --force`, then `npx playwright test --project=e2e-mocked` |
+| Middleware stress suite | builds the SDK, then root-level `npx playwright test` for `tests/middleware-test/` |
+| CI result | passes only if all of the above passed; mark this one as the required check |
+
+Jobs that need an encryption password generate a throwaway one per run.
 
 `publish.yml` and `publish-prerelease.yml` run `yarn test` (vitest + `unit-playwright`) before tagging or publishing.
 

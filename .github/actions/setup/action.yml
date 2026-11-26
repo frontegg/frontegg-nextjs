@@ -1,0 +1,47 @@
+name: 'Set up repo'
+description: 'Install Node from .nvmrc and dependencies; optionally build the SDK and install Playwright Chromium. Run actions/checkout first.'
+inputs:
+  build:
+    description: 'Run yarn build'
+    required: false
+    default: 'false'
+  playwright:
+    description: 'Install Playwright Chromium with its system dependencies'
+    required: false
+    default: 'false'
+  encryption-password:
+    description: 'Export a throwaway FRONTEGG_ENCRYPTION_PASSWORD for later steps'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    - name: Read .nvmrc
+      id: nvm
+      shell: bash
+      run: echo "NODE_VERSION=$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
+    - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
+        cache: yarn
+    - name: Install dependencies
+      shell: bash
+      run: yarn install
+    - name: Build
+      if: inputs.build == 'true'
+      shell: bash
+      run: yarn build
+    - name: Install Playwright Chromium
+      if: inputs.playwright == 'true'
+      shell: bash
+      run: |
+        sudo apt-get update
+        npx playwright install --with-deps chromium
+    - name: Generate a throwaway encryption password
+      if: inputs.encryption-password == 'true'
+      shell: bash
+      run: |
+        password=$(openssl rand -hex 32)
+        echo "::add-mask::$password"
+        echo "FRONTEGG_ENCRYPTION_PASSWORD=$password" >> "$GITHUB_ENV"
