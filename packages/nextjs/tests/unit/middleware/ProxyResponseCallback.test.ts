@@ -52,9 +52,7 @@ const createRes = () => {
 
 const createReq = (url: string, headers: Record<string, any> = {}) => ({ url, headers });
 
-/**
- * Feeds the proxied body through the stream callbacks and waits for the async `end` handler to respond.
- */
+/** Feeds the proxied body through the stream callbacks and waits for the async `end` handler to respond. */
 const respond = async (proxyRes: FakeProxyRes, req: any, body?: string) => {
   const res = createRes();
   (ProxyResponseCallback as any)(proxyRes, req, res);
@@ -83,13 +81,10 @@ afterEach(() => {
 
 describe('ProxyResponseCallback logout', () => {
   it('clears session cookies and passes the response through for embedded logout', async () => {
-    // Arrange
     const req = createReq('/frontegg/identity/resources/auth/v1/logout');
 
-    // Act
     const res = await respond(createProxyRes(200), req, '{"ok":true}');
 
-    // Assert
     expect(mockedRemoveCookies).toHaveBeenCalledWith({
       isSecured: true,
       cookieDomain: 'app.example.com',
@@ -133,17 +128,14 @@ describe('ProxyResponseCallback logout', () => {
 
 describe('ProxyResponseCallback successful responses', () => {
   it('creates a session cookie from an access token in the body', async () => {
-    // Arrange
     const body = JSON.stringify({ accessToken: 'header.payload.sig', refreshToken: 'r' });
     const exp = 1_900_000_000;
     mockedCreateSession.mockResolvedValue(['sealed', { exp }, 'r'] as any);
     mockedCreateCookie.mockReturnValue(['fe_session=sealed']);
     const req = createReq('/frontegg/identity/resources/auth/v1/user');
 
-    // Act
     const res = await respond(createProxyRes(200, { 'content-type': 'application/json' }), req, body);
 
-    // Assert
     expect(mockedCreateSession).toHaveBeenCalledWith({ accessToken: 'header.payload.sig', refreshToken: 'r' });
     expect(mockedCreateCookie).toHaveBeenCalledWith({
       value: 'sealed',
@@ -159,16 +151,13 @@ describe('ProxyResponseCallback successful responses', () => {
   });
 
   it('strips jwt signatures from the forwarded body when secure jwt is enabled', async () => {
-    // Arrange
     vi.stubEnv('FRONTEGG_SECURE_JWT_ENABLED', 'true');
     mockedCreateSession.mockResolvedValue(['sealed', { exp: 1 }, 'r'] as any);
     mockedCreateCookie.mockReturnValue(['fe_session=sealed']);
     const body = JSON.stringify({ accessToken: 'h.payload.s', refreshToken: 'r' });
 
-    // Act
     const res = await respond(createProxyRes(200), createReq('/frontegg/user'), body);
 
-    // Assert
     const expectedBody = JSON.stringify({ accessToken: 'REDACTED_FOR_SECURITY.payload.REDACTED_FOR_SECURITY' });
     // the session is still sealed from the original, unredacted tokens
     expect(mockedCreateSession).toHaveBeenCalledWith({ accessToken: 'h.payload.s', refreshToken: 'r' });
@@ -210,7 +199,7 @@ describe('ProxyResponseCallback successful responses', () => {
   });
 
   it('does not forward connection-level framing headers, since the body is re-sent with its own length', async () => {
-    // Arrange: a chunked upstream response
+    // A chunked upstream response
     const upstreamHeaders = {
       'transfer-encoding': 'chunked',
       connection: 'keep-alive',
@@ -218,10 +207,8 @@ describe('ProxyResponseCallback successful responses', () => {
       'content-type': 'application/json',
     };
 
-    // Act
     const res = await respond(createProxyRes(200, upstreamHeaders), createReq('/frontegg/tenants'), '{"a":1}');
 
-    // Assert
     expect(res.headers['transfer-encoding']).toBeUndefined();
     expect(res.headers['connection']).toBeUndefined();
     expect(res.headers['keep-alive']).toBeUndefined();
@@ -274,13 +261,10 @@ describe('ProxyResponseCallback successful responses', () => {
 
 describe('ProxyResponseCallback failed responses', () => {
   it('forwards client errors with headers and cookies and logs them', async () => {
-    // Arrange
     const req = createReq('/frontegg/identity/resources/auth/v1/user');
 
-    // Act
     const res = await respond(createProxyRes(401, { 'x-trace': 't', cookie: 'c' }), req, '{"errors":["no"]}');
 
-    // Assert
     expect(res.headers['x-trace']).toBe('t');
     expect(res.headers['cookie']).toBeUndefined();
     expect(res.headers['set-cookie']).toEqual(['fe_refresh=abc']);

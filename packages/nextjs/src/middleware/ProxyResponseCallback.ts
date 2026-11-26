@@ -15,10 +15,7 @@ import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
-/**
- * Upstream headers that must not be copied to the client response: `cookie` is never forwarded, and the
- * framing headers describe the upstream connection, not the body this proxy re-sends (with its own length).
- */
+// Never forward `cookie`; framing headers describe the upstream connection, not the body re-sent here.
 const NON_FORWARDED_HEADERS = new Set(['cookie', 'transfer-encoding', 'content-length', 'connection', 'keep-alive']);
 
 const copyForwardableHeaders = (headers: IncomingMessage['headers'], res: NextApiResponse) => {

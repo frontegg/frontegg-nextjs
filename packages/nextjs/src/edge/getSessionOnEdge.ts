@@ -154,14 +154,20 @@ export const getSessionOnEdge = (
  *     }
  *
  *     // check session
- *     const session = await checkSessionOnEdge(request);
+ *     const edgeSession = await checkSessionOnEdge(request);
  *
- *     if (!session) {
- *       return redirectToLogin(pathname);
+ *     // a rejected refresh returns { session: undefined, headers } with cookie-clearing headers
+ *     if (!edgeSession?.session) {
+ *       const loginRedirect = redirectToLogin(pathname);
+ *       const clearCookies = edgeSession?.headers?.['set-cookie'];
+ *       if (clearCookies) {
+ *         loginRedirect.headers.set('set-cookie', clearCookies);
+ *       }
+ *       return loginRedirect;
  *     }
  *
  *     // if headers are present forward them to the next response / request
- *     if (session.headers) {
+ *     if (edgeSession.headers) {
  *        return NextResponse.next({
  *          headers: edgeSession.headers,
  *          request:{

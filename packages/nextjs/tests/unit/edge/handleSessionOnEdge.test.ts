@@ -77,19 +77,15 @@ beforeEach(() => {
 
 describe('handleSessionOnEdge', () => {
   it('lets static assets through without checking the session', async () => {
-    // Act
     const response = await run('/_next/static/chunk.js');
 
-    // Assert
     expect(response.headers.get('x-middleware-next')).toBe('1');
     expect(mockedCreateSession).not.toHaveBeenCalled();
   });
 
   it('redirects to login with the original path when there is no session', async () => {
-    // Act
     const response = await run('/dashboard', 'tab=1');
 
-    // Assert
     expect(response.status).toBe(307);
     const location = new URL(response.headers.get('location')!);
     expect(location.pathname).toBe('/account/login');
@@ -98,16 +94,14 @@ describe('handleSessionOnEdge', () => {
   });
 
   it('redirects to login and clears cookies when the refresh is rejected', async () => {
-    // Arrange: refreshAccessTokenIfNeededOnEdge returns removal cookies but no session
+    // refreshAccessTokenIfNeededOnEdge returns removal cookies but no session
     mockedRefresh.mockResolvedValue({
       session: undefined,
       headers: { 'set-cookie': 'fe_session=; Max-Age=0, fe_refresh_abc=; Max-Age=0' },
     });
 
-    // Act
     const response = await run('/dashboard', 'tab=1');
 
-    // Assert
     expect(response.status).toBe(307);
     const location = new URL(response.headers.get('location')!);
     expect(location.pathname).toBe('/account/login');
@@ -135,15 +129,12 @@ describe('handleSessionOnEdge', () => {
   });
 
   it('forwards refreshed cookies to the response and the downstream request', async () => {
-    // Arrange
     const headers = new Headers([['set-cookie', 'fe_session=new']]);
     const forwardedHeaders = new Headers({ cookie: 'fe_session=new' });
     mockedRefresh.mockResolvedValue({ session: SESSION, headers, forwardedHeaders } as any);
 
-    // Act
     const response = await run('/dashboard');
 
-    // Assert
     expect(response.headers.get('x-middleware-next')).toBe('1');
     expect(response.headers.get('set-cookie')).toBe('fe_session=new');
     expect(response.headers.get('x-middleware-request-cookie')).toBe('fe_session=new');
@@ -171,14 +162,11 @@ describe('handleHostedLoginCallback', () => {
   });
 
   it('exchanges the code with the client credentials and sets session and refresh cookies', async () => {
-    // Arrange
     mockExchange({ accessToken: 'access', refreshToken: 'refresh' });
     const request = new Request('https://app.example.com/oauth/callback?code=xyz');
 
-    // Act
     const response = await handleHostedLoginCallback(request, '/oauth/callback', new URLSearchParams('code=xyz'));
 
-    // Assert
     const [headers, code, clientId, clientSecret, redirectUri] = mockedExchange.mock.calls[0];
     expect(code).toBe('xyz');
     expect(clientId).toBe('abc-def-ghi');
@@ -223,17 +211,14 @@ describe('handleHostedLoginCallback', () => {
   });
 
   it('forwards the cloudflare client ip of a fetch request when ip forwarding is enabled', async () => {
-    // Arrange
     Object.assign(config, { shouldForwardIp: true, sharedSecret: 'shh' });
     mockExchange({ access_token: 'access' });
     const request = new Request('https://app.example.com/oauth/callback?code=xyz', {
       headers: { 'cf-connecting-ip': '1.1.1.1', 'x-forwarded-for': '2.2.2.2' },
     });
 
-    // Act
     await handleHostedLoginCallback(request, '/oauth/callback', new URLSearchParams('code=xyz'));
 
-    // Assert
     const headers = mockedExchange.mock.calls[0][0];
     expect(headers['x-frontegg-forwarded-for']).toBe('1.1.1.1');
     expect(headers['x-frontegg-headers-verifier']).toBe('shh');
