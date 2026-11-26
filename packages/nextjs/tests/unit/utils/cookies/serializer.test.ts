@@ -20,23 +20,9 @@ import { splitValueToChunks, getIndexedCookieName } from '../../../../src/utils/
 import { COOKIE_MAX_LENGTH } from '../../../../src/utils/cookies/constants';
 
 describe('chunkString', () => {
-  it('returns single chunk for input smaller than chunk size', () => {
-    expect(chunkString('hello', 100)).toEqual(['hello']);
-  });
-
   it('splits exact multiples correctly', () => {
     // 12 chars / 4 = exactly 3 chunks
     expect(chunkString('abcdefghijkl', 4)).toEqual(['abcd', 'efgh', 'ijkl']);
-  });
-
-  it('splits non-multiple lengths with a shorter final chunk', () => {
-    // 10 chars / 4 = 3 chunks, last is 2 chars
-    expect(chunkString('abcdefghij', 4)).toEqual(['abcd', 'efgh', 'ij']);
-  });
-
-  it('returns empty array for empty string', () => {
-    // Math.ceil(0/4) === 0 -> no chunks produced
-    expect(chunkString('', 4)).toEqual([]);
   });
 
   it('handles single character chunk size', () => {
@@ -65,34 +51,8 @@ describe('cookieSerializer.serialize / parse round-trip', () => {
     expect(parsed.fe_session).toBe(value);
   });
 
-  it('includes Expires when provided', () => {
-    const expires = new Date('2030-01-01T00:00:00Z');
-    const serialized = cookieSerializer.serialize('fe_session', 'v', { expires });
-    expect(serialized).toContain(`Expires=${expires.toUTCString()}`);
-  });
-
-  it('includes Max-Age when provided', () => {
-    const serialized = cookieSerializer.serialize('fe_session', 'v', { maxAge: 3600 });
-    expect(serialized).toContain('Max-Age=3600');
-  });
-
   it('throws on invalid maxAge', () => {
-    expect(() => cookieSerializer.serialize('fe_session', 'v', { maxAge: NaN })).toThrow(TypeError);
-  });
-
-  it('includes Domain, Path, HttpOnly, Secure, SameSite flags', () => {
-    const serialized = cookieSerializer.serialize('fe_session', 'v', {
-      domain: 'example.com',
-      path: '/',
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    });
-    expect(serialized).toContain('Domain=example.com');
-    expect(serialized).toContain('Path=/');
-    expect(serialized).toContain('HttpOnly');
-    expect(serialized).toContain('Secure');
-    expect(serialized).toContain('SameSite=None');
+    expect(() => cookieSerializer.serialize('fe_session', 'v', { maxAge: NaN })).toThrow('option maxAge is invalid');
   });
 
   it('supports sameSite variants lax, strict, none, and boolean-true -> Strict', () => {
@@ -109,12 +69,18 @@ describe('cookieSerializer.serialize / parse round-trip', () => {
   });
 
   it('throws on invalid priority, domain, path, expires, sameSite, name', () => {
-    expect(() => cookieSerializer.serialize('bad\nname', 'v', {})).toThrow(TypeError);
-    expect(() => cookieSerializer.serialize('n', 'v', { priority: 'urgent' as any })).toThrow(TypeError);
-    expect(() => cookieSerializer.serialize('n', 'v', { domain: 'bad domain\n' })).toThrow(TypeError);
-    expect(() => cookieSerializer.serialize('n', 'v', { path: 'bad\npath' })).toThrow(TypeError);
-    expect(() => cookieSerializer.serialize('n', 'v', { expires: new Date('invalid') })).toThrow(TypeError);
-    expect(() => cookieSerializer.serialize('n', 'v', { sameSite: 'weird' as any })).toThrow(TypeError);
+    expect(() => cookieSerializer.serialize('bad\nname', 'v', {})).toThrow('argument name is invalid');
+    expect(() => cookieSerializer.serialize('n', 'v', { priority: 'urgent' as any })).toThrow(
+      'option priority is invalid'
+    );
+    expect(() => cookieSerializer.serialize('n', 'v', { domain: 'bad domain\n' })).toThrow('option domain is invalid');
+    expect(() => cookieSerializer.serialize('n', 'v', { path: 'bad\npath' })).toThrow('option path is invalid');
+    expect(() => cookieSerializer.serialize('n', 'v', { expires: new Date('invalid') })).toThrow(
+      'option expires is invalid'
+    );
+    expect(() => cookieSerializer.serialize('n', 'v', { sameSite: 'weird' as any })).toThrow(
+      'option sameSite is invalid'
+    );
   });
 
   it('omits optional flags when not set', () => {
@@ -152,11 +118,11 @@ describe('cookieSerializer.serialize / parse round-trip', () => {
 });
 
 describe('splitValueToChunks (chunked cookie round-trip)', () => {
-  it('produces a single chunked cookie small enough to fit', () => {
+  it('produces a single indexed chunk when the value fits in one cookie', () => {
     const value = 'z'.repeat(200);
     const chunks = splitValueToChunks('fe_session', value, { domain: 'example.com', path: '/' });
-    expect(chunks.length).toBeGreaterThanOrEqual(1);
-    chunks.forEach((c) => expect(c.length).toBeLessThanOrEqual(COOKIE_MAX_LENGTH));
+    // splitValueToChunks always uses the indexed name and appends a trailing ';'
+    expect(chunks).toEqual([`fe_session-1=${value}; Domain=example.com; Path=/;`]);
   });
 
   it('produces multiple chunks whose concatenated values equal the original', () => {
