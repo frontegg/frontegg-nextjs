@@ -17,12 +17,12 @@ vi.mock('../../../src/config', () => ({ default: { ...CONFIG_BASE } }));
 vi.mock('../../../src/utils/cookies', () => ({
   default: { removeCookies: vi.fn(), modifySetCookie: vi.fn(), create: vi.fn() },
 }));
-vi.mock('../../../src/common', () => ({ createSessionFromAccessToken: vi.fn() }));
+vi.mock('../../../src/utils/sessionTokens', () => ({ createSessionFromAccessToken: vi.fn() }));
 vi.mock('../../../src/utils/refreshAccessTokenIfNeeded/helpers', () => ({ isSSOPostRequest: vi.fn(() => false) }));
 
 import config from '../../../src/config';
 import CookieManager from '../../../src/utils/cookies';
-import { createSessionFromAccessToken } from '../../../src/common';
+import { createSessionFromAccessToken } from '../../../src/utils/sessionTokens';
 import { isSSOPostRequest } from '../../../src/utils/refreshAccessTokenIfNeeded/helpers';
 import ProxyResponseCallback from '../../../src/middleware/ProxyResponseCallback';
 

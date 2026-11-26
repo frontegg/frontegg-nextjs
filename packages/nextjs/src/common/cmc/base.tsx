@@ -3,7 +3,7 @@ import React, { memo } from 'react';
 import { useContext } from 'react';
 import { CMCComponentProps } from '@frontegg/types';
 import { FC } from 'react';
-import { AppContext } from '../..';
+import AppContext from '../AppContext';
 
 export type RenderableFronteggComponent = keyof Pick<
   FronteggApp,

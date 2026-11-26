@@ -2,15 +2,18 @@
 
 import { InviteUserDialogContextData, UsersTableContextData } from '@frontegg/types';
 import React, { useContext, useState } from 'react';
-import { AppContext, useSnapshot } from '../..';
+import { useSnapshot } from '@frontegg/react-hooks';
+import AppContext from '../AppContext';
 import { createProxy } from '@frontegg/redux-store';
 export const useUsersTable = (id?: string): UsersTableContextData => {
   const app = useContext(AppContext)!;
-  const [store, setStore] = useState<UsersTableContextData>(createProxy({
-    onSearch: () => { },
-    searchQuery: '',
-    searching: false,
-  }));
+  const [store, setStore] = useState<UsersTableContextData>(
+    createProxy({
+      onSearch: () => {},
+      searchQuery: '',
+      searching: false,
+    })
+  );
 
   React.useLayoutEffect(() => {
     app
@@ -28,11 +31,13 @@ export const useUsersTable = (id?: string): UsersTableContextData => {
 
 export const useInviteUserDialog = (id?: string): InviteUserDialogContextData => {
   const app = useContext(AppContext)!;
-  const [store, setStore] = useState<InviteUserDialogContextData>(createProxy({
-    openDialog: () => { },
-    closeDialog: () => { },
-    dialogOpen: false,
-  }));
+  const [store, setStore] = useState<InviteUserDialogContextData>(
+    createProxy({
+      openDialog: () => {},
+      closeDialog: () => {},
+      dialogOpen: false,
+    })
+  );
 
   React.useLayoutEffect(() => {
     app
@@ -44,7 +49,6 @@ export const useInviteUserDialog = (id?: string): InviteUserDialogContextData =>
         console.error('Error getting invite user dialog store', err);
       });
   }, []);
-
 
   return useSnapshot(store);
 };

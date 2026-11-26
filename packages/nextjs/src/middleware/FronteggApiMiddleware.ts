@@ -7,7 +7,7 @@ import { CorsOptions, FronteggApiMiddlewareType, FronteggMiddlewareOptions } fro
 import config from '../config';
 import { isFronteggLogoutUrl } from './helpers';
 import CookieManager from '../utils/cookies';
-import { getTokensFromCookie } from '../common';
+import { getTokensFromCookie } from '../utils/sessionTokens';
 
 const handleCors = (req: NextApiRequest, res: NextApiResponse, corsOptions?: CorsOptions) => {
   if (!corsOptions) return;

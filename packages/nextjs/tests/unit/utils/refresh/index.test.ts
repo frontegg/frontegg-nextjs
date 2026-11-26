@@ -36,32 +36,27 @@ vi.mock('../../../../src/utils/encryption', () => ({
   default: { sealTokens: vi.fn(), unsealTokens: vi.fn() },
 }));
 
-vi.mock('../../../../src/common', () => ({
+vi.mock('../../../../src/utils/sessionTokens', () => ({
   createSessionFromAccessToken: vi.fn(),
   getTokensFromCookie: vi.fn(),
 }));
-
-vi.mock('../../../../src/api/utils', async (orig) => {
-  const actual = await orig<typeof import('../../../../src/api/utils')>();
-  return {
-    ...actual,
-    getClientIp: vi.fn(),
-  };
-});
 
 import refreshAccessTokenIfNeeded from '../../../../src/utils/refreshAccessTokenIfNeeded';
 import config from '../../../../src/config';
 import CookieManager from '../../../../src/utils/cookies';
 import * as helpers from '../../../../src/utils/refreshAccessTokenIfNeeded/helpers';
 import createSession from '../../../../src/utils/createSession';
-import { createSessionFromAccessToken } from '../../../../src/common';
-import { getClientIp, FRONTEGG_FORWARD_IP_HEADER } from '../../../../src/api/utils';
+import { createSessionFromAccessToken } from '../../../../src/utils/sessionTokens';
+import {
+  FRONTEGG_FORWARD_IP_HEADER,
+  FRONTEGG_HEADERS_VERIFIER_HEADER,
+  FRONTEGG_VENDOR_ID_HEADER,
+} from '../../../../src/api/utils';
 
 const mockedCookieManager = vi.mocked(CookieManager);
 const mockedHelpers = vi.mocked(helpers);
 const mockedCreateSession = vi.mocked(createSession);
 const mockedCreateSessionFromAccessToken = vi.mocked(createSessionFromAccessToken);
-const mockedGetClientIp = vi.mocked(getClientIp);
 
 beforeEach(() => {
   Object.assign(config, FRONTEGG_CONFIG_BASE, { appId: undefined });
@@ -73,7 +68,6 @@ beforeEach(() => {
   mockedHelpers.getForwardedSession.mockReturnValue(null);
   mockedCookieManager.modifySetCookie.mockReturnValue([]);
   mockedCookieManager.create.mockReturnValue(['fe_session=cookie-value; Path=/']);
-  mockedGetClientIp.mockReturnValue(undefined);
 });
 
 // ---------- Early-exit branches ----------
@@ -148,12 +142,13 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
     mockedHelpers.isRuntimeNextRequest.mockReturnValue(true);
     mockedCookieManager.getSessionCookieFromRequest.mockReturnValue('seal');
     mockedCreateSession.mockResolvedValueOnce(undefined);
-    // refresh path returns null response → null result
+    // refresh is rejected → null result and cookies cleared
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(mockRefreshResponse({ ok: false, status: 401 }));
 
     const { req, res } = mockNextPageContext({ url: '/_next/data/page.json' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
     expect(result).toBeNull();
+    expect(mockedHelpers.refreshAccessTokenEmbedded).toHaveBeenCalledWith(req);
     expect(mockedCookieManager.removeCookies).toHaveBeenCalled();
   });
 
@@ -166,6 +161,8 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
     const { req, res } = mockNextPageContext({ url: '/some/page' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
     expect(result).toBe(session);
+    expect(mockedCookieManager.getSessionCookieFromRequest).toHaveBeenCalledWith(req);
+    expect(mockedHelpers.refreshAccessTokenEmbedded).not.toHaveBeenCalled();
   });
 
   it('isHostedLogin + isOauthCallback removes cookies and continues', async () => {
@@ -176,7 +173,17 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
 
     const { req, res } = mockNextPageContext({ url: '/oauth/callback?code=1' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
-    expect(mockedCookieManager.removeCookies).toHaveBeenCalled();
+    // once for the callback itself, once more because the (null) refresh response failed
+    expect(mockedCookieManager.removeCookies).toHaveBeenCalledTimes(2);
+    expect(mockedCookieManager.removeCookies).toHaveBeenNthCalledWith(1, {
+      isSecured: true,
+      cookieDomain: 'example.com',
+      res,
+      req,
+    });
+    // "continues": the hosted-login refresh is still attempted
+    expect(mockedHelpers.refreshAccessTokenHostedLogin).toHaveBeenCalledWith(req);
+    expect(mockedHelpers.refreshAccessTokenEmbedded).not.toHaveBeenCalled();
     expect(result).toBeNull();
   });
 
@@ -196,21 +203,37 @@ describe('refreshAccessTokenIfNeeded — runtime + hosted-login branches', () =>
 describe('refreshAccessTokenIfNeeded — embedded + ip forwarding', () => {
   it('forwards client ip headers when shouldForwardIp=true and ip available', async () => {
     (config as any).shouldForwardIp = true;
-    mockedGetClientIp.mockReturnValue('1.2.3.4');
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
 
     const { req, res } = mockNextPageContext({
       url: '/',
-      headers: { 'x-forwarded-for': '1.2.3.4' },
+      headers: { 'x-forwarded-for': '1.2.3.4, 10.0.0.1' },
+      remoteAddress: '9.9.9.9',
     });
 
     await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
+    // first hop of x-forwarded-for wins over the socket address
     expect((req as any).headers[FRONTEGG_FORWARD_IP_HEADER]).toBe('1.2.3.4');
+    expect((req as any).headers[FRONTEGG_HEADERS_VERIFIER_HEADER]).toBe('shh');
+    expect((req as any).headers[FRONTEGG_VENDOR_ID_HEADER]).toBe('abc-def-ghi');
+    expect(mockedHelpers.refreshAccessTokenEmbedded).toHaveBeenCalledWith(req);
+  });
+
+  it('prefers cf-connecting-ip over x-forwarded-for', async () => {
+    (config as any).shouldForwardIp = true;
+    mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
+
+    const { req, res } = mockNextPageContext({
+      url: '/',
+      headers: { 'cf-connecting-ip': '7.7.7.7', 'x-forwarded-for': '1.2.3.4' },
+    });
+
+    await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
+    expect((req as any).headers[FRONTEGG_FORWARD_IP_HEADER]).toBe('7.7.7.7');
   });
 
   it('uses socket.remoteAddress as ip fallback', async () => {
     (config as any).shouldForwardIp = true;
-    mockedGetClientIp.mockReturnValue(undefined);
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
 
     const { req, res } = mockNextPageContext({ url: '/', remoteAddress: '5.6.7.8' });
@@ -220,12 +243,13 @@ describe('refreshAccessTokenIfNeeded — embedded + ip forwarding', () => {
 
   it('does NOT forward ip when shouldForwardIp=false', async () => {
     (config as any).shouldForwardIp = false;
-    mockedGetClientIp.mockReturnValue('1.2.3.4');
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(null);
 
-    const { req, res } = mockNextPageContext({ url: '/' });
+    const { req, res } = mockNextPageContext({ url: '/', headers: { 'x-forwarded-for': '1.2.3.4' } });
     await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
     expect((req as any).headers[FRONTEGG_FORWARD_IP_HEADER]).toBeUndefined();
+    expect((req as any).headers[FRONTEGG_HEADERS_VERIFIER_HEADER]).toBeUndefined();
+    expect((req as any).headers[FRONTEGG_VENDOR_ID_HEADER]).toBeUndefined();
   });
 });
 
@@ -253,6 +277,8 @@ describe('refreshAccessTokenIfNeeded — refresh response handling', () => {
     const { req, res } = mockNextPageContext({ url: '/' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
     expect(result).toBeNull();
+    expect((res as any).setHeader).not.toHaveBeenCalled();
+    expect(mockedHelpers.saveForwardedSession).not.toHaveBeenCalled();
   });
 
   it('returns full session and sets set-cookie on success path', async () => {
@@ -260,16 +286,46 @@ describe('refreshAccessTokenIfNeeded — refresh response handling', () => {
     mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(mockRefreshResponse());
     mockedCreateSessionFromAccessToken.mockResolvedValueOnce(['sealed', decoded, 'rt-1'] as any);
 
+    mockedCookieManager.modifySetCookie.mockReturnValue(['fe_refresh=modified; Path=/']);
+
     const { req, res } = mockNextPageContext({ url: '/' });
     const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       accessToken: 'access-token-value',
       user: decoded,
       refreshToken: 'rt-1',
     });
-    expect((res as any).setHeader).toHaveBeenCalledWith('set-cookie', expect.any(Array));
-    expect(mockedHelpers.saveForwardedSession).toHaveBeenCalled();
+    expect(mockedCreateSessionFromAccessToken).toHaveBeenCalledWith({
+      accessToken: 'access-token-value',
+      refreshToken: 'refresh-token-value',
+    });
+    // session cookie expiry is derived from the jwt exp (seconds -> ms)
+    expect(mockedCookieManager.create).toHaveBeenCalledWith({
+      value: 'sealed',
+      expires: new Date(decoded.exp * 1000),
+      secure: true,
+      req,
+    });
+    // modified upstream cookies first, then the new session cookie
+    expect((res as any).setHeader).toHaveBeenCalledWith('set-cookie', [
+      'fe_refresh=modified; Path=/',
+      'fe_session=cookie-value; Path=/',
+    ]);
+    expect(mockedHelpers.saveForwardedSession).toHaveBeenCalledWith(res, result);
+  });
+
+  it('reads the access token from a snake_case access_token response body', async () => {
+    const { decoded } = mockJwt();
+    mockedHelpers.refreshAccessTokenEmbedded.mockResolvedValueOnce(
+      mockRefreshResponse({ jsonBody: { access_token: 'snake-access', refresh_token: 'snake-refresh' } })
+    );
+    mockedCreateSessionFromAccessToken.mockResolvedValueOnce(['sealed', decoded, 'snake-refresh'] as any);
+
+    const { req, res } = mockNextPageContext({ url: '/' });
+    const result = await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
+
+    expect(result?.accessToken).toBe('snake-access');
   });
 });
 
@@ -312,7 +368,8 @@ describe('refreshAccessTokenIfNeeded — set-cookie shims + error path', () => {
 
     const { req, res } = mockNextPageContext({ url: '/' });
     await refreshAccessTokenIfNeeded({ req, res, pathname: '/' } as any);
-    expect(mockedCookieManager.modifySetCookie).toHaveBeenCalled();
+    // headers.get() yields a single (comma-joined) string rather than an array
+    expect(mockedCookieManager.modifySetCookie).toHaveBeenCalledWith('g=1', true);
   });
 
   it('falls back to empty array when no set-cookie surface present', async () => {

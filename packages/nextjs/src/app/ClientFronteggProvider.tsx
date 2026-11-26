@@ -2,7 +2,7 @@
 
 import type { ContextOptions } from '@frontegg/rest-api';
 import type { ClientFronteggProviderProps } from '../types';
-import { FronteggBaseProvider } from '../common';
+import { FronteggBaseProvider } from '../common/FronteggBaseProvider';
 import { useRouter } from 'next/navigation';
 import React, { FC, useMemo } from 'react';
 import { createTenantResolverForClientProvider } from './createTenantResolverForClientProvider';
