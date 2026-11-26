@@ -28,7 +28,9 @@
     "**/*.js",
     "**/*.jsx",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next-e2e-embedded/types/**/*.ts",
+    ".next-e2e-hosted/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

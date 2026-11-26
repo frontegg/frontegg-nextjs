@@ -82,6 +82,24 @@ jobs:
           path: packages/nextjs/playwright-report/
           retention-days: 14
 
+  e2e-flows:
+    name: 'Server-side flows E2E'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          build: 'true'
+          playwright: 'true'
+      - name: Run server-side flow E2E against the mock Frontegg backend
+        working-directory: packages/nextjs
+        run: npx playwright test -c playwright.flows.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-e2e-flows
+          path: packages/nextjs/playwright-report-flows/
+          retention-days: 14
 
 
   middleware-stress:
@@ -114,7 +132,7 @@ jobs:
   ci-result:
     name: 'CI result'
     if: always()
-    needs: [unit, playwright-unit, e2e-mocked, middleware-stress]
+    needs: [unit, playwright-unit, e2e-mocked, e2e-flows, middleware-stress]
     runs-on: ubuntu-24.04
     steps:
       - name: Fail unless every job succeeded
