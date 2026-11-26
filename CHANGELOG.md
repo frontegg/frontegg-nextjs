@@ -1,5 +1,12 @@
 # Change Log
 
+## [9.2.15](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.14...v9.2.15) (2026-11-26)
+
+
+### NextJS Wrapper 9.2.15:
+- fix: accept the hosted login code on the app URL for impersonation
+- fix: honor authRoutes.hostedLoginRedirectUrl for hosted login callback
+
 ## [9.2.14](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.13...v9.2.14) (2026-9-29)
 
 
