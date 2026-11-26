@@ -11,10 +11,7 @@ import {
   sessionCookies,
 } from '../fixtures/mock-backend';
 
-/**
- * Server-side session handling in the edge middleware (embedded login), against the mock backend.
- * Every Frontegg call here is made by the Next.js server, not the browser.
- */
+/** Edge middleware session handling (embedded login); every Frontegg call here comes from the Next.js server. */
 test.describe('embedded: middleware session and token refresh', () => {
   let mock: MockBackend;
 
@@ -24,13 +21,10 @@ test.describe('embedded: middleware session and token refresh', () => {
   });
 
   test('a valid session is accepted without calling the refresh endpoint', async ({ context }) => {
-    // Arrange
     await context.addCookies([await forgeSessionCookie()]);
 
-    // Act
     const response = await context.request.get('/e2e/session');
 
-    // Assert
     expect(await response.json()).toMatchObject({ authenticated: true, user: { email: 'mock-user@example.com' } });
     expect(await mock.requests(REFRESH_PATH)).toHaveLength(0);
   });
@@ -46,13 +40,10 @@ test.describe('embedded: middleware session and token refresh', () => {
   });
 
   test('an expired session is refreshed on the server with the refresh cookie', async ({ context }) => {
-    // Arrange
     await context.addCookies([await forgeExpiredSessionCookie(), refreshCookie('refresh-0', FLOWS.embeddedAppUrl)]);
 
-    // Act
     const response = await context.request.get('/e2e/session');
 
-    // Assert
     expect(await response.json()).toMatchObject({ authenticated: true });
     const refreshCalls = await mock.requests(REFRESH_PATH);
     expect(refreshCalls).toHaveLength(1);
@@ -73,7 +64,6 @@ test.describe('embedded: middleware session and token refresh', () => {
   });
 
   test('on the refresh request, the app receives all request cookies with refreshed values', async ({ context }) => {
-    // Arrange
     await context.addCookies([
       { name: 'theme', value: 'dark', url: FLOWS.embeddedAppUrl },
       { name: 'tracking', value: 'a=b==', url: FLOWS.embeddedAppUrl },
@@ -81,12 +71,10 @@ test.describe('embedded: middleware session and token refresh', () => {
       refreshCookie('refresh-0', FLOWS.embeddedAppUrl),
     ]);
 
-    // Act
     const received: { name: string; value: string }[] = await (
       await context.request.get('/e2e/request-cookies')
     ).json();
 
-    // Assert
     const byName = Object.fromEntries(received.map((c) => [c.name, c.value]));
     expect(byName.theme).toBe('dark');
     expect(byName.tracking).toBe('a=b==');
@@ -96,17 +84,15 @@ test.describe('embedded: middleware session and token refresh', () => {
   });
 
   test('a large session is split into chunks that the app receives whole', async ({ context }) => {
-    // Arrange: a token big enough that the sealed session exceeds one cookie
+    // a token big enough that the sealed session exceeds one cookie
     await mock.configure({ claimsPaddingLength: 6000 });
     await context.addCookies([await forgeExpiredSessionCookie(), refreshCookie('refresh-0', FLOWS.embeddedAppUrl)]);
 
-    // Act
     const received: { name: string; value: string }[] = await (
       await context.request.get('/e2e/request-cookies')
     ).json();
     const sessionAfter = await context.request.get('/e2e/session');
 
-    // Assert
     const chunkNames = received.map((c) => c.name).filter((name) => name.startsWith(`${sessionCookieBaseName()}-`));
     expect(chunkNames.length).toBeGreaterThan(1);
     expect((await sessionCookies(context)).length).toBeGreaterThan(1);
@@ -115,17 +101,32 @@ test.describe('embedded: middleware session and token refresh', () => {
   });
 
   test('a rejected refresh sends the user to login and clears the session cookies', async ({ page, context }) => {
-    // Arrange
     await mock.configure({ failRefresh: true });
     await context.addCookies([await forgeExpiredSessionCookie(), refreshCookie('refresh-0', FLOWS.embeddedAppUrl)]);
 
-    // Act
     await page.goto('/session', { waitUntil: 'domcontentloaded' });
 
-    // Assert
     expect(await mock.requests(REFRESH_PATH)).toHaveLength(1);
     await expect(page).toHaveURL(/\/account\/login/);
     expect(await sessionCookies(context)).toHaveLength(0);
+  });
+
+  test('a Frontegg outage during refresh keeps the refresh cookie, so the session recovers', async ({
+    page,
+    context,
+  }) => {
+    await mock.configure({ failRefresh: true, refreshFailureStatus: 503 });
+    await context.addCookies([await forgeExpiredSessionCookie(), refreshCookie('refresh-0', FLOWS.embeddedAppUrl)]);
+
+    await page.goto('/session', { waitUntil: 'domcontentloaded' });
+
+    await expect(page).toHaveURL(/\/account\/login/);
+    const refreshAfterOutage = (await context.cookies()).find((c) => c.name === refreshCookieName());
+    expect(refreshAfterOutage?.value).toBe('refresh-0');
+
+    await mock.configure({ failRefresh: false });
+    const recovered = await context.request.get('/e2e/session');
+    expect(await recovered.json()).toMatchObject({ authenticated: true });
   });
 
   test('without any session or refresh cookie, the user is sent to login and Frontegg is not called', async ({

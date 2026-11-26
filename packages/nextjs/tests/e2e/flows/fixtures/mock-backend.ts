@@ -11,6 +11,7 @@ export interface MockRequest {
 
 export interface MockConfig {
   failRefresh?: boolean;
+  refreshFailureStatus?: number;
   accessTokenTtlSeconds?: number;
   claimsPaddingLength?: number;
 }

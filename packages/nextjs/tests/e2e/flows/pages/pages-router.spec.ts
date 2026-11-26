@@ -12,10 +12,7 @@ function ssrSessionEmail(html: string): string | undefined {
   return JSON.parse(match[1]).props?.pageProps?.ssrSession?.user?.email;
 }
 
-/**
- * Pages Router (packages/example-pages): withFronteggApp, withSSRSession, getSession and the
- * no-SSR provider, against the mock backend.
- */
+/** Pages Router (example-pages): withFronteggApp, withSSRSession, getSession and no-SSR, against the mock backend. */
 test.describe('pages router', () => {
   let mock: MockBackend;
 
@@ -24,16 +21,12 @@ test.describe('pages router', () => {
     await mock.reset();
   });
 
-  // withFronteggApp refreshes the token on every full page load (initial-load refresh), so a signed-in
-  // browser always carries a refresh cookie alongside the session.
+  // withFronteggApp refreshes on every full page load, so signed-in browsers always carry a refresh cookie.
   test('withSSRSession passes the server-side session to the page for a signed-in user', async ({ context }) => {
-    // Arrange
     await context.addCookies([await forgeSessionCookie(), refreshCookie('refresh-0', FLOWS.pagesAppUrl)]);
 
-    // Act
     const response = await context.request.get('/force-session', { maxRedirects: 0 });
 
-    // Assert
     expect(response.status()).toBe(200);
     expect(ssrSessionEmail(await response.text())).toBe('mock-user@example.com');
   });
@@ -48,10 +41,20 @@ test.describe('pages router', () => {
     expect(refreshCalls[0].headers.cookie).toContain('refresh-0');
   });
 
-  test('without a refresh cookie, the initial-load refresh fails and the user is sent to login', async ({
+  test('without a refresh cookie, a still-valid session is kept (nothing to refresh with)', async ({ context }) => {
+    await context.addCookies([await forgeSessionCookie()]);
+
+    const response = await context.request.get('/force-session', { maxRedirects: 0 });
+
+    expect(response.status()).toBe(200);
+    expect(ssrSessionEmail(await response.text())).toBe('mock-user@example.com');
+    expect(await mock.requests(REFRESH_PATH)).toHaveLength(0);
+  });
+
+  test('a signed-out visit with only an expired session and no refresh cookie is sent to login', async ({
     context,
   }) => {
-    await context.addCookies([await forgeSessionCookie()]);
+    await context.addCookies([await forgeExpiredSessionCookie()]);
 
     const response = await context.request.get('/force-session', { maxRedirects: 0 });
 
@@ -75,13 +78,11 @@ test.describe('pages router', () => {
   });
 
   test('an expired session is refreshed before getServerSideProps runs', async ({ context }) => {
-    // Arrange
     await context.addCookies([await forgeExpiredSessionCookie(), refreshCookie('refresh-0', FLOWS.pagesAppUrl)]);
 
-    // Act
     const response = await context.request.get('/force-session');
 
-    // Assert: the refreshed session reached the page's server-side props
+    // the refreshed session reached the page's server-side props
     expect(ssrSessionEmail(await response.text())).toBe('mock-user@example.com');
     expect(await mock.requests(REFRESH_PATH)).toHaveLength(1);
   });

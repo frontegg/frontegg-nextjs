@@ -3,10 +3,7 @@ import { forgeSessionCookie } from '../../mocked/fixtures/session-forge';
 import { FLOWS } from '../fixtures/env';
 import { MockBackend, REFRESH_PATH, refreshCookie, refreshCookieName, sessionCookies } from '../fixtures/mock-backend';
 
-/**
- * The /api/frontegg proxy (FronteggApiMiddleware) against the mock backend: what the browser-side
- * Frontegg client relies on for refresh and logout.
- */
+/** The /api/frontegg proxy against the mock backend: refresh and logout as the browser-side client uses them. */
 test.describe('embedded: /api/frontegg proxy', () => {
   let mock: MockBackend;
 
@@ -16,15 +13,12 @@ test.describe('embedded: /api/frontegg proxy', () => {
   });
 
   test('a client-side refresh through the proxy sets a session cookie from the returned token', async ({ context }) => {
-    // Arrange
     await context.addCookies([refreshCookie('refresh-0', FLOWS.embeddedAppUrl)]);
 
-    // Act
     const response = await context.request.post(`/api/frontegg${REFRESH_PATH.replace(/^\/frontegg/, '')}`, {
       data: {},
     });
 
-    // Assert
     expect(response.status()).toBe(200);
     expect((await response.json()).accessToken).toBeTruthy();
     const [refreshCall] = await mock.requests(REFRESH_PATH);
@@ -46,14 +40,11 @@ test.describe('embedded: /api/frontegg proxy', () => {
   });
 
   test('logout through the proxy clears the session cookies', async ({ context }) => {
-    // Arrange
     await context.addCookies([await forgeSessionCookie(), refreshCookie('refresh-0', FLOWS.embeddedAppUrl)]);
     expect(await sessionCookies(context)).not.toHaveLength(0);
 
-    // Act
     const response = await context.request.post('/api/frontegg/identity/resources/auth/v1/logout', { data: {} });
 
-    // Assert
     expect(response.status()).toBeLessThan(400);
     expect(await mock.requests('/frontegg/identity/resources/auth/v1/logout')).toHaveLength(1);
     expect(await sessionCookies(context)).toHaveLength(0);

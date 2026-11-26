@@ -3,14 +3,9 @@ import { devices } from '@playwright/test';
 import { randomBytes } from 'crypto';
 import { FLOWS } from './tests/e2e/flows/fixtures/env';
 
-/**
- * Server-side flow E2E: example apps run against a local mock Frontegg backend
- * (tests/e2e/mock-frontegg/server.js), so the SDK's server-to-Frontegg calls are real HTTP.
- * Run with: npx playwright test -c playwright.flows.config.ts
- */
+/** Server-side flow E2E: example apps talk to a local mock Frontegg backend. Run: npx playwright test -c playwright.flows.config.ts */
 
-// Shared by the app servers (which seal cookies) and the tests (which forge cookies).
-// Set once in the main process; workers inherit it.
+// Set once in the main process (workers inherit it) so app servers and tests share one password.
 process.env.FRONTEGG_ENCRYPTION_PASSWORD ||= randomBytes(32).toString('hex');
 process.env.FRONTEGG_CLIENT_ID = FLOWS.clientId;
 
@@ -26,6 +21,8 @@ function appEnv(appUrl: string, distDir: string, extra: Record<string, string> =
     // Empty on purpose: forces the SDK to download the JWKS from the mock backend.
     FRONTEGG_JWT_PUBLIC_KEY: '',
     NEXT_DIST_DIR: distDir,
+    // Turns on the example app's /e2e/* probe routes, which 404 otherwise.
+    FRONTEGG_E2E_PROBES: '1',
     ...extra,
   };
 }

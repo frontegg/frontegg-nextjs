@@ -1,16 +1,4 @@
-/**
- * Local stand-in for the Frontegg backend, used by the server-side flow E2E suite
- * (playwright.flows.config.ts). Example apps point FRONTEGG_BASE_URL here, so every call the
- * SDK makes from the Next.js server (JWKS, token refresh, hosted-login code exchange, user data,
- * the API proxy) is real HTTP that tests can inspect through the /__mock endpoints.
- *
- * Tokens are RS256 JWTs signed with the E2E test key pair; the public half is served as JWKS.
- *
- * Control API (test-only):
- *   GET  /__mock/requests   -> every request received since the last reset
- *   POST /__mock/reset      -> clear the request log and restore default behaviour
- *   POST /__mock/config     -> merge { failRefresh, accessTokenTtlSeconds, claimsPaddingLength }
- */
+/** Local stand-in for Frontegg for the flow E2E suite; control API: GET /__mock/requests, POST /__mock/reset, POST /__mock/config. */
 const http = require('http');
 const path = require('path');
 const { URL } = require('url');
@@ -25,6 +13,7 @@ const CLIENT_ID = process.env.FRONTEGG_CLIENT_ID || '';
 const KEY_ID = 'e2e-test-key';
 const DEFAULT_CONFIG = Object.freeze({
   failRefresh: false,
+  refreshFailureStatus: 401,
   accessTokenTtlSeconds: 3600,
   claimsPaddingLength: 0,
 });
@@ -116,7 +105,10 @@ function parseJson(text) {
 
 async function handleEmbeddedRefresh(req, res) {
   const refreshToken = findRefreshToken(parseCookies(req.headers.cookie));
-  if (mockConfig.failRefresh || !refreshToken) {
+  if (mockConfig.failRefresh) {
+    return sendJson(res, mockConfig.refreshFailureStatus, { errors: ['Refresh failed'] });
+  }
+  if (!refreshToken) {
     return sendJson(res, 401, { errors: ['Session expired'] });
   }
   const tokens = await issueTokens();
