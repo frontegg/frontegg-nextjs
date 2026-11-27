@@ -9,58 +9,162 @@ concurrency:
   group: ci-push-${{ github.ref }}
   cancel-in-progress: true
 
-
 env:
   CI: true
+
 jobs:
-  init:
-    name: 'Install, Build and Test'
+  unit:
+    name: 'Unit tests and coverage'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
-      - name: Read .nvmrc
-        id: nvm
-        run: echo "NODE_VERSION=$(cat .nvmrc)" >> $GITHUB_OUTPUT
-      - name: Use Node.js ${{ steps.nvm.outputs.NODE_VERSION }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
-      - run: yarn install
-      - run: yarn build
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-      - name: Unit tests (vitest)
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Unit tests (vitest) with coverage gate
         working-directory: packages/nextjs
         run: yarn test:unit:coverage
       - name: Upload unit coverage
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: unit-coverage
           path: packages/nextjs/coverage
           retention-days: 14
-      - name: Run Playwright tests
-        run: npx playwright test
-        env:
-          DEBUG: "pw:webserver"
-          FRONTEGG_TEST_URL: "http://localhost:3001"
-          FRONTEGG_APP_URL: "http://localhost:3000"
-          FRONTEGG_BASE_URL: "https://demo.frontegg.com"
-          FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
-          FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
-      - name: Run Playwright tests (packages/nextjs)
+
+  playwright-unit:
+    name: 'Playwright unit specs'
+    runs-on: ubuntu-24.04
+    # Public demo tenant; not a secret.
+    env:
+      FRONTEGG_APP_URL: 'http://localhost:3000'
+      FRONTEGG_BASE_URL: 'https://demo.frontegg.com'
+      FRONTEGG_CLIENT_ID: 'b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          playwright: 'true'
+          encryption-password: 'true'
+      - name: Run Playwright unit specs
         working-directory: packages/nextjs
         run: npx playwright test --project=unit-playwright
         env:
-          FRONTEGG_APP_URL: "http://localhost:3000"
-          FRONTEGG_BASE_URL: "https://demo.frontegg.com"
-          FRONTEGG_CLIENT_ID: "b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca"
-          FRONTEGG_ENCRYPTION_PASSWORD: "7adec29c60414777b30814da94db2263d8db827cd8d59c68434225e661b17eba"
+          PW_SKIP_WEBSERVER: '1'
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-unit
+          path: packages/nextjs/playwright-report/
+          retention-days: 14
+
+  e2e-mocked:
+    name: 'Mocked E2E'
+    runs-on: ubuntu-24.04
+    env:
+      FRONTEGG_APP_URL: 'http://localhost:3000'
+      FRONTEGG_BASE_URL: 'https://demo.frontegg.com'
+      FRONTEGG_CLIENT_ID: 'b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          build: 'true'
+          playwright: 'true'
+          encryption-password: 'true'
+      - name: Prepare example app env
+        run: node scripts/prepare-e2e-env-file.js --force
+      - name: Run mocked E2E
+        working-directory: packages/nextjs
+        run: npx playwright test --project=e2e-mocked
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-e2e-mocked
+          path: packages/nextjs/playwright-report/
+          retention-days: 14
+
+  e2e-flows:
+    name: 'Server-side flows E2E'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          build: 'true'
+          playwright: 'true'
+      - name: Run server-side flow E2E against the mock Frontegg backend
+        working-directory: packages/nextjs
+        run: npx playwright test -c playwright.flows.config.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-e2e-flows
+          path: packages/nextjs/playwright-report-flows/
+          retention-days: 14
+
+  fresh-install:
+    name: 'Fresh install build (${{ matrix.example }} router, next ${{ matrix.next }})'
+    runs-on: ubuntu-24.04
+    # Installs the packed SDK into a new app WITHOUT the repo lockfile, like a customer would,
+    # so a breaking transitive release (e.g. @peculiar/webcrypto 1.6+) fails here first.
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [app, pages]
+        next: ['14.2.35', '15.5.29']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          build: 'true'
+      - name: Pack the SDK
+        run: npm pack ./dist/@frontegg/nextjs --pack-destination "$RUNNER_TEMP"
+      - name: Install into a fresh app and build
+        run: |
+          node scripts/fresh-install-smoke.js \
+            --tarball "$(ls "$RUNNER_TEMP"/frontegg-nextjs-*.tgz)" \
+            --example ${{ matrix.example }} --next ${{ matrix.next }} \
+            --out "$RUNNER_TEMP/smoke-app"
+
+  middleware-stress:
+    name: 'Middleware stress suite'
+    runs-on: ubuntu-24.04
+    env:
+      FRONTEGG_APP_URL: 'http://localhost:3000'
+      FRONTEGG_BASE_URL: 'https://demo.frontegg.com'
+      FRONTEGG_CLIENT_ID: 'b6adfe4c-d695-4c04-b95f-3ec9fd0c6cca'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          build: 'true'
+          playwright: 'true'
+          encryption-password: 'true'
+      - name: Run middleware stress suite
+        run: npx playwright test
+        env:
+          DEBUG: 'pw:webserver'
+          FRONTEGG_TEST_URL: 'http://localhost:3001'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-middleware-stress
           path: playwright-report/
           retention-days: 14
+
+  # Single stable check to mark as required in branch protection.
+  ci-result:
+    name: 'CI result'
+    if: always()
+    needs: [unit, playwright-unit, e2e-mocked, e2e-flows, fresh-install, middleware-stress]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Fail unless every job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Job results: $RESULTS"
+          for result in $RESULTS; do
+            if [ "$result" != "success" ]; then
+              exit 1
+            fi
+          done

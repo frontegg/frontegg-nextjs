@@ -6,6 +6,7 @@ import api from '../api';
 import fronteggLogger from '../utils/fronteggLogger';
 import JwtManager from '../utils/jwt';
 import encryptionEdge from '../utils/encryption-edge';
+import { isRefreshRejected } from '../utils/common/refreshResponse';
 
 const logger = fronteggLogger.child({ tag: 'EdgeRuntime.refreshAccessTokenIfNeededOnEdge' });
 
@@ -42,6 +43,10 @@ export async function refreshAccessTokenIfNeededOnEdge(
 
   const isSecured = config.isSSL;
   if (response === null || !response.ok) {
+    if (!isRefreshRejected(response)) {
+      logger.warn(`Token refresh failed (status ${response?.status ?? 'none'}), keeping the session cookies`);
+      return undefined;
+    }
     const cookiesToRemove = CookieManager.getRequestCookiesHeaderToRemove({
       cookieDomain: config.cookieDomain,
       isSecured,
@@ -89,11 +94,7 @@ export async function refreshAccessTokenIfNeededOnEdge(
   newSetCookie.push(...cookieValue);
 
   const forwardedHeaders = req.headers as Headers;
-  newSetCookie.forEach((cookie) => {
-    // get cookie name and value only
-    const [name, value] = cookie.split(';')[0].split('=');
-    forwardedHeaders.set('cookie', `${name}=${value}`);
-  });
+  forwardedHeaders.set('cookie', mergeSetCookiesIntoCookieHeader(forwardedHeaders.get('cookie'), newSetCookie));
   return {
     session: {
       accessToken: data.accessToken ?? data.access_token,
@@ -105,6 +106,34 @@ export async function refreshAccessTokenIfNeededOnEdge(
     },
     forwardedHeaders,
   };
+}
+
+function splitNameValue(pair: string): [string, string] {
+  const separatorIndex = pair.indexOf('=');
+  if (separatorIndex === -1) {
+    return [pair.trim(), ''];
+  }
+  return [pair.slice(0, separatorIndex).trim(), pair.slice(separatorIndex + 1).trim()];
+}
+
+/** Request cookies with each set-cookie applied: new values replace old ones and empty values remove the cookie. */
+export function mergeSetCookiesIntoCookieHeader(cookieHeader: string | null, setCookies: string[]): string {
+  const requestCookies: [string, string][] = (cookieHeader ?? '')
+    .split(';')
+    .filter((pair) => pair.trim() !== '')
+    .map(splitNameValue);
+
+  const merged = setCookies.reduce((cookies, setCookie) => {
+    const [name, value] = splitNameValue(setCookie.split(';')[0]);
+    if (value === '') {
+      cookies.delete(name);
+    } else {
+      cookies.set(name, value);
+    }
+    return cookies;
+  }, new Map<string, string>(requestCookies));
+
+  return Array.from(merged, ([name, value]) => `${name}=${value}`).join('; ');
 }
 
 export async function createSessionFromAccessTokenOnEdge(data: any): Promise<[string, any, string] | []> {

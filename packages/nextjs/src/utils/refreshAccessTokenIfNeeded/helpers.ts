@@ -2,7 +2,7 @@ import fronteggLogger from '../fronteggLogger';
 import CookieManager from '../cookies';
 import { NextApiRequest } from 'next/dist/shared/lib/utils';
 import api from '../../api';
-import { getTokensFromCookie } from '../../common';
+import { getTokensFromCookie } from '../sessionTokens';
 import { IncomingMessage } from 'http';
 import config from '../../config';
 

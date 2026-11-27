@@ -8,6 +8,7 @@ const packagePath = process.cwd();
 const pkg = JSON.parse(fs.readFileSync(path.join(packagePath, "package.json"), "utf-8"));
 const buildPath = path.join(__dirname, "../dist", pkg.name);
 const srcPath = path.join(packagePath, "./src");
+const BROWSER_ENTRY = "index.browser.js";
 
 async function includeFileInBuild(file) {
   const sourcePath = path.resolve(packagePath, file);
@@ -47,7 +48,11 @@ async function createModulePackages({ from, to }) {
         // topLevelPathImportsAreCommonJSModules
         // ? "./index.js"
         // : path.posix.join("../node", directoryPackage, "index.js"),
-        types: "./index.d.ts"
+        types: "./index.d.ts",
+        // A folder with an index.browser.js ships a browser build that bundlers use for client code.
+        ...((await fse.pathExists(path.join(to, directoryPackage, BROWSER_ENTRY)))
+          ? { browser: `./${BROWSER_ENTRY}` }
+          : {})
       };
 
       const [typingsEntryExist, moduleEntryExists, mainEntryExists] = await Promise.all([

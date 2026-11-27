@@ -1,6 +1,6 @@
 import type { NextPageContext } from 'next/dist/shared/lib/utils';
 import type { FronteggNextJSSession } from '../../types';
-import { createSessionFromAccessToken } from '../../common';
+import { createSessionFromAccessToken } from '../sessionTokens';
 import config from '../../config';
 import CookieManager from '../cookies';
 import {
@@ -14,6 +14,7 @@ import {
   getForwardedSession,
 } from './helpers';
 import fronteggLogger from '../fronteggLogger';
+import { isRefreshRejected } from '../common/refreshResponse';
 import encryption from '../encryption';
 import createSession from '../createSession';
 import {
@@ -104,6 +105,10 @@ export default async function refreshAccessTokenIfNeeded(ctx: NextPageContext): 
 
     const isSecured = config.isSSL;
     if (response === null || !response.ok) {
+      if (!isRefreshRejected(response)) {
+        logger.warn(`Token refresh failed (status ${response?.status ?? 'none'}), keeping the session cookies`);
+        return null;
+      }
       CookieManager.removeCookies({
         cookieDomain: config.cookieDomain,
         isSecured,

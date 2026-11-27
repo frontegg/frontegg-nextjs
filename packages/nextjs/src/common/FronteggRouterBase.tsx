@@ -38,7 +38,7 @@ export function FronteggRouterBase(props: FronteggRouterBaseProps) {
         const redirectUrl = getAfterAuthRedirectUrl(queryParams);
 
         if (queryParams.redirectUrl) {
-          localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, `${window.location.origin}${redirectUrl}`);
+          localStorage.setItem(FRONTEGG_AFTER_AUTH_REDIRECT_URL, redirectUrl);
         }
         loginWithRedirect();
       } else if (pathname === routesObj.logoutUrl) {

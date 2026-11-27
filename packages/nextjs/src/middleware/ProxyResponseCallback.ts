@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 import { NextApiResponse } from 'next';
 import config from '../config';
 import CookieManager from '../utils/cookies';
-import { createSessionFromAccessToken } from '../common';
+import { createSessionFromAccessToken } from '../utils/sessionTokens';
 import {
   extractAccessToken,
   getHostedLogoutUrl,
@@ -15,6 +15,17 @@ import fronteggLogger from '../utils/fronteggLogger';
 import { isSSOPostRequest } from '../utils/refreshAccessTokenIfNeeded/helpers';
 
 const logger = fronteggLogger.child({ tag: 'FronteggApiMiddleware.ProxyResponseCallback' });
+// Never forward `cookie`; framing headers describe the upstream connection, not the body re-sent here.
+const NON_FORWARDED_HEADERS = new Set(['cookie', 'transfer-encoding', 'content-length', 'connection', 'keep-alive']);
+
+const copyForwardableHeaders = (headers: IncomingMessage['headers'], res: NextApiResponse) => {
+  Object.keys(headers)
+    .filter((header) => !NON_FORWARDED_HEADERS.has(header.toLowerCase()))
+    .forEach((header) => {
+      res.setHeader(header, `${headers[header]}`);
+    });
+};
+
 /**
  * Proxy response callback fired on after each response from Frontegg services,
  * to transport frontegg modify cookies and generating encrypted JWT session cookie.
@@ -95,11 +106,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
             });
           }
         }
-        Object.keys(proxyRes.headers)
-          .filter((header) => header !== 'cookie')
-          .forEach((header) => {
-            res.setHeader(header, `${proxyRes.headers[header]}`);
-          });
+        copyForwardableHeaders(proxyRes.headers, res);
         res.setHeader('set-cookie', cookies);
         res.setHeader('content-length', Buffer.byteLength(bodyStr));
         res.status(statusCode).end(bodyStr);
@@ -107,11 +114,7 @@ const ProxyResponseCallback: ProxyResCallback<IncomingMessage, NextApiResponse> 
         if (statusCode >= 400 && statusCode !== 404) {
           logger.error(`Middleware request failed statusCode: ${statusCode} for url: ${url}`);
         }
-        Object.keys(proxyRes.headers)
-          .filter((header) => header !== 'cookie')
-          .forEach((header) => {
-            res.setHeader(header, `${proxyRes.headers[header]}`);
-          });
+        copyForwardableHeaders(proxyRes.headers, res);
         res.setHeader('set-cookie', cookies);
         res.status(statusCode).end(bodyStr);
       }

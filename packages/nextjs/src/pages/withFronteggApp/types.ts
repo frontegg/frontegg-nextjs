@@ -1,10 +1,12 @@
+import type { ReactElement } from 'react';
 import { AppContextType, AppPropsType, NextComponentType } from 'next/dist/shared/lib/utils';
 import { AppInitialProps } from 'next/app';
 import { AllUserData } from '../../types';
 import { FronteggAppOptions } from '@frontegg/types';
 
 export type FronteggCustomApp = NextComponentType<AppContextType & AllUserData, AppInitialProps, AppPropsType>;
-export type FronteggCustomAppClass = ((props: AppPropsType<any>) => JSX.Element) & {
+// ReactElement<any, any> is what the global JSX.Element aliased; @types/react 19 removed the global JSX namespace.
+export type FronteggCustomAppClass = ((props: AppPropsType<any>) => ReactElement<any, any>) & {
   getInitialProps?: FronteggCustomApp['getInitialProps'];
 };
 

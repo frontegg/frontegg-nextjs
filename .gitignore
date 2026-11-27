@@ -88,3 +88,7 @@ playwright-report/
 lint-report.json
 reqs.md
 packages/nextjs/test-results
+
+# E2E flow suite build dirs (one per example-app instance)
+.next-e2e-*
+playwright-report-flows/
