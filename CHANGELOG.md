@@ -1,5 +1,11 @@
 # Change Log
 
+## [9.2.16](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.15...v9.2.16) (2026-11-27)
+
+
+### NextJS Wrapper 9.2.16:
+- fix: middleware cookie forwarding, rejected-refresh redirect, proxy headers
+
 ## [9.2.15](https://github.com/frontegg/frontegg-nextjs/compare/v9.2.14...v9.2.15) (2026-11-26)
 
 
